@@ -14,82 +14,56 @@ OrbitalSpaceInfo::~OrbitalSpaceInfo()
 {
 }
 
-void OrbitalSpaceInfo::add_elementary_space(const std::string& label,
-                                            OrbitalSpaceType type,
-                                            const std::vector<std::string>& indices)
+void OrbitalSpaceInfo::add_space(const std::string& label,
+                                 OrbitalSpaceType type,
+                                 const std::vector<std::string>& indices)
 {
-    elementary_spaces_.push_back(type);
-    composite_spaces_[type] = {type};
+    size_t pos = space_info_.size();
+    type_to_pos_[type] = pos;
+    label_to_pos_[label] = pos;
     for (auto& index : indices){
-        if (index_to_space_.count(index)){
+        if (indices_to_pos_.count(index)){
             std::cout << "Index: " << index << " is already assigned!" << std::endl;
             exit(1);
         }else{
-            index_to_space_[index] = type;
+            indices_to_pos_[index] = pos;
         }
     }
-    orbital_space_label_[type] = label;
-    orbital_space_indices_[type] = indices;
+    space_info_.push_back(make_tuple(type,label,indices));
 }
 
-void OrbitalSpaceInfo::add_composite_space(const std::string& label,
-                                           OrbitalSpaceType type,
-                                           const std::vector<std::string>& indices,
-                                           std::vector<OrbitalSpaceType> subspaces)
+std::string& OrbitalSpaceInfo::label(int pos)
 {
-    composite_spaces_[type] = subspaces;
-    for (auto& index : indices){
-        if (index_to_space_.count(index)){
-            std::cout << "Index: " << index << " is already assigned!" << std::endl;
-            exit(1);
-        }else{
-            index_to_space_[index] = type;
-        }
-    }
-    orbital_space_label_[type] = label;
-    orbital_space_indices_[type] = indices;
-}
-
-bool OrbitalSpaceInfo::is_space_elementary(OrbitalSpaceType type)
-{
-    return composite_spaces_[type].size() == 1;
-}
-
-size_t OrbitalSpaceInfo::space_size(OrbitalSpaceType type)
-{
-    return composite_spaces_[type].size();
+    return std::get<1>(space_info_[pos]);
 }
 
 std::string& OrbitalSpaceInfo::label(OrbitalSpaceType type)
 {
-    return orbital_space_label_[type];
+    return label(type_to_pos_[type]);
 }
 
-OrbitalSpaceType OrbitalSpaceInfo::index_to_space(const std::string &idx)
+std::vector<std::string>& OrbitalSpaceInfo::indices(int pos)
 {
-    return index_to_space_[idx];
+    return std::get<2>(space_info_[pos]);
 }
 
-std::string& OrbitalSpaceInfo::index(OrbitalSpaceType type, int n)
+std::vector<std::string>& OrbitalSpaceInfo::indices(OrbitalSpaceType type)
 {
-    return orbital_space_indices_[type][n];
+    return indices(type_to_pos_[type]);
 }
 
 void OrbitalSpaceInfo::reset()
 {
-    elementary_spaces_.clear();
-    composite_spaces_.clear();
-    index_to_space_.clear();
-    orbital_space_indices_.clear();
+    space_info_.clear();
+    type_to_pos_.clear();
+    label_to_pos_.clear();
+    indices_to_pos_.clear();
 }
 
 void OrbitalSpaceInfo::default_spaces()
 {
     std::cout << "Setting up default spaces" << std::endl;
-    add_elementary_space("c",Core,{"m","n","o"});
-    add_elementary_space("a",Active,{"u","v","w","x","y","z"});
-    add_elementary_space("v",Virtual,{"e","f","g","h"});
-    add_composite_space("h",Hole,{"i","j","k","l"},{Core,Active});
-    add_composite_space("p",Particle,{"a","b","c","d"},{Active,Virtual});
-    add_composite_space("g",All,{"p","q","r","s","t"},{Core,Active,Virtual});
+    add_space("c",OrbitalSpaceType::Core,{"m","n","o","p"});
+    add_space("a",OrbitalSpaceType::Active,{"u","v","w","x","y","z"});
+    add_space("v",OrbitalSpaceType::Virtual,{"e","f","g","h"});
 }

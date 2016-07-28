@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 2.9)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
 
+# CTest
+#enable_testing()
+#include(CTest)
+#add_subdirectory(test)
+
 aux_source_directory(SRC SRC_LIST)
 add_executable(wicked ${SRC_LIST})
 

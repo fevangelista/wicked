@@ -1,0 +1,5 @@
+set(TEST_INIT_SRC test_init.cc)
+add_executable(test_init ${TEST_INIT_SRC})
+add_dependencies(test_init pywicked)
+target_link_libraries(test_init pywicked)
+add_test(NAME init COMMAND test_init)
