@@ -1,6 +1,5 @@
 #include <iostream>
 #include "combinatorics.h"
-#include "wicked-def.h"
 
 /**
  * Generate combinations of 0,1,...,(n-1) taken k at a time
@@ -191,9 +190,9 @@ std::vector<std::vector<int> > generate_even_partitions(int n)
 {
     std::vector<std::vector<int> > even_partitions;
     std::vector<std::vector<int> > partitions = generate_partitions(n);
-    foreach(std::vector<int> p, partitions){
+    for(std::vector<int>& p : partitions){
         bool keep = true;
-        foreach(int x, p){
+        for(int x : p){
             if(x % 2 == 1) keep = false;
         }
         if(keep) even_partitions.push_back(p);
@@ -233,7 +232,7 @@ std::vector<std::vector<int> > generate_direct_product_combinations(std::vector<
     int total_combinations = 1;
     int sumn = 0;
     int nclass = static_cast<int>(n.size());
-    foreach(int n_i, n){
+    for(int n_i : n){
         sumn += n_i;
     }
     bool* a = new bool[sumn];

@@ -62,7 +62,7 @@ std::vector<std::vector<T>> enumeration_elements(const std::vector<std::vector<T
             }
         }
     }
-    return results;
+    return result;
 }
 
 #endif // _wicked_combinatorics_h_

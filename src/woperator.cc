@@ -1,5 +1,5 @@
+#include "helpers.h"
 #include "orbital_space.h"
-
 #include "woperator.h"
 
 using namespace std;
@@ -24,15 +24,24 @@ int WOperator::num_indices(int space, bool creation)
 std::string WOperator::str()
 {
     std::string s = label_;
-    s += "[";
-    for (size_t i = 0; i < osi->num_spaces(); ++i){
-        s += " " + osi->label(i) + "=" + to_string(num_indices(i,true));
+
+    std::vector<std::string> cv,av;
+    for (int i = 0; i < osi->num_spaces(); ++i){
+        cv.push_back(to_string(num_indices(i,true)));
     }
-    s += "|";
-    for (size_t i = 0; i < osi->num_spaces(); ++i){
-        s += " " + osi->label(i) + "=" + to_string(num_indices(i,false));
+    for (int i = 0; i < osi->num_spaces(); ++i){
+        av.push_back(to_string(num_indices(i,false)));
     }
-    s += "]";
+
+    s += " [" + to_string(cv," ") + "|" + to_string(av," ") + "] (";
+    for (int i = 0; i < osi->num_spaces(); ++i){
+        for (int j = 0; j < num_indices(i,false); j++) s += osi->label(i);
+    }
+    s += " -> ";
+    for (int i = 0; i < osi->num_spaces(); ++i){
+        for (int j = 0; j < num_indices(i,true); j++) s += osi->label(i);
+    }
+    s += ")";
     return s;
 }
 
