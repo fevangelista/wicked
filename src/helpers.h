@@ -4,7 +4,10 @@
 #include <string>
 #include <vector>
 
+#include "wicked-def.h"
+
 // Returns a comma separated list of the indices
 std::string to_string(const std::vector<std::string> &svec, const std::string &sep = ",");
+//std::string to_string(const rational r);
 
 #endif // _wicked_helpers_h_

@@ -3,108 +3,144 @@
 #include <string>
 #include <iomanip>
 
+#include "wicked-def.h"
 #include "orbital_space.h"
-#include "woperator.h"
+#include "wcontract.h"
+#include "wdiag_operator.h"
+#include "wterm.h"
+#include "wsum.h"
 
 using namespace std;
 
-int main (int argc, const char * argv[])
-{
-    std::cout << "pyWicked" << std::endl;
+int main(int argc, const char *argv[]) {
+  std::cout << "pyWicked" << std::endl;
 
-    osi = std::make_shared<OrbitalSpaceInfo>();
-    osi->default_spaces();
+  osi = std::make_shared<OrbitalSpaceInfo>();
+  osi->default_spaces();
 
-    auto opT1ca = WOperator("T1",{1,0,0},{0,1,0});
-    auto opT1cv = WOperator("T1",{1,0,0},{0,0,1});
-    auto opT1av = WOperator("T1",{0,1,0},{0,0,1});
+  // Convenience variables
+  OrbitalSpaceType c = OrbitalSpaceType::Core;
+  OrbitalSpaceType a = OrbitalSpaceType::Active;
+  OrbitalSpaceType v = OrbitalSpaceType::Virtual;
 
-    auto opT2ccaa = WOperator("T2",{2,0,0},{0,2,0});
-    auto opT2ccav = WOperator("T2",{2,0,0},{0,1,1});
-    auto opT2ccvv = WOperator("T2",{2,0,0},{0,0,2});
-    auto opT2caaa = WOperator("T2",{1,1,0},{0,2,0});
-    auto opT2caav = WOperator("T2",{1,1,0},{0,1,1});
-    auto opT2cavv = WOperator("T2",{1,1,0},{0,0,2});
-    auto opT2aaav = WOperator("T2",{0,2,0},{0,1,1});
-    auto opT2aavv = WOperator("T2",{0,2,0},{0,0,2});
+  WTerm opT1ca = make_operator("T1", {a}, {c});
+  WTerm opT1cv = make_operator("T1", {v}, {c});
+  WTerm opT1av = make_operator("T1", {v}, {a});
 
-    auto opH1cc = WOperator("H1",{1,0,0},{1,0,0});
-    auto opH1ca = WOperator("H1",{1,0,0},{0,1,0});
-    auto opH1cv = WOperator("H1",{1,0,0},{0,0,1});
-    auto opH1ac = WOperator("H1",{0,1,0},{1,0,0});
-    auto opH1aa = WOperator("H1",{0,1,0},{0,1,0});
-    auto opH1av = WOperator("H1",{0,1,0},{0,0,1});
-    auto opH1vc = WOperator("H1",{0,0,1},{1,0,0});
-    auto opH1va = WOperator("H1",{0,0,1},{0,1,0});
-    auto opH1vv = WOperator("H1",{0,0,1},{0,0,1});
+  auto opT2ccaa = make_operator("T2", {a, a}, {c, c});
+  auto opT2ccav = make_operator("T2", {a, v}, {c, c});
+  auto opT2ccvv = make_operator("T2", {v, v}, {c, c});
+  auto opT2caaa = make_operator("T2", {a, a}, {c, a});
+  auto opT2caav = make_operator("T2", {a, v}, {c, a});
+  auto opT2cavv = make_operator("T2", {v, v}, {c, a});
+  auto opT2aaav = make_operator("T2", {a, v}, {a, a});
+  auto opT2aavv = make_operator("T2", {v, v}, {a, a});
 
-    auto opH2cccc = WOperator("H2",{2,0,0},{2,0,0});
-    auto opH2ccca = WOperator("H2",{2,0,0},{1,1,0});
-    auto opH2cccv = WOperator("H2",{2,0,0},{1,0,1});
-    auto opH2ccaa = WOperator("H2",{2,0,0},{0,2,0});
-    auto opH2ccav = WOperator("H2",{2,0,0},{0,1,1});
-    auto opH2ccvv = WOperator("H2",{2,0,0},{0,0,2});
+  std::vector<WTerm> opT = {opT1ca,   opT1cv,   opT1av,   opT2ccaa,
+                            opT2ccav, opT2ccvv, opT2caaa, opT2caav,
+                            opT2cavv, opT2aaav, opT2aavv};
 
-    auto opH2cacc = WOperator("H2",{1,1,0},{2,0,0});
-    auto opH2caca = WOperator("H2",{1,1,0},{1,1,0});
-    auto opH2cacv = WOperator("H2",{1,1,0},{1,0,1});
-    auto opH2caaa = WOperator("H2",{1,1,0},{0,2,0});
-    auto opH2caav = WOperator("H2",{1,1,0},{0,1,1});
-    auto opH2cavv = WOperator("H2",{1,1,0},{0,0,2});
+  WSum sum;
+  for (WTerm &term : opT){
+    cout << term.str() << endl;
+    sum.add(term);
+  }
 
-    auto opH2cvcc = WOperator("H2",{1,0,1},{2,0,0});
-    auto opH2cvca = WOperator("H2",{1,0,1},{1,1,0});
-    auto opH2cvcv = WOperator("H2",{1,0,1},{1,0,1});
-    auto opH2cvaa = WOperator("H2",{1,0,1},{0,2,0});
-    auto opH2cvav = WOperator("H2",{1,0,1},{0,1,1});
-    auto opH2cvvv = WOperator("H2",{1,0,1},{0,0,2});
+  cout << sum.str() << endl;
 
-    auto opH2aacc = WOperator("H2",{0,2,0},{2,0,0});
-    auto opH2aaca = WOperator("H2",{0,2,0},{1,1,0});
-    auto opH2aacv = WOperator("H2",{0,2,0},{1,0,1});
-    auto opH2aaaa = WOperator("H2",{0,2,0},{0,2,0});
-    auto opH2aaav = WOperator("H2",{0,2,0},{0,1,1});
-    auto opH2aavv = WOperator("H2",{0,2,0},{0,0,2});
+//  for (WTerm &term : opT)
+//    cout << term.latex() << endl;
 
-    auto opH2avcc = WOperator("H2",{0,1,1},{2,0,0});
-    auto opH2avca = WOperator("H2",{0,1,1},{1,1,0});
-    auto opH2avcv = WOperator("H2",{0,1,1},{1,0,1});
-    auto opH2avaa = WOperator("H2",{0,1,1},{0,2,0});
-    auto opH2avav = WOperator("H2",{0,1,1},{0,1,1});
-    auto opH2avvv = WOperator("H2",{0,1,1},{0,0,2});
+  //  for (auto op : opT) {
+  //    std::cout << op.str() << std::endl;
+  //  }
 
-    auto opH2vvcc = WOperator("H2",{0,0,2},{2,0,0});
-    auto opH2vvca = WOperator("H2",{0,0,2},{1,1,0});
-    auto opH2vvcv = WOperator("H2",{0,0,2},{1,0,1});
-    auto opH2vvaa = WOperator("H2",{0,0,2},{0,2,0});
-    auto opH2vvav = WOperator("H2",{0,0,2},{0,1,1});
-    auto opH2vvvv = WOperator("H2",{0,0,2},{0,0,2});
+  //  for (auto op : opH) {
+  //    std::cout << op.str() << std::endl;
+  //  }
 
-    std::vector<WOperator> opT = {opT1ca,opT1cv,opT1av,
-                opT2ccaa,opT2ccav,opT2ccvv,opT2caaa,opT2caav,opT2cavv,opT2aaav,opT2aavv};
+  //  WContract wc;
+  //  wc.contract(1.0, {opH1cc, opH1cc});
 
-    std::vector<WOperator> opH = {opH1cc, opH1ca, opH1cv,
-                                  opH1ac, opH1aa, opH1av,
-                                  opH1vc, opH1va, opH1vv,
-                                  opH2cccc, opH2ccca, opH2cccv,
-                                  opH2ccaa, opH2ccav, opH2ccvv,
-                                  opH2cacc, opH2caca, opH2cacv,
-                                  opH2caaa, opH2caav, opH2cavv,
-                                  opH2cvcc, opH2cvca, opH2cvcv,
-                                  opH2cvaa, opH2cvav, opH2cvvv,
-                                  opH2aacc, opH2aaca, opH2aacv,
-                                  opH2aaaa, opH2aaav, opH2aavv,
-                                  opH2avcc, opH2avca, opH2avcv,
-                                  opH2avaa, opH2avav, opH2avvv,
-                                  opH2vvcc, opH2vvca, opH2vvcv,
-                                  opH2vvaa, opH2vvav, opH2vvvv};
-
-    for (auto op : opT){
-        std::cout << op.str() << std::endl;
-    }
-
-    for (auto op : opH){
-        std::cout << op.str() << std::endl;
-    }
-    return 0;
+  return 0;
 }
+
+/*
+ *   auto opT1ca = WDiagOperator("T1", {1, 0, 0}, {0, 1, 0});
+  auto opT1cv = WDiagOperator("T1", {1, 0, 0}, {0, 0, 1});
+  auto opT1av = WDiagOperator("T1", {0, 1, 0}, {0, 0, 1});
+
+  auto opT2ccaa = WDiagOperator("T2", {2, 0, 0}, {0, 2, 0});
+  auto opT2ccav = WDiagOperator("T2", {2, 0, 0}, {0, 1, 1});
+  auto opT2ccvv = WDiagOperator("T2", {2, 0, 0}, {0, 0, 2});
+  auto opT2caaa = WDiagOperator("T2", {1, 1, 0}, {0, 2, 0});
+  auto opT2caav = WDiagOperator("T2", {1, 1, 0}, {0, 1, 1});
+  auto opT2cavv = WDiagOperator("T2", {1, 1, 0}, {0, 0, 2});
+  auto opT2aaav = WDiagOperator("T2", {0, 2, 0}, {0, 1, 1});
+  auto opT2aavv = WDiagOperator("T2", {0, 2, 0}, {0, 0, 2});
+
+  auto opH1cc = WDiagOperator("H1", {1, 0, 0}, {1, 0, 0});
+  auto opH1ca = WDiagOperator("H1", {1, 0, 0}, {0, 1, 0});
+  auto opH1cv = WDiagOperator("H1", {1, 0, 0}, {0, 0, 1});
+  auto opH1ac = WDiagOperator("H1", {0, 1, 0}, {1, 0, 0});
+  auto opH1aa = WDiagOperator("H1", {0, 1, 0}, {0, 1, 0});
+  auto opH1av = WDiagOperator("H1", {0, 1, 0}, {0, 0, 1});
+  auto opH1vc = WDiagOperator("H1", {0, 0, 1}, {1, 0, 0});
+  auto opH1va = WDiagOperator("H1", {0, 0, 1}, {0, 1, 0});
+  auto opH1vv = WDiagOperator("H1", {0, 0, 1}, {0, 0, 1});
+
+  auto opH2cccc = WDiagOperator("H2", {2, 0, 0}, {2, 0, 0});
+  auto opH2ccca = WDiagOperator("H2", {2, 0, 0}, {1, 1, 0});
+  auto opH2cccv = WDiagOperator("H2", {2, 0, 0}, {1, 0, 1});
+  auto opH2ccaa = WDiagOperator("H2", {2, 0, 0}, {0, 2, 0});
+  auto opH2ccav = WDiagOperator("H2", {2, 0, 0}, {0, 1, 1});
+  auto opH2ccvv = WDiagOperator("H2", {2, 0, 0}, {0, 0, 2});
+
+  auto opH2cacc = WDiagOperator("H2", {1, 1, 0}, {2, 0, 0});
+  auto opH2caca = WDiagOperator("H2", {1, 1, 0}, {1, 1, 0});
+  auto opH2cacv = WDiagOperator("H2", {1, 1, 0}, {1, 0, 1});
+  auto opH2caaa = WDiagOperator("H2", {1, 1, 0}, {0, 2, 0});
+  auto opH2caav = WDiagOperator("H2", {1, 1, 0}, {0, 1, 1});
+  auto opH2cavv = WDiagOperator("H2", {1, 1, 0}, {0, 0, 2});
+
+  auto opH2cvcc = WDiagOperator("H2", {1, 0, 1}, {2, 0, 0});
+  auto opH2cvca = WDiagOperator("H2", {1, 0, 1}, {1, 1, 0});
+  auto opH2cvcv = WDiagOperator("H2", {1, 0, 1}, {1, 0, 1});
+  auto opH2cvaa = WDiagOperator("H2", {1, 0, 1}, {0, 2, 0});
+  auto opH2cvav = WDiagOperator("H2", {1, 0, 1}, {0, 1, 1});
+  auto opH2cvvv = WDiagOperator("H2", {1, 0, 1}, {0, 0, 2});
+
+  auto opH2aacc = WDiagOperator("H2", {0, 2, 0}, {2, 0, 0});
+  auto opH2aaca = WDiagOperator("H2", {0, 2, 0}, {1, 1, 0});
+  auto opH2aacv = WDiagOperator("H2", {0, 2, 0}, {1, 0, 1});
+  auto opH2aaaa = WDiagOperator("H2", {0, 2, 0}, {0, 2, 0});
+  auto opH2aaav = WDiagOperator("H2", {0, 2, 0}, {0, 1, 1});
+  auto opH2aavv = WDiagOperator("H2", {0, 2, 0}, {0, 0, 2});
+
+  auto opH2avcc = WDiagOperator("H2", {0, 1, 1}, {2, 0, 0});
+  auto opH2avca = WDiagOperator("H2", {0, 1, 1}, {1, 1, 0});
+  auto opH2avcv = WDiagOperator("H2", {0, 1, 1}, {1, 0, 1});
+  auto opH2avaa = WDiagOperator("H2", {0, 1, 1}, {0, 2, 0});
+  auto opH2avav = WDiagOperator("H2", {0, 1, 1}, {0, 1, 1});
+  auto opH2avvv = WDiagOperator("H2", {0, 1, 1}, {0, 0, 2});
+
+  auto opH2vvcc = WDiagOperator("H2", {0, 0, 2}, {2, 0, 0});
+  auto opH2vvca = WDiagOperator("H2", {0, 0, 2}, {1, 1, 0});
+  auto opH2vvcv = WDiagOperator("H2", {0, 0, 2}, {1, 0, 1});
+  auto opH2vvaa = WDiagOperator("H2", {0, 0, 2}, {0, 2, 0});
+  auto opH2vvav = WDiagOperator("H2", {0, 0, 2}, {0, 1, 1});
+  auto opH2vvvv = WDiagOperator("H2", {0, 0, 2}, {0, 0, 2});
+
+  std::vector<WDiagOperator> opT = {opT1ca,   opT1cv,   opT1av,   opT2ccaa,
+                                opT2ccav, opT2ccvv, opT2caaa, opT2caav,
+                                opT2cavv, opT2aaav, opT2aavv};
+
+  std::vector<WDiagOperator> opH = {
+      opH1cc,   opH1ca,   opH1cv,   opH1ac,   opH1aa,   opH1av,   opH1vc,
+      opH1va,   opH1vv,   opH2cccc, opH2ccca, opH2cccv, opH2ccaa, opH2ccav,
+      opH2ccvv, opH2cacc, opH2caca, opH2cacv, opH2caaa, opH2caav, opH2cavv,
+      opH2cvcc, opH2cvca, opH2cvcv, opH2cvaa, opH2cvav, opH2cvvv, opH2aacc,
+      opH2aaca, opH2aacv, opH2aaaa, opH2aaav, opH2aavv, opH2avcc, opH2avca,
+      opH2avcv, opH2avaa, opH2avav, opH2avvv, opH2vvcc, opH2vvca, opH2vvcv,
+      opH2vvaa, opH2vvav, opH2vvvv};
+      */
