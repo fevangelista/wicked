@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "combinatorics.h"
+#include "helpers.h"
 #include "wtheorem.h"
 
 using namespace std;
@@ -29,27 +30,65 @@ void WTheorem::theorem_pair(const WTerm &A, const WTerm &B, int minrank,
   PRINT(Summary, cout << "Contracting the following terms:" << endl;
         cout << A.str() << endl; cout << B.str() << endl;)
 
+  int nspace = osi->num_spaces();
+
   int naop = A.noperators();
   int nbop = B.noperators();
 
   // max number of contractions is largest multiple of two less than naop + nbop
   int maxcontr = (naop + nbop) / 2;
 
-  // Loop over the number of contractions
-  PRINT(Detailed, cout << "Max number of contractions: " << maxcontr << endl;)
-  for (int n = 0; n <= maxcontr; n++) {
+  std::vector<int> naop_space = A.noperators_per_space();
+  std::vector<int> nbop_space = B.noperators_per_space();
 
-    //    // Loop over partitions
-    //    PRINT(Detailed, cout << "Type of " << n << "-contractions:" << endl;)
-    //    for (const auto &partition : partitions) {
-    //      PRINT(Detailed, for (const auto &i : partition) { cout << " " << i;
-    //      })
-    //      PRINT(Detailed, cout << endl;)
+  PRINT(Detailed, for (const auto &space
+                       : {naop_space, nbop_space}) {
+    cout << "Operators per space:        ";
+    for (const auto &i : space) {
+      cout << ' ' << i;
+    }
+    cout << endl;
+  })
 
-    //      //      // Get the contraction configurations
-    //      //      std::vector<std::map<std::pair<int, int>, int>>;
-    //    }
+  std::vector<int> maxcontr_space;
+  for (int s = 0; s < nspace; ++s) {
+    // DMStructure dms = osi->dmstructure(s);
+    maxcontr_space.push_back((naop_space[s] + nbop_space[s]) / 2);
   }
+
+  PRINT(
+      Detailed, cout << "Max contractions per space: "; for (const auto &i
+                                                             : maxcontr_space) {
+        cout << ' ' << i;
+      } cout << endl;)
+
+  // determine the number of ways we can contract the two operators
+  int nways = 1; // the no-contraction case
+  for (int s = 0; s < nspace; s++) {
+    nways *= (1 + maxcontr_space[s]);
+  }
+
+  PRINT(Detailed, cout << "Operators can be contracted in " << nways << " ways"
+                       << endl;)
+
+  std::vector<int> contr_range;
+  for (int i : maxcontr_space) {
+    contr_range.push_back(i + 1);
+  }
+
+  product_space(contr_range, [&](const std::vector<int> &contr_per_space) {
+    this->contract_pair(A, B, contr_per_space);
+  });
+}
+
+void WTheorem::contract_pair(const WTerm &A, const WTerm &B,
+                             const std::vector<int> &contr_per_space) {
+  PRINT(Detailed, cout << "Contraction pattern:";
+        for (int i
+             : contr_per_space) { cout << ' ' << i; };
+        cout << endl;)
+
+
 }
 
 void WTheorem::make_contraction_partitions() {
@@ -62,7 +101,7 @@ void WTheorem::make_contraction_partitions() {
   }
 
   PRINT(Detailed, int k = 0; for (auto cp
-                       : contraction_partitions_) {
+                                  : contraction_partitions_) {
     cout << 2 * k << "-legged contractions:" << endl;
     for (auto p : cp) {
       cout << p.first << " " << p.second << endl;

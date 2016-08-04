@@ -1,5 +1,11 @@
+#include <assert.h>
 #include <iostream>
+#include <numeric>
+
 #include "combinatorics.h"
+
+#define DEBUG_PRODUCT_SPACE(code)                                              \
+  { code }
 
 /**
  * Generate combinations of 0,1,...,(n-1) taken k at a time
@@ -234,3 +240,122 @@ generate_direct_product_combinations(std::vector<int> &n, std::vector<int> &k) {
   delete[] a;
   return combinations;
 }
+
+void product_space(const std::vector<int> &r,
+                   const std::function<void(const std::vector<int> &)> &func) {
+  int n = r.size(); // number of indices
+  std::vector<int> a(n, 0);
+
+  func(a);
+  int i = 0;
+  for (;;) {
+    // if bin i is at zero, reset all previous ones
+    if (a[i] == 0) {
+      for (int j = 0; j < i; ++j) {
+        a[j] = 0;
+      }
+    }
+    // try to increase bin i
+    if (a[i] < r[i] - 1) {
+      a[i] += 1;
+      func(a);
+      i = 0;
+    } else { // try the next bin
+      i++;
+    }
+    // we're done
+    if (i == n)
+      break;
+  }
+}
+
+// Williamson's implementation (seems to have a bug if one of the r_i = 1)
+// void product_space(const std::vector<int> &r,
+//                   const std::function<void(const std::vector<int> &)> &func)
+//                   {
+//  int n = r.size(); // number of indices
+//  std::vector<int> a(n, 0);
+//  std::vector<int> d(n, 1);
+//  std::vector<int> l(n + 1);
+//  std::iota(l.begin(), l.end(), 1);
+//  int p = 1;
+
+//  int k = 0;
+//  while (p <= n) {
+//    for (int i : a) {
+//      std::cout << ' ' << i;
+//    }
+
+//    for (int i : d) {
+//      std::cout << ' ' << i;
+//    }
+
+//    for (int i : l) {
+//      std::cout << ' ' << i;
+//    }
+//    std::cout << std::endl;
+
+//    func(a);
+//    l[0] = 1;
+//    a[p - 1] += d[p - 1];
+//    if ((a[p - 1] == 0) or (a[p - 1] == r[p - 1] - 1)) {
+//      d[p - 1] = -d[p - 1];
+//      l[p - 1] = l[p];
+//      l[p] = p + 1;
+//    }
+//    p = l[0];
+//    k++;
+//    if (k > 100)
+//      p = n + 1;
+//  }
+//  func(a);
+//}
+
+// void product_space(const std::vector<int> &r,
+//                   const std::function<void(const std::vector<int> &)> &func)
+//                   {
+
+//  int n = r.size(); // number of indices
+
+//  size_t size = 1; // size of the product space
+//  for (int ri : r) {
+//    size *= static_cast<size_t>(ri);
+//  }
+
+//  assert(size <= 64);
+
+//  // build masks to count bits
+//  std::vector<std::bitset<64>> mask(n);
+//  std::vector<int> offset(n);
+//  int current_offset = 0;
+//  for (int i = 0; i < n; i++) {
+//    offset[i] = current_offset;
+//    std::bitset<64> &mask_i = mask[i];
+//    for (int k = 0; k < r[i] - 1; k++) {
+//      mask_i.set(current_offset + k);
+//    }
+//    current_offset += r[i] - 1;
+//    DEBUG_PRODUCT_SPACE(std::cout << "Mask " << i << " : " << mask_i
+//                                  << std::endl;)
+//  }
+
+//  // Generate the product space by creating all possible strings of bits
+//  std::bitset<64> bs;
+//  std::bitset<64> bs_count;
+//  std::vector<int> s(n);
+//  for (size_t r = 0; r < size; r++) {
+//    bs = r;
+//    DEBUG_PRODUCT_SPACE(std::cout << r << " = " << bs << std::endl;)
+//    for (int i = 0; i < n; i++) {
+//      DEBUG_PRODUCT_SPACE(
+//          std::cout << "bs             = " << bs << std::endl;
+//          std::cout << "mask[i]        = " << mask[i] << std::endl;
+//          std::cout << "(bs & mask[i]) = " << (bs & mask[i]) << std::endl;
+//          std::cout << "(bs & mask[i]) = " << ((bs & mask[i]) >> offset[i])
+//                    << std::endl;)
+//      s[i] = ((bs & mask[i]) >> offset[i]).to_ulong();
+//      DEBUG_PRODUCT_SPACE(std::cout << i << " -> " << s[i] << std::endl;)
+//    }
+//    func(s);
+//  }
+//}

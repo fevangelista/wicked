@@ -2,20 +2,10 @@
 #define _wicked_combinatorics_h_
 
 #include <vector>
+#include <functional>
 
 typedef std::vector<std::vector<int>> vecvecint;
 typedef std::vector<int> vecint;
-
-// Combinations
-std::vector<std::vector<int>> generate_combinations(int n, int k,
-                                                    std::vector<int> &labels);
-std::vector<std::vector<int>> generate_combinations(int n, int k);
-std::vector<std::vector<int>>
-generate_direct_product_combinations(std::vector<int> &n, std::vector<int> &k);
-
-// Permutations
-std::vector<std::vector<int>> generate_permutations(int n,
-                                                    std::vector<int> &labels);
 
 // ==> Integer partitions <==
 
@@ -28,6 +18,23 @@ std::vector<std::vector<int>> even_integer_partitions(int n);
 /// Function to test integer partitions
 void test_integer_partitions();
 
+// ==> Product space <==
+
+// Given a vector of ranges (r_i, i = 0,...,n-1) computes the product space
+// S = S(0) x S(1) x ... S(n-1) where S(i) = {0,1,2,...,r_i - 1)
+void product_space(const std::vector<int> &r,
+                   const std::function<void(const std::vector<int> &)> &func);
+
+// Combinations
+std::vector<std::vector<int>> generate_combinations(int n, int k,
+                                                    std::vector<int> &labels);
+std::vector<std::vector<int>> generate_combinations(int n, int k);
+std::vector<std::vector<int>>
+generate_direct_product_combinations(std::vector<int> &n, std::vector<int> &k);
+
+// Permutations
+std::vector<std::vector<int>> generate_permutations(int n,
+                                                    std::vector<int> &labels);
 
 template <typename T>
 std::vector<std::vector<T>>

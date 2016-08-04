@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 
 #include "helpers.h"
@@ -15,13 +16,3 @@ std::string to_string(const std::vector<std::string> &strvec,
 
   return ss.str();
 }
-
-//std::string to_string(const rational r) {
-//  if (r.numerator() == 0) {
-//    return "0";
-//  }
-//  if (r.denominator() == 1) {
-//    return to_string(r.numerator());
-//  }
-//  return to_string(r.numerator()) + "/" + to_string(r.denominator());
-//}

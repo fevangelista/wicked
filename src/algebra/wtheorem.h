@@ -30,6 +30,9 @@ public:
   void theorem_pair(const WTerm &A, const WTerm &B, int minrank = -1,
                     int maxrank = -1);
 
+  void contract_pair(const WTerm &A, const WTerm &B,
+                     const std::vector<int> &contr_per_space);
+
   std::vector<std::map<std::pair<int, int>, int>>
   make_contraction_configurations();
 
