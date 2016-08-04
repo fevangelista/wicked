@@ -36,11 +36,14 @@ public:
   /// Return the number of SQ operators
   int noperators() const { return (operators_.size()); }
 
+  /// Return the number of SQ operators in each orbital space
+  std::vector<int> noperators_per_space() const;
+
   /// Return the SQ operators
   std::vector<WSQOperator> &operators() { return operators_; }
 
-  /// Return a map with the number of indices per space
-  std::map<OrbitalSpaceType, int> space_count();
+//  /// Return a vector with the number of indices per space
+//  std::vector<int> space_count();
 
   /// Canonicalize this term
   void canonicalize();
@@ -73,7 +76,7 @@ private:
 // Helper functions
 /// Create an operator
 WTerm make_operator(const std::string &label,
-                    const std::vector<OrbitalSpaceType> &cre,
-                    const std::vector<OrbitalSpaceType> &ann);
+                    const std::vector<std::string> &cre,
+                    const std::vector<std::string> &ann);
 
 #endif // _wicked_wterm_h_

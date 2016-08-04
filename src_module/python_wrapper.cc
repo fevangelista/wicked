@@ -11,17 +11,6 @@ namespace py = pybind11;
 PYBIND11_PLUGIN(pywicked) {
   py::module m("pywicked", "Wicked python interface");
 
-  py::enum_<OrbitalSpaceType>(m, "OrbitalSpaceType")
-      .value("Core", OrbitalSpaceType::Core)
-      .value("Active", OrbitalSpaceType::Active)
-      .value("Virtual", OrbitalSpaceType::Virtual)
-      .value("Hole", OrbitalSpaceType::Hole)
-      .value("Particle", OrbitalSpaceType::Particle)
-      .value("All", OrbitalSpaceType::All)
-      .value("RI", OrbitalSpaceType::RI)
-      .value("None", OrbitalSpaceType::None)
-      .export_values();
-
   py::enum_<SpinType>(m, "SpinType")
       .value("SpinOrbital", SpinType::SpinOrbital)
       .value("SpinFree", SpinType::SpinFree)

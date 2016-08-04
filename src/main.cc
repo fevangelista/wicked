@@ -9,6 +9,7 @@
 #include "wdiag_operator.h"
 #include "wterm.h"
 #include "wsum.h"
+#include "wtheorem.h"
 
 using namespace std;
 
@@ -19,9 +20,9 @@ int main(int argc, const char *argv[]) {
   osi->default_spaces();
 
   // Convenience variables
-  OrbitalSpaceType c = OrbitalSpaceType::Core;
-  OrbitalSpaceType a = OrbitalSpaceType::Active;
-  OrbitalSpaceType v = OrbitalSpaceType::Virtual;
+  std::string c = "c";
+  std::string a = "a";
+  std::string v = "v";
 
   WTerm opT1ca = make_operator("T1", {a}, {c});
   WTerm opT1cv = make_operator("T1", {v}, {c});
@@ -40,6 +41,9 @@ int main(int argc, const char *argv[]) {
                             opT2ccav, opT2ccvv, opT2caaa, opT2caav,
                             opT2cavv, opT2aaav, opT2aavv};
 
+  WTerm opH1aa = make_operator("H1", {a}, {a});
+
+
   WSum sum;
   for (WTerm &term : opT){
     cout << term.str() << endl;
@@ -47,6 +51,9 @@ int main(int argc, const char *argv[]) {
   }
 
   cout << sum.str() << endl;
+
+  WTheorem wt;
+  wt.theorem_pair(opH1aa,opT1ca);
 
 //  for (WTerm &term : opT)
 //    cout << term.latex() << endl;

@@ -6,15 +6,13 @@
 #include <vector>
 
 /// Type of orbital space
-enum class OrbitalSpaceType {
-  Core,
-  Active,
-  Virtual,
-  Hole,
-  Particle,
-  All,
-  RI,
-  None
+//enum class OrbitalSpaceType { Core, Active, Virtual, RI, None };
+
+/// Type of orbital space
+enum class DMStructure {
+  Delta,  // Single contractions only-Kronecker delta
+  OPDM,   // Single contractions only-One-particle density matrix
+  General // Multi-leg contractions
 };
 
 /// Spin types
@@ -22,8 +20,9 @@ enum class SpinType { SpinOrbital, SpinFree, Alpha, Beta };
 
 class OrbitalSpaceInfo {
 
-  using t_space_info = std::vector<
-      std::tuple<OrbitalSpaceType, std::string, std::vector<std::string>>>;
+  /// This type holds infomation about a space
+  using t_space_info =
+      std::tuple<std::string, DMStructure, std::vector<std::string>>;
 
 public:
   OrbitalSpaceInfo();
@@ -35,26 +34,28 @@ public:
   void reset();
 
   /// Add an elementary space
-  void add_space(const std::string &label, OrbitalSpaceType type,
+  void add_space(const std::string &label,
+                 DMStructure structure,
                  const std::vector<std::string> &indices);
 
   /// Return the number of elementary spaces
   int num_spaces() { return static_cast<int>(space_info_.size()); }
 
   /// The label of an orbital space
-  std::string &label(int pos);
-  std::string &label(OrbitalSpaceType type);
+  const std::string &label(int pos) const;
+
+  /// The structure of the density matrices for an orbital space
+  DMStructure dmstructure(int pos) const;
 
   /// The indices of an orbital space
-  std::vector<std::string> &indices(int pos);
-  std::vector<std::string> &indices(OrbitalSpaceType type);
+  const std::vector<std::string> &indices(int pos) const;
+
+  /// Maps a label into an orbital space
+  int label_to_space(const std::string& label) const;
 
 private:
   /// Vector of spaces
-  t_space_info space_info_;
-
-  /// Maps a space to its index
-  std::map<OrbitalSpaceType, int> type_to_pos_;
+  std::vector<t_space_info> space_info_;
 
   /// Maps a space label to its index
   std::map<std::string, int> label_to_pos_;

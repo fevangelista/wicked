@@ -12,9 +12,21 @@ scalar_t WTerm::factor() const { return factor_; }
 
 void WTerm::set_factor(scalar_t value) { factor_ = value; }
 
-void WTerm::canonicalize() {
-  // 1. Extract the features of each tensor
+std::vector<int> WTerm::noperators_per_space() const {
+  std::vector<int> counter(osi->num_spaces());
+  for (const auto &op : operators_) {
+    counter[op.index().space()] += 1;
+  }
+  return counter;
+}
 
+void WTerm::canonicalize() {
+  // 1. Sort the tensors according to a score function
+  using score_t =
+      std::tuple<std::string, int, std::vector<int>, std::vector<int>, WTensor>;
+  std::vector<score_t> scores;
+
+  int n = 0;
   for (const auto &tensor : tensors_) {
     // a) label
     const std::string &label = tensor.label();
@@ -22,19 +34,23 @@ void WTerm::canonicalize() {
     // b) rank
     int rank = tensor.rank();
 
-//    std::vector<WIndex> &lower = tensor.lower();
-//    std::vector<WIndex> &upper = tensor.upper();
-
     // c) number of indices per space
-    std::vector<int> u_space;
-    for (const auto &index : tensor.lower()) {
+    std::vector<int> num_low = num_indices_per_space(tensor.lower());
+    std::vector<int> num_upp = num_indices_per_space(tensor.lower());
 
-    }
+    scores.push_back(std::make_tuple(label, rank, num_low, num_upp, tensor));
+    n += 1;
   }
-  std::sort(tensors_.begin(), tensors_.end(),
-            [](const WTensor &a, const WTensor &b) -> bool {
-              return a.label() > b.label();
-            });
+  std::sort(scores.begin(), scores.end());
+
+  tensors_.clear();
+  for (const auto &score : scores) {
+    tensors_.push_back(std::get<4>(score));
+  }
+
+  // 2. Relabel indices of tensors and operators
+
+  // 3. Sort operators according to canonical form
 }
 
 bool WTerm::operator<(const WTerm &other) const {
@@ -98,12 +114,12 @@ std::string WTerm::latex() const {
 }
 
 WTerm make_operator(const std::string &label,
-                    const std::vector<OrbitalSpaceType> &cre,
-                    const std::vector<OrbitalSpaceType> &ann) {
+                    const std::vector<std::string> &cre,
+                    const std::vector<std::string> &ann) {
   WTerm term;
 
-  std::vector<WIndex> cre_ind = make_indices_from_space_type(cre);
-  std::vector<WIndex> ann_ind = make_indices_from_space_type(ann);
+  std::vector<WIndex> cre_ind = make_indices_from_space_labels(cre);
+  std::vector<WIndex> ann_ind = make_indices_from_space_labels(ann);
 
   // Add the tensor
   WTensor tensor(label, cre_ind, ann_ind);
