@@ -274,14 +274,19 @@ void product_space_iterator(
     // try to increase bin i
     if (a[i] < r[i] - 1) {
       a[i] += 1;
+
       // reset all previous bins
       for (int j = 0; j < i; ++j) {
         a[j] = 0;
       }
+
+      // output configuration
       func(a);
       ps.push_back(a);
-      l++;
+
+      // restart from the beginning
       i = 0;
+      l++;
     } else { // try the next bin
       i++;
     }
@@ -301,7 +306,7 @@ void product_space_iterator(
   assert(all == unique);
 }
 
-void combination_space_iterator(
+void generalized_combinations_with_repetitions_iterator(
     const std::vector<int> &r, const std::vector<int> &k,
     const std::function<void(const std::vector<std::vector<int>> &)> &func) {
   int n = r.size();                // number of indices
@@ -342,6 +347,7 @@ void combination_space_iterator(
         a[i][m] = 0;
       }
 
+      // output configuration
       func(a);
       ps.push_back(a);
 
