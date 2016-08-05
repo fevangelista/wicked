@@ -158,6 +158,23 @@ int binomial(int n, int k) {
   }
   return (static_cast<int>(combinations));
 }
+
+// int nChoosek(unsigned n, unsigned k) {
+//  if (k > n)
+//    return 0;
+//  if (k * 2 > n)
+//    k = n - k;
+//  if (k == 0)
+//    return 1;
+
+//  int result = n;
+//  for (int i = 2; i <= k; ++i) {
+//    result *= (n - i + 1);
+//    result /= i;
+//  }
+//  return result;
+//}
+
 void reset_class(bool *a, std::vector<int> &n, std::vector<int> &k,
                  std::vector<int> &offset, int q);
 
@@ -241,32 +258,118 @@ generate_direct_product_combinations(std::vector<int> &n, std::vector<int> &k) {
   return combinations;
 }
 
-void product_space(const std::vector<int> &r,
-                   const std::function<void(const std::vector<int> &)> &func) {
-  int n = r.size(); // number of indices
-  std::vector<int> a(n, 0);
+void product_space_iterator(
+    const std::vector<int> &r,
+    const std::function<void(const std::vector<int> &)> &func) {
+  int n = r.size();         // number of indices
+  std::vector<int> a(n, 0); // current configuration
+
+  std::vector<std::vector<int>> ps;
 
   func(a);
+  ps.push_back(a);
   int i = 0;
+  int l = 1;
   for (;;) {
-    // if bin i is at zero, reset all previous ones
-    if (a[i] == 0) {
-      for (int j = 0; j < i; ++j) {
-        a[j] = 0;
-      }
-    }
     // try to increase bin i
     if (a[i] < r[i] - 1) {
       a[i] += 1;
+      // reset all previous bins
+      for (int j = 0; j < i; ++j) {
+        a[j] = 0;
+      }
       func(a);
+      ps.push_back(a);
+      l++;
       i = 0;
     } else { // try the next bin
       i++;
     }
-    // we're done
+    // if we go beyond the last bin we're done
     if (i == n)
       break;
   }
+  int exact = 1;
+  for (int ri : r)
+    exact *= ri;
+  assert(l == exact);
+
+  size_t all = ps.size();
+  std::sort(ps.begin(), ps.end());
+  ps.erase(std::unique(ps.begin(), ps.end()), ps.end());
+  size_t unique = ps.size();
+  assert(all == unique);
+}
+
+void combination_space_iterator(
+    const std::vector<int> &r, const std::vector<int> &k,
+    const std::function<void(const std::vector<std::vector<int>> &)> &func) {
+  int n = r.size();                // number of indices
+  std::vector<std::vector<int>> a; // current configuration
+
+  // Initialize each bin
+  for (int i = 0; i < n; i++) {
+    a.push_back(std::vector<int>(k[i], 0));
+  }
+
+  std::vector<std::vector<std::vector<int>>> ps;
+
+  func(a);
+  ps.push_back(a);
+  int i = 0;
+  int j = 0;
+  int l = 1;
+  for (;;) {
+    // try to increase bin (i,j)
+    if (a[i][j] == r[i] - 1) {
+      // if this walker reached the top, move to the next bin
+      i++;
+    } else if ((j < k[i] - 1) and (a[i][j] == a[i][j + 1])) {
+      // if another walker is blocking this
+      // one try the next walker
+      j++;
+    } else {
+      // increase walker j on bin i
+      a[i][j] += 1;
+
+      // reset all previous walkers
+      for (int p = 0; p < i; ++p) {
+        for (int m = 0; m < k[p]; m++) {
+          a[p][m] = 0;
+        }
+      }
+      for (int m = 0; m < j; m++) {
+        a[i][m] = 0;
+      }
+
+      func(a);
+      ps.push_back(a);
+
+      // restart from the beginning
+      i = 0;
+      j = 0;
+      l++;
+    }
+
+    // if we go beyond the last bin we're done
+    if (i == n)
+      break;
+  }
+
+  int exact = 1;
+  for (int m = 0; m < n; ++m) {
+    exact *= binomial(r[m] + k[m] - 1, k[m]);
+    std::cout << r[m] + k[m] - 1 << " " << k[m] << " "
+              << binomial(r[m] + k[m] - 1, r[m]) << std::endl;
+  }
+  std::cout << "l = " << l << "exact = " << exact << std::endl;
+  assert(l == exact);
+
+  size_t all = ps.size();
+  std::sort(ps.begin(), ps.end());
+  ps.erase(std::unique(ps.begin(), ps.end()), ps.end());
+  size_t unique = ps.size();
+  assert(all == unique);
 }
 
 // Williamson's implementation (seems to have a bug if one of the r_i = 1)

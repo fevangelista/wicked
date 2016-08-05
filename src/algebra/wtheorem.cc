@@ -76,9 +76,48 @@ void WTheorem::theorem_pair(const WTerm &A, const WTerm &B, int minrank,
     contr_range.push_back(i + 1);
   }
 
-  product_space(contr_range, [&](const std::vector<int> &contr_per_space) {
-    this->contract_pair(A, B, contr_per_space);
+  product_space_iterator(contr_range,
+                         [&](const std::vector<int> &contr_per_space) {
+      this->contract_pair(A, B, contr_per_space);
   });
+
+  product_space_iterator({2,3,2}, [&](const std::vector<int> &vec) {
+    for (int i : vec) {
+      cout << i << ' ';
+    }
+    cout << endl;
+  });
+
+  product_space_iterator({2,4,2}, [&](const std::vector<int> &vec) {
+    for (int i : vec) {
+      cout << i << ' ';
+    }
+    cout << endl;
+  });
+
+
+
+  combination_space_iterator({2, 2, 2}, {2, 2, 2},
+                             [&](const std::vector<std::vector<int>> &res) {
+                               for (auto &vec : res) {
+                                 for (int i : vec) {
+                                   cout << i << ' ';
+                                 }
+                                 cout << endl;
+                               }
+                               cout << endl;
+                             });
+
+  combination_space_iterator({2, 3, 3}, {2, 2, 2},
+                             [&](const std::vector<std::vector<int>> &res) {
+                               for (auto &vec : res) {
+                                 for (int i : vec) {
+                                   cout << i << ' ';
+                                 }
+                                 cout << endl;
+                               }
+                               cout << endl;
+                             });
 }
 
 void WTheorem::contract_pair(const WTerm &A, const WTerm &B,
@@ -87,8 +126,12 @@ void WTheorem::contract_pair(const WTerm &A, const WTerm &B,
         for (int i
              : contr_per_space) { cout << ' ' << i; };
         cout << endl;)
+  // At this point we are given two operators and the number of contractions per
+  // space (contr_per_space).
 
-
+  // For each space find out the list of all possible contractions
+  for (int s = 0; s < osi->num_spaces(); s++) {
+  }
 }
 
 void WTheorem::make_contraction_partitions() {
@@ -111,6 +154,10 @@ void WTheorem::make_contraction_partitions() {
 }
 
 void WTheorem::make_contraction_skeletons() {
+
+  //  std::vector<std::vector<std::pair<int, int>>> contraction_partition_;
+  //  for ()
+
   for (int n = 0; n <= maxskeleton_; ++n) {
     PRINT(Detailed, cout << "Number of contractions: " << n << endl;)
     // Partition the number of contractions (n)
@@ -121,14 +168,32 @@ void WTheorem::make_contraction_skeletons() {
       PRINT(Detailed, for (const auto &i : partition) { cout << " " << i; })
       PRINT(Detailed, cout << endl;)
 
-      std::map<int, int> count;
+      std::vector<std::vector<std::pair<int, int>>> contr_spaces;
       for (int i : partition) {
-        count[i] += 1;
+        std::vector<std::pair<int, int>> contr_space;
+        PRINT(Detailed, cout << i
+                             << "-legged contraction can be split as:" << endl;)
+        for (int j = 1; j <= 2 * i - 1; ++j) {
+          PRINT(Detailed, cout << "(" << j << "," << 2 * i - j << ")" << endl;)
+          contr_space.push_back(std::make_pair(j, 2 * i - j));
+        }
       }
-      for (auto kv : count) {
-        PRINT(Detailed, cout << "class = " << kv.first
-                             << " multp = " << kv.second << endl;)
-      }
+
+      //      std::map<int, int> count;
+      //      for (int i : partition) {
+      //        count[i] += 1;
+      //      }
+      //      for (auto kv : count) {
+      //        PRINT(Detailed, cout << "class = " << kv.first
+      //                             << " multp = " << kv.second << endl;)
+      //      }
+
+      //      for (int i : partition) {
+      //        for (int j = 1; j <= 2 * i - 1; ++j) {
+      //          PRINT(Detailed, cout << "(" << j << "," << 2 * i - j << ")" <<
+      //          endl;)
+      //        }
+      //      }
     }
   }
 }

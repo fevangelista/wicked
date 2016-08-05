@@ -22,10 +22,20 @@ void test_integer_partitions();
 
 // Given a vector of ranges (r_i, i = 0,...,n-1) computes the product space
 // S = S(0) x S(1) x ... S(n-1) where S(i) = {0,1,2,...,r_i - 1)
-void product_space(const std::vector<int> &r,
-                   const std::function<void(const std::vector<int> &)> &func);
+void product_space_iterator(
+    const std::vector<int> &r,
+    const std::function<void(const std::vector<int> &)> &func);
 
-// Combinations
+// Given a vector of ranges (r_i, i = 0,...,n-1) computes the product space
+// S = S(0) x S(1) x ... S(n-1) where S(i) = {0,1,2,...,r_i - 1)
+void combination_space_iterator(
+    const std::vector<int> &r, const std::vector<int> &k,
+    const std::function<void(const std::vector<std::vector<int>> &)> &func);
+
+// ==> Combinations <==
+
+
+
 std::vector<std::vector<int>> generate_combinations(int n, int k,
                                                     std::vector<int> &labels);
 std::vector<std::vector<int>> generate_combinations(int n, int k);
