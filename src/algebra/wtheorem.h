@@ -41,7 +41,7 @@ public:
 private:
   /// The largest allowed cumulant
   int maxcumulant_ = 20;
-  int maxskeleton_ = 4;
+  int maxskeleton_ = 10;
   WTPrintLevel print_ = Full;
   std::vector<std::vector<std::vector<int>>> integer_partitions_;
 

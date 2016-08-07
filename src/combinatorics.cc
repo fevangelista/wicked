@@ -12,28 +12,20 @@
 int binomial(int n, int k);
 
 int binomial(int n, int k) {
-  double combinations = 1.0;
-  for (int i = 0; i < k; ++i) {
-    combinations *= static_cast<double>(n - i) / static_cast<double>(k - i);
+  if (k > n)
+    return 0;
+  if (k * 2 > n)
+    k = n - k;
+  if (k == 0)
+    return 1;
+
+  int result = n;
+  for (int i = 2; i <= k; ++i) {
+    result *= (n - i + 1);
+    result /= i;
   }
-  return (static_cast<int>(combinations));
+  return result;
 }
-
-// int nChoosek(unsigned n, unsigned k) {
-//  if (k > n)
-//    return 0;
-//  if (k * 2 > n)
-//    k = n - k;
-//  if (k == 0)
-//    return 1;
-
-//  int result = n;
-//  for (int i = 2; i <= k; ++i) {
-//    result *= (n - i + 1);
-//    result /= i;
-//  }
-//  return result;
-//}
 
 std::vector<std::vector<int>> integer_partitions(int n) {
   std::vector<std::vector<int>> partitions;
@@ -124,10 +116,11 @@ void test_integer_partitions() {
 void product_space_iterator(
     const std::vector<int> &r,
     const std::function<void(const std::vector<int> &)> &func) {
-  int n = r.size();         // number of indices
+  int n = r.size(); // number of indices
 
   // special case
-  if (n == 0) return;
+  if (n == 0)
+    return;
 
   std::vector<int> a(n, 0); // current configuration
 
@@ -208,7 +201,8 @@ void generalized_combinations_with_repetitions_iterator(
   std::vector<std::vector<int>> a; // current configuration
 
   // special case
-  if (n == 0) return;
+  if (n == 0)
+    return;
 
   // Initialize each bin
   for (int i = 0; i < n; i++) {
@@ -263,8 +257,8 @@ void generalized_combinations_with_repetitions_iterator(
   int exact = 1;
   for (int m = 0; m < n; ++m) {
     exact *= binomial(r[m] + k[m] - 1, k[m]);
-//    std::cout << r[m] + k[m] - 1 << " " << k[m] << " "
-//              << binomial(r[m] + k[m] - 1, r[m]) << std::endl;
+    //    std::cout << r[m] + k[m] - 1 << " " << k[m] << " "
+    //              << binomial(r[m] + k[m] - 1, r[m]) << std::endl;
   }
   std::cout << "l = " << l << "exact = " << exact << std::endl;
   assert(l == exact);
