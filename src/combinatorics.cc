@@ -2,66 +2,38 @@
 #include <iostream>
 #include <numeric>
 
+#include "stl_utils.hpp"
+
 #include "combinatorics.h"
 
 #define DEBUG_PRODUCT_SPACE(code)                                              \
   { code }
 
-/**
- * Generate combinations of 0,1,...,(n-1) taken k at a time
- * @param n
- * @param k
- */
-std::vector<std::vector<int>> generate_combinations(int n, int k,
-                                                    std::vector<int> &labels) {
-  std::vector<std::vector<int>> combinations;
-  if ((n > 0) && (k > 0)) {
-    std::vector<int> combination;
-    bool *a = new bool[n];
-    for (int i = 0; i < n - k; ++i)
-      a[i] = false;
-    for (int i = n - k; i < n; ++i)
-      a[i] = true;
-    do {
-      combination.clear();
-      for (int i = 0; i < n; ++i) {
-        if (a[i])
-          combination.push_back(labels[i]);
-      }
-      combinations.push_back(combination);
-    } while (std::next_permutation(a, a + n));
-    delete[] a;
+int binomial(int n, int k);
+
+int binomial(int n, int k) {
+  double combinations = 1.0;
+  for (int i = 0; i < k; ++i) {
+    combinations *= static_cast<double>(n - i) / static_cast<double>(k - i);
   }
-  return combinations;
+  return (static_cast<int>(combinations));
 }
 
-/**
- * Generate combinations of 0,1,...,(n-1) taken k at a time
- * @param n
- * @param k
- */
-std::vector<std::vector<int>> generate_combinations(int n, int k) {
-  std::vector<int> labels;
-  for (int i = 0; i < n; ++i)
-    labels.push_back(i);
-  return generate_combinations(n, k, labels);
-}
+// int nChoosek(unsigned n, unsigned k) {
+//  if (k > n)
+//    return 0;
+//  if (k * 2 > n)
+//    k = n - k;
+//  if (k == 0)
+//    return 1;
 
-/**
- * Generate permutation of n labels
- * @param n
- * @param labels a vector of integers
- */
-std::vector<std::vector<int>> generate_permutations(int n,
-                                                    std::vector<int> &labels) {
-  std::vector<std::vector<int>> permutations;
-  if (n > 0) {
-    do {
-      permutations.push_back(labels);
-    } while (std::next_permutation(labels.begin(), labels.end()));
-  }
-  return permutations;
-}
+//  int result = n;
+//  for (int i = 2; i <= k; ++i) {
+//    result *= (n - i + 1);
+//    result /= i;
+//  }
+//  return result;
+//}
 
 std::vector<std::vector<int>> integer_partitions(int n) {
   std::vector<std::vector<int>> partitions;
@@ -149,31 +121,226 @@ void test_integer_partitions() {
   }
 }
 
-int binomial(int n, int k);
+void product_space_iterator(
+    const std::vector<int> &r,
+    const std::function<void(const std::vector<int> &)> &func) {
+  int n = r.size();         // number of indices
 
-int binomial(int n, int k) {
-  double combinations = 1.0;
-  for (int i = 0; i < k; ++i) {
-    combinations *= static_cast<double>(n - i) / static_cast<double>(k - i);
+  // special case
+  if (n == 0) return;
+
+  std::vector<int> a(n, 0); // current configuration
+
+  std::vector<std::vector<int>> ps;
+
+  func(a);
+  ps.push_back(a);
+  int i = 0;
+  int l = 1;
+  for (;;) {
+    // try to increase bin i
+    if (a[i] < r[i] - 1) {
+      a[i] += 1;
+
+      // reset all previous bins
+      for (int j = 0; j < i; ++j) {
+        a[j] = 0;
+      }
+
+      // output configuration
+      func(a);
+      ps.push_back(a);
+
+      // restart from the beginning
+      i = 0;
+      l++;
+    } else { // try the next bin
+      i++;
+    }
+    // if we go beyond the last bin we're done
+    if (i == n)
+      break;
   }
-  return (static_cast<int>(combinations));
+  int exact = 1;
+  for (int ri : r)
+    exact *= ri;
+  assert(l == exact);
+
+  size_t all = ps.size();
+  std::sort(ps.begin(), ps.end());
+  ps.erase(std::unique(ps.begin(), ps.end()), ps.end());
+  size_t unique = ps.size();
+  assert(all == unique);
 }
 
-// int nChoosek(unsigned n, unsigned k) {
-//  if (k > n)
-//    return 0;
-//  if (k * 2 > n)
-//    k = n - k;
-//  if (k == 0)
-//    return 1;
+std::vector<std::vector<int>> product_space(const std::vector<int> &r) {
+  std::vector<std::vector<int>> elements;
+  product_space_iterator(
+      r, [&](const std::vector<int> &el) { elements.push_back(el); });
+  return elements;
+}
 
-//  int result = n;
-//  for (int i = 2; i <= k; ++i) {
-//    result *= (n - i + 1);
-//    result /= i;
-//  }
-//  return result;
-//}
+void test_product_space() {
+  int maxn = 30;
+
+  std::cout << "testing product space" << std::endl;
+
+  std::vector<std::vector<int>> tests{{1, 1, 1}, {2, 1, 1}};
+  std::vector<std::vector<std::vector<int>>> results{{{0, 0, 0}},
+                                                     {{0, 0, 0}, {0, 0, 1}}};
+  for (const auto &test : tests) {
+    auto results = product_space(test);
+    std::sort(results.begin(), results.end());
+    bool pass = true;
+    // TODO: add check
+    //    for (int n = 0; n < resul)
+    //    for (auto &result : results) {
+
+    //      PRINT_ELEMENTS(result);
+    //    }
+  }
+}
+
+void generalized_combinations_with_repetitions_iterator(
+    const std::vector<int> &r, const std::vector<int> &k,
+    const std::function<void(const std::vector<std::vector<int>> &)> &func) {
+  int n = r.size();                // number of indices
+  std::vector<std::vector<int>> a; // current configuration
+
+  // special case
+  if (n == 0) return;
+
+  // Initialize each bin
+  for (int i = 0; i < n; i++) {
+    a.push_back(std::vector<int>(k[i], 0));
+  }
+
+  std::vector<std::vector<std::vector<int>>> ps;
+
+  func(a);
+  ps.push_back(a);
+  int i = 0;
+  int j = 0;
+  int l = 1;
+  for (;;) {
+    // try to increase bin (i,j)
+    if (a[i][j] == r[i] - 1) {
+      // if this walker reached the top, move to the next bin
+      i++;
+    } else if ((j < k[i] - 1) and (a[i][j] == a[i][j + 1])) {
+      // if another walker is blocking this
+      // one try the next walker
+      j++;
+    } else {
+      // increase walker j on bin i
+      a[i][j] += 1;
+
+      // reset all previous walkers
+      for (int p = 0; p < i; ++p) {
+        for (int m = 0; m < k[p]; m++) {
+          a[p][m] = 0;
+        }
+      }
+      for (int m = 0; m < j; m++) {
+        a[i][m] = 0;
+      }
+
+      // output configuration
+      func(a);
+      ps.push_back(a);
+
+      // restart from the beginning
+      i = 0;
+      j = 0;
+      l++;
+    }
+
+    // if we go beyond the last bin we're done
+    if (i == n)
+      break;
+  }
+
+  int exact = 1;
+  for (int m = 0; m < n; ++m) {
+    exact *= binomial(r[m] + k[m] - 1, k[m]);
+//    std::cout << r[m] + k[m] - 1 << " " << k[m] << " "
+//              << binomial(r[m] + k[m] - 1, r[m]) << std::endl;
+  }
+  std::cout << "l = " << l << "exact = " << exact << std::endl;
+  assert(l == exact);
+
+  size_t all = ps.size();
+  std::sort(ps.begin(), ps.end());
+  ps.erase(std::unique(ps.begin(), ps.end()), ps.end());
+  size_t unique = ps.size();
+  assert(all == unique);
+}
+
+std::vector<std::vector<std::vector<int>>>
+generalized_combinations_with_repetitions(const std::vector<int> &r,
+                                          const std::vector<int> &k) {
+  std::vector<std::vector<std::vector<int>>> elements;
+  generalized_combinations_with_repetitions_iterator(
+      r, k,
+      [&](const std::vector<std::vector<int>> &el) { elements.push_back(el); });
+  return elements;
+}
+
+/**
+ * Generate combinations of 0,1,...,(n-1) taken k at a time
+ * @param n
+ * @param k
+ */
+std::vector<std::vector<int>> generate_combinations(int n, int k,
+                                                    std::vector<int> &labels) {
+  std::vector<std::vector<int>> combinations;
+  if ((n > 0) && (k > 0)) {
+    std::vector<int> combination;
+    bool *a = new bool[n];
+    for (int i = 0; i < n - k; ++i)
+      a[i] = false;
+    for (int i = n - k; i < n; ++i)
+      a[i] = true;
+    do {
+      combination.clear();
+      for (int i = 0; i < n; ++i) {
+        if (a[i])
+          combination.push_back(labels[i]);
+      }
+      combinations.push_back(combination);
+    } while (std::next_permutation(a, a + n));
+    delete[] a;
+  }
+  return combinations;
+}
+
+/**
+ * Generate combinations of 0,1,...,(n-1) taken k at a time
+ * @param n
+ * @param k
+ */
+std::vector<std::vector<int>> generate_combinations(int n, int k) {
+  std::vector<int> labels;
+  for (int i = 0; i < n; ++i)
+    labels.push_back(i);
+  return generate_combinations(n, k, labels);
+}
+
+/**
+ * Generate permutation of n labels
+ * @param n
+ * @param labels a vector of integers
+ */
+std::vector<std::vector<int>> generate_permutations(int n,
+                                                    std::vector<int> &labels) {
+  std::vector<std::vector<int>> permutations;
+  if (n > 0) {
+    do {
+      permutations.push_back(labels);
+    } while (std::next_permutation(labels.begin(), labels.end()));
+  }
+  return permutations;
+}
 
 void reset_class(bool *a, std::vector<int> &n, std::vector<int> &k,
                  std::vector<int> &offset, int q);
@@ -256,126 +423,6 @@ generate_direct_product_combinations(std::vector<int> &n, std::vector<int> &k) {
 
   delete[] a;
   return combinations;
-}
-
-void product_space_iterator(
-    const std::vector<int> &r,
-    const std::function<void(const std::vector<int> &)> &func) {
-  int n = r.size();         // number of indices
-  std::vector<int> a(n, 0); // current configuration
-
-  std::vector<std::vector<int>> ps;
-
-  func(a);
-  ps.push_back(a);
-  int i = 0;
-  int l = 1;
-  for (;;) {
-    // try to increase bin i
-    if (a[i] < r[i] - 1) {
-      a[i] += 1;
-
-      // reset all previous bins
-      for (int j = 0; j < i; ++j) {
-        a[j] = 0;
-      }
-
-      // output configuration
-      func(a);
-      ps.push_back(a);
-
-      // restart from the beginning
-      i = 0;
-      l++;
-    } else { // try the next bin
-      i++;
-    }
-    // if we go beyond the last bin we're done
-    if (i == n)
-      break;
-  }
-  int exact = 1;
-  for (int ri : r)
-    exact *= ri;
-  assert(l == exact);
-
-  size_t all = ps.size();
-  std::sort(ps.begin(), ps.end());
-  ps.erase(std::unique(ps.begin(), ps.end()), ps.end());
-  size_t unique = ps.size();
-  assert(all == unique);
-}
-
-void generalized_combinations_with_repetitions_iterator(
-    const std::vector<int> &r, const std::vector<int> &k,
-    const std::function<void(const std::vector<std::vector<int>> &)> &func) {
-  int n = r.size();                // number of indices
-  std::vector<std::vector<int>> a; // current configuration
-
-  // Initialize each bin
-  for (int i = 0; i < n; i++) {
-    a.push_back(std::vector<int>(k[i], 0));
-  }
-
-  std::vector<std::vector<std::vector<int>>> ps;
-
-  func(a);
-  ps.push_back(a);
-  int i = 0;
-  int j = 0;
-  int l = 1;
-  for (;;) {
-    // try to increase bin (i,j)
-    if (a[i][j] == r[i] - 1) {
-      // if this walker reached the top, move to the next bin
-      i++;
-    } else if ((j < k[i] - 1) and (a[i][j] == a[i][j + 1])) {
-      // if another walker is blocking this
-      // one try the next walker
-      j++;
-    } else {
-      // increase walker j on bin i
-      a[i][j] += 1;
-
-      // reset all previous walkers
-      for (int p = 0; p < i; ++p) {
-        for (int m = 0; m < k[p]; m++) {
-          a[p][m] = 0;
-        }
-      }
-      for (int m = 0; m < j; m++) {
-        a[i][m] = 0;
-      }
-
-      // output configuration
-      func(a);
-      ps.push_back(a);
-
-      // restart from the beginning
-      i = 0;
-      j = 0;
-      l++;
-    }
-
-    // if we go beyond the last bin we're done
-    if (i == n)
-      break;
-  }
-
-  int exact = 1;
-  for (int m = 0; m < n; ++m) {
-    exact *= binomial(r[m] + k[m] - 1, k[m]);
-    std::cout << r[m] + k[m] - 1 << " " << k[m] << " "
-              << binomial(r[m] + k[m] - 1, r[m]) << std::endl;
-  }
-  std::cout << "l = " << l << "exact = " << exact << std::endl;
-  assert(l == exact);
-
-  size_t all = ps.size();
-  std::sort(ps.begin(), ps.end());
-  ps.erase(std::unique(ps.begin(), ps.end()), ps.end());
-  size_t unique = ps.size();
-  assert(all == unique);
 }
 
 // Williamson's implementation (seems to have a bug if one of the r_i = 1)

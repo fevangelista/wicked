@@ -21,6 +21,8 @@ WTheorem::WTheorem() {
   make_contraction_skeletons();
 
   test_integer_partitions();
+
+  test_product_space();
 }
 
 void WTheorem::theorem(const std::vector<WTerm> &terms) {}
@@ -78,46 +80,44 @@ void WTheorem::theorem_pair(const WTerm &A, const WTerm &B, int minrank,
 
   product_space_iterator(contr_range,
                          [&](const std::vector<int> &contr_per_space) {
-      this->contract_pair(A, B, contr_per_space);
-  });
+                           this->contract_pair(A, B, contr_per_space);
+                         });
 
-  product_space_iterator({2,3,2}, [&](const std::vector<int> &vec) {
-    for (int i : vec) {
-      cout << i << ' ';
-    }
-    cout << endl;
-  });
+  //  product_space_iterator({2,3,2}, [&](const std::vector<int> &vec) {
+  //    for (int i : vec) {
+  //      cout << i << ' ';
+  //    }
+  //    cout << endl;
+  //  });
 
-  product_space_iterator({2,4,2}, [&](const std::vector<int> &vec) {
-    for (int i : vec) {
-      cout << i << ' ';
-    }
-    cout << endl;
-  });
+  //  product_space_iterator({2,4,2}, [&](const std::vector<int> &vec) {
+  //    for (int i : vec) {
+  //      cout << i << ' ';
+  //    }
+  //    cout << endl;
+  //  });
 
+  //  generalized_combinations_with_repetitions_iterator({2, 2, 2}, {2, 2, 2},
+  //                             [&](const std::vector<std::vector<int>> &res) {
+  //                               for (auto &vec : res) {
+  //                                 for (int i : vec) {
+  //                                   cout << i << ' ';
+  //                                 }
+  //                                 cout << endl;
+  //                               }
+  //                               cout << endl;
+  //                             });
 
-
-  combination_space_iterator({2, 2, 2}, {2, 2, 2},
-                             [&](const std::vector<std::vector<int>> &res) {
-                               for (auto &vec : res) {
-                                 for (int i : vec) {
-                                   cout << i << ' ';
-                                 }
-                                 cout << endl;
-                               }
-                               cout << endl;
-                             });
-
-  combination_space_iterator({2, 3, 3}, {2, 2, 2},
-                             [&](const std::vector<std::vector<int>> &res) {
-                               for (auto &vec : res) {
-                                 for (int i : vec) {
-                                   cout << i << ' ';
-                                 }
-                                 cout << endl;
-                               }
-                               cout << endl;
-                             });
+  //  generalized_combinations_with_repetitions_iterator({2, 3, 3}, {2, 2, 2},
+  //                             [&](const std::vector<std::vector<int>> &res) {
+  //                               for (auto &vec : res) {
+  //                                 for (int i : vec) {
+  //                                   cout << i << ' ';
+  //                                 }
+  //                                 cout << endl;
+  //                               }
+  //                               cout << endl;
+  //                             });
 }
 
 void WTheorem::contract_pair(const WTerm &A, const WTerm &B,
@@ -159,42 +159,82 @@ void WTheorem::make_contraction_skeletons() {
   //  for ()
 
   for (int n = 0; n <= maxskeleton_; ++n) {
-    PRINT(Detailed, cout << "Number of contractions: " << n << endl;)
+    PRINT(Detailed, cout << "\nNumber of contractions: " << n << endl;)
     // Partition the number of contractions (n)
     const auto &partitions = integer_partitions_[n];
 
     PRINT(Detailed, cout << "Type of " << n << "-contractions:" << endl;)
     for (const auto &partition : partitions) {
-      PRINT(Detailed, for (const auto &i : partition) { cout << " " << i; })
-      PRINT(Detailed, cout << endl;)
+      PRINT(Detailed, std::vector<std::string> s; for (const auto &i
+                                                       : partition) {
+        s.push_back(to_string(i));
+      } cout << to_string(s, "+");)
+      PRINT(Detailed, cout << " | ";)
 
-      std::vector<std::vector<std::pair<int, int>>> contr_spaces;
+      std::map<int, int> leg_count;
       for (int i : partition) {
-        std::vector<std::pair<int, int>> contr_space;
-        PRINT(Detailed, cout << i
-                             << "-legged contraction can be split as:" << endl;)
-        for (int j = 1; j <= 2 * i - 1; ++j) {
-          PRINT(Detailed, cout << "(" << j << "," << 2 * i - j << ")" << endl;)
-          contr_space.push_back(std::make_pair(j, 2 * i - j));
-        }
+        leg_count[i] += 1;
       }
+      std::vector<int> nlegs;
+      std::vector<int> ntypes;
+      std::vector<int> multp;
+      std::vector<std::string> s;
+      //      PRINT(Detailed, )
 
-      //      std::map<int, int> count;
-      //      for (int i : partition) {
-      //        count[i] += 1;
-      //      }
-      //      for (auto kv : count) {
-      //        PRINT(Detailed, cout << "class = " << kv.first
-      //                             << " multp = " << kv.second << endl;)
-      //      }
-
-      //      for (int i : partition) {
-      //        for (int j = 1; j <= 2 * i - 1; ++j) {
-      //          PRINT(Detailed, cout << "(" << j << "," << 2 * i - j << ")" <<
-      //          endl;)
-      //        }
-      //      }
+      for (auto kv : leg_count) {
+        PRINT(Detailed, s.push_back(to_string(kv.first * 2) + "-leg x " +
+                                    to_string(kv.second)););
+        nlegs.push_back(2 * kv.first);
+        ntypes.push_back(2 * kv.first - 1);
+        multp.push_back(kv.second);
+      }
+      PRINT(Detailed, cout << to_string(s, " + ") << endl;);
+      auto sets = generalized_combinations_with_repetitions(ntypes, multp);
+      for (auto &set : sets) {
+        std::vector<std::pair<int, int>> contraction_skeleton;
+        int nlegs_left_total = 0;
+        int nlegs_right_total = 0;
+        for (int n = 0; n < nlegs.size(); n++) {
+          for (int i : set[n]) {
+            int nlegs_left = i + 1;
+            int nlegs_right = nlegs[n] - i - 1;
+            cout << nlegs[n] << "-leg(" << nlegs_left << "|" << nlegs_right
+                 << ")  ";
+            nlegs_left_total += nlegs_left;
+            nlegs_right_total += nlegs_right;
+            contraction_skeleton.push_back(
+                std::make_pair(nlegs_left, nlegs_right));
+          }
+        }
+        cout << " -> (" << nlegs_left_total << "|" << nlegs_right_total << ")"
+             << endl;
+        // save this skeleton
+        std::tuple<int, int, int> key(2 * n, nlegs_left_total, nlegs_right_total);
+        skeletons_[key].push_back(contraction_skeleton);
+      }
+      cout << endl;
     }
+  }
+
+  std::vector<std::tuple<int, int, int>> sorted_keys;
+  for (auto &kv : skeletons_) {
+    sorted_keys.push_back(kv.first);
+  }
+  std::sort(sorted_keys.begin(), sorted_keys.end());
+
+  for (auto &k : sorted_keys) {
+      cout << "Total legs:" << std::get<0>(k) << " (" << std::get<1>(k) << "|" << std::get<2>(k) << ")" << endl;
+    const auto &skeleton_familty = skeletons_[k];
+    for (auto &el : skeleton_familty) {
+      std::vector<std::string> str;
+      for (auto p : el) {
+        str.push_back("(" + to_string(p.first) + "|" + to_string(p.second) +
+                      ")");
+      }
+      cout << to_string(str, " ");
+      cout << endl;
+    }
+    cout << endl;
   }
 }
 

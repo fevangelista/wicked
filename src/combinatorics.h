@@ -20,19 +20,34 @@ void test_integer_partitions();
 
 // ==> Product space <==
 
-// Given a vector of ranges (r_i, i = 0,...,n-1) computes the product space
-// S = S(0) x S(1) x ... S(n-1) where S(i) = {0,1,2,...,r_i - 1)
+/// Given a vector of ranges (r_i, i = 0,...,n-1) iterate over the product space
+/// S = S(0) x S(1) x ... S(n-1) where S(i) = {0,1,2,...,r_i - 1)
 void product_space_iterator(
     const std::vector<int> &r,
     const std::function<void(const std::vector<int> &)> &func);
 
-// Given a vector of ranges (r_i, i = 0,...,n-1) and number of elements
-// (k_i, i = 0,...,n-1) compute the product space
-// C = C(S(0),k_0) x C(S(1),k_1) x C(S(2),k_2) x ... where C(S,k) stands for the
-// combination of k elements of set S with repetitions.
+/// Given a vector of ranges (r_i, i = 0,...,n-1) compute the product space
+/// S = S(0) x S(1) x ... S(n-1) where S(i) = {0,1,2,...,r_i - 1)
+std::vector<std::vector<int>> product_space(const std::vector<int> &r);
+
+/// Function to test product space
+void test_product_space();
+
+/// Given a vector of ranges (r_i, i = 0,...,n-1) and number of elements
+/// (k_i, i = 0,...,n-1) iterate over the product space
+/// C = C(S(0),k_0) x C(S(1),k_1) x C(S(2),k_2) x ... where C(S,k) stands for
+/// all the combinations of k elements taken from S (with repetitions).
 void generalized_combinations_with_repetitions_iterator(
     const std::vector<int> &r, const std::vector<int> &k,
     const std::function<void(const std::vector<std::vector<int>> &)> &func);
+
+/// Given a vector of ranges (r_i, i = 0,...,n-1) and number of elements
+/// (k_i, i = 0,...,n-1) compute the product space
+/// C = C(S(0),k_0) x C(S(1),k_1) x C(S(2),k_2) x ... where C(S,k) stands for
+/// all the combinations of k elements taken from S (with repetitions).
+std::vector<std::vector<std::vector<int>>>
+generalized_combinations_with_repetitions(const std::vector<int> &r,
+                                          const std::vector<int> &k);
 
 // ==> Combinations <==
 
