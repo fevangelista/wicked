@@ -260,7 +260,11 @@ void generalized_combinations_with_repetitions_iterator(
     //    std::cout << r[m] + k[m] - 1 << " " << k[m] << " "
     //              << binomial(r[m] + k[m] - 1, r[m]) << std::endl;
   }
-  std::cout << "l = " << l << "exact = " << exact << std::endl;
+  if (l != exact) {
+    std::cout << "generalized_combinations_with_repetitions_iterator():"
+              << std::endl;
+    std::cout << "l = " << l << "exact = " << exact << std::endl;
+  }
   assert(l == exact);
 
   size_t all = ps.size();

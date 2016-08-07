@@ -16,7 +16,7 @@ WTheorem::WTheorem() {
     integer_partitions_.push_back(integer_partitions(n));
   }
 
-  make_contraction_partitions();
+  //  make_contraction_partitions();
 
   make_contraction_skeletons();
 
@@ -134,25 +134,6 @@ void WTheorem::contract_pair(const WTerm &A, const WTerm &B,
   }
 }
 
-void WTheorem::make_contraction_partitions() {
-  for (int n = 0; n <= maxcumulant_; n++) {
-    contr_part_t part;
-    for (int i = 1; i < 2 * n; i++) {
-      part.push_back(std::make_pair(2 * n - i, i));
-    }
-    contraction_partitions_.push_back(part);
-  }
-
-  PRINT(Detailed, int k = 0; for (auto cp
-                                  : contraction_partitions_) {
-    cout << 2 * k << "-legged contractions:" << endl;
-    for (auto p : cp) {
-      cout << p.first << " " << p.second << endl;
-    }
-    k++;
-  })
-}
-
 void WTheorem::make_contraction_skeletons() {
 
   //  std::vector<std::vector<std::pair<int, int>>> contraction_partition_;
@@ -165,21 +146,25 @@ void WTheorem::make_contraction_skeletons() {
 
     PRINT(Detailed, cout << "Type of " << n << "-contractions:" << endl;)
     for (const auto &partition : partitions) {
-      PRINT(Detailed, std::vector<std::string> s; for (const auto &i
-                                                       : partition) {
-        s.push_back(to_string(i));
-      } cout << to_string(s, "+");)
+      PRINT(
+          Detailed, std::vector<std::string> s; for (const auto &i
+                                                     : partition) {
+            s.push_back(to_string(i));
+          } cout << "  "
+                 << to_string(s, "+");)
       PRINT(Detailed, cout << " | ";)
 
       std::map<int, int> leg_count;
+      int highest_cumulant = 0;
       for (int i : partition) {
         leg_count[i] += 1;
+        highest_cumulant = std::max(highest_cumulant, i);
       }
+
       std::vector<int> nlegs;
       std::vector<int> ntypes;
       std::vector<int> multp;
       std::vector<std::string> s;
-      //      PRINT(Detailed, )
 
       for (auto kv : leg_count) {
         PRINT(Detailed, s.push_back(to_string(kv.first * 2) + "-leg x " +
@@ -188,31 +173,40 @@ void WTheorem::make_contraction_skeletons() {
         ntypes.push_back(2 * kv.first - 1);
         multp.push_back(kv.second);
       }
-      PRINT(Detailed, cout << to_string(s, " + ") << endl;);
+      PRINT(Detailed, cout << to_string(s, " + "););
+
+      PRINT(Detailed, cout << " (highest cumulant: " << highest_cumulant << ")"
+                           << endl;);
+
+      if (highest_cumulant > maxcumulant_)
+        continue;
       auto sets = generalized_combinations_with_repetitions(ntypes, multp);
       for (auto &set : sets) {
         std::vector<std::pair<int, int>> contraction_skeleton;
         int nlegs_left_total = 0;
         int nlegs_right_total = 0;
+
+        PRINT(Detailed,cout << "    ";)
         for (int n = 0; n < nlegs.size(); n++) {
           for (int i : set[n]) {
             int nlegs_left = i + 1;
             int nlegs_right = nlegs[n] - i - 1;
-            cout << nlegs[n] << "-leg(" << nlegs_left << "|" << nlegs_right
-                 << ")  ";
+            PRINT(Detailed, cout << nlegs[n] << "-leg(" << nlegs_left << "|"
+                                 << nlegs_right << ")  ";)
             nlegs_left_total += nlegs_left;
             nlegs_right_total += nlegs_right;
             contraction_skeleton.push_back(
                 std::make_pair(nlegs_left, nlegs_right));
           }
         }
-        cout << " -> (" << nlegs_left_total << "|" << nlegs_right_total << ")"
-             << endl;
+        PRINT(Detailed, cout << " -> (" << nlegs_left_total << "|"
+                             << nlegs_right_total << ")" << endl;)
         // save this skeleton
-        std::tuple<int, int, int> key(2 * n, nlegs_left_total, nlegs_right_total);
+        std::tuple<int, int, int> key(2 * n, nlegs_left_total,
+                                      nlegs_right_total);
         skeletons_[key].push_back(contraction_skeleton);
       }
-      cout << endl;
+      PRINT(Detailed,cout << endl;)
     }
   }
 
@@ -222,8 +216,10 @@ void WTheorem::make_contraction_skeletons() {
   }
   std::sort(sorted_keys.begin(), sorted_keys.end());
 
-  for (auto &k : sorted_keys) {
-      cout << "Total legs:" << std::get<0>(k) << " (" << std::get<1>(k) << "|" << std::get<2>(k) << ")" << endl;
+  PRINT(Detailed, for (auto &k
+                       : sorted_keys) {
+    cout << "Total legs:" << std::get<0>(k) << " (" << std::get<1>(k) << "|"
+         << std::get<2>(k) << ")" << endl;
     const auto &skeleton_familty = skeletons_[k];
     for (auto &el : skeleton_familty) {
       std::vector<std::string> str;
@@ -235,7 +231,7 @@ void WTheorem::make_contraction_skeletons() {
       cout << endl;
     }
     cout << endl;
-  }
+  })
 }
 
 // std::vector<std::map<std::pair<int, int>, int>>
