@@ -22,12 +22,16 @@ void test_integer_partitions();
 
 /// Given a vector of ranges (r_i, i = 0,...,n-1) iterate over the product space
 /// S = S(0) x S(1) x ... S(n-1) where S(i) = {0,1,2,...,r_i - 1)
+/// If one or more spaces are empty (that is, r_i = 0 for some i) then this
+/// iterator will not call func
 void product_space_iterator(
     const std::vector<int> &r,
     const std::function<void(const std::vector<int> &)> &func);
 
 /// Given a vector of ranges (r_i, i = 0,...,n-1) compute the product space
 /// S = S(0) x S(1) x ... S(n-1) where S(i) = {0,1,2,...,r_i - 1)
+/// If one or more spaces are empty (that is, r_i = 0 for some i) then this
+/// function will return an empty vector
 std::vector<std::vector<int>> product_space(const std::vector<int> &r);
 
 /// Function to test product space

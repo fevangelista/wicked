@@ -42,10 +42,11 @@ int main(int argc, const char *argv[]) {
                             opT2cavv, opT2aaav, opT2aavv};
 
   WTerm opH1aa = make_operator("H1", {a}, {a});
+  WTerm opH1ac = make_operator("H1", {a}, {c});
 
 
   WSum sum;
-  for (WTerm &term : opT){
+  for (WTerm &term : opT) {
     cout << term.str() << endl;
     sum.add(term);
   }
@@ -53,10 +54,12 @@ int main(int argc, const char *argv[]) {
   cout << sum.str() << endl;
 
   WTheorem wt;
-  wt.theorem_pair(opH1aa,opT1ca);
+  wt.theorem_pair(opH1aa, opT1ca);
 
-//  for (WTerm &term : opT)
-//    cout << term.latex() << endl;
+  wt.theorem_pair(opH1ac, opT1ca);
+
+  //  for (WTerm &term : opT)
+  //    cout << term.latex() << endl;
 
   //  for (auto op : opT) {
   //    std::cout << op.str() << std::endl;

@@ -7,7 +7,7 @@
 #include "combinatorics.h"
 
 #define DEBUG_PRODUCT_SPACE(code)                                              \
-  { code }
+  //{ code }
 
 int binomial(int n, int k);
 
@@ -118,9 +118,18 @@ void product_space_iterator(
     const std::function<void(const std::vector<int> &)> &func) {
   int n = r.size(); // number of indices
 
-  // special case
-  if (n == 0)
+  int exact = 1;
+  for (int ri : r)
+    exact *= ri;
+
+  // Zero indices -> no elements
+  if (n == 0) {
     return;
+  }
+  // One or more spaces has zero dimension -> no elements
+  if (exact == 0) {
+    return;
+  }
 
   std::vector<int> a(n, 0); // current configuration
 
@@ -154,9 +163,9 @@ void product_space_iterator(
     if (i == n)
       break;
   }
-  int exact = 1;
-  for (int ri : r)
-    exact *= ri;
+  DEBUG_PRODUCT_SPACE(std::cout << "Number of elements:" << l
+                                << " (exact = " << exact << ")" << std::endl;)
+
   assert(l == exact);
 
   size_t all = ps.size();

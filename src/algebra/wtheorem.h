@@ -7,7 +7,6 @@
 
 enum WTPrintLevel { No, Summary, Detailed, Full };
 
-
 using skeleton_map_t = std::map<std::tuple<int, int, int>,
                                 std::vector<std::vector<std::pair<int, int>>>>;
 
@@ -28,8 +27,13 @@ public:
   void theorem_pair(const WTerm &A, const WTerm &B, int minrank = -1,
                     int maxrank = -1);
 
-  void contract_pair(const WTerm &A, const WTerm &B,
+  void contract_pair(const WTerm &A, const std::vector<int> &naop,
+                     const WTerm &B, const std::vector<int> &nbop,
                      const std::vector<int> &contr_per_space);
+
+  void contract_pair_splitting(
+      const WTerm &A, const WTerm &B,
+      const std::vector<std::tuple<int, int, int>> &splitting);
 
   void set_print_level(WTPrintLevel print) { print_ = print; }
 

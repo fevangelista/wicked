@@ -15,14 +15,11 @@ WTheorem::WTheorem() {
   for (int n = 0; n <= 20; ++n) {
     integer_partitions_.push_back(integer_partitions(n));
   }
-
-  //  make_contraction_partitions();
-
-  make_contraction_skeletons();
-
   test_integer_partitions();
 
   test_product_space();
+
+  make_contraction_skeletons();
 }
 
 void WTheorem::theorem(const std::vector<WTerm> &terms) {}
@@ -64,80 +61,130 @@ void WTheorem::theorem_pair(const WTerm &A, const WTerm &B, int minrank,
         cout << ' ' << i;
       } cout << endl;)
 
-  // determine the number of ways we can contract the two operators
-  int nways = 1; // the no-contraction case
-  for (int s = 0; s < nspace; s++) {
-    nways *= (1 + maxcontr_space[s]);
-  }
-
-  PRINT(Detailed, cout << "Operators can be contracted in " << nways << " ways"
-                       << endl;)
-
   std::vector<int> contr_range;
   for (int i : maxcontr_space) {
     contr_range.push_back(i + 1);
   }
 
-  product_space_iterator(contr_range,
-                         [&](const std::vector<int> &contr_per_space) {
-                           this->contract_pair(A, B, contr_per_space);
-                         });
-
-  //  product_space_iterator({2,3,2}, [&](const std::vector<int> &vec) {
-  //    for (int i : vec) {
-  //      cout << i << ' ';
-  //    }
-  //    cout << endl;
-  //  });
-
-  //  product_space_iterator({2,4,2}, [&](const std::vector<int> &vec) {
-  //    for (int i : vec) {
-  //      cout << i << ' ';
-  //    }
-  //    cout << endl;
-  //  });
-
-  //  generalized_combinations_with_repetitions_iterator({2, 2, 2}, {2, 2, 2},
-  //                             [&](const std::vector<std::vector<int>> &res) {
-  //                               for (auto &vec : res) {
-  //                                 for (int i : vec) {
-  //                                   cout << i << ' ';
-  //                                 }
-  //                                 cout << endl;
-  //                               }
-  //                               cout << endl;
-  //                             });
-
-  //  generalized_combinations_with_repetitions_iterator({2, 3, 3}, {2, 2, 2},
-  //                             [&](const std::vector<std::vector<int>> &res) {
-  //                               for (auto &vec : res) {
-  //                                 for (int i : vec) {
-  //                                   cout << i << ' ';
-  //                                 }
-  //                                 cout << endl;
-  //                               }
-  //                               cout << endl;
-  //                             });
+  product_space_iterator(
+      contr_range, [&](const std::vector<int> &contr_per_space) {
+        this->contract_pair(A, naop_space, B, nbop_space, contr_per_space);
+      });
 }
 
-void WTheorem::contract_pair(const WTerm &A, const WTerm &B,
+void WTheorem::contract_pair(const WTerm &A, const std::vector<int> &naop,
+                             const WTerm &B, const std::vector<int> &nbop,
                              const std::vector<int> &contr_per_space) {
   PRINT(Detailed, cout << "Contraction pattern:";
         for (int i
              : contr_per_space) { cout << ' ' << i; };
         cout << endl;)
-  // At this point we are given two operators and the number of contractions per
-  // space (contr_per_space).
+  // At this point we are given two operators and the number of contractions
+  // per space (contr_per_space).
 
-  // For each space find out the list of all possible contractions
+  // For each space find out the list of all possible ways to split the
+  // contractions among A and B
+  std::vector<std::vector<std::tuple<int, int, int>>> contraction_splittings;
+  std::vector<int> num_splitting_per_space;
   for (int s = 0; s < osi->num_spaces(); s++) {
+    std::vector<std::tuple<int, int, int>> splittings;
+    PRINT(Detailed, cout << "Space: " << s << endl;)
+    //    PRINT(Detailed, cout << contr_per_space[s] << "-contractions with max"
+    //    << : " << s << endl;)
+    int lt = 2 * contr_per_space[s];
+    for (int la = 1; la <= naop[s]; ++la) { // loop over the legs in A
+      int lb = lt - la;
+      if ((lb >= 1) and (lb <= nbop[s])) {
+        splittings.push_back(std::make_tuple(lt, la, lb));
+        PRINT(Detailed, cout << "  Skeleton (" << lt << "," << la << "," << lb
+                             << ")" << endl;)
+      }
+    }
+    // If no contractions are possible, add a void contraction
+    if (splittings.size() == 0)
+      splittings.push_back(std::make_tuple(0, 0, 0));
+    contraction_splittings.push_back(splittings);
+    num_splitting_per_space.push_back(splittings.size());
   }
+
+  // Loop over all combinations of contraction splittings
+  product_space_iterator(
+      num_splitting_per_space,
+      [&](const std::vector<int> &splitting_per_space) {
+        PRINT(Detailed, cout << "  Picking combination:" << endl;)
+        std::vector<std::tuple<int, int, int>> splitting_list;
+        for (int s = 0; s < osi->num_spaces(); s++) {
+          PRINT(Detailed, for (int i
+                               : splitting_per_space) { cout << " " << i; })
+
+          auto t = contraction_splittings[s][splitting_per_space[s]];
+          splitting_list.push_back(
+              contraction_splittings[s][splitting_per_space[s]]);
+          PRINT(Detailed, cout << " -> (" << std::get<0>(t) << ","
+                               << std::get<1>(t) << "," << std::get<2>(t) << ")"
+                               << endl;)
+          //            JUST introduced a bug somewhere here.
+        }
+        this->contract_pair_splitting(A, B, splitting_list);
+      });
+}
+
+void WTheorem::contract_pair_splitting(
+    const WTerm &A, const WTerm &B,
+    const std::vector<std::tuple<int, int, int>> &splitting) {
+  // look into the skeleton database to find all compatible splittings
+  PRINT(
+      Detailed, cout << "Contract using the following splitting ->";
+      for (auto t
+           : splitting) {
+        cout << " (" << std::get<0>(t) << "," << std::get<1>(t) << ","
+             << std::get<2>(t) << ")";
+      } cout
+      << endl;)
+  std::vector<int> num_skeletons_per_space;
+  for (auto t : splitting) {
+    const auto search = skeletons_.find(t);
+    if (search != skeletons_.end()) {
+      int n = search->second.size();
+      num_skeletons_per_space.push_back(n);
+      PRINT(Detailed,
+            cout << "Found " << n
+                 << " skeleton(s) that match(es) this splitting:" << endl;
+            int k = 0; for (const auto &s_vec
+                            : search->second) {
+              cout << k + 1 << ":";
+              for (const auto &s : s_vec) {
+                cout << " (" << s.first << "," << s.second << ")" << endl;
+              }
+              k++;
+            });
+    } else {
+      PRINT(Detailed, cout << "Found no skeletons that match this splitting"
+                           << endl;);
+      num_skeletons_per_space.push_back(0);
+    }
+  }
+
+  product_space_iterator(
+      num_skeletons_per_space,
+      [&](const std::vector<int> &skeletons_per_space) {
+        PRINT(Summary, cout << "  Picking the following contractions:" << endl;)
+        for (int s = 0; s < osi->num_spaces(); s++) {
+          int sk = skeletons_per_space[s];
+          const auto &key = splitting[s];
+          const auto &skeleton = skeletons_[key][skeletons_per_space[s]];
+          for (auto p : skeleton) {
+            cout << " (" << p.first << "," << p.second << ")";
+          }
+          cout << endl;
+        }
+      });
 }
 
 void WTheorem::make_contraction_skeletons() {
-
-  //  std::vector<std::vector<std::pair<int, int>>> contraction_partition_;
-  //  for ()
+  // the null contraction
+  std::tuple<int, int, int> key(0, 0, 0);
+  skeletons_[key].push_back({std::make_pair(0, 0)});
 
   for (int n = 0; n <= maxskeleton_; ++n) {
     PRINT(Detailed, cout << "\nNumber of contractions: " << n << endl;)
@@ -186,7 +233,7 @@ void WTheorem::make_contraction_skeletons() {
         int nlegs_left_total = 0;
         int nlegs_right_total = 0;
 
-        PRINT(Detailed,cout << "    ";)
+        PRINT(Detailed, cout << "    ";)
         for (int n = 0; n < nlegs.size(); n++) {
           for (int i : set[n]) {
             int nlegs_left = i + 1;
@@ -206,7 +253,7 @@ void WTheorem::make_contraction_skeletons() {
                                       nlegs_right_total);
         skeletons_[key].push_back(contraction_skeleton);
       }
-      PRINT(Detailed,cout << endl;)
+      PRINT(Detailed, cout << endl;)
     }
   }
 
@@ -249,3 +296,39 @@ void WTheorem::make_contraction_skeletons() {
 
 //  return result;
 //}
+
+//  product_space_iterator({2,3,2}, [&](const std::vector<int> &vec) {
+//    for (int i : vec) {
+//      cout << i << ' ';
+//    }
+//    cout << endl;
+//  });
+
+//  product_space_iterator({2,4,2}, [&](const std::vector<int> &vec) {
+//    for (int i : vec) {
+//      cout << i << ' ';
+//    }
+//    cout << endl;
+//  });
+
+//  generalized_combinations_with_repetitions_iterator({2, 2, 2}, {2, 2, 2},
+//                             [&](const std::vector<std::vector<int>> &res) {
+//                               for (auto &vec : res) {
+//                                 for (int i : vec) {
+//                                   cout << i << ' ';
+//                                 }
+//                                 cout << endl;
+//                               }
+//                               cout << endl;
+//                             });
+
+//  generalized_combinations_with_repetitions_iterator({2, 3, 3}, {2, 2, 2},
+//                             [&](const std::vector<std::vector<int>> &res) {
+//                               for (auto &vec : res) {
+//                                 for (int i : vec) {
+//                                   cout << i << ' ';
+//                                 }
+//                                 cout << endl;
+//                               }
+//                               cout << endl;
+//                             });
