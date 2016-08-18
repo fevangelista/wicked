@@ -23,10 +23,10 @@ public:
   // ==> Class public interface <==
 
   /// Add one or more WSQOperator
-  void add(WSQOperator &op);
+  void add(const WSQOperator &op);
 
   /// Add a tensor
-  void add(WTensor &tensor_);
+  void add(const WTensor& tensor);
 
   /// Return the scalar factor
   scalar_t factor() const;
@@ -44,13 +44,13 @@ public:
   std::vector<int> noperators_per_space() const;
 
   /// Return the SQ operators
-  std::vector<std::vector<WSQOperator>> &operators() { return operators_; }
+  const std::vector<std::vector<WSQOperator>> &operators() const { return operators_; }
 
   /// Return the SQ operators in space n
-  std::vector<WSQOperator> &operators(int n) { return operators_[n]; }
+  const std::vector<WSQOperator> &operators(int n) const { return operators_[n]; }
 
-  //  /// Return a vector with the number of indices per space
-  //  std::vector<int> space_count();
+  /// Return the tensors
+  const std::vector<WTensor> &tensors() const { return tensors_; }
 
   /// Canonicalize this term
   void canonicalize();

@@ -58,6 +58,10 @@ private:
   // ==> Private class functions <==
 
   void make_contraction_skeletons();
+
+  std::vector<std::pair<std::vector<int>, std::vector<int>>>
+  contraction_layout_to_edges(const std::vector<int> &A_legs,
+                              const std::vector<int> &B_legs);
 };
 
 #endif // _wicked_wtheorem_h_

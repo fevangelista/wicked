@@ -5,11 +5,11 @@
 WTerm::WTerm()
     : operators_(std::vector<std::vector<WSQOperator>>(osi->num_spaces())) {}
 
-void WTerm::add(WSQOperator &op) {
+void WTerm::add(const WSQOperator& op) {
   operators_[op.index().space()].push_back(op);
 }
 
-void WTerm::add(WTensor &tensor_) { tensors_.push_back(tensor_); }
+void WTerm::add(const WTensor &tensor) { tensors_.push_back(tensor); }
 
 scalar_t WTerm::factor() const { return factor_; }
 

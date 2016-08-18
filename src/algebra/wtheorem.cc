@@ -204,7 +204,7 @@ void WTheorem::contract_pair_permute(
     int nbops = B.noperators(s);
     std::vector<int> A_perm(naops, 0);
     std::vector<int> B_perm(nbops, 0);
-//and (nbops > 0)
+
     if (naops > 0) {
       int offa = 0;
       int ncontr = 1;
@@ -249,8 +249,8 @@ void WTheorem::contract_pair_permute(
           cout << " non unique" << endl;
         }
       }
-    }else{
-        A_perms_space_unique.push_back(A_perm);
+    } else {
+      A_perms_space_unique.push_back(A_perm);
     }
 
     if (nbops > 0) {
@@ -264,7 +264,6 @@ void WTheorem::contract_pair_permute(
         ncontr++;
       }
       std::sort(B_perm.begin(), B_perm.end());
-
 
       do {
         PRINT_ELEMENTS(B_perm, "B perm -> ");
@@ -304,9 +303,8 @@ void WTheorem::contract_pair_permute(
         cout << ' ' << i;
       }
       B_legs.push_back(B_perms[s][product[osi->num_spaces() + s]]);
-
-      this->contract_pair_execute(A, B, A_legs, B_legs);
     }
+    this->contract_pair_execute(A, B, A_legs, B_legs);
     cout << endl;
   });
 
@@ -317,39 +315,68 @@ void WTheorem::contract_pair_execute(
     const WTerm &A, const WTerm &B, const std::vector<std::vector<int>> &A_legs,
     const std::vector<std::vector<int>> &B_legs) {
   cout << "Finally:" << endl;
-  // rebuild all the contractions
+
+  // merge the two tensors
+  WTerm AB;
+  std::vector<std::vector<WSQOperator>> Aops = A.operators();
+  std::vector<std::vector<WSQOperator>> Bops = B.operators();
+
+  std::vector<WTensor> Atens = A.tensors();
+  std::vector<WTensor> Btens = B.tensors();
+
+  scalar_t ABfact = A.factor() * B.factor();
+
+  // relabel indices to avoid redundant terms
+
+  // contract indices and keep track of signs
   for (int s = 0; s < osi->num_spaces(); s++) {
-    // find the number of contractions
-    int maxa = 0;
-    for (int a : A_legs[s]) {
-      maxa = std::max(a, maxa);
-    }
-    int maxb = 0;
-    for (int b : B_legs[s]) {
-      maxb = std::max(b, maxb);
-    }
-    assert(maxa == maxb);
-
-    std::vector<std::pair<std::vector<int>, std::vector<int>>> legs(maxa);
-
-    for (int i = 0, maxi = A_legs[s].size(); i < maxi; ++i) {
-      int a = A_legs[s][i];
-      if (a > 0) {
-        legs[a - 1].first.push_back(i);
-      }
-    }
-    for (int i = 0, maxi = B_legs[s].size(); i < maxi; ++i) {
-      int b = B_legs[s][i];
-      if (b > 0) {
-        legs[b - 1].first.push_back(i);
-      }
-    }
-
+    auto legs = contraction_layout_to_edges(A_legs[s], B_legs[s]);
     for (const auto &c : legs) {
-      PRINT_ELEMENTS(c.first);
-      PRINT_ELEMENTS(c.second);
+      for (int a : c.first) {
+      }
+      for (int b : c.second) {
+      }
     }
   }
+}
+
+std::vector<std::pair<std::vector<int>, std::vector<int>>>
+WTheorem::contraction_layout_to_edges(const std::vector<int> &A_legs,
+                                      const std::vector<int> &B_legs) {
+  std::vector<std::pair<std::vector<int>, std::vector<int>>> legs;
+  if ((A_legs.size() == 0) or (B_legs.size() == 0))
+    return legs;
+  // find the number of contractions
+  int maxa = 0;
+  for (int a : A_legs) {
+    maxa = std::max(a, maxa);
+  }
+  int maxb = 0;
+  for (int b : B_legs) {
+    maxb = std::max(b, maxb);
+  }
+  assert(maxa == maxb);
+
+  legs.resize(maxa);
+
+  for (int i = 0, maxi = A_legs.size(); i < maxi; ++i) {
+    int a = A_legs[i];
+    if (a > 0) {
+      legs[a - 1].first.push_back(i);
+    }
+  }
+  for (int i = 0, maxi = B_legs.size(); i < maxi; ++i) {
+    int b = B_legs[i];
+    if (b > 0) {
+      legs[b - 1].second.push_back(i);
+    }
+  }
+  for (const auto &c : legs) {
+    PRINT_ELEMENTS(c.first, "leg A ");
+    PRINT_ELEMENTS(c.second, "leg B ");
+    cout << endl;
+  }
+  return legs;
 }
 
 void WTheorem::make_contraction_skeletons() {
