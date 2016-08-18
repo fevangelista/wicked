@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <numeric>
 
 #include "combinatorics.h"
 #include "windex.h"
@@ -34,16 +35,22 @@ public:
   void set_factor(scalar_t value);
 
   /// Return the number of SQ operators
-  int noperators() const { return (operators_.size()); }
+  int noperators() const;
+
+  /// Return the number of SQ operators
+  int noperators(int n) const { return (operators_[n].size()); }
 
   /// Return the number of SQ operators in each orbital space
   std::vector<int> noperators_per_space() const;
 
   /// Return the SQ operators
-  std::vector<WSQOperator> &operators() { return operators_; }
+  std::vector<std::vector<WSQOperator>> &operators() { return operators_; }
 
-//  /// Return a vector with the number of indices per space
-//  std::vector<int> space_count();
+  /// Return the SQ operators in space n
+  std::vector<WSQOperator> &operators(int n) { return operators_[n]; }
+
+  //  /// Return a vector with the number of indices per space
+  //  std::vector<int> space_count();
 
   /// Canonicalize this term
   void canonicalize();
@@ -64,7 +71,7 @@ private:
   // ==> Class private data <==
 
   scalar_t factor_ = 1;
-  std::vector<WSQOperator> operators_;
+  std::vector<std::vector<WSQOperator>> operators_;
   std::vector<WTensor> tensors_;
 
   // ==> Class private functions <==

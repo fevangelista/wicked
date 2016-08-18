@@ -2,9 +2,12 @@
 #include "helpers.h"
 #include "wterm.h"
 
-WTerm::WTerm() {}
+WTerm::WTerm()
+    : operators_(std::vector<std::vector<WSQOperator>>(osi->num_spaces())) {}
 
-void WTerm::add(WSQOperator &op) { operators_.push_back(op); }
+void WTerm::add(WSQOperator &op) {
+  operators_[op.index().space()].push_back(op);
+}
 
 void WTerm::add(WTensor &tensor_) { tensors_.push_back(tensor_); }
 
@@ -12,10 +15,18 @@ scalar_t WTerm::factor() const { return factor_; }
 
 void WTerm::set_factor(scalar_t value) { factor_ = value; }
 
+int WTerm::noperators() const {
+  int result = 0;
+  for (const auto &op_space : operators_) {
+    result += op_space.size();
+  }
+  return result;
+}
+
 std::vector<int> WTerm::noperators_per_space() const {
-  std::vector<int> counter(osi->num_spaces());
+  std::vector<int> counter;
   for (const auto &op : operators_) {
-    counter[op.index().space()] += 1;
+    counter.push_back(op.size());
   }
   return counter;
 }
@@ -74,8 +85,10 @@ std::string WTerm::str() const {
     str_vec.push_back(tensor.str());
   }
   str_vec.push_back("{");
-  for (const WSQOperator &q : operators_) {
-    str_vec.push_back(q.str());
+  for (const auto &op_space : operators_) {
+    for (const WSQOperator &q : op_space) {
+      str_vec.push_back(q.str());
+    }
   }
   str_vec.push_back("}");
 
@@ -93,8 +106,10 @@ std::string WTerm::tensor_str() const {
 std::string WTerm::operator_str() const {
   std::vector<std::string> str_vec;
   str_vec.push_back("{");
-  for (const WSQOperator &q : operators_) {
-    str_vec.push_back(q.str());
+  for (const auto &op_space : operators_) {
+    for (const WSQOperator &q : op_space) {
+      str_vec.push_back(q.str());
+    }
   }
   str_vec.push_back("}");
   return (to_string(str_vec, " "));
@@ -106,8 +121,10 @@ std::string WTerm::latex() const {
     str_vec.push_back(tensor.latex());
   }
   str_vec.push_back("\\{");
-  for (const WSQOperator &q : operators_) {
-    str_vec.push_back(q.latex());
+  for (const auto &op_space : operators_) {
+    for (const WSQOperator &q : op_space) {
+      str_vec.push_back(q.latex());
+    }
   }
   str_vec.push_back("\\}");
   return (to_string(str_vec, " "));

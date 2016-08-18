@@ -35,6 +35,14 @@ public:
       const WTerm &A, const WTerm &B,
       const std::vector<std::tuple<int, int, int>> &splitting);
 
+  void contract_pair_permute(
+      const WTerm &A, const WTerm &B,
+      const std::vector<std::vector<std::pair<int, int>>> &contractions);
+
+  void contract_pair_execute(const WTerm &A, const WTerm &B,
+                             const std::vector<std::vector<int>> &A_legs,
+                             const std::vector<std::vector<int>> &B_legs);
+
   void set_print_level(WTPrintLevel print) { print_ = print; }
 
 private:

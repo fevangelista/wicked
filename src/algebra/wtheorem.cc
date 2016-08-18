@@ -1,8 +1,10 @@
+#include <assert.h>
 #include <iostream>
 
 #include "combinatorics.h"
 #include "helpers.h"
 #include "wtheorem.h"
+#include "stl_utils.hpp"
 
 using namespace std;
 
@@ -123,7 +125,6 @@ void WTheorem::contract_pair(const WTerm &A, const std::vector<int> &naop,
           PRINT(Detailed, cout << " -> (" << std::get<0>(t) << ","
                                << std::get<1>(t) << "," << std::get<2>(t) << ")"
                                << endl;)
-          //            JUST introduced a bug somewhere here.
         }
         this->contract_pair_splitting(A, B, splitting_list);
       });
@@ -168,17 +169,187 @@ void WTheorem::contract_pair_splitting(
   product_space_iterator(
       num_skeletons_per_space,
       [&](const std::vector<int> &skeletons_per_space) {
+        std::vector<std::vector<std::pair<int, int>>> contractions;
         PRINT(Summary, cout << "  Picking the following contractions:" << endl;)
         for (int s = 0; s < osi->num_spaces(); s++) {
           int sk = skeletons_per_space[s];
           const auto &key = splitting[s];
           const auto &skeleton = skeletons_[key][skeletons_per_space[s]];
+          contractions.push_back(skeleton);
           for (auto p : skeleton) {
             cout << " (" << p.first << "," << p.second << ")";
           }
           cout << endl;
         }
+        contract_pair_permute(A, B, contractions);
       });
+}
+
+void WTheorem::contract_pair_permute(
+    const WTerm &A, const WTerm &B,
+    const std::vector<std::vector<std::pair<int, int>>> &contractions) {
+
+  // lay out the legs and perform all permutations for each separate space
+  // this will include duplicate contractions that need to be eliminated
+
+  std::vector<std::vector<std::vector<int>>> A_perms;
+  std::vector<std::vector<std::vector<int>>> B_perms;
+  for (int s = 0; s < osi->num_spaces(); s++) {
+    cout << "  Space " << s << endl;
+    const auto &space_contr = contractions[s];
+    std::vector<std::vector<int>> A_perms_space;
+    std::vector<std::vector<int>> A_perms_space_unique;
+    std::vector<std::vector<int>> B_perms_space;
+    int naops = A.noperators(s);
+    int nbops = B.noperators(s);
+    std::vector<int> A_perm(naops, 0);
+    std::vector<int> B_perm(nbops, 0);
+//and (nbops > 0)
+    if (naops > 0) {
+      int offa = 0;
+      int ncontr = 1;
+      for (const auto &contr : space_contr) {
+        for (int i = 0; i < contr.first; i++) {
+          A_perm[offa + i] = ncontr;
+        }
+        offa += contr.first;
+        ncontr++;
+      }
+      std::sort(A_perm.begin(), A_perm.end());
+
+      do {
+        PRINT_ELEMENTS(A_perm, "A perm -> ");
+        A_perms_space.push_back(A_perm);
+      } while (std::next_permutation(A_perm.begin(), A_perm.end()));
+
+      std::vector<std::vector<bitset<64>>> A_perms_bitset_rep;
+      for (const auto &Ap : A_perms_space) {
+        std::vector<bitset<64>> vec_bitset(space_contr.size(), bitset<64>(0));
+
+        // form a bit representation of a contraction
+        for (int i = 0; i < naops; i++) {
+          int contr = Ap[i] - 1;
+          if (contr >= 0) {
+            vec_bitset[contr].set(i);
+          }
+        }
+
+        std::sort(vec_bitset.begin(), vec_bitset.end(),
+                  [](const bitset<64> &lhs, const bitset<64> &rhs) {
+                    return lhs.to_ullong() < rhs.to_ullong();
+                  });
+
+        if (std::find(A_perms_bitset_rep.begin(), A_perms_bitset_rep.end(),
+                      vec_bitset) == A_perms_bitset_rep.end()) {
+          A_perms_space_unique.push_back(Ap);
+          A_perms_bitset_rep.push_back(vec_bitset);
+          PRINT_ELEMENTS(Ap, "A perm -> ");
+        } else {
+          PRINT_ELEMENTS(Ap, "A perm -> ");
+          cout << " non unique" << endl;
+        }
+      }
+    }else{
+        A_perms_space_unique.push_back(A_perm);
+    }
+
+    if (nbops > 0) {
+      int offb = 0;
+      int ncontr = 1;
+      for (const auto &contr : space_contr) {
+        for (int i = 0; i < contr.second; i++) {
+          B_perm[offb + i] = ncontr;
+        }
+        offb += contr.second;
+        ncontr++;
+      }
+      std::sort(B_perm.begin(), B_perm.end());
+
+
+      do {
+        PRINT_ELEMENTS(B_perm, "B perm -> ");
+        B_perms_space.push_back(B_perm);
+      } while (std::next_permutation(B_perm.begin(), B_perm.end()));
+    } else {
+      B_perms_space.push_back(B_perm);
+    }
+
+    A_perms.push_back(A_perms_space_unique);
+    B_perms.push_back(B_perms_space);
+  }
+
+  // combine contractions for each orbital space
+  std::vector<int> range;
+  for (const auto &space_perms : A_perms) {
+    range.push_back(space_perms.size());
+  }
+  for (const auto &space_perms : B_perms) {
+    range.push_back(space_perms.size());
+  }
+
+  PRINT_ELEMENTS(range, "  Range -> ");
+
+  product_space_iterator(range, [&](const std::vector<int> &product) {
+    PRINT(Summary, cout << "  Picking the following contractions:" << endl;)
+    std::vector<std::vector<int>> A_legs;
+    std::vector<std::vector<int>> B_legs;
+    for (int s = 0; s < osi->num_spaces(); s++) {
+      cout << "  Space " << s << endl;
+      for (int i : A_perms[s][product[s]]) {
+        cout << ' ' << i;
+      }
+      A_legs.push_back(A_perms[s][product[s]]);
+      cout << " | ";
+      for (int i : B_perms[s][product[osi->num_spaces() + s]]) {
+        cout << ' ' << i;
+      }
+      B_legs.push_back(B_perms[s][product[osi->num_spaces() + s]]);
+
+      this->contract_pair_execute(A, B, A_legs, B_legs);
+    }
+    cout << endl;
+  });
+
+  // execute the contraction
+}
+
+void WTheorem::contract_pair_execute(
+    const WTerm &A, const WTerm &B, const std::vector<std::vector<int>> &A_legs,
+    const std::vector<std::vector<int>> &B_legs) {
+  cout << "Finally:" << endl;
+  // rebuild all the contractions
+  for (int s = 0; s < osi->num_spaces(); s++) {
+    // find the number of contractions
+    int maxa = 0;
+    for (int a : A_legs[s]) {
+      maxa = std::max(a, maxa);
+    }
+    int maxb = 0;
+    for (int b : B_legs[s]) {
+      maxb = std::max(b, maxb);
+    }
+    assert(maxa == maxb);
+
+    std::vector<std::pair<std::vector<int>, std::vector<int>>> legs(maxa);
+
+    for (int i = 0, maxi = A_legs[s].size(); i < maxi; ++i) {
+      int a = A_legs[s][i];
+      if (a > 0) {
+        legs[a - 1].first.push_back(i);
+      }
+    }
+    for (int i = 0, maxi = B_legs[s].size(); i < maxi; ++i) {
+      int b = B_legs[s][i];
+      if (b > 0) {
+        legs[b - 1].first.push_back(i);
+      }
+    }
+
+    for (const auto &c : legs) {
+      PRINT_ELEMENTS(c.first);
+      PRINT_ELEMENTS(c.second);
+    }
+  }
 }
 
 void WTheorem::make_contraction_skeletons() {

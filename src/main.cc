@@ -24,6 +24,10 @@ int main(int argc, const char *argv[]) {
   std::string a = "a";
   std::string v = "v";
 
+  // internal excitations
+  WTerm opT1aa = make_operator("T1", {a}, {a});
+  auto opT2aaaa = make_operator("T2", {a, a}, {a, a});
+
   WTerm opT1ca = make_operator("T1", {a}, {c});
   WTerm opT1cv = make_operator("T1", {v}, {c});
   WTerm opT1av = make_operator("T1", {v}, {a});
@@ -42,8 +46,9 @@ int main(int argc, const char *argv[]) {
                             opT2cavv, opT2aaav, opT2aavv};
 
   WTerm opH1aa = make_operator("H1", {a}, {a});
-  WTerm opH1ac = make_operator("H1", {a}, {c});
+  WTerm opH1ac = make_operator("H1", {c}, {a});
 
+  WTerm opH2aaaa = make_operator("H2", {a, a}, {a, a});
 
   WSum sum;
   for (WTerm &term : opT) {
@@ -57,6 +62,12 @@ int main(int argc, const char *argv[]) {
   wt.theorem_pair(opH1aa, opT1ca);
 
   wt.theorem_pair(opH1ac, opT1ca);
+
+  wt.theorem_pair(opH1aa, opT1aa);
+
+  wt.theorem_pair(opH2aaaa, opT1aa);
+
+  wt.theorem_pair(opH2aaaa, opT2aaaa);
 
   //  for (WTerm &term : opT)
   //    cout << term.latex() << endl;
