@@ -176,6 +176,7 @@ void WTheorem::contract_pair_splitting(
           const auto &key = splitting[s];
           const auto &skeleton = skeletons_[key][skeletons_per_space[s]];
           contractions.push_back(skeleton);
+          cout << "  " << osi->label(s) << " ->";
           for (auto p : skeleton) {
             cout << " (" << p.first << "," << p.second << ")";
           }
@@ -195,7 +196,7 @@ void WTheorem::contract_pair_permute(
   std::vector<std::vector<std::vector<int>>> A_perms;
   std::vector<std::vector<std::vector<int>>> B_perms;
   for (int s = 0; s < osi->num_spaces(); s++) {
-    cout << "  Space " << s << endl;
+    //    cout << "  " << osi->label(s) << endl;
     const auto &space_contr = contractions[s];
     std::vector<std::vector<int>> A_perms_space;
     std::vector<std::vector<int>> A_perms_space_unique;
@@ -218,7 +219,7 @@ void WTheorem::contract_pair_permute(
       std::sort(A_perm.begin(), A_perm.end());
 
       do {
-        PRINT_ELEMENTS(A_perm, "A perm -> ");
+        //        PRINT_ELEMENTS(A_perm, "A perm -> ",true);
         A_perms_space.push_back(A_perm);
       } while (std::next_permutation(A_perm.begin(), A_perm.end()));
 
@@ -243,10 +244,10 @@ void WTheorem::contract_pair_permute(
                       vec_bitset) == A_perms_bitset_rep.end()) {
           A_perms_space_unique.push_back(Ap);
           A_perms_bitset_rep.push_back(vec_bitset);
-          PRINT_ELEMENTS(Ap, "A perm -> ");
+          //          PRINT_ELEMENTS(Ap, "A perm -> ",true);
         } else {
-          PRINT_ELEMENTS(Ap, "A perm -> ");
-          cout << " non unique" << endl;
+          //          PRINT_ELEMENTS(Ap, "A perm -> ",false);
+          //          cout << " non unique" << endl;
         }
       }
     } else {
@@ -266,7 +267,7 @@ void WTheorem::contract_pair_permute(
       std::sort(B_perm.begin(), B_perm.end());
 
       do {
-        PRINT_ELEMENTS(B_perm, "B perm -> ");
+        //        PRINT_ELEMENTS(B_perm, "B perm -> ");
         B_perms_space.push_back(B_perm);
       } while (std::next_permutation(B_perm.begin(), B_perm.end()));
     } else {
@@ -286,26 +287,22 @@ void WTheorem::contract_pair_permute(
     range.push_back(space_perms.size());
   }
 
-  PRINT_ELEMENTS(range, "  Range -> ");
-
+  int n = 0;
   product_space_iterator(range, [&](const std::vector<int> &product) {
-    PRINT(Summary, cout << "  Picking the following contractions:" << endl;)
+    PRINT(Summary, cout << "    Layout of legs " << n << endl;)
     std::vector<std::vector<int>> A_legs;
     std::vector<std::vector<int>> B_legs;
     for (int s = 0; s < osi->num_spaces(); s++) {
-      cout << "  Space " << s << endl;
-      for (int i : A_perms[s][product[s]]) {
-        cout << ' ' << i;
-      }
       A_legs.push_back(A_perms[s][product[s]]);
-      cout << " | ";
-      for (int i : B_perms[s][product[osi->num_spaces() + s]]) {
-        cout << ' ' << i;
-      }
       B_legs.push_back(B_perms[s][product[osi->num_spaces() + s]]);
+      cout << "    " << osi->label(s) << " -> ";
+      PRINT_ELEMENTS(A_perms[s][product[s]]);
+      PRINT_ELEMENTS(B_perms[s][product[osi->num_spaces() + s]], " ");
+      cout << endl;
     }
     this->contract_pair_execute(A, B, A_legs, B_legs);
     cout << endl;
+    n++;
   });
 
   // execute the contraction
@@ -314,29 +311,177 @@ void WTheorem::contract_pair_permute(
 void WTheorem::contract_pair_execute(
     const WTerm &A, const WTerm &B, const std::vector<std::vector<int>> &A_legs,
     const std::vector<std::vector<int>> &B_legs) {
-  cout << "Finally:" << endl;
-
-  // merge the two tensors
-  WTerm AB;
-  std::vector<std::vector<WSQOperator>> Aops = A.operators();
-  std::vector<std::vector<WSQOperator>> Bops = B.operators();
-
-  std::vector<WTensor> Atens = A.tensors();
-  std::vector<WTensor> Btens = B.tensors();
-
-  scalar_t ABfact = A.factor() * B.factor();
 
   // relabel indices to avoid redundant terms
+  // find the indices that are summed
+  std::map<WIndex, int> Aidx_count;
+  std::vector<WIndex> Aidx = A.indices();
+  std::vector<WIndex> Aidx_un, Aidx_sum;
+  for (const WIndex idx : Aidx) {
+    Aidx_count[idx] += 1;
+  }
+  for (const auto &kv : Aidx_count) {
+    if (kv.second == 1) {
+      Aidx_un.push_back(kv.first);
+    } else {
+      Aidx_sum.push_back(kv.first);
+    }
+  }
+  std::sort(Aidx_un.begin(), Aidx_un.end());
+  std::sort(Aidx_sum.begin(), Aidx_sum.end());
+
+  std::map<WIndex, int> Bidx_count;
+  std::vector<WIndex> Bidx = B.indices();
+  std::vector<WIndex> Bidx_un, Bidx_sum;
+  for (const WIndex idx : Bidx) {
+    Bidx_count[idx] += 1;
+  }
+  for (const auto &kv : Bidx_count) {
+    if (kv.second == 1) {
+      Bidx_un.push_back(kv.first);
+    } else {
+      Bidx_sum.push_back(kv.first);
+    }
+  }
+  std::sort(Bidx_un.begin(), Bidx_un.end());
+  std::sort(Bidx_sum.begin(), Bidx_sum.end());
+
+  // find the common non-summed indices of A and B
+  std::vector<WIndex> ABidx_un;
+  std::set_intersection(Aidx_un.begin(), Aidx_un.end(), Bidx_un.begin(),
+                        Bidx_un.end(), std::back_inserter(ABidx_un));
+
+  // check that A and B do not have common non-summed indices
+  assert(ABidx_un.size() == 0);
+
+  // find the reindexing map for the repeated indices of B
+  index_map_t B_idx_map = remap(Aidx_sum, Bidx_sum);
+
+  //  PRINT_ELEMENTS(Aidx);
+  //  PRINT_ELEMENTS(Bidx);
+
+  cout << "\n    Contractions:" << endl;
+
+  // merge the two tensors
+  WTerm Amod = A;
+  WTerm Bmod = B;
+
+  // reindex B
+  Bmod.reindex(B_idx_map);
+
+  cout << "    " << Amod.str() << endl;
+  cout << "    " << Bmod.str() << endl;
+
+  std::vector<std::vector<WSQOperator>> Aops = Amod.operators();
+  std::vector<std::vector<WSQOperator>> Bops = Bmod.operators();
+  std::vector<std::vector<WSQOperator>> Aops_mod, Bops_mod;
+
+  std::vector<WTensor> Atens = Amod.tensors();
+  std::vector<WTensor> Btens = Bmod.tensors();
+
+  std::vector<WTensor> ABtens;
+  // insert the tensors
+  ABtens.insert(ABtens.end(), Atens.begin(), Atens.end());
+  ABtens.insert(ABtens.end(), Btens.begin(), Btens.end());
+
+  scalar_t ABfact = Amod.factor() * Bmod.factor();
 
   // contract indices and keep track of signs
+  bool valid = true;
   for (int s = 0; s < osi->num_spaces(); s++) {
+    // get the edges for all contractions
     auto legs = contraction_layout_to_edges(A_legs[s], B_legs[s]);
+
+    // differentiate between various types of spaces
+    DMStructure dmstruc = osi->dmstructure(s);
+
+    // Create density matrices and cumulants
     for (const auto &c : legs) {
-      for (int a : c.first) {
-      }
-      for (int b : c.second) {
+      int order = c.first.size() + c.second.size();
+      std::vector<WIndex> upper_idx;
+      std::vector<WIndex> lower_idx;
+      // pair contractions
+      if (order == 2) {
+        // pairwise contraction with Kronecker delta
+        if (dmstruc == DMStructure::Delta) {
+
+        }
+        // pairwise contraction with density matrix
+        else {
+          const WSQOperator &left_op = Aops[s][c.first[0]];
+          const WSQOperator &right_op = Bops[s][c.second[0]];
+          if ((left_op.type() == Creation) and
+              (right_op.type() == Annihilation)) {
+            upper_idx.push_back(left_op.index());
+            lower_idx.push_back(right_op.index());
+            // add particle density matrix
+            WTensor gamma("Gamma", upper_idx, lower_idx);
+            ABtens.push_back(gamma);
+          } else if ((left_op.type() == Annihilation) and
+                     (right_op.type() == Creation)) {
+            upper_idx.push_back(left_op.index());
+            lower_idx.push_back(right_op.index());
+            // add hole density matrix
+            WTensor eta("Eta", upper_idx, lower_idx);
+            ABtens.push_back(eta);
+          } else {
+            valid = false;
+          }
+        }
+      } else {
+        // cumulants
+        for (int a : c.first) {
+        }
+        for (int b : c.second) {
+        }
       }
     }
+
+    // Remove contracted operators
+    std::vector<bool> Aelim(Aops[s].size(), false);
+    std::vector<bool> Belim(Bops[s].size(), false);
+    for (const auto &c : legs) {
+      for (int a : c.first) {
+        Aelim[a] = true;
+      }
+      for (int b : c.second) {
+        Belim[b] = true;
+      }
+    }
+    std::vector<WSQOperator> Aops_mod_space;
+    int a = 0;
+    for (const WSQOperator op : Aops[s]) {
+      if (not Aelim[a]) {
+        Aops_mod_space.push_back(op);
+      }
+    }
+    std::vector<WSQOperator> Bops_mod_space;
+    int b = 0;
+    for (const WSQOperator op : Bops[s]) {
+      if (not Belim[a]) {
+        Bops_mod_space.push_back(op);
+      }
+    }
+    Aops_mod.push_back(Aops_mod_space);
+    Bops_mod.push_back(Bops_mod_space);
+  }
+
+  if (valid) {
+    WTerm AB;
+    for (auto const &t : ABtens) {
+      AB.add(t);
+    }
+    for (auto const &ops : Aops_mod) {
+      for (auto const &op : ops) {
+        AB.add(op);
+      }
+    }
+    for (auto const &ops : Bops_mod) {
+      for (auto const &op : ops) {
+        AB.add(op);
+      }
+    }
+    cout << "\n    Result:\n    " << AB.str();
   }
 }
 
@@ -370,11 +515,6 @@ WTheorem::contraction_layout_to_edges(const std::vector<int> &A_legs,
     if (b > 0) {
       legs[b - 1].second.push_back(i);
     }
-  }
-  for (const auto &c : legs) {
-    PRINT_ELEMENTS(c.first, "leg A ");
-    PRINT_ELEMENTS(c.second, "leg B ");
-    cout << endl;
   }
   return legs;
 }

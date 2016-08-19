@@ -8,8 +8,6 @@ enum TensorType { Amplitude, Integral, OneDensity, OneHole, Cumulant };
 
 enum SymmetryType { Symmetric, Antisymmetric };
 
-enum SQOperatorType { Creation, Annihilation };
-
 /// The type used to represent vertices in a graph
 using graph_t = std::vector<std::pair<int, int>>;
 

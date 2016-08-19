@@ -10,6 +10,12 @@ SQOperatorType WSQOperator::type() const { return operator_.first; }
 
 WIndex WSQOperator::index() const { return operator_.second; }
 
+void WSQOperator::reindex(index_map_t &idx_map) {
+  if (idx_map.count(operator_.second) > 0) {
+    operator_.second = idx_map[operator_.second];
+  }
+}
+
 bool WSQOperator::operator<(WSQOperator const &other) const {
   return operator_ < other.operator_;
 }
@@ -34,4 +40,9 @@ std::string WSQOperator::latex() const {
   str_ += index().latex();
   str_ += "}";
   return (str_);
+}
+
+std::ostream &operator<<(std::ostream &os, const WSQOperator &op) {
+  os << op.str();
+  return os;
 }

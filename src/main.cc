@@ -59,15 +59,15 @@ int main(int argc, const char *argv[]) {
   cout << sum.str() << endl;
 
   WTheorem wt;
-  wt.theorem_pair(opH1aa, opT1ca);
+//  wt.theorem_pair(opH1aa, opT1ca);
 
-  wt.theorem_pair(opH1ac, opT1ca);
+//  wt.theorem_pair(opH1ac, opT1ca);
 
   wt.theorem_pair(opH1aa, opT1aa);
 
-  wt.theorem_pair(opH2aaaa, opT1aa);
+//  wt.theorem_pair(opH2aaaa, opT1aa);
 
-  wt.theorem_pair(opH2aaaa, opT2aaaa);
+//  wt.theorem_pair(opH2aaaa, opT2aaaa);
 
   //  for (WTerm &term : opT)
   //    cout << term.latex() << endl;

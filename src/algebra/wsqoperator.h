@@ -1,11 +1,13 @@
 #ifndef _wicked_wsqoperator_h_
 #define _wicked_wsqoperator_h_
 
-#include "wicked-def.h"
+#include <string>
+
+//#include "wicked-def.h"
 #include "orbital_space.h"
 #include "windex.h"
 
-#include <string>
+enum SQOperatorType { Creation, Annihilation };
 
 class WSQOperator {
 
@@ -16,8 +18,14 @@ public:
   bool operator<(WSQOperator const &other) const;
   bool operator==(WSQOperator const &other) const;
 
+  /// Return the type of this operator
   SQOperatorType type() const;
+
+  /// Return the index of this operator
   WIndex index() const;
+
+  /// Reindex this operator
+  void reindex(index_map_t &idx_map);
 
   /// Return a string representation
   std::string str() const;
@@ -27,6 +35,8 @@ public:
 
   /// Return an ambit representation
   std::string ambit() const;
+
+  friend std::ostream &operator<<(std::ostream &os, const WSQOperator &op);
 
 private:
   std::pair<SQOperatorType, WIndex> operator_;

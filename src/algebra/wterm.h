@@ -52,6 +52,12 @@ public:
   /// Return the tensors
   const std::vector<WTensor> &tensors() const { return tensors_; }
 
+  /// Return a vector containing all indices used in this term
+  std::vector<WIndex> indices() const;
+
+  /// Reindex this term
+  void reindex(index_map_t &idx_map);
+
   /// Canonicalize this term
   void canonicalize();
 

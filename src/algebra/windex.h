@@ -38,6 +38,8 @@ public:
   /// Return an ambit representation
   std::string ambit() const;
 
+  friend std::ostream &operator<<(std::ostream &os, const WIndex &idx);
+
 private:
   // ==> Class private data <==
 
@@ -45,10 +47,18 @@ private:
   std::pair<int, int> index_;
 };
 
-/// Helper function that converts a vector of space types (OrbitalSpaceType)
-/// into a vector of indices (WIndex) labeled staring with zero.
-std::vector<WIndex>
-make_indices_from_space_labels(const std::vector<std::string> &labels);
+using index_map_t = std::map<WIndex, WIndex>;
+
+/// Helper function that converts multiple vectors of space types
+/// (OrbitalSpaceType) to vectors of indices (WIndex) labeled staring with zero.
+/// Indices are assigned in an incremental way with no duplicates
+std::vector<std::vector<WIndex>> make_indices_from_space_labels(
+    const std::vector<std::vector<std::string>> &labels_space);
+
+/// A function that takes two lists of indices and creates a index map for the
+/// second list that voids duplicates
+index_map_t remap(const std::vector<WIndex> &idx_vec1,
+                  const std::vector<WIndex> &idx_vec2);
 
 /// Helper function that counts the number of spaces in a vector of indices
 std::vector<int> num_indices_per_space(const std::vector<WIndex> &indices);

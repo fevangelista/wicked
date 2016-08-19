@@ -1,4 +1,6 @@
+#include <iostream>
 #include <regex>
+
 #include "wicked-def.h"
 #include "helpers.h"
 #include "wtensor.h"
@@ -26,27 +28,31 @@ bool WTensor::operator==(WTensor const &other) const {
          (upper_ == other.upper_);
 }
 
-void WTensor::reindex(std::map<WIndex, WIndex> &index_map) {
-  for (WIndex &idx : upper_) {
-    idx = index_map[idx];
-  }
-  for (WIndex &idx : lower_) {
-    idx = index_map[idx];
-  }
-}
-
-std::vector<WIndex> WTensor::indices() {
+std::vector<WIndex> WTensor::indices() const {
   std::vector<WIndex> vec;
-  for (WIndex &idx : upper_) {
+  for (const WIndex &idx : upper_) {
     vec.push_back(idx);
   }
-  for (WIndex &idx : lower_) {
+  for (const WIndex &idx : lower_) {
     vec.push_back(idx);
   }
   // Remove repeated indices
   std::sort(vec.begin(), vec.end());
   vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
   return vec;
+}
+
+void WTensor::reindex(index_map_t &idx_map) {
+  for (WIndex &idx : upper_) {
+    if (idx_map.count(idx) > 0) {
+      idx = idx_map[idx];
+    }
+  }
+  for (WIndex &idx : lower_) {
+    if (idx_map.count(idx) > 0) {
+      idx = idx_map[idx];
+    }
+  }
 }
 
 std::string WTensor::str() const {
@@ -58,7 +64,7 @@ std::string WTensor::str() const {
   for (const WIndex &index : lower_) {
     str_vec_lower.push_back(index.str());
   }
-  return (label_ + "(u = " + to_string(str_vec_upper, ",") + "|l = " +
+  return (label_ + "(" + to_string(str_vec_upper, ",") + "|" +
           to_string(str_vec_lower, ",") + ")");
 }
 

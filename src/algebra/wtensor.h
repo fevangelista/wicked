@@ -20,9 +20,6 @@ public:
 
   // ==> Class public interface <==
 
-  /// Reindex this tensor
-  void reindex(std::map<WIndex, WIndex> &index_map);
-
   /// Return a reference to the label
   const std::string &label() const { return label_; }
 
@@ -33,7 +30,10 @@ public:
   const std::vector<WIndex> &upper() const { return upper_; }
 
   /// Return a vector containing all indices
-  std::vector<WIndex> indices();
+  std::vector<WIndex> indices() const;
+
+  /// Reindex this tensor
+  void reindex(index_map_t &idx_map);
 
   /// Return the rank of the tensor
   int rank() const { return lower_.size() + upper_.size(); }

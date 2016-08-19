@@ -5,7 +5,7 @@
 WTerm::WTerm()
     : operators_(std::vector<std::vector<WSQOperator>>(osi->num_spaces())) {}
 
-void WTerm::add(const WSQOperator& op) {
+void WTerm::add(const WSQOperator &op) {
   operators_[op.index().space()].push_back(op);
 }
 
@@ -29,6 +29,31 @@ std::vector<int> WTerm::noperators_per_space() const {
     counter.push_back(op.size());
   }
   return counter;
+}
+
+std::vector<WIndex> WTerm::indices() const {
+  std::vector<WIndex> result;
+  for (const auto &t : tensors_) {
+    const auto t_idx = t.indices();
+    result.insert(result.end(), t_idx.begin(), t_idx.end());
+  }
+  for (const auto &ops : operators_) {
+    for (const auto &op : ops) {
+      result.push_back(op.index());
+    }
+  }
+  return result;
+}
+
+void WTerm::reindex(index_map_t &idx_map) {
+  for (auto &t : tensors_) {
+    t.reindex(idx_map);
+  }
+  for (auto &ops : operators_) {
+    for (auto &op : ops) {
+      op.reindex(idx_map);
+    }
+  }
 }
 
 void WTerm::canonicalize() {
@@ -135,8 +160,9 @@ WTerm make_operator(const std::string &label,
                     const std::vector<std::string> &ann) {
   WTerm term;
 
-  std::vector<WIndex> cre_ind = make_indices_from_space_labels(cre);
-  std::vector<WIndex> ann_ind = make_indices_from_space_labels(ann);
+  auto indices = make_indices_from_space_labels({cre, ann});
+  std::vector<WIndex> &cre_ind = indices[0];
+  std::vector<WIndex> &ann_ind = indices[1];
 
   // Add the tensor
   WTensor tensor(label, cre_ind, ann_ind);
