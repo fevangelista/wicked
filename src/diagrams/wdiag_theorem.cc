@@ -14,18 +14,132 @@ WDiagTheorem::WDiagTheorem() {}
 void WDiagTheorem::contract(double factor,
                             const std::vector<WDiagOperator> &ops) {
 
-  std::cout << "\nContracting the following operators" << std::endl;
+  std::cout << "\nContracting the following operators:" << std::endl;
   for (auto &op : ops) {
-    std::cout << op << std::endl;
+    std::cout << "    " << op;
   }
 
-  auto basic_contractions = generate_basic_contractions(ops);
+  auto elementary_contractions = generate_elementary_contractions(ops);
 
-  //  /// Create the contraction graph
-  //  WContractionGraph cg(factor,ops);
+  bt_finished_ = false;
+
+  std::vector<int> a(50, -1);
+  std::vector<WDiagVertex> free_vertices;
+  for (const auto &op : ops) {
+    free_vertices.push_back(op.vertex());
+  }
+
+  std::cout << "\nPossible contractions:" << std::endl;
+
+  generate_contractions(a, 0, elementary_contractions, free_vertices);
 }
 
-std::vector<std::vector<WDiagVertex>> WDiagTheorem::generate_basic_contractions(
+void WDiagTheorem::generate_contractions(
+    std::vector<int> a, int k,
+    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
+    std::vector<WDiagVertex> &free_vertices) {
+
+  cout << " ";
+  for (int i = 0; i < k; ++i) {
+    cout << " " << a[i];
+  }
+  cout << endl;
+
+  k = k + 1;
+  std::vector<int> candidates =
+      construct_candidates(a, k, el_contr_vec, free_vertices);
+
+//  PRINT_ELEMENTS(candidates, "\n  candidates:"); cout << endl;
+
+  for (const auto &c : candidates) {
+    a[k - 1] = c;
+    make_move(a, k, el_contr_vec, free_vertices);
+    generate_contractions(a, k, el_contr_vec, free_vertices);
+    unmake_move(a, k, el_contr_vec, free_vertices);
+  }
+}
+
+std::vector<int> WDiagTheorem::construct_candidates(
+    std::vector<int> &a, int k,
+    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
+    const std::vector<WDiagVertex> &free_vertices) {
+
+  std::vector<int> candidates;
+
+  int nops = free_vertices.size();
+
+  // determine the last elementary contraction used
+  int minc = (k > 1) ? a[k - 2] : 0;
+  int maxc = el_contr_vec.size();
+
+//  cout << "\n  Min C: " << minc << "  Max C: " << maxc;
+
+  // loop over all potentially viable contractions
+  for (int c = minc; c < maxc; c++) {
+    const auto &el_contr = el_contr_vec[c];
+
+//    PRINT_ELEMENTS(free_vertices, "\n");
+//    PRINT_ELEMENTS(el_contr, "\n");
+
+    // test if this contraction is compatible
+    bool compatible = true;
+    for (int A = 0; A < nops; A++) {
+      for (int s = 0; s < osi->num_spaces(); s++) {
+        if (free_vertices[A].cre(s) < el_contr[A].cre(s))
+          compatible = false;
+        if (free_vertices[A].ann(s) < el_contr[A].ann(s))
+          compatible = false;
+      }
+    }
+    if (compatible) {
+      candidates.push_back(c);
+    }
+  }
+  return candidates;
+}
+
+void WDiagTheorem::make_move(
+    const std::vector<int> &a, int k,
+    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
+    std::vector<WDiagVertex> &free_vertices) {
+  int nops = free_vertices.size();
+
+  // remove the current elementary contraction
+  int c = a[k - 1];
+  const auto &el_contr = el_contr_vec[c];
+
+  for (int A = 0; A < nops; A++) {
+    for (int s = 0; s < osi->num_spaces(); s++) {
+      int ncre = free_vertices[A].cre(s) - el_contr[A].cre(s);
+      free_vertices[A].cre(s, ncre);
+      int nann = free_vertices[A].ann(s) - el_contr[A].ann(s);
+      free_vertices[A].ann(s, nann);
+    }
+  }
+}
+
+void WDiagTheorem::unmake_move(
+    const std::vector<int> &a, int k,
+    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
+    std::vector<WDiagVertex> &free_vertices) {
+  int nops = free_vertices.size();
+
+  // remove the current elementary contraction
+  int c = a[k - 1];
+  const auto &el_contr = el_contr_vec[c];
+
+  for (int A = 0; A < nops; A++) {
+    for (int s = 0; s < osi->num_spaces(); s++) {
+      int ncre = free_vertices[A].cre(s) + el_contr[A].cre(s);
+      free_vertices[A].cre(s, ncre);
+      int nann = free_vertices[A].ann(s) + el_contr[A].ann(s);
+      free_vertices[A].ann(s, nann);
+    }
+  }
+}
+
+std::vector<std::vector<WDiagVertex>>
+WDiagTheorem::generate_elementary_contractions(
     const std::vector<WDiagOperator> &ops) {
 
   int nops = ops.size();
@@ -35,7 +149,7 @@ std::vector<std::vector<WDiagVertex>> WDiagTheorem::generate_basic_contractions(
 
   // loop over orbital spaces
   for (int s = 0; s < osi->num_spaces(); s++) {
-    std::cout << "\nBasic contractions for space " << s << std::endl;
+    std::cout << "\n  => Basic contractions for space " << s << std::endl;
 
     // differentiate between various types of spaces
     DMStructure dmstruc = osi->dmstructure(s);
@@ -45,7 +159,7 @@ std::vector<std::vector<WDiagVertex>> WDiagTheorem::generate_basic_contractions(
     // |   |
     // a^+ a
 
-    cout << "\n  ==> c/a pairwise contractions <==" << endl;
+    cout << "\n    * c/a pairwise contractions" << endl;
     // loop over the creation operators of each operator
     for (int c = 0; c < nops; c++) {
       // loop over the annihilation operators of each operator (right to the
@@ -57,7 +171,7 @@ std::vector<std::vector<WDiagVertex>> WDiagTheorem::generate_basic_contractions(
           new_contr[c].cre(s, 1);
           new_contr[a].ann(s, 1);
 
-          PRINT_ELEMENTS(new_contr, "      ** C: ");
+          PRINT_ELEMENTS(new_contr, "      ");
           cout << endl;
 
           contr_vec.push_back(new_contr);
@@ -70,7 +184,7 @@ std::vector<std::vector<WDiagVertex>> WDiagTheorem::generate_basic_contractions(
     // |   |
     // a   a^+
 
-    cout << "\n  ==> a/c pairwise contractions <==" << endl;
+    cout << "\n    * a/c pairwise contractions" << endl;
     // loop over the creation operators of each operator
     for (int a = 0; a < nops; a++) {
       // loop over the annihilation operators of each operator (right to the
@@ -82,7 +196,7 @@ std::vector<std::vector<WDiagVertex>> WDiagTheorem::generate_basic_contractions(
           new_contr[c].cre(s, 1);
           new_contr[a].ann(s, 1);
 
-          PRINT_ELEMENTS(new_contr, "      ** C: ");
+          PRINT_ELEMENTS(new_contr, "      ");
           cout << endl;
 
           contr_vec.push_back(new_contr);
@@ -108,13 +222,13 @@ std::vector<std::vector<WDiagVertex>> WDiagTheorem::generate_basic_contractions(
       int max_half_legs = std::min(std::min(sumcre, sumann), maxcumulant_);
       int max_legs = 2 * max_half_legs;
 
-      cout << "\n  Maximum cumulant considered has " << max_legs
-           << " legs (max = " << 2 * std::min(sumcre, sumann) << ")" << endl;
+//      cout << "\n  Maximum cumulant considered has " << max_legs
+//           << " legs (max = " << 2 * std::min(sumcre, sumann) << ")" << endl;
 
       // loop over all possible contractions from 4 to max_legs
       for (int half_legs = 2; half_legs <= max_half_legs; half_legs++) {
-        cout << "\n  ==> " << 2 * half_legs
-             << "-legs cumulant contractions <==" << endl;
+        cout << "\n    * " << 2 * half_legs
+             << "-legs cumulant contractions" << endl;
         auto half_legs_part = integer_partitions(half_legs);
 
         // create lists of leg partitionings compatible with the number of
@@ -165,7 +279,7 @@ std::vector<std::vector<WDiagVertex>> WDiagTheorem::generate_basic_contractions(
             for (int a = 0; a < nops; a++) {
               new_contr[a].ann(s, ann_legs[a]);
             }
-            PRINT_ELEMENTS(new_contr, "      ** C: ");
+            PRINT_ELEMENTS(new_contr, "      ");
             cout << endl;
 
             contr_vec.push_back(new_contr);

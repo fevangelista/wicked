@@ -7,17 +7,19 @@ using namespace std;
 WDiagOperator::WDiagOperator(const std::string &label,
                              const std::vector<int> &cre,
                              const std::vector<int> &ann)
-    : label_(label), ops_(cre, ann) {}
+    : label_(label), vertex_(cre, ann) {}
 
-std::string &WDiagOperator::label() { return label_; }
+const std::string &WDiagOperator::label() const { return label_; }
+
+WDiagVertex WDiagOperator::vertex() const {return vertex_;}
 
 int WDiagOperator::num_indices(int space, bool creation) const {
-  return creation ? ops_.cre(space) : ops_.ann(space);
+  return creation ? vertex_.cre(space) : vertex_.ann(space);
 }
 
-int WDiagOperator::num_cre(int space) const { return ops_.cre(space); }
+int WDiagOperator::num_cre(int space) const { return vertex_.cre(space); }
 
-int WDiagOperator::num_ann(int space) const { return ops_.ann(space); }
+int WDiagOperator::num_ann(int space) const { return vertex_.ann(space); }
 
 std::string WDiagOperator::str() const {
   std::string s = label_;

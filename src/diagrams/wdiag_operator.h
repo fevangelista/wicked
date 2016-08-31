@@ -16,7 +16,9 @@ public:
                 const std::vector<int> &ann);
 
   /// Return the label of the operator
-  std::string &label();
+  const std::string &label() const;
+
+  WDiagVertex vertex() const;
 
   /// Return the number of indices for a given space and type (cre/ann)
   int num_indices(int space, bool creation) const;
@@ -38,7 +40,7 @@ private:
   std::string label_;
 
   /// The number of creation/annihilation operators in each space
-  WDiagVertex ops_;
+  WDiagVertex vertex_;
 };
 
 // Helper functions

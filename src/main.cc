@@ -111,7 +111,7 @@ int main(int argc, const char *argv[]) {
 
     cout << opH1aa;
     WDiagTheorem wdt;
-    wdt.contract(1.0, {opH2aaaa, opT1aa,opH1aa});
+    wdt.contract(1.0, {opH2aaaa, opT2aaaa});
   }
 
   return 0;
