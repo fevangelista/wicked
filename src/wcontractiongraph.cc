@@ -1,9 +1,9 @@
-#include <iostream>
+//#include <iostream>
 
-#include "wcontractiongraph.h"
+//#include "wcontractiongraph.h"
 
-WContractionGraph::WContractionGraph(double factor,
-                                     const std::vector<WDiagOperator> &ops)
-    : factor_(factor), ops_(ops) {
-  std::cout << mat_.str();
-}
+//WContractionGraph::WContractionGraph(double factor,
+//                                     const std::vector<WDiagOperator> &ops)
+//    : factor_(factor), ops_(ops) {
+//  std::cout << mat_.str();
+//}

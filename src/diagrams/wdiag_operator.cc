@@ -7,27 +7,27 @@ using namespace std;
 WDiagOperator::WDiagOperator(const std::string &label,
                              const std::vector<int> &cre,
                              const std::vector<int> &ann)
-    : label_(label), ops_(std::vector<std::pair<int, int>>(osi->num_spaces())) {
-  for (int i = 0; i < osi->num_spaces(); i++) {
-    ops_[i] = std::make_pair(cre[i], ann[i]);
-  }
-}
+    : label_(label), ops_(cre, ann) {}
 
 std::string &WDiagOperator::label() { return label_; }
 
 int WDiagOperator::num_indices(int space, bool creation) const {
-  return creation ? ops_[space].first : ops_[space].second;
+  return creation ? ops_.cre(space) : ops_.ann(space);
 }
+
+int WDiagOperator::num_cre(int space) const { return ops_.cre(space); }
+
+int WDiagOperator::num_ann(int space) const { return ops_.ann(space); }
 
 std::string WDiagOperator::str() const {
   std::string s = label_;
 
   std::vector<std::string> cv, av;
-  for (int i = 0; i < osi->num_spaces(); ++i) {
-    cv.push_back(to_string(num_indices(i, true)));
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    cv.push_back(to_string(num_cre(s)));
   }
-  for (int i = 0; i < osi->num_spaces(); ++i) {
-    av.push_back(to_string(num_indices(i, false)));
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    av.push_back(to_string(num_ann(s)));
   }
 
   s += " [" + to_string(cv, " ") + "|" + to_string(av, " ") + "] (";

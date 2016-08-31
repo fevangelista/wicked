@@ -5,6 +5,7 @@
 #include <string>
 
 #include "wicked-def.h"
+#include "wdiag_vertex.h"
 
 /// A class to represent operators
 class WDiagOperator {
@@ -20,6 +21,12 @@ public:
   /// Return the number of indices for a given space and type (cre/ann)
   int num_indices(int space, bool creation) const;
 
+  /// Return the number of creation operators in space
+  int num_cre(int space) const;
+
+  /// Return the number of annihilation operators in space
+  int num_ann(int space) const;
+
   /// Return a string representation of the operator
   std::string str() const;
 
@@ -31,7 +38,7 @@ private:
   std::string label_;
 
   /// The number of creation/annihilation operators in each space
-  std::vector<std::pair<int, int>> ops_;
+  WDiagVertex ops_;
 };
 
 // Helper functions

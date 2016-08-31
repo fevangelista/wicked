@@ -2,7 +2,7 @@
 #include <pybind11/stl.h>
 
 #include "../src/orbital_space.h"
-#include "../src/wdiag_operator.h"
+#include "../src/diagrams/wdiag_operator.h"
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
 

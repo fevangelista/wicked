@@ -5,7 +5,7 @@
 
 #include "wicked-def.h"
 #include "orbital_space.h"
-#include "wcontract.h"
+#include "wdiag_theorem.h"
 #include "wdiag_operator.h"
 #include "wterm.h"
 #include "wsum.h"
@@ -106,10 +106,12 @@ int main(int argc, const char *argv[]) {
 
     auto opH1aa = make_diag_operator("H1", {a}, {a});
     auto opH1ac = make_diag_operator("H1", {c}, {a});
+    auto opH2aaaa = make_diag_operator("H2", {a, a}, {a, a});
+
 
     cout << opH1aa;
-    WContract wc;
-    wc.contract(1.0, {opH1cc, opH1cc});
+    WDiagTheorem wdt;
+    wdt.contract(1.0, {opH2aaaa, opT1aa,opH1aa});
   }
 
   return 0;
