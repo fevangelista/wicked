@@ -24,64 +24,93 @@ int main(int argc, const char *argv[]) {
   std::string a = "a";
   std::string v = "v";
 
-  // internal excitations
-  WTerm opT1aa = make_operator("T1", {a}, {a});
-  auto opT2aaaa = make_operator("T2", {a, a}, {a, a});
+  bool algebra = false;
+  if (algebra) {
+    // internal excitations
+    WTerm opT1aa = make_operator("T1", {a}, {a});
+    auto opT2aaaa = make_operator("T2", {a, a}, {a, a});
 
-  WTerm opT1ca = make_operator("T1", {a}, {c});
-  WTerm opT1cv = make_operator("T1", {v}, {c});
-  WTerm opT1av = make_operator("T1", {v}, {a});
+    WTerm opT1ca = make_operator("T1", {a}, {c});
+    WTerm opT1cv = make_operator("T1", {v}, {c});
+    WTerm opT1av = make_operator("T1", {v}, {a});
 
-  auto opT2ccaa = make_operator("T2", {a, a}, {c, c});
-  auto opT2ccav = make_operator("T2", {a, v}, {c, c});
-  auto opT2ccvv = make_operator("T2", {v, v}, {c, c});
-  auto opT2caaa = make_operator("T2", {a, a}, {c, a});
-  auto opT2caav = make_operator("T2", {a, v}, {c, a});
-  auto opT2cavv = make_operator("T2", {v, v}, {c, a});
-  auto opT2aaav = make_operator("T2", {a, v}, {a, a});
-  auto opT2aavv = make_operator("T2", {v, v}, {a, a});
+    auto opT2ccaa = make_operator("T2", {a, a}, {c, c});
+    auto opT2ccav = make_operator("T2", {a, v}, {c, c});
+    auto opT2ccvv = make_operator("T2", {v, v}, {c, c});
+    auto opT2caaa = make_operator("T2", {a, a}, {c, a});
+    auto opT2caav = make_operator("T2", {a, v}, {c, a});
+    auto opT2cavv = make_operator("T2", {v, v}, {c, a});
+    auto opT2aaav = make_operator("T2", {a, v}, {a, a});
+    auto opT2aavv = make_operator("T2", {v, v}, {a, a});
 
-  std::vector<WTerm> opT = {opT1ca,   opT1cv,   opT1av,   opT2ccaa,
-                            opT2ccav, opT2ccvv, opT2caaa, opT2caav,
-                            opT2cavv, opT2aaav, opT2aavv};
+    std::vector<WTerm> opT = {opT1ca,   opT1cv,   opT1av,   opT2ccaa,
+                              opT2ccav, opT2ccvv, opT2caaa, opT2caav,
+                              opT2cavv, opT2aaav, opT2aavv};
 
-  WTerm opH1aa = make_operator("H1", {a}, {a});
-  WTerm opH1ac = make_operator("H1", {c}, {a});
+    WTerm opH1aa = make_operator("H1", {a}, {a});
+    WTerm opH1ac = make_operator("H1", {c}, {a});
 
-  WTerm opH2aaaa = make_operator("H2", {a, a}, {a, a});
+    WTerm opH2aaaa = make_operator("H2", {a, a}, {a, a});
 
-  WSum sum;
-  for (WTerm &term : opT) {
-    cout << term.str() << endl;
-    sum.add(term);
+    WSum sum;
+    for (WTerm &term : opT) {
+      cout << term.str() << endl;
+      sum.add(term);
+    }
+
+    cout << sum.str() << endl;
+
+    WTheorem wt;
+    //  wt.theorem_pair(opH1aa, opT1ca);
+
+    //  wt.theorem_pair(opH1ac, opT1ca);
+
+    wt.theorem_pair(opH1aa, opT1aa);
+    //  wt.theorem_pair(opH2aaaa, opT1aa);
+
+    //  wt.theorem_pair(opH2aaaa, opT2aaaa);
+
+    //  for (WTerm &term : opT)
+    //    cout << term.latex() << endl;
+
+    //  for (auto op : opT) {
+    //    std::cout << op.str() << std::endl;
+    //  }
+
+    //  for (auto op : opH) {
+    //    std::cout << op.str() << std::endl;
+    //  }
   }
 
-  cout << sum.str() << endl;
+  {
+    // internal excitations
+    auto opT1aa = make_diag_operator("T1", {a}, {a});
+    auto opT2aaaa = make_diag_operator("T2", {a, a}, {a, a});
 
-  WTheorem wt;
-//  wt.theorem_pair(opH1aa, opT1ca);
+    auto opT1ca = make_diag_operator("T1", {a}, {c});
+    auto opT1cv = make_diag_operator("T1", {v}, {c});
+    auto opT1av = make_diag_operator("T1", {v}, {a});
 
-//  wt.theorem_pair(opH1ac, opT1ca);
+    auto opT2ccaa = make_diag_operator("T2", {a, a}, {c, c});
+    auto opT2ccav = make_diag_operator("T2", {a, v}, {c, c});
+    auto opT2ccvv = make_diag_operator("T2", {v, v}, {c, c});
+    auto opT2caaa = make_diag_operator("T2", {a, a}, {c, a});
+    auto opT2caav = make_diag_operator("T2", {a, v}, {c, a});
+    auto opT2cavv = make_diag_operator("T2", {v, v}, {c, a});
+    auto opT2aaav = make_diag_operator("T2", {a, v}, {a, a});
+    auto opT2aavv = make_diag_operator("T2", {v, v}, {a, a});
 
-  wt.theorem_pair(opH1aa, opT1aa);
+    std::vector<WDiagOperator> opT = {opT1ca,   opT1cv,   opT1av,   opT2ccaa,
+                                      opT2ccav, opT2ccvv, opT2caaa, opT2caav,
+                                      opT2cavv, opT2aaav, opT2aavv};
 
-//  wt.theorem_pair(opH2aaaa, opT1aa);
+    auto opH1aa = make_diag_operator("H1", {a}, {a});
+    auto opH1ac = make_diag_operator("H1", {c}, {a});
 
-//  wt.theorem_pair(opH2aaaa, opT2aaaa);
-
-  //  for (WTerm &term : opT)
-  //    cout << term.latex() << endl;
-
-  //  for (auto op : opT) {
-  //    std::cout << op.str() << std::endl;
-  //  }
-
-  //  for (auto op : opH) {
-  //    std::cout << op.str() << std::endl;
-  //  }
-
-  //  WContract wc;
-  //  wc.contract(1.0, {opH1cc, opH1cc});
+    cout << opH1aa;
+    WContract wc;
+    wc.contract(1.0, {opH1cc, opH1cc});
+  }
 
   return 0;
 }

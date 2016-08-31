@@ -21,5 +21,4 @@ add_subdirectory(test)
 
 include_directories(src)
 include_directories(src/algebra)
-
-
+include_directories(src/diagrams)

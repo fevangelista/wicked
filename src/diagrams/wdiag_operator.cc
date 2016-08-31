@@ -4,8 +4,9 @@
 
 using namespace std;
 
-WDiagOperator::WDiagOperator(const std::string &label, const std::vector<int> &ann,
-                     const std::vector<int> &cre)
+WDiagOperator::WDiagOperator(const std::string &label,
+                             const std::vector<int> &cre,
+                             const std::vector<int> &ann)
     : label_(label), ops_(std::vector<std::pair<int, int>>(osi->num_spaces())) {
   for (int i = 0; i < osi->num_spaces(); i++) {
     ops_[i] = std::make_pair(cre[i], ann[i]);
@@ -41,4 +42,27 @@ std::string WDiagOperator::str() const {
   }
   s += ")";
   return s;
+}
+
+std::ostream &operator<<(std::ostream &os, const WDiagOperator &op) {
+  os << op.str();
+  return os;
+}
+
+WDiagOperator make_diag_operator(const std::string &label,
+                                 const std::vector<std::string> &cre_labels,
+                                 const std::vector<std::string> &ann_labels) {
+  // count the number of creation and annihilation operators in each space
+  std::vector<int> cre(osi->num_spaces());
+  std::vector<int> ann(osi->num_spaces());
+  for (const auto &label : cre_labels) {
+    int space = osi->label_to_space(label);
+    cre[space] += 1;
+  }
+  for (const auto &label : ann_labels) {
+    int space = osi->label_to_space(label);
+    ann[space] += 1;
+  }
+
+  return WDiagOperator(label, cre, ann);
 }
