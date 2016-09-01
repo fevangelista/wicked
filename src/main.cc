@@ -107,11 +107,21 @@ int main(int argc, const char *argv[]) {
     auto opH1aa = make_diag_operator("H1", {a}, {a});
     auto opH1ac = make_diag_operator("H1", {c}, {a});
     auto opH2aaaa = make_diag_operator("H2", {a, a}, {a, a});
+    auto opH2cccc = make_diag_operator("H2", {c, c}, {c, c});
+    auto opH2cccv = make_diag_operator("H2", {c, c}, {c, v});
+    auto opH2ccvv = make_diag_operator("H2", {c, c}, {v, v});
+    auto opH2cvcc = make_diag_operator("H2", {c, v}, {c, c});
+    auto opH2vvcc = make_diag_operator("H2", {v, v}, {c, c});
 
 
     cout << opH1aa;
     WDiagTheorem wdt;
-    wdt.contract(1.0, {opH2aaaa, opT2aaaa});
+    wdt.contract(1.0, {opH2aaaa, opT2aavv});
+
+    auto Hsr = {opH2cccc, opH2cccv, opH2ccvv, opH2cvcc, opH2vvcc};
+    for (const auto& H : Hsr){
+        wdt.contract(1.0, {H, opT2ccvv});
+    }
   }
 
   return 0;

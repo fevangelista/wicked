@@ -18,34 +18,46 @@ public:
   void contract(double factor, const std::vector<WDiagOperator> &ops);
 
 private:
+  std::vector<std::vector<int>> contractions_;
+  std::vector<std::vector<WDiagVertex>> elementary_contractions_;
+
   /// Generates all elementary contractions
   std::vector<std::vector<WDiagVertex>>
   generate_elementary_contractions(const std::vector<WDiagOperator> &ops);
 
-  /// Generates all contractions product of elementary contractions
-  void generate_contractions(
-      std::vector<int> a, int k,
+  /// Backtracking algorithm used to generate all contractions product of
+  /// elementary contractions
+  void generate_contractions(std::vector<int> a, int k,
       const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-      std::vector<WDiagVertex> &free_vertices);
+      std::vector<WDiagVertex> &free_vertex_vec);
 
   /// Return a vector of indices of elementary contractions that can be added to
-  /// the current solution
-  std::vector<int> construct_candidates(std::vector<int> &a, int k,
+  /// the current solution. Used in backtracking algorithm
+  std::vector<int> construct_candidates(
+      std::vector<int> &a, int k,
       const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-      const std::vector<WDiagVertex> &free_vertices);
+      const std::vector<WDiagVertex> &free_vertex_vec);
 
+  /// Applies a contraction to the list of free vertices. Used in backtracking
+  /// algorithm
   void make_move(const std::vector<int> &a, int k,
                  const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-                 std::vector<WDiagVertex> &free_vertices);
+                 std::vector<WDiagVertex> &free_vertex_vec);
 
+  /// Undoes the application of a contraction to the list of free vertices. Used
+  /// in backtracking algorithm
   void unmake_move(const std::vector<int> &a, int k,
                    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-                   std::vector<WDiagVertex> &free_vertices);
+                   std::vector<WDiagVertex> &free_vertex_vec);
 
+  /// Process a contraction found by the backtracking algorithm
+  void process_contraction(const std::vector<int> &a, int k,
+                           std::vector<WDiagVertex> &free_vertex_vec);
+
+  /// The number of contractions found
+  int ncontractions_ = 0;
   /// The largest allowed cumulant
-  int maxcumulant_ = 3;
-
-  bool bt_finished_;
+  int maxcumulant_ = 100;
 };
 
 #endif // _wicked_diag_theorem_h_
