@@ -27,6 +27,22 @@ void WDiagVertex::cre(int space, int value) { vertex_[space].first = value; }
 
 void WDiagVertex::ann(int space, int value) { vertex_[space].second = value; }
 
+int WDiagVertex::rank() const {
+  int r = 0;
+  for (const auto &pair : vertex_) {
+    r += pair.first + pair.second;
+  }
+  return r;
+}
+
+WDiagVertex &WDiagVertex::operator+=(const WDiagVertex &rhs) {
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    vertex_[s].first += rhs.vertex_[s].first;
+    vertex_[s].second += rhs.vertex_[s].second;
+  }
+  return *this;
+}
+
 std::string WDiagVertex::str() const {
   std::vector<std::string> cv, av;
   for (int s = 0; s < osi->num_spaces(); ++s) {
@@ -42,3 +58,13 @@ std::ostream &operator<<(std::ostream &os, const WDiagVertex &v) {
   os << v.str();
   return os;
 }
+
+int vertices_rank(const std::vector<WDiagVertex> &vertices)
+{
+    int r = 0;
+    for (const auto& vertex : vertices){
+        r += vertex.rank();
+    }
+    return r;
+}
+

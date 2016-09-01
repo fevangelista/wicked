@@ -37,6 +37,16 @@ void WDiagTheorem::contract(double factor,
   generate_contractions(a, 0, elementary_contractions_, free_vertex_vec);
 
   std::cout << "\nTotal:" << ncontractions_ << std::endl;
+
+  int ops_rank = operators_rank(ops);
+  for (const auto &contraction : contractions_) {
+    std::vector<std::vector<WDiagVertex>> vertices;
+    int contr_rank = 0;
+    for (int c : contraction) {
+        contr_rank += vertices_rank(elementary_contractions_[c]);
+    }
+    cout << "  " << ops_rank - contr_rank << endl;
+  }
 }
 
 void WDiagTheorem::generate_contractions(
@@ -139,11 +149,19 @@ void WDiagTheorem::process_contraction(
     const std::vector<int> &a, int k,
     std::vector<WDiagVertex> &free_vertex_vec) {
   contractions_.push_back(std::vector<int>(a.begin(), a.begin() + k));
-  cout << " ";
+  cout << " " << ncontractions_ << ":";
   for (int i = 0; i < k; ++i) {
     cout << " " << a[i];
   }
+
+  WDiagVertex free_ops;
+  for (const auto &free_vertex : free_vertex_vec) {
+    free_ops += free_vertex;
+  }
+
+  cout << " " << free_ops << " rank = " << free_ops.rank();
   cout << endl;
+
   ncontractions_++;
 }
 
@@ -274,15 +292,15 @@ WDiagTheorem::generate_elementary_contractions(
               new_contr[A].cre(s, cre_legs[A]);
               new_contr[A].ann(s, ann_legs[A]);
               // count number of operators contracted
-              if (cre_legs[A] + ann_legs[A] > 0){
-                  ncontracted += 1;
+              if (cre_legs[A] + ann_legs[A] > 0) {
+                ncontracted += 1;
               }
             }
             // exclude operators that have legs only on one operator
-            if (ncontracted > 1){
-                contr_vec.push_back(new_contr);
-                PRINT_ELEMENTS(new_contr, "      ");
-                cout << endl;
+            if (ncontracted > 1) {
+              contr_vec.push_back(new_contr);
+              PRINT_ELEMENTS(new_contr, "      ");
+              cout << endl;
             }
           }
         }

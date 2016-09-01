@@ -29,6 +29,9 @@ public:
   /// Return the number of annihilation operators in space
   int num_ann(int space) const;
 
+  /// Return the particle rank of this operator (sum creation + sum annilation)
+  int rank() const;
+
   /// Return a string representation of the operator
   std::string str() const;
 
@@ -44,9 +47,13 @@ private:
 };
 
 // Helper functions
+
 /// Create an operator
 WDiagOperator make_diag_operator(const std::string &label,
                                  const std::vector<std::string> &cre_labels,
                                  const std::vector<std::string> &ann_labels);
+
+/// Return the particle rank of a vector of operators
+int operators_rank(const std::vector<WDiagOperator> &ops);
 
 #endif // _wicked_diag_operator_h_

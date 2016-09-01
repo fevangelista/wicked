@@ -28,6 +28,12 @@ public:
   /// Set the number of annihilation operators in space
   void ann(int space, int value);
 
+  /// Return the particle rank of this vertex (sum creation + sum annilation)
+  int rank() const;
+
+  // compound assignment
+  WDiagVertex &operator+=(const WDiagVertex &rhs);
+
   /// Return a string representation of the operator
   std::string str() const;
 
@@ -38,5 +44,10 @@ private:
   /// The number of creation/annihilation operators in each space
   std::vector<std::pair<int, int>> vertex_;
 };
+
+// Helper functions
+
+/// Return the particle rank of a vector of operators
+int vertices_rank(const std::vector<WDiagVertex> &vertices);
 
 #endif // _wicked_diag_vertex_h_

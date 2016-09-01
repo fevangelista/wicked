@@ -21,6 +21,10 @@ int WDiagOperator::num_cre(int space) const { return vertex_.cre(space); }
 
 int WDiagOperator::num_ann(int space) const { return vertex_.ann(space); }
 
+int WDiagOperator::rank() const {
+  return vertex_.rank();
+}
+
 std::string WDiagOperator::str() const {
   std::string s = label_;
 
@@ -67,4 +71,13 @@ WDiagOperator make_diag_operator(const std::string &label,
   }
 
   return WDiagOperator(label, cre, ann);
+}
+
+int operators_rank(const std::vector<WDiagOperator> &ops)
+{
+    int r = 0;
+    for (const auto& op : ops){
+        r += op.rank();
+    }
+    return r;
 }
