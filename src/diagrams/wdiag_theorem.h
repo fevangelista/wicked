@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 
+class WSQOperator;
+class WTensor;
+class WTerm;
 class WDiagOperator;
 class WDiagVertex;
 
@@ -27,7 +30,8 @@ private:
 
   /// Backtracking algorithm used to generate all contractions product of
   /// elementary contractions
-  void generate_contractions(std::vector<int> a, int k,
+  void generate_contractions(
+      std::vector<int> a, int k,
       const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
       std::vector<WDiagVertex> &free_vertex_vec);
 
@@ -53,6 +57,29 @@ private:
   /// Process a contraction found by the backtracking algorithm
   void process_contraction(const std::vector<int> &a, int k,
                            std::vector<WDiagVertex> &free_vertex_vec);
+
+  /// Apply the contraction to this set of operators and produce a term
+  WTerm evaluate_contraction(const std::vector<WDiagOperator> &ops,
+                             const std::vector<int> &contraction);
+
+  /// Return the sign corresponding to a contraction pattern
+  int contraction_sign(const std::vector<WDiagOperator> &ops,
+                       const std::vector<int> &contraction);
+
+  /// Return the factor corresponding to a contraction pattern
+  scalar_t contraction_factor(const std::vector<WDiagOperator> &ops,
+                              const std::vector<int> &contraction);
+
+  /// Return the tensors corresponding to a contraction pattern
+  std::vector<WTensor>
+  contraction_tensors(const std::vector<WDiagOperator> &ops,
+                      const std::vector<int> &contraction);
+
+  /// Return the second quantized operators corresponding to a contraction
+  /// pattern
+  std::vector<WSQOperator>
+  contraction_sqoperators(const std::vector<WDiagOperator> &ops,
+                          const std::vector<int> &contraction);
 
   /// The number of contractions found
   int ncontractions_ = 0;

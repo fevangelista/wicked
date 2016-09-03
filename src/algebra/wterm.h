@@ -73,6 +73,8 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
+  friend std::ostream &operator<<(std::ostream &os, const WTerm &term);
+
 private:
   // ==> Class private data <==
 

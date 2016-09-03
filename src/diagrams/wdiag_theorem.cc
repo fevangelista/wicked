@@ -5,7 +5,7 @@
 #include "combinatorics.h"
 #include "wdiag_operator.h"
 #include "wdiag_theorem.h"
-#include "wcontractiongraph.h"
+#include "wterm.h"
 
 using namespace std;
 
@@ -43,9 +43,13 @@ void WDiagTheorem::contract(double factor,
     std::vector<std::vector<WDiagVertex>> vertices;
     int contr_rank = 0;
     for (int c : contraction) {
-        contr_rank += vertices_rank(elementary_contractions_[c]);
+      contr_rank += vertices_rank(elementary_contractions_[c]);
     }
     cout << "  " << ops_rank - contr_rank << endl;
+
+    WTerm term = evaluate_contraction(ops, contraction);
+
+    cout << term << endl;
   }
 }
 
@@ -308,4 +312,48 @@ WDiagTheorem::generate_elementary_contractions(
     }
   }
   return contr_vec;
+}
+
+WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
+                                         const std::vector<int> &contraction) {
+
+  int sign = contraction_sign(ops, contraction);
+  scalar_t factor = contraction_factor(ops, contraction);
+  std::vector<WTensor> tensors = contraction_tensors(ops, contraction);
+  std::vector<WSQOperator> sqops = contraction_sqoperators(ops, contraction);
+
+  WTerm term;
+  for (const auto &t : tensors) {
+    term.add(t);
+  }
+  for (const auto &sqop : sqops) {
+    term.add(sqop);
+  }
+  term.set_factor(scalar_t(sign) * factor);
+
+  return term;
+}
+
+int WDiagTheorem::contraction_sign(const std::vector<WDiagOperator> &ops,
+                                   const std::vector<int> &contraction) {
+  return 1;
+}
+
+scalar_t WDiagTheorem::contraction_factor(const std::vector<WDiagOperator> &ops,
+                                          const std::vector<int> &contraction) {
+  return static_cast<scalar_t>(1.0);
+}
+
+std::vector<WTensor>
+WDiagTheorem::contraction_tensors(const std::vector<WDiagOperator> &ops,
+                                  const std::vector<int> &contraction) {
+  std::vector<WTensor> tensors;
+  return tensors;
+}
+
+std::vector<WSQOperator>
+WDiagTheorem::contraction_sqoperators(const std::vector<WDiagOperator> &ops,
+                                      const std::vector<int> &contraction) {
+  std::vector<WSQOperator> sqops;
+  return sqops;
 }

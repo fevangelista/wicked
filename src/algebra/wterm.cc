@@ -155,6 +155,11 @@ std::string WTerm::latex() const {
   return (to_string(str_vec, " "));
 }
 
+std::ostream &operator<<(std::ostream &os, const WTerm &term) {
+  os << term.str();
+  return os;
+}
+
 WTerm make_operator(const std::string &label,
                     const std::vector<std::string> &cre,
                     const std::vector<std::string> &ann) {
