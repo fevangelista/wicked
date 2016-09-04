@@ -336,6 +336,10 @@ WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
 
 int WDiagTheorem::contraction_sign(const std::vector<WDiagOperator> &ops,
                                    const std::vector<int> &contraction) {
+  int sign = 1;
+
+  std::vector<int> ops_layout;
+
   return 1;
 }
 
@@ -348,6 +352,242 @@ std::vector<WTensor>
 WDiagTheorem::contraction_tensors(const std::vector<WDiagOperator> &ops,
                                   const std::vector<int> &contraction) {
   std::vector<WTensor> tensors;
+  std::vector<WSQOperator> sqops;
+
+  std::vector<int> index_counter(osi->num_spaces(), 0);
+
+  // create the tensors corresponding to the operators, lay out the operators on
+  // a vector, and create mappings
+
+  // this map takes the operator index (op), orbital space (s), the sqop type,
+  // and an index and maps it to the operators as they are stored in a vector
+  std::map<std::tuple<int, int, bool, int>, int> op_map;
+  //                   op space cre    n
+
+  int n = 0;
+  for (int o = 0; o < ops.size(); o++) {
+    const auto &op = ops[o];
+    std::vector<WIndex> lower;
+    std::vector<WIndex> upper;
+    for (int s = 0; s < osi->num_spaces(); s++) {
+      for (int c = 0; c < op.num_cre(s); c++) {
+        WIndex idx(s, index_counter[s]);
+        lower.push_back(idx);
+        sqops.push_back(WSQOperator(Creation, idx));
+        auto key = std::make_tuple(o, s, true, c);
+        op_map[key] = n;
+        cout << "key = " << std::get<0>(key) << " " << std::get<1>(key) << " "
+             << std::get<2>(key) << " " << std::get<3>(key) << " -> " << n
+             << endl;
+        index_counter[s] += 1;
+        n += 1;
+      }
+    }
+    // the annihilation operators will be layed out as normal and then reversed
+    std::vector<WSQOperator> sqops_ann;
+    for (int s = 0; s < osi->num_spaces(); s++) {
+      for (int a = 0; a < op.num_ann(s); a++) {
+        WIndex idx(s, index_counter[s]);
+        upper.push_back(idx);
+        sqops_ann.push_back(WSQOperator(Annihilation, idx));
+        auto key = std::make_tuple(o, s, false, op.num_ann(s) - a - 1);
+        op_map[key] = n;
+        cout << "key = " << std::get<0>(key) << " " << std::get<1>(key) << " "
+             << std::get<2>(key) << " " << std::get<3>(key) << " -> " << n
+             << endl;
+
+        index_counter[s] += 1;
+        n += 1;
+      }
+    }
+    std::reverse(sqops_ann.begin(), sqops_ann.end());
+    sqops.insert(sqops.end(), sqops_ann.begin(), sqops_ann.end());
+    tensors.push_back(WTensor(op.label(), lower, upper));
+  }
+
+  // now apply the contractions.  this means contracting operators, creating
+  // density matrices and cumulant tensors
+
+  // stores the offset for each uncontracted operator
+  std::vector<WDiagVertex> ops_offset(ops.size());
+
+  cout << "\n  Applying contraction" << endl;
+  for (int c : contraction) {
+    const auto &vertex_vec = elementary_contractions_[c];
+    PRINT_ELEMENTS(vertex_vec);
+  }
+  cout << endl;
+
+  // this vector will keep track of the which operators have been assigned an
+  // order
+  //    std::vector<bool> is_op_ordered_flag(ops.size(), false);
+  std::vector<int> sign_order(sqops.size(), -1);
+
+  int pos = 0;
+  int nsqops_contracted = 0;
+
+  std::vector<std::vector<bool>> bit_map_vec;
+
+  for (int c : contraction) {
+    std::vector<bool> bit_map(sqops.size(), false);
+    const auto &vertex_vec = elementary_contractions_[c];
+    int rank = vertices_rank(vertex_vec);
+    nsqops_contracted += rank;
+    std::string label;
+    if (rank == 2) {
+      // find the last operator
+      bool is_right_op_annihilation = true;
+      for (const WDiagVertex &vertex : vertex_vec) {
+        for (int s = 0; s < osi->num_spaces(); s++) {
+          if (vertex.cre(s) > 0)
+            is_right_op_annihilation = false;
+          if (vertex.ann(s) > 0)
+            is_right_op_annihilation = true;
+        }
+      }
+      // if the operator contracted on the right is an annihilation op then this
+      // is a one-particle density matrix (gamma)
+      label = is_right_op_annihilation ? "Gamma" : "Eta";
+    } else {
+      label = "Lambda" + std::to_string(rank);
+    }
+
+    std::vector<WIndex> lower;
+    std::vector<WIndex> upper;
+    // loop over all vertices of this contraction and collect the indices that
+    // label the density/cumulant
+
+    for (int v = 0; v < vertex_vec.size(); v++) {
+      const WDiagVertex &vertex = vertex_vec[v];
+      for (int s = 0; s < osi->num_spaces(); s++) {
+        int ncre = vertex.cre(s);
+        int nann = vertex.ann(s);
+        // assign the creation indices
+        int cre_off = ops_offset[v].cre(s);
+        for (int c = 0; c < ncre; c++) {
+          // find the operator corresponding to this leg
+          auto key = std::make_tuple(v, s, true, cre_off + c);
+          if (op_map.count(key) == 0) {
+            cout << "key = " << std::get<0>(key) << " " << std::get<1>(key)
+                 << " " << std::get<2>(key) << " " << std::get<3>(key) << " -> "
+                 << " NOT FOUND!!!" << endl;
+            exit(1);
+          } else {
+            int nn = op_map[key];
+            cout << "key = " << std::get<0>(key) << " " << std::get<1>(key)
+                 << " " << std::get<2>(key) << " " << std::get<3>(key) << " -> "
+                 << nn << endl;
+            upper.push_back(sqops[nn].index());
+            // assign a position to this operator
+            sign_order[nn] = pos;
+            bit_map[nn] = true;
+            pos += 1;
+          }
+        }
+        // update the creator's offset
+        ops_offset[v].cre(s, cre_off + ncre);
+
+        // assign the annihilation indices
+        int ann_off = ops_offset[v].ann(s);
+        for (int a = 0; a < nann; a++) {
+          // find the operator corresponding to this leg
+          auto key = std::make_tuple(v, s, false, ann_off + a);
+          if (op_map.count(key) == 0) {
+            cout << "key = " << std::get<0>(key) << " " << std::get<1>(key)
+                 << " " << std::get<2>(key) << " " << std::get<3>(key) << " -> "
+                 << " NOT FOUND!!!" << endl;
+            exit(1);
+          } else {
+            int nn = op_map[key];
+            cout << "key = " << std::get<0>(key) << " " << std::get<1>(key)
+                 << " " << std::get<2>(key) << " " << std::get<3>(key) << " -> "
+                 << nn << endl;
+            lower.push_back(sqops[nn].index());
+            // assign a position to this operator
+            sign_order[nn] = pos;
+            bit_map[nn] = true;
+            pos += 1;
+          }
+        }
+        // update the annihilation's offset
+        ops_offset[v].ann(s, ann_off + nann);
+      }
+    }
+    tensors.push_back(WTensor(label, lower, upper));
+    bit_map_vec.push_back(bit_map);
+  }
+
+  for (const auto &bit_map : bit_map_vec) {
+    int ntrue = std::count(bit_map.begin(), bit_map.end(), true);
+    bool line = false;
+    cout << "";
+    for (bool b : bit_map) {
+      if (b) {
+        line = true;
+        ntrue -= 1;
+      }
+      if (line) {
+        cout << "___";
+      } else {
+        cout << "   ";
+      }
+      if (ntrue == 0)
+        line = false;
+    }
+    cout << endl;
+    for (bool b : bit_map) {
+      cout << (b ? " | " : "   ");
+    }
+    cout << endl;
+  }
+  for (const auto &sqop : sqops) {
+    cout << ((sqop.type() == Creation) ? " + " : " - ");
+  }
+  cout << endl;
+  for (const auto &sqop : sqops) {
+    cout << " " << sqop.index();
+  }
+  cout << endl;
+
+  for (int s = 0; s < osi->num_spaces(); s++) {
+    for (int i = 0; i < sqops.size(); i++) {
+      if ((sign_order[i] == -1) and (sqops[i].index().space() == s) and
+          (sqops[i].type() == Creation)) {
+        sign_order[i] = pos;
+        pos += 1;
+      }
+    }
+  }
+  for (int s = 0; s < osi->num_spaces(); s++) {
+    for (int i = 0; i < sqops.size(); i++) {
+      if ((sign_order[i] == -1) and (sqops[i].index().space() == s) and
+          (sqops[i].type() == Annihilation)) {
+        sign_order[i] = pos;
+        pos += 1;
+      }
+    }
+  }
+
+  int sign = permutation_sign(sign_order);
+
+  PRINT_ELEMENTS(sign_order, "\n  positions: ");
+  cout << endl;
+  cout << "\n  sign = " << sign << endl;
+
+  std::vector<std::pair<int, WSQOperator>> sorted_sqops;
+  pos = 0;
+  for (const auto &sqop : sqops) {
+    sorted_sqops.push_back(std::make_pair(sign_order[pos], sqop));
+    pos += 1;
+  }
+  std::sort(sorted_sqops.begin(), sorted_sqops.end());
+  sqops.clear();
+
+  for (int i = nsqops_contracted; i < sorted_sqops.size(); ++i) {
+    sqops.push_back(sorted_sqops[i].second);
+  }
+  cout << endl;
+
   return tensors;
 }
 

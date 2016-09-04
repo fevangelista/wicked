@@ -27,6 +27,20 @@ int binomial(int n, int k) {
   return result;
 }
 
+int permutation_sign(const std::vector<int>& vec)
+{
+    int sign = 0;
+    int n = vec.size();
+    for (int i = 0; i < n; i++){
+        for (int j = i + 1; j < n; ++j){
+            if (vec[i] > vec[j]){
+                sign += 1;
+            }
+        }
+    }
+    return (sign % 2 == 0) ? 1 : -1;
+}
+
 std::vector<std::vector<int>> integer_partitions(int n) {
   std::vector<std::vector<int>> partitions;
   if (n > 1) {

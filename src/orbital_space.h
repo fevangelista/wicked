@@ -6,7 +6,7 @@
 #include <vector>
 
 /// Type of orbital space
-//enum class OrbitalSpaceType { Core, Active, Virtual, RI, None };
+// enum class OrbitalSpaceType { Core, Active, Virtual, RI, None };
 
 /// Type of orbital space
 enum class DMStructure {
@@ -34,8 +34,7 @@ public:
   void reset();
 
   /// Add an elementary space
-  void add_space(const std::string &label,
-                 DMStructure structure,
+  void add_space(const std::string &label, DMStructure structure,
                  const std::vector<std::string> &indices);
 
   /// Return the number of elementary spaces
@@ -51,7 +50,7 @@ public:
   const std::vector<std::string> &indices(int pos) const;
 
   /// Maps a label into an orbital space
-  int label_to_space(const std::string& label) const;
+  int label_to_space(const std::string &label) const;
 
 private:
   /// Vector of spaces

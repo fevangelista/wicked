@@ -64,8 +64,8 @@ std::string WTensor::str() const {
   for (const WIndex &index : lower_) {
     str_vec_lower.push_back(index.str());
   }
-  return (label_ + "(" + to_string(str_vec_upper, ",") + "|" +
-          to_string(str_vec_lower, ",") + ")");
+  return (label_ + "^{" + to_string(str_vec_upper, ",") + "}_{" +
+          to_string(str_vec_lower, ",") + "}");
 }
 
 std::string WTensor::latex() const {

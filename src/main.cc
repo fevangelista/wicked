@@ -116,12 +116,14 @@ int main(int argc, const char *argv[]) {
 
     cout << opH1aa;
     WDiagTheorem wdt;
-    wdt.contract(1.0, {opH2aaaa, opT2aavv});
+//    wdt.contract(1.0, {opH2aaaa, opT2aavv});
+    wdt.contract(1.0, {opT2aavv, opH2aaaa});
 
-    auto Hsr = {opH2cccc, opH2cccv, opH2ccvv, opH2cvcc, opH2vvcc};
-    for (const auto& H : Hsr){
-        wdt.contract(1.0, {H, opT2ccvv});
-    }
+
+//    auto Hsr = {opH2cccc, opH2cccv, opH2ccvv, opH2cvcc, opH2vvcc};
+//    for (const auto& H : Hsr){
+//        wdt.contract(1.0, {H, opT2ccvv});
+//    }
   }
 
   return 0;

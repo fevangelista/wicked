@@ -65,6 +65,8 @@ generate_direct_product_combinations(std::vector<int> &n, std::vector<int> &k);
 std::vector<std::vector<int>> generate_permutations(int n,
                                                     std::vector<int> &labels);
 
+int permutation_sign(const std::vector<int>& vec);
+
 template <typename T>
 std::vector<std::vector<T>>
 enumeration_elements(const std::vector<std::vector<T>> &sets) {
