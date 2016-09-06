@@ -6,10 +6,17 @@
 
 #include "combinatorics.h"
 
-#define DEBUG_PRODUCT_SPACE(code)                                              \
-  //{ code }
+#define DEBUG_PRODUCT_SPACE(code) //{ code }
 
-int binomial(int n, int k);
+int factorial(int n) {
+  if (n == 0)
+    return 1;
+  int result = 1;
+  for (int i = 2; i <= n; ++i) {
+    result *= i;
+  }
+  return result;
+}
 
 int binomial(int n, int k) {
   if (k > n)
@@ -27,18 +34,19 @@ int binomial(int n, int k) {
   return result;
 }
 
-int permutation_sign(const std::vector<int>& vec)
-{
-    int sign = 0;
-    int n = vec.size();
-    for (int i = 0; i < n; i++){
-        for (int j = i + 1; j < n; ++j){
-            if (vec[i] > vec[j]){
-                sign += 1;
-            }
-        }
+// see
+// http://math.stackexchange.com/questions/65923/how-does-one-compute-the-sign-of-a-permutation
+int permutation_sign(const std::vector<int> &vec) {
+  int sign = 0;
+  int n = vec.size();
+  for (int i = 0; i < n; i++) {
+    for (int j = i + 1; j < n; ++j) {
+      if (vec[i] > vec[j]) {
+        sign += 1;
+      }
     }
-    return (sign % 2 == 0) ? 1 : -1;
+  }
+  return (sign % 2 == 0) ? 1 : -1;
 }
 
 std::vector<std::vector<int>> integer_partitions(int n) {

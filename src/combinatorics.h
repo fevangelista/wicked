@@ -7,6 +7,11 @@
 typedef std::vector<std::vector<int>> vecvecint;
 typedef std::vector<int> vecint;
 
+
+int factorial(int n);
+
+int binomial(int n, int k);
+
 // ==> Integer partitions <==
 
 /// Generate all the partitions of the integer n
@@ -65,7 +70,7 @@ generate_direct_product_combinations(std::vector<int> &n, std::vector<int> &k);
 std::vector<std::vector<int>> generate_permutations(int n,
                                                     std::vector<int> &labels);
 
-int permutation_sign(const std::vector<int>& vec);
+int permutation_sign(const std::vector<int> &vec);
 
 template <typename T>
 std::vector<std::vector<T>>

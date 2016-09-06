@@ -10,6 +10,9 @@
 std::string to_string(const std::vector<std::string> &svec,
                       const std::string &sep = ",");
 
+std::string to_string(const scalar_t r);
+std::string to_latex(const scalar_t r);
+
 class range {
 private:
   int last;

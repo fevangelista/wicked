@@ -18,6 +18,8 @@ public:
   /// Return the label of the operator
   const std::string &label() const;
 
+  scalar_t factor() const;
+
   WDiagVertex vertex() const;
 
   /// Return the number of indices for a given space and type (cre/ann)
@@ -41,6 +43,9 @@ public:
 private:
   /// The label of the operator
   std::string label_;
+
+  /// The factor associated with this operator
+  scalar_t factor_;
 
   /// The number of creation/annihilation operators in each space
   WDiagVertex vertex_;

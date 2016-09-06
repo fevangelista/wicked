@@ -106,6 +106,7 @@ bool WTerm::operator==(const WTerm &other) const {
 std::string WTerm::str() const {
   std::vector<std::string> str_vec;
 
+  str_vec.push_back(to_string(factor_));
   for (const WTensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }

@@ -16,3 +16,24 @@ std::string to_string(const std::vector<std::string> &strvec,
 
   return ss.str();
 }
+
+std::string to_string(const scalar_t r) {
+  if (r.numerator() == 0) {
+    return "0";
+  }
+  if (r.denominator() == 1) {
+    return std::to_string(r.numerator());
+  }
+  return std::to_string(r.numerator()) + "/" + std::to_string(r.denominator());
+}
+
+std::string to_latex(const scalar_t r) {
+  if (r.numerator() == 0) {
+    return "0";
+  }
+  if (r.denominator() == 1) {
+    return std::to_string(r.numerator());
+  }
+  return "\frac{" + std::to_string(r.numerator()) + "}{" +
+         std::to_string(r.denominator()) + "}";
+}
