@@ -50,7 +50,7 @@ void WDiagTheorem::contract(scalar_t factor,
     for (int c : contraction) {
       contr_rank += vertices_rank(elementary_contractions_[c]);
     }
-    cout << "  " << ops_rank - contr_rank << endl;
+    cout << "\n  Operator rank " << ops_rank - contr_rank << endl;
 
     WTerm term = evaluate_contraction(ops, contraction, factor);
 
@@ -320,13 +320,9 @@ WDiagTheorem::generate_elementary_contractions(
 }
 
 void print_key(std::tuple<int, int, bool, int> key, int n);
-
-void print_key(std::tuple<int, int, bool, int> key, int n) {
-  cout << "key[vertex = " << std::get<0>(key)
-       << ", space = " << std::get<1>(key)
-       << ", creation = " << std::get<2>(key) << ", num = " << std::get<3>(key)
-       << "] -> " << n << endl;
-}
+void print_contraction(const std::vector<std::vector<bool>> &bit_map_vec,
+                       const std::vector<WSQOperator> &sqops,
+                       const std::vector<int> sign_order);
 
 WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
                                          const std::vector<int> &contraction,
@@ -386,10 +382,13 @@ WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   // stores the offset for each uncontracted operator
   std::vector<WDiagVertex> ops_offset(ops.size());
 
-  cout << "\n  Applying contraction" << endl;
+  cout << "  Contraction(s):" << endl;
   for (int c : contraction) {
     const auto &vertex_vec = elementary_contractions_[c];
-    PRINT_ELEMENTS(vertex_vec);
+    for (const auto &vertex : vertex_vec) {
+      cout << vertex;
+    }
+    cout << endl;
   }
   cout << endl;
 
@@ -499,38 +498,6 @@ WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
     bit_map_vec.push_back(bit_map);
   }
 
-  for (const auto &bit_map : bit_map_vec) {
-    int ntrue = std::count(bit_map.begin(), bit_map.end(), true);
-    bool line = false;
-    cout << "";
-    for (bool b : bit_map) {
-      if (b) {
-        line = true;
-        ntrue -= 1;
-      }
-      if (line) {
-        cout << "___";
-      } else {
-        cout << "   ";
-      }
-      if (ntrue == 0)
-        line = false;
-    }
-    cout << endl;
-    for (bool b : bit_map) {
-      cout << (b ? " | " : "   ");
-    }
-    cout << endl;
-  }
-  for (const auto &sqop : sqops) {
-    cout << ((sqop.type() == Creation) ? " + " : " - ");
-  }
-  cout << endl;
-  for (const auto &sqop : sqops) {
-    cout << " " << sqop.index();
-  }
-  cout << endl;
-
   for (int s = 0; s < osi->num_spaces(); s++) {
     for (int i = 0; i < sqops.size(); i++) {
       if ((sign_order[i] == -1) and (sqops[i].index().space() == s) and
@@ -550,14 +517,11 @@ WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
     }
   }
 
-  for (int order : sign_order) {
-    cout << " " << order << " ";
-  }
-  cout << endl;
+  print_contraction(bit_map_vec, sqops, sign_order);
 
   int sign = eta_sign * permutation_sign(sign_order);
 
-  PRINT(WDiagPrint::All,  PRINT_ELEMENTS(sign_order, "\n  positions: "););
+  PRINT(WDiagPrint::All, PRINT_ELEMENTS(sign_order, "\n  positions: "););
 
   std::vector<std::pair<int, WSQOperator>> sorted_sqops;
   sorted_position = 0;
@@ -588,9 +552,9 @@ WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   }
   term.set_factor(sign * factor * comb_factor);
 
-  cout << "  sign = " << sign << endl;
-  cout << "  factor = " << factor << endl;
-  cout << "  combinatorial_factor = " << comb_factor << endl;
+  PRINT(WDiagPrint::All, cout << "  sign = " << sign << endl;
+        cout << "  factor = " << factor << endl;
+        cout << "  combinatorial_factor = " << comb_factor << endl;)
 
   return term;
 }
@@ -636,9 +600,57 @@ WDiagTheorem::combinatorial_factor(const std::vector<WDiagOperator> &ops,
   return factor;
 }
 
-// std::vector<WSQOperator>
-// WDiagTheorem::contraction_sqoperators(const std::vector<WDiagOperator> &ops,
-//                                      const std::vector<int> &contraction) {
-//  std::vector<WSQOperator> sqops;
-//  return sqops;
-//}
+void print_key(std::tuple<int, int, bool, int> key, int n) {
+  cout << "key[vertex = " << std::get<0>(key)
+       << ", space = " << std::get<1>(key)
+       << ", creation = " << std::get<2>(key) << ", num = " << std::get<3>(key)
+       << "] -> " << n << endl;
+}
+
+void print_contraction(const std::vector<std::vector<bool>> &bit_map_vec,
+                       const std::vector<WSQOperator> &sqops,
+                       const std::vector<int> sign_order) {
+  for (const auto &bit_map : bit_map_vec) {
+    int ntrue = std::count(bit_map.begin(), bit_map.end(), true);
+    bool line = false;
+    bool first = true;
+    cout << "";
+    for (bool b : bit_map) {
+      if (b) {
+        line = true;
+        ntrue -= 1;
+      }
+      if (line) {
+        if (first) {
+          cout << " __";
+          first = false;
+        } else if (ntrue == 0) {
+          cout << "__ ";
+        } else {
+          cout << "___";
+        }
+      } else {
+        cout << "   ";
+      }
+      if (ntrue == 0)
+        line = false;
+    }
+    cout << endl;
+    for (bool b : bit_map) {
+      cout << (b ? " | " : "   ");
+    }
+    cout << endl;
+  }
+  for (const auto &sqop : sqops) {
+    cout << ((sqop.type() == Creation) ? " + " : " - ");
+  }
+  cout << endl;
+  for (const auto &sqop : sqops) {
+    cout << " " << sqop.index();
+  }
+  cout << endl;
+  for (int order : sign_order) {
+    cout << " " << order << " ";
+  }
+  cout << "\n" << endl;
+}
