@@ -52,13 +52,13 @@ int main(int argc, const char *argv[]) {
 
     WTerm opH2aaaa = make_operator("H2", {a, a}, {a, a});
 
-    WSum sum;
-    for (WTerm &term : opT) {
-      cout << term.str() << endl;
-      sum.add(term);
-    }
+//    WSum sum;
+//    for (WTerm &term : opT) {
+//      cout << term.str() << endl;
+//      sum.add(term);
+//    }
 
-    cout << sum.str() << endl;
+//    cout << sum.str() << endl;
 
     WTheorem wt;
     //  wt.theorem_pair(opH1aa, opT1ca);
@@ -113,17 +113,24 @@ int main(int argc, const char *argv[]) {
     auto opH2cvcc = make_diag_operator("H2", {c, v}, {c, c});
     auto opH2vvcc = make_diag_operator("H2", {v, v}, {c, c});
 
-
     cout << opH1aa;
     WDiagTheorem wdt;
-//    wdt.contract(1.0, {opH2aaaa, opT2aavv});
-    wdt.contract(1.0, {opT2aavv, opH2aaaa});
+    //    wdt.contract(1.0, {opH2aaaa, opT2aavv});
+    WSum terms;
+    auto c1 = wdt.contract(1, {opT1aa, opH1aa});
+    auto c2 = wdt.contract(-1, {opH1aa, opT1aa});
+    for (const auto& c1_term : c1){
+        terms.add(c1_term);
+    }
+    for (const auto& c2_term : c2){
+        terms.add(c2_term);
+    }
+    cout << terms.str() << endl;
 
-
-//    auto Hsr = {opH2cccc, opH2cccv, opH2ccvv, opH2cvcc, opH2vvcc};
-//    for (const auto& H : Hsr){
-//        wdt.contract(1.0, {H, opT2ccvv});
-//    }
+    //    auto Hsr = {opH2cccc, opH2cccv, opH2ccvv, opH2cvcc, opH2vvcc};
+    //    for (const auto& H : Hsr){
+    //        wdt.contract(1.0, {H, opT2ccvv});
+    //    }
   }
 
   return 0;

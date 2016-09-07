@@ -5,7 +5,7 @@
 #include "combinatorics.h"
 #include "wdiag_operator.h"
 #include "wdiag_theorem.h"
-#include "wterm.h"
+#include "walgebraicterm.h"
 
 #define PRINT(detail, code)                                                    \
   if (print_ >= detail) {                                                      \
@@ -16,9 +16,10 @@ using namespace std;
 
 WDiagTheorem::WDiagTheorem() {}
 
-void WDiagTheorem::contract(scalar_t factor,
-                            const std::vector<WDiagOperator> &ops) {
+std::vector<WAlgebraicTerm>
+WDiagTheorem::contract(scalar_t factor, const std::vector<WDiagOperator> &ops) {
 
+  std::vector<WAlgebraicTerm> result;
   ncontractions_ = 0;
   contractions_.clear();
   elementary_contractions_.clear();
@@ -52,10 +53,14 @@ void WDiagTheorem::contract(scalar_t factor,
     }
     cout << "\n  Operator rank " << ops_rank - contr_rank << endl;
 
-    WTerm term = evaluate_contraction(ops, contraction, factor);
+    WAlgebraicTerm term = evaluate_contraction(ops, contraction, factor);
 
     cout << term << endl;
+    term.canonicalize();
+    cout << term << endl;
+    result.push_back(term);
   }
+  return result;
 }
 
 void WDiagTheorem::generate_contractions(
@@ -324,9 +329,10 @@ void print_contraction(const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<WSQOperator> &sqops,
                        const std::vector<int> sign_order);
 
-WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
-                                         const std::vector<int> &contraction,
-                                         scalar_t factor) {
+WAlgebraicTerm
+WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
+                                   const std::vector<int> &contraction,
+                                   scalar_t factor) {
   std::vector<WTensor> tensors;
   std::vector<WSQOperator> sqops;
 
@@ -539,7 +545,7 @@ WTerm WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   // find the combinatorial factor associated with this contraction
   scalar_t comb_factor = combinatorial_factor(ops, contraction);
 
-  WTerm term;
+  WAlgebraicTerm term;
 
   for (const auto &tensor : tensors) {
     term.add(tensor);

@@ -72,7 +72,7 @@ void WTerm::canonicalize() {
 
     // c) number of indices per space
     std::vector<int> num_low = num_indices_per_space(tensor.lower());
-    std::vector<int> num_upp = num_indices_per_space(tensor.lower());
+    std::vector<int> num_upp = num_indices_per_space(tensor.upper());
 
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, tensor));
     n += 1;

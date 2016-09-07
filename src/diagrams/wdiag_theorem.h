@@ -6,7 +6,7 @@
 
 class WSQOperator;
 class WTensor;
-class WTerm;
+class WAlgebraicTerm;
 class WDiagOperator;
 class WDiagVertex;
 
@@ -20,7 +20,7 @@ public:
   WDiagTheorem();
 
   /// Contract a product of operators
-  void contract(scalar_t factor, const std::vector<WDiagOperator> &ops);
+  std::vector<WAlgebraicTerm> contract(scalar_t factor, const std::vector<WDiagOperator> &ops);
 
 private:
   std::vector<std::vector<int>> contractions_;
@@ -61,7 +61,7 @@ private:
                            std::vector<WDiagVertex> &free_vertex_vec);
 
   /// Apply the contraction to this set of operators and produce a term
-  WTerm evaluate_contraction(const std::vector<WDiagOperator> &ops,
+  WAlgebraicTerm evaluate_contraction(const std::vector<WDiagOperator> &ops,
                              const std::vector<int> &contraction,
                              scalar_t factor);
 

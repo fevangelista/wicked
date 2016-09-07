@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "wicked-def.h"
-#include "wterm.h"
+#include "walgebraicterm.h"
 
 /// A class to represent a sum of SQ terms.
 class WSum {
@@ -15,10 +15,10 @@ public:
   // ==> Class public interface <==
 
   /// Return the map (term,factor)
-  std::vector<WTerm> &sum() { return sum_; }
+  std::vector<WAlgebraicTerm> &sum() { return sum_; }
 
   /// Add a term that can optionally be scaled
-  void add(const WTerm &term, scalar_t scale = 1);
+  void add(const WAlgebraicTerm &term, scalar_t scale = 1);
 
   /// Add a term that can optionally be scaled
   void add(const WSum &sum, scalar_t scale = 1);
@@ -38,7 +38,7 @@ public:
 private:
   // ==> Class private data <==
 
-  std::vector<WTerm> sum_;
+  std::vector<WAlgebraicTerm> sum_;
 
   // ==> Class private functions <==
 };
