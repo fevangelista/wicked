@@ -29,6 +29,12 @@ public:
   /// Return a reference to the upper indices
   const std::vector<WIndex> &upper() const { return upper_; }
 
+  /// Set the lower indices
+  void set_lower(const std::vector<WIndex> &indices) { lower_ = indices; }
+
+  /// Set the upper indices
+  void set_upper(const std::vector<WIndex> &indices) { upper_ = indices; }
+
   /// Return a vector containing all indices
   std::vector<WIndex> indices() const;
 

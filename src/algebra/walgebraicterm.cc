@@ -64,26 +64,30 @@ void WAlgebraicTerm::canonicalize() {
   }
 
   // 2. Relabel indices of tensors and operators
-  // a. Operators have higher priority
+
   std::vector<int> sqop_index_count(osi->num_spaces(), 0);
   std::vector<int> tens_index_count(osi->num_spaces(), 0);
   index_map_t index_map;
   std::map<WIndex, bool> is_operator_index;
 
+  // a. Assign indices to free operators
   for (const auto &sqop : operators_) {
     tens_index_count[sqop.index().space()] += 1;
     is_operator_index[sqop.index()] = true;
   }
 
+  // b. Assign indices to tensors operators
   for (const auto &tensor : tensors_) {
     for (const auto &l : tensor.lower()) {
       if (is_operator_index.count(l) == 0) {
+        // this index is not shared with an operator
         if (index_map.count(l) == 0) {
           int s = l.space();
           index_map[l] = WIndex(s, tens_index_count[s]);
           tens_index_count[s] += 1;
         }
       } else {
+        // this index is shared with an operator
         if (index_map.count(l) == 0) {
           int s = l.space();
           index_map[l] = WIndex(s, sqop_index_count[s]);
@@ -110,7 +114,74 @@ void WAlgebraicTerm::canonicalize() {
 
   reindex(index_map);
 
-  // 3. Sort operators according to canonical form
+  // 3. Sort tensor indices according to canonical form
+  for (auto &tensor : tensors_) {
+    scalar_t sign = 1;
+    {
+      std::vector<std::tuple<int, int, int, WIndex>> upper_sort;
+      int upos = 0;
+      for (const auto &index : tensor.upper()) {
+        upper_sort.push_back(
+            std::make_tuple(index.space(), index.index(), upos, index));
+        upos += 1;
+      }
+      std::sort(upper_sort.begin(), upper_sort.end());
+
+      std::vector<int> usign;
+      std::vector<WIndex> new_upper;
+      for (const auto &tpl : upper_sort) {
+        usign.push_back(std::get<2>(tpl));
+        new_upper.push_back(std::get<3>(tpl));
+      }
+      tensor.set_upper(new_upper);
+      sign *= permutation_sign(usign);
+    }
+
+    {
+      std::vector<std::tuple<int, int, int, WIndex>> lower_sort;
+      int lpos = 0;
+      for (const auto &index : tensor.lower()) {
+        lower_sort.push_back(
+            std::make_tuple(index.space(), index.index(), lpos, index));
+        lpos += 1;
+      }
+      std::sort(lower_sort.begin(), lower_sort.end());
+
+      std::vector<int> lsign;
+      std::vector<WIndex> new_lower;
+      for (const auto &tpl : lower_sort) {
+        lsign.push_back(std::get<2>(tpl));
+        new_lower.push_back(std::get<3>(tpl));
+      }
+      tensor.set_lower(new_lower);
+      sign *= permutation_sign(lsign);
+    }
+    factor_ *= sign;
+  }
+
+  // 4. Sort operators according to canonical form
+  std::vector<int> sqops_pos(operators_.size(), -1);
+  std::vector<std::tuple<int, int, int, int>> sorting_vec;
+  int pos = 0;
+  for (const auto &sqop : operators_) {
+    int type = (sqop.type() == Creation) ? 0 : 1;
+    int s = sqop.index().space();
+    int index = sqop.index().index();
+    sorting_vec.push_back(std::make_tuple(type, s, index, pos));
+    pos += 1;
+  }
+
+  std::sort(sorting_vec.begin(), sorting_vec.end());
+
+  std::vector<int> sign_order;
+  std::vector<WSQOperator> new_sqops;
+  for (const auto &tpl : sorting_vec) {
+    int idx = std::get<3>(tpl);
+    sign_order.push_back(idx);
+    new_sqops.push_back(operators_[idx]);
+  }
+  factor_ *= permutation_sign(sign_order);
+  operators_ = new_sqops;
 }
 
 bool WAlgebraicTerm::operator<(const WAlgebraicTerm &other) const {
