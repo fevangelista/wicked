@@ -10,8 +10,10 @@
 
 /// Type of orbital space
 enum class DMStructure {
-  Delta,  // Single contractions only-Kronecker delta
-  OPDM,   // Single contractions only-One-particle density matrix
+  // Single creation/annihilation contractions that yields a Kronecker delta
+  DoublyOccupied,
+  // Single annihilation/creation contractions that yields a Kronecker delta
+  Unoccupied,
   General // Multi-leg contractions
 };
 

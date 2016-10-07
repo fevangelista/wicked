@@ -13,12 +13,60 @@
 
 using namespace std;
 
+void srcc();
+void mr();
+
 int main(int argc, const char *argv[]) {
-  std::cout << "pyWicked" << std::endl;
+  srcc();
+  //  mr();
 
+  return 0;
+}
+
+void srcc() {
   osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->default_spaces();
+  osi->add_space("o", DMStructure::DoublyOccupied,
+                 {"i", "j", "k", "l", "m", "n"});
+  osi->add_space("v", DMStructure::Unoccupied, {"a", "b", "c", "d", "e", "f"});
+  // Convenience variables
+  std::string o = "o";
+  std::string v = "v";
 
+  auto opT1 = make_diag_operator("T1", {v}, {o});
+  auto opT2 = make_diag_operator("T2", {v, v}, {o, o});
+
+  auto opH1oo = make_diag_operator("H1", {o}, {o});
+  auto opH1ov = make_diag_operator("H1", {o}, {v});
+  auto opH1vo = make_diag_operator("H1", {v}, {o});
+  auto opH1vv = make_diag_operator("H1", {v}, {v});
+
+  auto opH2oooo = make_diag_operator("H2", {o, o}, {o, o});
+  auto opH2ovoo = make_diag_operator("H2", {o, v}, {o, o});
+  auto opH2ooov = make_diag_operator("H2", {o, o}, {o, v});
+  auto opH2ovov = make_diag_operator("H2", {o, v}, {o, v});
+  auto opH2vvoo = make_diag_operator("H2", {v, v}, {o, o});
+  auto opH2oovv = make_diag_operator("H2", {o, o}, {v, v});
+  auto opH2vvov = make_diag_operator("H2", {v, v}, {o, v});
+  auto opH2ovvv = make_diag_operator("H2", {o, v}, {v, v});
+  auto opH2vvvv = make_diag_operator("H2", {v, v}, {v, v});
+
+  auto opR1 = make_diag_operator("R1", {o}, {v});
+  auto opR2 = make_diag_operator("R2", {o, o}, {v, v});
+
+  WDiagTheorem wdt;
+  WSum terms;
+  auto c1 = wdt.contract(1, {opT1, opH1ov});
+  auto c2 = wdt.contract(-1, {opH1ov, opT1});
+  for (const auto &c1_term : c1) {
+    terms.add(c1_term);
+  }
+  for (const auto &c2_term : c2) {
+    terms.add(c2_term);
+  }
+  cout << terms.str() << endl;
+}
+
+void mr() {
   // Convenience variables
   std::string c = "c";
   std::string a = "a";
@@ -52,13 +100,13 @@ int main(int argc, const char *argv[]) {
 
     WTerm opH2aaaa = make_operator("H2", {a, a}, {a, a});
 
-//    WSum sum;
-//    for (WTerm &term : opT) {
-//      cout << term.str() << endl;
-//      sum.add(term);
-//    }
+    //    WSum sum;
+    //    for (WTerm &term : opT) {
+    //      cout << term.str() << endl;
+    //      sum.add(term);
+    //    }
 
-//    cout << sum.str() << endl;
+    //    cout << sum.str() << endl;
 
     WTheorem wt;
     //  wt.theorem_pair(opH1aa, opT1ca);
@@ -119,11 +167,11 @@ int main(int argc, const char *argv[]) {
     WSum terms;
     auto c1 = wdt.contract(1, {opT1aa, opH1aa});
     auto c2 = wdt.contract(-1, {opH1aa, opT1aa});
-    for (const auto& c1_term : c1){
-        terms.add(c1_term);
+    for (const auto &c1_term : c1) {
+      terms.add(c1_term);
     }
-    for (const auto& c2_term : c2){
-        terms.add(c2_term);
+    for (const auto &c2_term : c2) {
+      terms.add(c2_term);
     }
     cout << terms.str() << endl;
 
@@ -132,8 +180,6 @@ int main(int argc, const char *argv[]) {
     //        wdt.contract(1.0, {H, opT2ccvv});
     //    }
   }
-
-  return 0;
 }
 
 /*

@@ -49,10 +49,10 @@ void OrbitalSpaceInfo::reset() {
 
 void OrbitalSpaceInfo::default_spaces() {
   std::cout << "Setting up default spaces" << std::endl;
-  add_space("c", DMStructure::Delta,
+  add_space("c", DMStructure::DoublyOccupied,
             {"m", "n", "o", "p"});
   add_space("a", DMStructure::General,
             {"u", "v", "w", "x", "y", "z"});
-  add_space("v", DMStructure::Delta,
+  add_space("v", DMStructure::Unoccupied,
             {"e", "f", "g", "h"});
 }

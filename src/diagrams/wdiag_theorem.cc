@@ -185,7 +185,7 @@ WDiagTheorem::generate_elementary_contractions(
 
   int nops = ops.size();
 
-  // holds all the contractions
+  // a vector that holds all the contractions
   std::vector<std::vector<WDiagVertex>> contr_vec;
 
   // loop over orbital spaces
@@ -200,21 +200,23 @@ WDiagTheorem::generate_elementary_contractions(
     // |   |
     // a^+ a
 
-    cout << "\n    * c/a pairwise contractions" << endl;
-    // loop over the creation operators of each operator
-    for (int c = 0; c < nops; c++) {
-      // loop over the annihilation operators of each operator (right to the
-      // creation operators)
-      for (int a = c + 1; a < nops; a++) {
-        // check if contraction is viable
-        if ((ops[c].num_cre(s) > 0) and (ops[a].num_ann(s) > 0)) {
-          std::vector<WDiagVertex> new_contr(nops);
-          new_contr[c].cre(s, 1);
-          new_contr[a].ann(s, 1);
-          contr_vec.push_back(new_contr);
+    if (dmstruc == DMStructure::DoublyOccupied) {
+      cout << "\n    * c/a pairwise contractions" << endl;
+      // loop over the creation operators of each operator
+      for (int c = 0; c < nops; c++) {
+        // loop over the annihilation operators of each operator (right to the
+        // creation operators)
+        for (int a = c + 1; a < nops; a++) {
+          // check if contraction is viable
+          if ((ops[c].num_cre(s) > 0) and (ops[a].num_ann(s) > 0)) {
+            std::vector<WDiagVertex> new_contr(nops);
+            new_contr[c].cre(s, 1);
+            new_contr[a].ann(s, 1);
+            contr_vec.push_back(new_contr);
 
-          PRINT_ELEMENTS(new_contr, "      ");
-          cout << endl;
+            PRINT_ELEMENTS(new_contr, "      ");
+            cout << endl;
+          }
         }
       }
     }
@@ -224,21 +226,23 @@ WDiagTheorem::generate_elementary_contractions(
     // |   |
     // a   a^+
 
-    cout << "\n    * a/c pairwise contractions" << endl;
-    // loop over the creation operators of each operator
-    for (int a = 0; a < nops; a++) {
-      // loop over the annihilation operators of each operator (right to the
-      // creation operators)
-      for (int c = a + 1; c < nops; c++) {
-        // check if contraction is viable
-        if ((ops[c].num_cre(s) > 0) and (ops[a].num_ann(s) > 0)) {
-          std::vector<WDiagVertex> new_contr(nops);
-          new_contr[c].cre(s, 1);
-          new_contr[a].ann(s, 1);
-          contr_vec.push_back(new_contr);
+    if (dmstruc == DMStructure::Unoccupied) {
+      cout << "\n    * a/c pairwise contractions" << endl;
+      // loop over the creation operators of each operator
+      for (int a = 0; a < nops; a++) {
+        // loop over the annihilation operators of each operator (right to the
+        // creation operators)
+        for (int c = a + 1; c < nops; c++) {
+          // check if contraction is viable
+          if ((ops[c].num_cre(s) > 0) and (ops[a].num_ann(s) > 0)) {
+            std::vector<WDiagVertex> new_contr(nops);
+            new_contr[c].cre(s, 1);
+            new_contr[a].ann(s, 1);
+            contr_vec.push_back(new_contr);
 
-          PRINT_ELEMENTS(new_contr, "      ");
-          cout << endl;
+            PRINT_ELEMENTS(new_contr, "      ");
+            cout << endl;
+          }
         }
       }
     }
@@ -261,9 +265,9 @@ WDiagTheorem::generate_elementary_contractions(
       int max_half_legs = std::min(std::min(sumcre, sumann), maxcumulant_);
       int max_legs = 2 * max_half_legs;
 
-      // loop over all possible contractions from 4 to max_legs
-      for (int half_legs = 2; half_legs <= max_half_legs; half_legs++) {
-        cout << "\n    * " << 2 * half_legs << "-legs cumulant contractions"
+      // loop over all possible contractions from 2 to max_legs
+      for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
+        cout << "\n    * " << 2 * half_legs << "-legs contractions"
              << endl;
         auto half_legs_part = integer_partitions(half_legs);
 
@@ -338,7 +342,8 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
 
   std::vector<int> index_counter(osi->num_spaces(), 0);
 
-  // create the tensors corresponding to the operators, lay out the operators on
+  // create the tensors corresponding to the operators, lay out the operators
+  // on
   // a vector, and create mappings
 
   // this map takes the operator index (op), orbital space (s), the sqop type,
@@ -363,7 +368,8 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
         n += 1;
       }
     }
-    // the annihilation operators will be layed out as normal and then reversed
+    // the annihilation operators will be layed out as normal and then
+    // reversed
     std::vector<WSQOperator> sqops_ann;
     for (int s = 0; s < osi->num_spaces(); s++) {
       for (int a = 0; a < op.num_ann(s); a++) {
@@ -426,7 +432,8 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
             is_right_op_annihilation = true;
         }
       }
-      // if the operator contracted on the right is an annihilation op then this
+      // if the operator contracted on the right is an annihilation op then
+      // this
       // is a one-particle density matrix (gamma)
       if (is_right_op_annihilation) {
         label = "Gamma";
