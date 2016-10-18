@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "wicked-def.h"
 #include "windex.h"
 
 /// This class represents a tensor labeled with orbital indices.

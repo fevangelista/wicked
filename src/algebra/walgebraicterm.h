@@ -1,10 +1,10 @@
 #ifndef _wicked_algebraic_term_h_
 #define _wicked_algebraic_term_h_
 
-#include <string>
-#include <vector>
 #include <map>
 #include <numeric>
+#include <string>
+#include <vector>
 
 #include "combinatorics.h"
 #include "windex.h"
@@ -67,8 +67,6 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
-  friend std::ostream &operator<<(std::ostream &os, const WAlgebraicTerm &term);
-
 private:
   // ==> Class private data <==
 
@@ -83,6 +81,10 @@ private:
 };
 
 // Helper functions
+
+/// Print to an output stream
+std::ostream &operator<<(std::ostream &os, const WAlgebraicTerm &term);
+
 ///// Create an operator
 WAlgebraicTerm make_algebraic_term(const std::string &label,
                                    const std::vector<std::string> &cre,

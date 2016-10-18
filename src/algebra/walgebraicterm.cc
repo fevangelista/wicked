@@ -1,6 +1,6 @@
-#include "wicked-def.h"
-#include "helpers.h"
 #include "walgebraicterm.h"
+#include "helpers.h"
+#include "wicked-def.h"
 
 WAlgebraicTerm::WAlgebraicTerm() {}
 
@@ -205,11 +205,13 @@ std::string WAlgebraicTerm::str() const {
   for (const WTensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }
-  str_vec.push_back("{");
-  for (const auto &op : operators_) {
-    str_vec.push_back(op.str());
+  if (operators_.size()) {
+    str_vec.push_back("{");
+    for (const auto &op : operators_) {
+      str_vec.push_back(op.str());
+    }
+    str_vec.push_back("}");
   }
-  str_vec.push_back("}");
 
   return (to_string(str_vec, " "));
 }

@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "wicked-def.h"
 #include "walgebraicterm.h"
+#include "wicked-def.h"
 
 /// A class to represent a sum of SQ terms.
 class WSum {
@@ -42,5 +42,8 @@ private:
 
   // ==> Class private functions <==
 };
+
+/// Print to an output stream
+std::ostream &operator<<(std::ostream &os, const WSum &sum);
 
 #endif // _wicked_wsum_h_

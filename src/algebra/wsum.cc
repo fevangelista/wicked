@@ -14,7 +14,7 @@ void WSum::add(const WAlgebraicTerm &term, scalar_t scale) {
     factor += scale * term.factor();
     it->set_factor(factor);
     if (factor == 0){
-        std::cout << "\n Term cancellation!" << std::endl;
+//        std::cout << "\n Term cancellation!" << std::endl;
     }
   } else {
     sum_.push_back(term);
@@ -35,4 +35,9 @@ std::string WSum::str() const {
     str_vec.push_back(term.str());
   }
   return (to_string(str_vec, "\n"));
+}
+
+std::ostream &operator<<(std::ostream &os, const WSum &sum) {
+  os << sum.str();
+  return os;
 }

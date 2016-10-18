@@ -38,8 +38,6 @@ public:
   /// Return an ambit representation
   std::string ambit() const;
 
-  friend std::ostream &operator<<(std::ostream &os, const WIndex &idx);
-
 private:
   // ==> Class private data <==
 
@@ -47,7 +45,13 @@ private:
   std::pair<int, int> index_;
 };
 
+// A WIndex -> WIndex map used for reindexing
 using index_map_t = std::map<WIndex, WIndex>;
+
+// Helper functions
+
+/// Print to an output stream
+std::ostream &operator<<(std::ostream &os, const WIndex &idx);
 
 /// Helper function that converts multiple vectors of space types
 /// (OrbitalSpaceType) to vectors of indices (WIndex) labeled staring with zero.

@@ -73,8 +73,6 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
-  friend std::ostream &operator<<(std::ostream &os, const WTerm &term);
-
 private:
   // ==> Class private data <==
 
@@ -93,5 +91,8 @@ private:
 WTerm make_operator(const std::string &label,
                     const std::vector<std::string> &cre,
                     const std::vector<std::string> &ann);
+
+/// Print to an output stream
+std::ostream &operator<<(std::ostream &os, const WTerm &term);
 
 #endif // _wicked_wterm_h_

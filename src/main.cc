@@ -1,14 +1,15 @@
-#include <iostream>
 #include <fstream>
-#include <string>
 #include <iomanip>
+#include <iostream>
+#include <string>
 
-#include "wicked-def.h"
+#include "helpers.h"
 #include "orbital_space.h"
-#include "wdiag_theorem.h"
 #include "wdiag_operator.h"
-#include "wterm.h"
+#include "wdiag_theorem.h"
+#include "wicked-def.h"
 #include "wsum.h"
+#include "wterm.h"
 #include "wtheorem.h"
 
 using namespace std;
@@ -17,8 +18,26 @@ void srcc();
 void mr();
 
 int main(int argc, const char *argv[]) {
+  //  for (int i : range(19)) {
+  //    cout << i << endl;
+  //  }
+  //  std::vector<MyInt> vec; //{1, 4, 9, 19, 12, 21};
+
+  //  cout << "\nAdding 1" << endl;
+  //  vec.push_back(MyInt(1));
+
+  //  cout << "\nAdding 4" << endl;
+  //  vec.push_back(MyInt(4));
+
+  //  cout << "\nAdding 9" << endl;
+  //  vec.push_back(MyInt(9));
+
+  //  cout << "\nBegin loop" << endl;
+  //  for (auto kv : enumerate(vec)) {
+  //    cout << kv.first << " " << kv.second.get() << endl;
+  //  }
   srcc();
-  //  mr();
+  //    mr();
 
   return 0;
 }
@@ -32,103 +51,69 @@ void srcc() {
   std::string o = "o";
   std::string v = "v";
 
-  auto opT1 = make_diag_operator("T1", {v}, {o});
-  auto opT2 = make_diag_operator("T2", {v, v}, {o, o});
+  auto opT1 = make_diag_operator("t", {v}, {o});
+  auto opT2 = make_diag_operator("t", {v, v}, {o, o});
 
-  auto opH1oo = make_diag_operator("H1", {o}, {o});
-  auto opH1ov = make_diag_operator("H1", {o}, {v});
-  auto opH1vo = make_diag_operator("H1", {v}, {o});
-  auto opH1vv = make_diag_operator("H1", {v}, {v});
+  auto opH1oo = make_diag_operator("f", {o}, {o});
+  auto opH1ov = make_diag_operator("f", {o}, {v});
+  auto opH1vo = make_diag_operator("f", {v}, {o});
+  auto opH1vv = make_diag_operator("f", {v}, {v});
 
-  auto opH2oooo = make_diag_operator("H2", {o, o}, {o, o});
-  auto opH2ovoo = make_diag_operator("H2", {o, v}, {o, o});
-  auto opH2ooov = make_diag_operator("H2", {o, o}, {o, v});
-  auto opH2ovov = make_diag_operator("H2", {o, v}, {o, v});
-  auto opH2vvoo = make_diag_operator("H2", {v, v}, {o, o});
-  auto opH2oovv = make_diag_operator("H2", {o, o}, {v, v});
-  auto opH2vvov = make_diag_operator("H2", {v, v}, {o, v});
-  auto opH2ovvv = make_diag_operator("H2", {o, v}, {v, v});
-  auto opH2vvvv = make_diag_operator("H2", {v, v}, {v, v});
+  auto opH2oooo = make_diag_operator("v", {o, o}, {o, o});
+  auto opH2ovoo = make_diag_operator("v", {o, v}, {o, o});
+  auto opH2ooov = make_diag_operator("v", {o, o}, {o, v});
+  auto opH2ovov = make_diag_operator("v", {o, v}, {o, v});
+  auto opH2vvoo = make_diag_operator("v", {v, v}, {o, o});
+  auto opH2oovv = make_diag_operator("v", {o, o}, {v, v});
+  auto opH2vvov = make_diag_operator("v", {v, v}, {o, v});
+  auto opH2ovvv = make_diag_operator("v", {o, v}, {v, v});
+  auto opH2vvvv = make_diag_operator("v", {v, v}, {v, v});
 
   auto opR1 = make_diag_operator("R1", {o}, {v});
   auto opR2 = make_diag_operator("R2", {o, o}, {v, v});
 
   WDiagTheorem wdt;
   WSum terms;
-  auto c1 = wdt.contract(1, {opT1, opH1ov});
-  auto c2 = wdt.contract(-1, {opH1ov, opT1});
-  for (const auto &c1_term : c1) {
-    terms.add(c1_term);
+  //  auto e1 = wdt.contract(1, {opH1ov, opT1}, 0, 0);
+  //  auto e2 = wdt.contract(1, {opH2oovv, opT2}, 0, 0);
+  //  auto e3 = wdt.contract(rational(1, 2), {opH2oovv, opT1, opT1}, 0, 0);
+
+  //  auto r1_1 = wdt.contract(1, {opR1, opH1vo}, 0, 0);
+  //  auto r1_2 = wdt.contract(1, {opR1, opH1oo, opT1}, 0, 0);
+  //  auto r1_3 = wdt.contract(1, {opR1, opH1vv, opT1}, 0, 0);
+  //  auto r1_4 = wdt.contract(1, {opR1, opH2ovov, opT1}, 0, 0);
+  //  auto r1_5 = wdt.contract(1, {opR1, opH1ov, opT2}, 0, 0);
+  //  auto r1_6 = wdt.contract(1, {opR1, opH2ooov, opT2}, 0, 0);
+  //    auto r1_6 = wdt.contract(1, {opR1, opH2ovvv, opT2}, 0, 0);
+  auto r1_7 = wdt.contract(rational(1, 2), {opR1, opH1ov, opT1, opT1}, 0, 0);
+  auto r1_8 = wdt.contract(-1, {opR1, opT1, opH1ov, opT1}, 0, 0);
+  auto r1_9 = wdt.contract(rational(1, 2), {opR1, opT1, opT1, opH1ov}, 0, 0);
+
+  //  auto d2_1 = wdt.contract(1, {opR2, opH2vvoo}, 0, 0);
+  //  auto c3 = wdt.contract(1, {opR1,opH1vv, opT1},0,0);
+  //  auto c4 = wdt.contract(1, {opR2,opH1vv, opT2},0,0);
+  ////  auto c2 = wdt.contract(-1, {opT1, opH1ov},0,0);
+  //  for (const auto &c1_term : c1) {
+  //    terms.add(c1_term);
+  //  }
+  //  for (const auto &c2_term : c2) {
+  //    terms.add(c2_term);
+  //  }
+  for (const auto &term : {r1_7, r1_8, r1_9}) {
+    terms.add(term);
   }
-  for (const auto &c2_term : c2) {
-    terms.add(c2_term);
-  }
-  cout << terms.str() << endl;
+
+  cout << terms << endl;
 }
 
 void mr() {
+  osi = std::make_shared<OrbitalSpaceInfo>();
+  osi->default_spaces();
+
   // Convenience variables
   std::string c = "c";
   std::string a = "a";
   std::string v = "v";
-
-  bool algebra = false;
-  if (algebra) {
-    // internal excitations
-    WTerm opT1aa = make_operator("T1", {a}, {a});
-    auto opT2aaaa = make_operator("T2", {a, a}, {a, a});
-
-    WTerm opT1ca = make_operator("T1", {a}, {c});
-    WTerm opT1cv = make_operator("T1", {v}, {c});
-    WTerm opT1av = make_operator("T1", {v}, {a});
-
-    auto opT2ccaa = make_operator("T2", {a, a}, {c, c});
-    auto opT2ccav = make_operator("T2", {a, v}, {c, c});
-    auto opT2ccvv = make_operator("T2", {v, v}, {c, c});
-    auto opT2caaa = make_operator("T2", {a, a}, {c, a});
-    auto opT2caav = make_operator("T2", {a, v}, {c, a});
-    auto opT2cavv = make_operator("T2", {v, v}, {c, a});
-    auto opT2aaav = make_operator("T2", {a, v}, {a, a});
-    auto opT2aavv = make_operator("T2", {v, v}, {a, a});
-
-    std::vector<WTerm> opT = {opT1ca,   opT1cv,   opT1av,   opT2ccaa,
-                              opT2ccav, opT2ccvv, opT2caaa, opT2caav,
-                              opT2cavv, opT2aaav, opT2aavv};
-
-    WTerm opH1aa = make_operator("H1", {a}, {a});
-    WTerm opH1ac = make_operator("H1", {c}, {a});
-
-    WTerm opH2aaaa = make_operator("H2", {a, a}, {a, a});
-
-    //    WSum sum;
-    //    for (WTerm &term : opT) {
-    //      cout << term.str() << endl;
-    //      sum.add(term);
-    //    }
-
-    //    cout << sum.str() << endl;
-
-    WTheorem wt;
-    //  wt.theorem_pair(opH1aa, opT1ca);
-
-    //  wt.theorem_pair(opH1ac, opT1ca);
-
-    wt.theorem_pair(opH1aa, opT1aa);
-    //  wt.theorem_pair(opH2aaaa, opT1aa);
-
-    //  wt.theorem_pair(opH2aaaa, opT2aaaa);
-
-    //  for (WTerm &term : opT)
-    //    cout << term.latex() << endl;
-
-    //  for (auto op : opT) {
-    //    std::cout << op.str() << std::endl;
-    //  }
-
-    //  for (auto op : opH) {
-    //    std::cout << op.str() << std::endl;
-    //  }
-  }
 
   {
     // internal excitations
@@ -165,14 +150,14 @@ void mr() {
     WDiagTheorem wdt;
     //    wdt.contract(1.0, {opH2aaaa, opT2aavv});
     WSum terms;
-    auto c1 = wdt.contract(1, {opT1aa, opH1aa});
-    auto c2 = wdt.contract(-1, {opH1aa, opT1aa});
-    for (const auto &c1_term : c1) {
-      terms.add(c1_term);
-    }
-    for (const auto &c2_term : c2) {
-      terms.add(c2_term);
-    }
+    auto c1 = wdt.contract(1, {opT1aa, opH1aa}, 0, 0);
+    auto c2 = wdt.contract(-1, {opH1aa, opT1aa}, 0, 0);
+//    for (const auto &c1_term : c1) {
+//      terms.add(c1_term);
+//    }
+//    for (const auto &c2_term : c2) {
+//      terms.add(c2_term);
+//    }
     cout << terms.str() << endl;
 
     //    auto Hsr = {opH2cccc, opH2cccv, opH2ccvv, opH2cvcc, opH2vvcc};

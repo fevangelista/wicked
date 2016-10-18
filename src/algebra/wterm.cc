@@ -1,6 +1,6 @@
-#include "wicked-def.h"
-#include "helpers.h"
 #include "wterm.h"
+#include "helpers.h"
+#include "wicked-def.h"
 
 WTerm::WTerm()
     : operators_(std::vector<std::vector<WSQOperator>>(osi->num_spaces())) {}
@@ -106,17 +106,22 @@ bool WTerm::operator==(const WTerm &other) const {
 std::string WTerm::str() const {
   std::vector<std::string> str_vec;
 
+  str_vec.push_back("hello");
+
   str_vec.push_back(to_string(factor_));
   for (const WTensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }
-  str_vec.push_back("{");
-  for (const auto &op_space : operators_) {
-    for (const WSQOperator &q : op_space) {
-      str_vec.push_back(q.str());
+
+  if (noperators() > 0) {
+    str_vec.push_back("{");
+    for (const auto &op_space : operators_) {
+      for (const WSQOperator &q : op_space) {
+        str_vec.push_back(q.str());
+      }
     }
+    str_vec.push_back("}");
   }
-  str_vec.push_back("}");
 
   return (to_string(str_vec, " "));
 }
@@ -131,13 +136,16 @@ std::string WTerm::tensor_str() const {
 
 std::string WTerm::operator_str() const {
   std::vector<std::string> str_vec;
-  str_vec.push_back("{");
-  for (const auto &op_space : operators_) {
-    for (const WSQOperator &q : op_space) {
-      str_vec.push_back(q.str());
+
+  if (noperators() > 0) {
+    str_vec.push_back("{");
+    for (const auto &op_space : operators_) {
+      for (const WSQOperator &q : op_space) {
+        str_vec.push_back(q.str());
+      }
     }
+    str_vec.push_back("}");
   }
-  str_vec.push_back("}");
   return (to_string(str_vec, " "));
 }
 
@@ -146,13 +154,17 @@ std::string WTerm::latex() const {
   for (const WTensor &tensor : tensors_) {
     str_vec.push_back(tensor.latex());
   }
-  str_vec.push_back("\\{");
-  for (const auto &op_space : operators_) {
-    for (const WSQOperator &q : op_space) {
-      str_vec.push_back(q.latex());
+
+  if (noperators() > 0) {
+    str_vec.push_back("\\{");
+    for (const auto &op_space : operators_) {
+      for (const WSQOperator &q : op_space) {
+        str_vec.push_back(q.latex());
+      }
     }
+    str_vec.push_back("\\}");
   }
-  str_vec.push_back("\\}");
+
   return (to_string(str_vec, " "));
 }
 

@@ -2,7 +2,7 @@
 #define _wicked_wicked_def_h_
 
 #include <vector>
-#include <../rational_boost/boost/rational.hpp>
+#include "rational.h"
 
 /// Enums
 enum TensorType { Amplitude, Integral, OneDensity, OneHole, Cumulant };
@@ -10,6 +10,6 @@ enum TensorType { Amplitude, Integral, OneDensity, OneHole, Cumulant };
 enum SymmetryType { Symmetric, Antisymmetric };
 
 /// Rational numbers
-using scalar_t = boost::rational<int>;
+using scalar_t = rational;
 
 #endif // #ifndef _wicked_wicked_def_h_

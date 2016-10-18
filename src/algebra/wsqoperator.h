@@ -36,10 +36,13 @@ public:
   /// Return an ambit representation
   std::string ambit() const;
 
-  friend std::ostream &operator<<(std::ostream &os, const WSQOperator &op);
-
 private:
   std::pair<SQOperatorType, WIndex> operator_;
 };
+
+// Helper functions
+
+/// Print to an output stream
+std::ostream &operator<<(std::ostream &os, const WSQOperator &op);
 
 #endif // _wicked_wsqoperator_h_

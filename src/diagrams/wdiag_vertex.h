@@ -1,8 +1,8 @@
 #ifndef _wicked_diag_vertex_h_
 #define _wicked_diag_vertex_h_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "wicked-def.h"
 
@@ -49,5 +49,9 @@ private:
 
 /// Return the particle rank of a vector of operators
 int vertices_rank(const std::vector<WDiagVertex> &vertices);
+
+/// Return the space for which the number of creation/annihilation operators !=
+/// 0
+int vertices_space(const std::vector<WDiagVertex> &vertices);
 
 #endif // _wicked_diag_vertex_h_

@@ -1,6 +1,6 @@
-#include "orbital_space.h"
-#include "helpers.h"
 #include "wdiag_vertex.h"
+#include "helpers.h"
+#include "orbital_space.h"
 
 using namespace std;
 
@@ -59,12 +59,25 @@ std::ostream &operator<<(std::ostream &os, const WDiagVertex &v) {
   return os;
 }
 
-int vertices_rank(const std::vector<WDiagVertex> &vertices)
-{
-    int r = 0;
-    for (const auto& vertex : vertices){
-        r += vertex.rank();
-    }
-    return r;
+int vertices_rank(const std::vector<WDiagVertex> &vertices) {
+  int r = 0;
+  for (const auto &vertex : vertices) {
+    r += vertex.rank();
+  }
+  return r;
 }
 
+int vertices_space(const std::vector<WDiagVertex> &vertices) {
+  std::vector<int> count(osi->num_spaces());
+  for (const auto &vertex : vertices) {
+    for (int s = 0; s < osi->num_spaces(); ++s) {
+      count[s] += vertex.ann(s) + vertex.cre(s);
+    }
+  }
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    if (count[s] > 0) {
+      return s;
+    }
+  }
+  return -1;
+}

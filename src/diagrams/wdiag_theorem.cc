@@ -1,11 +1,13 @@
 #include <iostream>
 
-#include "stl_utils.hpp"
-#include "orbital_space.h"
 #include "combinatorics.h"
+#include "helpers.h"
+#include "orbital_space.h"
+#include "stl_utils.hpp"
+#include "walgebraicterm.h"
 #include "wdiag_operator.h"
 #include "wdiag_theorem.h"
-#include "walgebraicterm.h"
+#include "wsum.h"
 
 #define PRINT(detail, code)                                                    \
   if (print_ >= detail) {                                                      \
@@ -16,33 +18,34 @@ using namespace std;
 
 WDiagTheorem::WDiagTheorem() {}
 
-std::vector<WAlgebraicTerm>
-WDiagTheorem::contract(scalar_t factor, const std::vector<WDiagOperator> &ops) {
+WSum WDiagTheorem::contract(scalar_t factor,
+                            const std::vector<WDiagOperator> &ops, int minrank,
+                            int maxrank) {
 
-  std::vector<WAlgebraicTerm> result;
+  WSum result;
   ncontractions_ = 0;
   contractions_.clear();
   elementary_contractions_.clear();
 
-  std::cout << "\nContracting the following operators:" << std::endl;
-  for (auto &op : ops) {
-    std::cout << "    " << op;
-  }
+  PRINT(WDiagPrint::Summary,
+        std::cout << "\nContracting the following operators:" << std::endl;
+        for (auto &op
+             : ops) { std::cout << "    " << op; })
 
   elementary_contractions_ = generate_elementary_contractions(ops);
 
-  std::vector<int> a(50, -1);
+  std::vector<int> a(100, -1);
   // create a vector of
   std::vector<WDiagVertex> free_vertex_vec;
   for (const auto &op : ops) {
     free_vertex_vec.push_back(op.vertex());
   }
 
-  std::cout << "\nPossible contractions:" << std::endl;
-
+  PRINT(WDiagPrint::Summary, std::cout << "\nPossible contractions:"
+                                       << std::endl;)
   generate_contractions(a, 0, elementary_contractions_, free_vertex_vec);
-
-  std::cout << "\nTotal:" << ncontractions_ << std::endl;
+  PRINT(WDiagPrint::Summary, std::cout << "\nTotal:" << ncontractions_
+                                       << std::endl;)
 
   int ops_rank = operators_rank(ops);
   for (const auto &contraction : contractions_) {
@@ -51,14 +54,19 @@ WDiagTheorem::contract(scalar_t factor, const std::vector<WDiagOperator> &ops) {
     for (int c : contraction) {
       contr_rank += vertices_rank(elementary_contractions_[c]);
     }
-    cout << "\n  Operator rank " << ops_rank - contr_rank << endl;
+    int term_rank = ops_rank - contr_rank;
 
-    WAlgebraicTerm term = evaluate_contraction(ops, contraction, factor);
+    if ((term_rank >= minrank) and (term_rank <= maxrank)) {
+      PRINT(WDiagPrint::Basic, cout << "\n  Operator rank "
+                                    << ops_rank - contr_rank << endl;)
 
-    cout << term << endl;
-    term.canonicalize();
-    cout << term << endl;
-    result.push_back(term);
+      WAlgebraicTerm term = evaluate_contraction(ops, contraction, factor);
+      PRINT(WDiagPrint::Summary, cout << term << endl;)
+
+      term.canonicalize();
+      result.add(term);
+      PRINT(WDiagPrint::Basic, cout << term << endl;)
+    }
   }
   return result;
 }
@@ -163,18 +171,17 @@ void WDiagTheorem::process_contraction(
     const std::vector<int> &a, int k,
     std::vector<WDiagVertex> &free_vertex_vec) {
   contractions_.push_back(std::vector<int>(a.begin(), a.begin() + k));
-  cout << " " << ncontractions_ << ":";
-  for (int i = 0; i < k; ++i) {
-    cout << " " << a[i];
-  }
+
+  PRINT(WDiagPrint::Summary, cout << " " << ncontractions_ << ":";
+        for (int i = 0; i < k; ++i) { cout << " " << a[i]; })
 
   WDiagVertex free_ops;
   for (const auto &free_vertex : free_vertex_vec) {
     free_ops += free_vertex;
   }
 
-  cout << " " << free_ops << " rank = " << free_ops.rank();
-  cout << endl;
+  PRINT(WDiagPrint::Summary, cout << " " << free_ops
+                                  << " rank = " << free_ops.rank() << endl;)
 
   ncontractions_++;
 }
@@ -190,7 +197,9 @@ WDiagTheorem::generate_elementary_contractions(
 
   // loop over orbital spaces
   for (int s = 0; s < osi->num_spaces(); s++) {
-    std::cout << "\n  => Basic contractions for space " << s << std::endl;
+    PRINT(WDiagPrint::Summary, std::cout
+                                   << "\n  => Basic contractions for space "
+                                   << s << std::endl;)
 
     // differentiate between various types of spaces
     DMStructure dmstruc = osi->dmstructure(s);
@@ -201,7 +210,8 @@ WDiagTheorem::generate_elementary_contractions(
     // a^+ a
 
     if (dmstruc == DMStructure::DoublyOccupied) {
-      cout << "\n    * c/a pairwise contractions" << endl;
+      PRINT(WDiagPrint::Summary, cout << "\n    * c/a pairwise contractions"
+                                      << endl;)
       // loop over the creation operators of each operator
       for (int c = 0; c < nops; c++) {
         // loop over the annihilation operators of each operator (right to the
@@ -214,8 +224,8 @@ WDiagTheorem::generate_elementary_contractions(
             new_contr[a].ann(s, 1);
             contr_vec.push_back(new_contr);
 
-            PRINT_ELEMENTS(new_contr, "      ");
-            cout << endl;
+            PRINT(WDiagPrint::Summary, PRINT_ELEMENTS(new_contr, "      ");
+                  cout << endl;)
           }
         }
       }
@@ -227,7 +237,8 @@ WDiagTheorem::generate_elementary_contractions(
     // a   a^+
 
     if (dmstruc == DMStructure::Unoccupied) {
-      cout << "\n    * a/c pairwise contractions" << endl;
+      PRINT(WDiagPrint::Summary, cout << "\n    * a/c pairwise contractions"
+                                      << endl;)
       // loop over the creation operators of each operator
       for (int a = 0; a < nops; a++) {
         // loop over the annihilation operators of each operator (right to the
@@ -240,8 +251,8 @@ WDiagTheorem::generate_elementary_contractions(
             new_contr[a].ann(s, 1);
             contr_vec.push_back(new_contr);
 
-            PRINT_ELEMENTS(new_contr, "      ");
-            cout << endl;
+            PRINT(WDiagPrint::Summary, PRINT_ELEMENTS(new_contr, "      ");
+                  cout << endl;)
           }
         }
       }
@@ -267,8 +278,8 @@ WDiagTheorem::generate_elementary_contractions(
 
       // loop over all possible contractions from 2 to max_legs
       for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
-        cout << "\n    * " << 2 * half_legs << "-legs contractions"
-             << endl;
+        PRINT(WDiagPrint::Summary, cout << "\n    * " << 2 * half_legs
+                                        << "-legs contractions" << endl;)
         auto half_legs_part = integer_partitions(half_legs);
 
         // create lists of leg partitionings among all operators that are
@@ -329,7 +340,8 @@ WDiagTheorem::generate_elementary_contractions(
 }
 
 void print_key(std::tuple<int, int, bool, int> key, int n);
-void print_contraction(const std::vector<std::vector<bool>> &bit_map_vec,
+void print_contraction(const std::vector<WDiagOperator> &ops,
+                       const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<WSQOperator> &sqops,
                        const std::vector<int> sign_order);
 
@@ -337,202 +349,154 @@ WAlgebraicTerm
 WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
                                    const std::vector<int> &contraction,
                                    scalar_t factor) {
-  std::vector<WTensor> tensors;
-  std::vector<WSQOperator> sqops;
+  PRINT(WDiagPrint::Basic, cout << "\n----------------------------" << endl;)
 
-  std::vector<int> index_counter(osi->num_spaces(), 0);
-
-  // create the tensors corresponding to the operators, lay out the operators
-  // on
-  // a vector, and create mappings
-
+  // 1. Create tensors, lay out the second quantized operators on a vector,
+  // and create mappings
+  auto tensors_sqops_op_map = contration_tensors_sqops(ops);
+  std::vector<WTensor> &tensors = std::get<0>(tensors_sqops_op_map);
+  std::vector<WSQOperator> &sqops = std::get<1>(tensors_sqops_op_map);
   // this map takes the operator index (op), orbital space (s), the sqop type,
   // and an index and maps it to the operators as they are stored in a vector
-  std::map<std::tuple<int, int, bool, int>, int> op_map;
+  //  std::map<std::tuple<int, int, bool, int>, int> op_map;
   //                   op space cre    n
+  std::map<std::tuple<int, int, bool, int>, int> &op_map =
+      std::get<2>(tensors_sqops_op_map);
 
-  int n = 0;
-  for (int o = 0; o < ops.size(); o++) {
-    const auto &op = ops[o];
-    std::vector<WIndex> lower;
-    std::vector<WIndex> upper;
-    for (int s = 0; s < osi->num_spaces(); s++) {
-      for (int c = 0; c < op.num_cre(s); c++) {
-        WIndex idx(s, index_counter[s]);
-        lower.push_back(idx);
-        sqops.push_back(WSQOperator(Creation, idx));
-        auto key = std::make_tuple(o, s, true, c);
-        op_map[key] = n;
-        PRINT(WDiagPrint::All, print_key(key, n););
-        index_counter[s] += 1;
-        n += 1;
-      }
-    }
-    // the annihilation operators will be layed out as normal and then
-    // reversed
-    std::vector<WSQOperator> sqops_ann;
-    for (int s = 0; s < osi->num_spaces(); s++) {
-      for (int a = 0; a < op.num_ann(s); a++) {
-        WIndex idx(s, index_counter[s]);
-        upper.push_back(idx);
-        sqops_ann.push_back(WSQOperator(Annihilation, idx));
-        auto key = std::make_tuple(o, s, false, op.num_ann(s) - a - 1);
-        op_map[key] = n;
-        PRINT(WDiagPrint::All, print_key(key, n););
-        index_counter[s] += 1;
-        n += 1;
-      }
-    }
-    std::reverse(sqops_ann.begin(), sqops_ann.end());
-    sqops.insert(sqops.end(), sqops_ann.begin(), sqops_ann.end());
-    tensors.push_back(WTensor(op.label(), lower, upper));
-  }
+  PRINT(
+      WDiagPrint::Summary, cout << "  Contraction(s):" << endl;
+      for (int c
+           : contraction) {
+        const auto &vertex_vec = elementary_contractions_[c];
+        for (const auto &vertex : vertex_vec) {
+          cout << vertex;
+        }
+        cout << endl;
+      } cout
+      << endl;)
 
-  // now apply the contractions.  this means contracting operators, creating
-  // density matrices and cumulant tensors
+  // 2. Apply the contractions to the second quantized operators and add new
+  // tensors (density matrices, cumulants)
 
-  // stores the offset for each uncontracted operator
+  // counter of how many second quantized operators are not contracted
   std::vector<WDiagVertex> ops_offset(ops.size());
-
-  cout << "  Contraction(s):" << endl;
-  for (int c : contraction) {
-    const auto &vertex_vec = elementary_contractions_[c];
-    for (const auto &vertex : vertex_vec) {
-      cout << vertex;
-    }
-    cout << endl;
-  }
-  cout << endl;
-
-  // this vector will keep track of the which operators have been assigned an
-  // order
-  //    std::vector<bool> is_op_ordered_flag(ops.size(), false);
+  // vector to store the order of operators
   std::vector<int> sign_order(sqops.size(), -1);
+  std::vector<std::vector<bool>> bit_map_vec;
 
+  // a counter to keep track of the positions assigned to operators
   int sorted_position = 0;
+
+  // a counter that keeps track of the number of sq operators contracted
   int nsqops_contracted = 0;
 
-  std::vector<std::vector<bool>> bit_map_vec;
-  // a sign factor due to the contractions with the hole-density matrix
-  int eta_sign = 1;
+  // a sign factor that keeps into account a negative sign introduced by sorting
+  // the operators in a unoccupied-unoccupied contraction
+  int unoccupied_sign = 1;
+
+  index_map_t pair_contraction_reindex_map;
+  // Loop over elementary contractions
   for (int c : contraction) {
     std::vector<bool> bit_map(sqops.size(), false);
+
+    // Find the rank and space of this contraction
     const auto &vertex_vec = elementary_contractions_[c];
     int rank = vertices_rank(vertex_vec);
+    int s = vertices_space(vertex_vec);
     nsqops_contracted += rank;
-    std::string label;
-    if (rank == 2) {
-      // find the last operator
-      bool is_right_op_annihilation = true;
-      for (const WDiagVertex &vertex : vertex_vec) {
-        for (int s = 0; s < osi->num_spaces(); s++) {
-          if (vertex.cre(s) > 0)
-            is_right_op_annihilation = false;
-          if (vertex.ann(s) > 0)
-            is_right_op_annihilation = true;
-        }
-      }
-      // if the operator contracted on the right is an annihilation op then
-      // this
-      // is a one-particle density matrix (gamma)
-      if (is_right_op_annihilation) {
-        label = "Gamma";
-      } else {
-        label = "Eta";
-        eta_sign *= -1;
-      }
-    } else {
-      label = "Lambda" + std::to_string(rank);
+
+    // find the position of the creation operators
+    std::vector<int> pos_cre_sqops =
+        vertex_vec_to_pos(vertex_vec, ops_offset, op_map, true);
+    // find the position of the annihilation operators
+    std::vector<int> pos_ann_sqops =
+        vertex_vec_to_pos(vertex_vec, ops_offset, op_map, false);
+
+    // mark the creation operators contracted and their order
+    for (int c : pos_cre_sqops) {
+      bit_map[c] = true;
+      sign_order[c] = sorted_position;
+      sorted_position += 1;
+    }
+    // mark the annihilation operators contracted and their order
+    for (int a : pos_ann_sqops) {
+      bit_map[a] = true;
+      sign_order[a] = sorted_position;
+      sorted_position += 1;
     }
 
-    std::vector<WIndex> lower;
-    std::vector<WIndex> upper;
+    DMStructure dmstruc = osi->dmstructure(s);
 
-    // collect all the creators
-    for (int v = 0; v < vertex_vec.size(); v++) {
-      const WDiagVertex &vertex = vertex_vec[v];
-      for (int s = 0; s < osi->num_spaces(); s++) {
-        int ncre = vertex.cre(s);
-        // assign the creation indices
-        int cre_off = ops_offset[v].cre(s);
-        for (int c = 0; c < ncre; c++) {
-          // find the operator corresponding to this leg
-          auto key = std::make_tuple(v, s, true, cre_off + c);
-          if (op_map.count(key) == 0) {
-            PRINT(WDiagPrint::All, print_key(key, -1););
-            cout << " NOT FOUND!!!" << endl;
-            exit(1);
-          } else {
-            int sqop_pos = op_map[key];
-            PRINT(WDiagPrint::All, print_key(key, sqop_pos););
-            upper.push_back(sqops[sqop_pos].index());
-            // assign a position to this operator
-            sign_order[sqop_pos] = sorted_position;
-            bit_map[sqop_pos] = true;
-            sorted_position += 1;
-          }
-        }
-        // update the creator's offset
-        ops_offset[v].cre(s, cre_off + ncre);
-      }
+    // Pairwise contractions creation-annihilation:
+    // ________
+    // |      |
+    // a^+(i) a(j) = delta(i,j)
+
+    if (dmstruc == DMStructure::DoublyOccupied) {
+      // Reindex the annihilator (j) to the creator (i)
+      WIndex cre_index = sqops[pos_cre_sqops[0]].index();
+      WIndex ann_index = sqops[pos_ann_sqops[0]].index();
+      pair_contraction_reindex_map[ann_index] = cre_index;
     }
 
-    for (int v = 0; v < vertex_vec.size(); v++) {
-      const WDiagVertex &vertex = vertex_vec[v];
-      for (int s = 0; s < osi->num_spaces(); s++) {
-        int nann = vertex.ann(s);
-        // assign the annihilation indices
-        int ann_off = ops_offset[v].ann(s);
-        for (int a = 0; a < nann; a++) {
-          // find the operator corresponding to this leg
-          auto key = std::make_tuple(
-              v, s, false,
-              ann_off + nann - 1 - a); // start from the rightmost operator
-          if (op_map.count(key) == 0) {
-            PRINT(WDiagPrint::All, print_key(key, -1););
-            cout << " NOT FOUND!!!" << endl;
-            exit(1);
-          } else {
-            int sqop_pos = op_map[key];
-            PRINT(WDiagPrint::All, print_key(key, sqop_pos););
-            lower.push_back(sqops[sqop_pos].index());
-            // assign a position to this operator
-            sign_order[sqop_pos] = sorted_position;
-            bit_map[sqop_pos] = true;
-            sorted_position += 1;
-          }
-        }
-        // update the annihilation's offset
-        ops_offset[v].ann(s, ann_off + nann);
-      }
+    // Pairwise contractions creation-annihilation:
+    // ______
+    // |    |
+    // a(i) a^+(j) = delta(i,j)
+
+    if (dmstruc == DMStructure::Unoccupied) {
+      // Reindex the creator (j) to the annihilator (i)
+      WIndex cre_index = sqops[pos_cre_sqops[0]].index();
+      WIndex ann_index = sqops[pos_ann_sqops[0]].index();
+      pair_contraction_reindex_map[cre_index] = ann_index;
+      unoccupied_sign *= -1;
     }
-    std::reverse(lower.begin(), lower.end());
-    tensors.push_back(WTensor(label, lower, upper));
+
+    // 2k-legged contractions (k >= 2) of k creation and k annihilation
+    // operators:
+    // _____________
+    // |   |   |   |
+    // a^+ a   a   a^+
+
+    if (dmstruc == DMStructure::General) {
+      std::vector<WIndex> lower;
+      std::vector<WIndex> upper;
+      // collect indices of creation operators for the upper indices
+      for (int c : pos_cre_sqops) {
+        upper.push_back(sqops[c].index());
+      }
+      // collect indices of annihilation operators for the lower indices
+      for (int a : pos_ann_sqops) {
+        lower.push_back(sqops[a].index());
+      }
+      // reverse the lower indices
+      std::reverse(lower.begin(), lower.end());
+      // prepare the label
+      std::string label = "Lambda" + std::to_string(rank / 2);
+      // add the cumulant to the list of tensors
+      tensors.push_back(WTensor(label, lower, upper));
+    }
     bit_map_vec.push_back(bit_map);
   }
 
-  for (int s = 0; s < osi->num_spaces(); s++) {
-    for (int i = 0; i < sqops.size(); i++) {
-      if ((sign_order[i] == -1) and (sqops[i].index().space() == s) and
-          (sqops[i].type() == Creation)) {
-        sign_order[i] = sorted_position;
-        sorted_position += 1;
-      }
-    }
-  }
-  for (int s = 0; s < osi->num_spaces(); s++) {
-    for (int i = 0; i < sqops.size(); i++) {
-      if ((sign_order[i] == -1) and (sqops[i].index().space() == s) and
-          (sqops[i].type() == Annihilation)) {
-        sign_order[i] = sorted_position;
-        sorted_position += 1;
+  // assign an order to the uncontracted operators
+  // creation operators come before annihilation operators
+  for (SQOperatorType type : {Creation, Annihilation}) {
+    for (int s = 0; s < osi->num_spaces(); s++) {
+      for (int i = 0; i < sqops.size(); i++) {
+        if ((sign_order[i] == -1) and (sqops[i].index().space() == s) and
+            (sqops[i].type() == type)) {
+          sign_order[i] = sorted_position;
+          sorted_position += 1;
+        }
       }
     }
   }
 
-  print_contraction(bit_map_vec, sqops, sign_order);
+  PRINT(WDiagPrint::Basic,
+        print_contraction(ops, bit_map_vec, sqops, sign_order);)
 
-  int sign = eta_sign * permutation_sign(sign_order);
+  int sign = unoccupied_sign * permutation_sign(sign_order);
 
   PRINT(WDiagPrint::All, PRINT_ELEMENTS(sign_order, "\n  positions: "););
 
@@ -543,8 +507,8 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
     sorted_position += 1;
   }
   std::sort(sorted_sqops.begin(), sorted_sqops.end());
-  sqops.clear();
 
+  sqops.clear();
   for (int i = nsqops_contracted; i < sorted_sqops.size(); ++i) {
     sqops.push_back(sorted_sqops[i].second);
   }
@@ -565,11 +529,127 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   }
   term.set_factor(sign * factor * comb_factor);
 
+  term.reindex(pair_contraction_reindex_map);
+
   PRINT(WDiagPrint::All, cout << "  sign = " << sign << endl;
         cout << "  factor = " << factor << endl;
         cout << "  combinatorial_factor = " << comb_factor << endl;)
 
   return term;
+}
+
+std::tuple<std::vector<WTensor>, std::vector<WSQOperator>,
+           std::map<std::tuple<int, int, bool, int>, int>>
+WDiagTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
+
+  std::vector<WSQOperator> sqops;
+  std::vector<WTensor> tensors;
+  std::map<std::tuple<int, int, bool, int>, int> op_map;
+
+  index_counter ic(osi->num_spaces());
+
+  // Loop over all operators
+  int n = 0;
+  for (int o = 0; o < ops.size(); o++) {
+    const auto &op = ops[o];
+    std::vector<WIndex> lower;
+    // Loop over creation operators (lower indices)
+    for (int s = 0; s < osi->num_spaces(); s++) {
+      for (int c = 0; c < op.num_cre(s); c++) {
+        WIndex idx(s, ic.next_index(s)); // get next available index
+        sqops.push_back(WSQOperator(Creation, idx));
+        lower.push_back(idx);
+        auto key = std::make_tuple(o, s, true, c);
+        op_map[key] = n;
+        PRINT(WDiagPrint::All, print_key(key, n););
+        n += 1;
+      }
+    }
+    // Loop over annihilation operators (upper indices)
+    // the annihilation operators will be layed out as normal and then
+    // reversed
+    std::vector<WIndex> upper;
+    std::vector<WSQOperator> sqops_ann;
+    //    for (int s = 0; s < osi->num_spaces(); s++) {
+    //      for (int a = 0; a < op.num_ann(s); a++) {
+    //        WIndex idx(s, ic.next_index(s)); // get next available index
+    //        sqops_ann.push_back(WSQOperator(Annihilation, idx));
+    //        upper.push_back(idx);
+    //        auto key = std::make_tuple(o, s, false, op.num_ann(s) - a - 1);
+    //        op_map[key] = n;
+    //        PRINT(WDiagPrint::All, print_key(key, n););
+    //        n += 1;
+    //      }
+    //    }
+    for (int s = osi->num_spaces() - 1; s >= 0; s--) {
+      for (int a = op.num_ann(s) - 1; a >= 0; a--) {
+        WIndex idx(s, ic.next_index(s)); // get next available index
+        sqops.push_back(WSQOperator(Annihilation, idx));
+        upper.push_back(idx);
+        auto key = std::make_tuple(o, s, false, a);
+        op_map[key] = n;
+        PRINT(WDiagPrint::All, print_key(key, n););
+        n += 1;
+      }
+    }
+
+    //    std::reverse(sqops_ann.begin(), sqops_ann.end());
+    //    sqops.insert(sqops.end(), sqops_ann.begin(), sqops_ann.end());
+    tensors.push_back(WTensor(op.label(), lower, upper));
+  }
+  return make_tuple(tensors, sqops, op_map);
+}
+
+std::vector<int> WDiagTheorem::vertex_vec_to_pos(
+    const std::vector<WDiagVertex> &vertex_vec,
+    std::vector<WDiagVertex> &ops_offset,
+    std::map<std::tuple<int, int, bool, int>, int> &op_map, bool creation) {
+
+  std::vector<int> result;
+
+  int s = vertices_space(vertex_vec);
+
+  PRINT(WDiagPrint::All, cout << "\n  Vertex to position:" << endl;);
+
+  // Loop over all vertices
+  for (int v = 0; v < vertex_vec.size(); v++) {
+    const WDiagVertex &vertex = vertex_vec[v];
+    int nops = creation ? vertex.cre(s) : vertex.ann(s);
+    // assign the operator indices
+    int ops_off = creation ? ops_offset[v].cre(s) : ops_offset[v].ann(s);
+    for (int i = 0; i < nops; i++) {
+      // find the operator corresponding to this leg
+      auto key =
+          creation
+              ? std::make_tuple(v, s, true,
+                                ops_off + i) // start from the leftmost operator
+              : std::make_tuple(v, s, false, ops_off + i);
+      //                + nops - 1 -
+      //                                    i); // start from the rightmost
+      //                                    operator
+      if (op_map.count(key) == 0) {
+        PRINT(WDiagPrint::All, print_key(key, -1););
+        cout << " NOT FOUND!!!" << endl;
+        exit(1);
+      } else {
+        int sqop_pos = op_map[key];
+        result.push_back(sqop_pos);
+        PRINT(WDiagPrint::All, print_key(key, sqop_pos););
+        //        upper.push_back(sqops[sqop_pos].index());
+        // assign a position to this operator
+        //        sign_order[sqop_pos] = sorted_position;
+        //        bit_map[sqop_pos] = true;
+        //        sorted_position += 1;
+      }
+    }
+    // update the creator's offset
+    if (creation) {
+      ops_offset[v].cre(s, ops_off + nops);
+    } else {
+      ops_offset[v].ann(s, ops_off + nops);
+    }
+  }
+  return result;
 }
 
 scalar_t
@@ -620,7 +700,8 @@ void print_key(std::tuple<int, int, bool, int> key, int n) {
        << "] -> " << n << endl;
 }
 
-void print_contraction(const std::vector<std::vector<bool>> &bit_map_vec,
+void print_contraction(const std::vector<WDiagOperator> &ops,
+                       const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<WSQOperator> &sqops,
                        const std::vector<int> sign_order) {
   for (const auto &bit_map : bit_map_vec) {
@@ -666,4 +747,22 @@ void print_contraction(const std::vector<std::vector<bool>> &bit_map_vec,
     cout << " " << order << " ";
   }
   cout << "\n" << endl;
+
+  int nsqops = sqops.size();
+  int opoffset = 0;
+  for (const auto &op : ops) {
+    int oprank = op.rank();
+    for (int i = 0; i < opoffset; i++) {
+      cout << "   ";
+    }
+    for (int i = 0; i < oprank; i++) {
+      cout << "---";
+    }
+    for (int i = 0; i < nsqops - oprank - opoffset; i++) {
+      cout << "   ";
+    }
+    cout << " " << op.label();
+    opoffset += oprank;
+    cout << endl;
+  }
 }
