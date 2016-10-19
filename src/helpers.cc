@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <iterator>
 
 #include "helpers.h"
 
