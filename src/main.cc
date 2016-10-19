@@ -19,21 +19,21 @@ int main(int argc, const char *argv[]) {
   //  for (int i : range(19)) {
   //    cout << i << endl;
   //  }
-  //  std::vector<MyInt> vec; //{1, 4, 9, 19, 12, 21};
+//  std::vector<MyInt> vec; //{1, 4, 9, 19, 12, 21};
 
-  //  cout << "\nAdding 1" << endl;
-  //  vec.push_back(MyInt(1));
+//  cout << "\nAdding 1" << endl;
+//  vec.push_back(MyInt(1));
 
-  //  cout << "\nAdding 4" << endl;
-  //  vec.push_back(MyInt(4));
+//  cout << "\nAdding 4" << endl;
+//  vec.push_back(MyInt(4));
 
-  //  cout << "\nAdding 9" << endl;
-  //  vec.push_back(MyInt(9));
+//  cout << "\nAdding 9" << endl;
+//  vec.push_back(MyInt(9));
 
-  //  cout << "\nBegin loop" << endl;
-  //  for (auto kv : enumerate(vec)) {
-  //    cout << kv.first << " " << kv.second.get() << endl;
-  //  }
+//  cout << "\nBegin loop" << endl;
+//  for (auto kv : enumerate(vec)) {
+//    cout << kv.first << " " << kv.second.get() << endl;
+//  }
   srcc();
   //    mr();
 

@@ -1,6 +1,8 @@
-#include "walgebraicterm.h"
-#include "helpers.h"
+#include <algorithm>
+
 #include "wicked-def.h"
+#include "helpers.h"
+#include "walgebraicterm.h"
 
 WAlgebraicTerm::WAlgebraicTerm() {}
 
