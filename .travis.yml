@@ -11,8 +11,10 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - cmake
+            - cmake-data
       env: COMPILER=clang++-3.6
 
 script:
-- cmake .
+- cmake --CMAKE_CXX_COMPILER_ID=clang-3.6 .
 - make
