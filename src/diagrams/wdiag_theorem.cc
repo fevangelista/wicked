@@ -15,6 +15,13 @@
     code                                                                       \
   }
 
+void print_key(std::tuple<int, int, bool, int> key, int n);
+void print_contraction(const std::vector<WDiagOperator> &ops,
+                       const std::vector<WTensor> &tensors,
+                       const std::vector<std::vector<bool>> &bit_map_vec,
+                       const std::vector<WSQOperator> &sqops,
+                       const std::vector<int> sign_order);
+
 using namespace std;
 
 WDiagTheorem::WDiagTheorem() {}
@@ -340,12 +347,6 @@ WDiagTheorem::generate_elementary_contractions(
   return contr_vec;
 }
 
-void print_key(std::tuple<int, int, bool, int> key, int n);
-void print_contraction(const std::vector<WDiagOperator> &ops,
-                       const std::vector<std::vector<bool>> &bit_map_vec,
-                       const std::vector<WSQOperator> &sqops,
-                       const std::vector<int> sign_order);
-
 WAlgebraicTerm
 WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
                                    const std::vector<int> &contraction,
@@ -495,7 +496,7 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   }
 
   PRINT(WDiagPrint::Basic,
-        print_contraction(ops, bit_map_vec, sqops, sign_order);)
+        print_contraction(ops, tensors, bit_map_vec, sqops, sign_order);)
 
   int sign = unoccupied_sign * permutation_sign(sign_order);
 
@@ -553,8 +554,9 @@ WDiagTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
   int n = 0;
   for (int o = 0; o < ops.size(); o++) {
     const auto &op = ops[o];
-    std::vector<WIndex> lower;
+
     // Loop over creation operators (lower indices)
+    std::vector<WIndex> lower;
     for (int s = 0; s < osi->num_spaces(); s++) {
       for (int c = 0; c < op.num_cre(s); c++) {
         WIndex idx(s, ic.next_index(s)); // get next available index
@@ -566,22 +568,11 @@ WDiagTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
         n += 1;
       }
     }
+
     // Loop over annihilation operators (upper indices)
-    // the annihilation operators will be layed out as normal and then
-    // reversed
+    // the annihilation operators are layed out in a reversed order (hence the
+    // need to reverse the upper indices of the tensor, see below)
     std::vector<WIndex> upper;
-    std::vector<WSQOperator> sqops_ann;
-    //    for (int s = 0; s < osi->num_spaces(); s++) {
-    //      for (int a = 0; a < op.num_ann(s); a++) {
-    //        WIndex idx(s, ic.next_index(s)); // get next available index
-    //        sqops_ann.push_back(WSQOperator(Annihilation, idx));
-    //        upper.push_back(idx);
-    //        auto key = std::make_tuple(o, s, false, op.num_ann(s) - a - 1);
-    //        op_map[key] = n;
-    //        PRINT(WDiagPrint::All, print_key(key, n););
-    //        n += 1;
-    //      }
-    //    }
     for (int s = osi->num_spaces() - 1; s >= 0; s--) {
       for (int a = op.num_ann(s) - 1; a >= 0; a--) {
         WIndex idx(s, ic.next_index(s)); // get next available index
@@ -594,8 +585,8 @@ WDiagTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
       }
     }
 
-    //    std::reverse(sqops_ann.begin(), sqops_ann.end());
-    //    sqops.insert(sqops.end(), sqops_ann.begin(), sqops_ann.end());
+    // reverse the order of the upper indices
+    std::reverse(upper.begin(), upper.end());
     tensors.push_back(WTensor(op.label(), lower, upper));
   }
   return make_tuple(tensors, sqops, op_map);
@@ -702,6 +693,7 @@ void print_key(std::tuple<int, int, bool, int> key, int n) {
 }
 
 void print_contraction(const std::vector<WDiagOperator> &ops,
+                       const std::vector<WTensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<WSQOperator> &sqops,
                        const std::vector<int> sign_order) {
@@ -751,8 +743,8 @@ void print_contraction(const std::vector<WDiagOperator> &ops,
 
   int nsqops = sqops.size();
   int opoffset = 0;
-  for (const auto &op : ops) {
-    int oprank = op.rank();
+  for (const auto &tensor : tensors) {
+    int oprank = tensor.rank();
     for (int i = 0; i < opoffset; i++) {
       cout << "   ";
     }
@@ -762,8 +754,23 @@ void print_contraction(const std::vector<WDiagOperator> &ops,
     for (int i = 0; i < nsqops - oprank - opoffset; i++) {
       cout << "   ";
     }
-    cout << " " << op.label();
+    cout << " " << tensor.str();
     opoffset += oprank;
     cout << endl;
   }
+  //  for (const auto &op : ops) {
+  //    int oprank = op.rank();
+  //    for (int i = 0; i < opoffset; i++) {
+  //      cout << "   ";
+  //    }
+  //    for (int i = 0; i < oprank; i++) {
+  //      cout << "---";
+  //    }
+  //    for (int i = 0; i < nsqops - oprank - opoffset; i++) {
+  //      cout << "   ";
+  //    }
+  //    cout << " " << op.label();
+  //    opoffset += oprank;
+  //    cout << endl;
+  //  }
 }

@@ -19,21 +19,21 @@ int main(int argc, const char *argv[]) {
   //  for (int i : range(19)) {
   //    cout << i << endl;
   //  }
-//  std::vector<MyInt> vec; //{1, 4, 9, 19, 12, 21};
+  //  std::vector<MyInt> vec; //{1, 4, 9, 19, 12, 21};
 
-//  cout << "\nAdding 1" << endl;
-//  vec.push_back(MyInt(1));
+  //  cout << "\nAdding 1" << endl;
+  //  vec.push_back(MyInt(1));
 
-//  cout << "\nAdding 4" << endl;
-//  vec.push_back(MyInt(4));
+  //  cout << "\nAdding 4" << endl;
+  //  vec.push_back(MyInt(4));
 
-//  cout << "\nAdding 9" << endl;
-//  vec.push_back(MyInt(9));
+  //  cout << "\nAdding 9" << endl;
+  //  vec.push_back(MyInt(9));
 
-//  cout << "\nBegin loop" << endl;
-//  for (auto kv : enumerate(vec)) {
-//    cout << kv.first << " " << kv.second.get() << endl;
-//  }
+  //  cout << "\nBegin loop" << endl;
+  //  for (auto kv : enumerate(vec)) {
+  //    cout << kv.first << " " << kv.second.get() << endl;
+  //  }
   srcc();
   //    mr();
 
@@ -72,14 +72,17 @@ void srcc() {
 
   WDiagTheorem wdt;
   WSum terms;
-  //  auto e1 = wdt.contract(1, {opH1ov, opT1}, 0, 0);
+  //  terms.add(wdt.contract(1, {opH1ov, opT1}, 0, 0));
   //  auto e2 = wdt.contract(1, {opH2oovv, opT2}, 0, 0);
   //  auto e3 = wdt.contract(rational(1, 2), {opH2oovv, opT1, opT1}, 0, 0);
 
-  //  auto r1_1 = wdt.contract(1, {opR1, opH1vo}, 0, 0);
-  //  auto r1_2 = wdt.contract(1, {opR1, opH1oo, opT1}, 0, 0);
-  //  auto r1_3 = wdt.contract(1, {opR1, opH1vv, opT1}, 0, 0);
-  //  auto r1_4 = wdt.contract(1, {opR1, opH2ovov, opT1}, 0, 0);
+  // R1 F
+  //  terms.add(wdt.contract(1, {opR1, opH1vo}, 0, 0));
+  // R1 [F,T1]
+  //  terms.add(wdt.contract(1, {opR1, opH1vv, opT1}, 0, 0));
+  //  terms.add(wdt.contract(1, {opR1, opH1oo, opT1}, 0, 0));
+  // R1 [V,T1]
+  terms.add(wdt.contract(1, {opR1, opH2ovov, opT1}, 0, 0));
   //  auto r1_5 = wdt.contract(1, {opR1, opH1ov, opT2}, 0, 0);
   //  auto r1_6 = wdt.contract(1, {opR1, opH2ooov, opT2}, 0, 0);
   //    auto r1_6 = wdt.contract(1, {opR1, opH2ovvv, opT2}, 0, 0);
@@ -124,15 +127,19 @@ void srcc() {
   // R1 1/3! [[[V,T1],T1],T1] = 1/6 R1 (V T1 T1 T1 - 3 T1 V T1 T1 + 3 T1 T1 V T1
   // -
   // T1 T1 T1 V)
-  rational r1_6(1, 6);
-  rational r1_2(1, 2);
-  auto r1_11a = wdt.contract(+r1_6, {opR1, opH2oovv, opT1, opT1, opT1}, 0, 0);
-  auto r1_11b = wdt.contract(-r1_2, {opR1, opT1, opH2oovv, opT1, opT1}, 0, 0);
-  auto r1_11c = wdt.contract(+r1_2, {opR1, opT1, opT1, opH2oovv, opT1}, 0, 0);
-  auto r1_11d = wdt.contract(-r1_6, {opR1, opT1, opT1, opT1, opH2oovv}, 0, 0);
-  for (const auto &term : {r1_11a, r1_11b, r1_11c, r1_11d}) {
-    terms.add(term);
-  }
+  //  rational r1_6(1, 6);
+  //  rational r1_2(1, 2);
+  //  auto r1_11a = wdt.contract(+r1_6, {opR1, opH2oovv, opT1, opT1, opT1}, 0,
+  //  0);
+  //  auto r1_11b = wdt.contract(-r1_2, {opR1, opT1, opH2oovv, opT1, opT1}, 0,
+  //  0);
+  //  auto r1_11c = wdt.contract(+r1_2, {opR1, opT1, opT1, opH2oovv, opT1}, 0,
+  //  0);
+  //  auto r1_11d = wdt.contract(-r1_6, {opR1, opT1, opT1, opT1, opH2oovv}, 0,
+  //  0);
+  //  for (const auto &term : {r1_11a, r1_11b, r1_11c, r1_11d}) {
+  //    terms.add(term);
+  //  }
 
   cout << "Sum of all terms:" << endl;
   cout << terms << endl;
