@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "windex.h"
 
 WIndex::WIndex() : index_(std::make_pair(-1, -1)) {}

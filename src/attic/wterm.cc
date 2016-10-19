@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "wterm.h"
 #include "helpers.h"
 #include "wicked-def.h"
