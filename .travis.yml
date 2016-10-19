@@ -9,6 +9,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.6
+            - george-edison55-precise-backports
           packages:
             - clang-3.6
             - cmake
