@@ -16,9 +16,9 @@ add_executable(wicked ${SRC_LIST})
 #pybind11_add_module(pywicked ${SRC_LIST} ${module_SOURCES})
 
 # CTest
-enable_testing()
-include(CTest)
-add_subdirectory(test)
+#enable_testing()
+#include(CTest)
+#add_subdirectory(test)
 
 include_directories(src)
 include_directories(src/algebra)
