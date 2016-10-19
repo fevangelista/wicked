@@ -20,6 +20,10 @@ public:
   void numerator(int value);
   /// set the denominator
   void denominator(int value);
+  /// return a string representation
+  std::string str() const;
+  /// return a LaTeX representation
+  std::string latex() const;
 
   /// addition assignment
   rational &operator+=(const rational &rhs);

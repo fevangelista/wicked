@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "walgebraicterm.h"
 #include "wicked-def.h"
+#include "walgebraicterm.h"
 
 /// A class to represent a sum of SQ terms.
 class WSum {
@@ -15,13 +15,14 @@ public:
   // ==> Class public interface <==
 
   /// Return the map (term,factor)
-  std::vector<WAlgebraicTerm> &sum() { return sum_; }
+  std::map<WAlgebraicTerm, scalar_t> &sum() { return sum_; }
 
   /// Add a term that can optionally be scaled
-  void add(const WAlgebraicTerm &term, scalar_t scale = 1);
+  void add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
+           scalar_t scale = 1);
 
   /// Add a term that can optionally be scaled
-  void add(const WSum &sum, scalar_t scale = 1);
+  void add_sum(WSum&& sum, scalar_t scale = 1);
 
   /// Add a sum
   WSum &operator+=(WSum &sum);
@@ -38,7 +39,7 @@ public:
 private:
   // ==> Class private data <==
 
-  std::vector<WAlgebraicTerm> sum_;
+  std::map<WAlgebraicTerm, scalar_t> sum_;
 
   // ==> Class private functions <==
 };

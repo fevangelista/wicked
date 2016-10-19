@@ -28,12 +28,6 @@ public:
   /// Add a tensor
   void add(const WTensor &tensor);
 
-  /// Return the scalar factor
-  scalar_t factor() const;
-
-  /// Return the scalar factor
-  void set_factor(scalar_t value);
-
   /// Return the number of SQ operators
   int noperators() const;
 
@@ -52,8 +46,8 @@ public:
   /// Reindex this term
   void reindex(index_map_t &idx_map);
 
-  /// Canonicalize this term
-  void canonicalize();
+  /// Canonicalize this term and return the overall phase factor
+  scalar_t canonicalize();
 
   /// Comparison operator used for sorting
   bool operator<(const WAlgebraicTerm &term) const;
@@ -70,7 +64,6 @@ public:
 private:
   // ==> Class private data <==
 
-  scalar_t factor_ = 1;
   std::vector<WSQOperator> operators_;
   std::vector<WTensor> tensors_;
 
@@ -85,9 +78,18 @@ private:
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const WAlgebraicTerm &term);
 
+std::ostream &operator<<(std::ostream &os, const std::pair<WAlgebraicTerm,scalar_t> &term);
+
 ///// Create an operator
 WAlgebraicTerm make_algebraic_term(const std::string &label,
                                    const std::vector<std::string> &cre,
                                    const std::vector<std::string> &ann);
+
+///// A class to represent a term in a SQ expression. A term includes:
+///// 1) a product of tensors
+///// 2) a product of operators normal ordered with respect to the vacuum
+//class WScala {
+//public:
+//}
 
 #endif // _wicked_algebraic_term_h_

@@ -68,12 +68,15 @@ WSum WDiagTheorem::contract(scalar_t factor,
       PRINT(WDiagPrint::Basic, cout << "\n  Operator rank "
                                     << ops_rank - contr_rank << endl;)
 
-      WAlgebraicTerm term = evaluate_contraction(ops, contraction, factor);
-      PRINT(WDiagPrint::Summary, cout << term << endl;)
+      std::pair<WAlgebraicTerm, scalar_t> term_factor =
+          evaluate_contraction(ops, contraction, factor);
+      PRINT(WDiagPrint::Summary, cout << term_factor << endl;)
 
-      term.canonicalize();
-      result.add(term);
+      WAlgebraicTerm &term = term_factor.first;
       PRINT(WDiagPrint::Basic, cout << term << endl;)
+      scalar_t canonicalize_factor = term.canonicalize();
+      result.add(
+          std::make_pair(term, term_factor.second * canonicalize_factor));
     }
   }
   return result;
@@ -347,7 +350,7 @@ WDiagTheorem::generate_elementary_contractions(
   return contr_vec;
 }
 
-WAlgebraicTerm
+std::pair<WAlgebraicTerm, scalar_t>
 WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
                                    const std::vector<int> &contraction,
                                    scalar_t factor) {
@@ -529,7 +532,6 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   for (const auto &op : ops) {
     factor *= op.factor();
   }
-  term.set_factor(sign * factor * comb_factor);
 
   term.reindex(pair_contraction_reindex_map);
 
@@ -537,7 +539,7 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
         cout << "  factor = " << factor << endl;
         cout << "  combinatorial_factor = " << comb_factor << endl;)
 
-  return term;
+  return std::make_pair(term, sign * factor * comb_factor);
 }
 
 std::tuple<std::vector<WTensor>, std::vector<WSQOperator>,

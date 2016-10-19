@@ -63,9 +63,9 @@ private:
                            std::vector<WDiagVertex> &free_vertex_vec);
 
   /// Apply the contraction to this set of operators and produce a term
-  WAlgebraicTerm evaluate_contraction(const std::vector<WDiagOperator> &ops,
-                                      const std::vector<int> &contraction,
-                                      scalar_t factor);
+  std::pair<WAlgebraicTerm, scalar_t>
+  evaluate_contraction(const std::vector<WDiagOperator> &ops,
+                       const std::vector<int> &contraction, scalar_t factor);
 
   /// Return the tensors and operators correspoding to a product of operators
   std::tuple<std::vector<WTensor>, std::vector<WSQOperator>,

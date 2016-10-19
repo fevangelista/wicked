@@ -10,10 +10,6 @@ void WAlgebraicTerm::add(const WSQOperator &op) { operators_.push_back(op); }
 
 void WAlgebraicTerm::add(const WTensor &tensor) { tensors_.push_back(tensor); }
 
-scalar_t WAlgebraicTerm::factor() const { return factor_; }
-
-void WAlgebraicTerm::set_factor(scalar_t value) { factor_ = value; }
-
 int WAlgebraicTerm::nops() const { return operators_.size(); }
 
 std::vector<WIndex> WAlgebraicTerm::indices() const {
@@ -37,7 +33,9 @@ void WAlgebraicTerm::reindex(index_map_t &idx_map) {
   }
 }
 
-void WAlgebraicTerm::canonicalize() {
+scalar_t WAlgebraicTerm::canonicalize() {
+  scalar_t factor(1);
+
   // 1. Sort the tensors according to a score function
   using score_t =
       std::tuple<std::string, int, std::vector<int>, std::vector<int>, WTensor>;
@@ -158,7 +156,7 @@ void WAlgebraicTerm::canonicalize() {
       tensor.set_lower(new_lower);
       sign *= permutation_sign(lsign);
     }
-    factor_ *= sign;
+    factor *= sign;
   }
 
   // 4. Sort operators according to canonical form
@@ -182,8 +180,10 @@ void WAlgebraicTerm::canonicalize() {
     sign_order.push_back(idx);
     new_sqops.push_back(operators_[idx]);
   }
-  factor_ *= permutation_sign(sign_order);
+  factor *= permutation_sign(sign_order);
   operators_ = new_sqops;
+
+  return factor;
 }
 
 bool WAlgebraicTerm::operator<(const WAlgebraicTerm &other) const {
@@ -202,8 +202,6 @@ bool WAlgebraicTerm::operator==(const WAlgebraicTerm &other) const {
 
 std::string WAlgebraicTerm::str() const {
   std::vector<std::string> str_vec;
-
-  str_vec.push_back(to_string(factor_));
   for (const WTensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }
@@ -251,6 +249,13 @@ std::string WAlgebraicTerm::latex() const {
 
 std::ostream &operator<<(std::ostream &os, const WAlgebraicTerm &term) {
   os << term.str();
+  return os;
+}
+
+std::ostream &
+operator<<(std::ostream &os,
+           const std::pair<WAlgebraicTerm, scalar_t> &term_factor) {
+  os << term_factor.second << ' ' << term_factor.second;
   return os;
 }
 

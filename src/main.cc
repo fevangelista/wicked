@@ -72,74 +72,59 @@ void srcc() {
 
   WDiagTheorem wdt;
   WSum terms;
+
+  rational r1_6(1, 6);
+  rational r1_2(1, 2);
+
   //  terms.add(wdt.contract(1, {opH1ov, opT1}, 0, 0));
   //  auto e2 = wdt.contract(1, {opH2oovv, opT2}, 0, 0);
-  //  auto e3 = wdt.contract(rational(1, 2), {opH2oovv, opT1, opT1}, 0, 0);
+  //  auto e3 = wdt.contract(r1_2, {opH2oovv, opT1, opT1}, 0, 0);
 
   // R1 F
-  //  terms.add(wdt.contract(1, {opR1, opH1vo}, 0, 0));
+  terms.add_sum(wdt.contract(1, {opR1, opH1vo}, 0, 0));
+
   // R1 [F,T1]
-  //  terms.add(wdt.contract(1, {opR1, opH1vv, opT1}, 0, 0));
-  //  terms.add(wdt.contract(1, {opR1, opH1oo, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(1, {opR1, opH1vv, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(1, {opR1, opH1oo, opT1}, 0, 0));
+
   // R1 [V,T1]
-  terms.add(wdt.contract(1, {opR1, opH2ovov, opT1}, 0, 0));
-  //  auto r1_5 = wdt.contract(1, {opR1, opH1ov, opT2}, 0, 0);
-  //  auto r1_6 = wdt.contract(1, {opR1, opH2ooov, opT2}, 0, 0);
-  //    auto r1_6 = wdt.contract(1, {opR1, opH2ovvv, opT2}, 0, 0);
+  terms.add_sum(wdt.contract(1, {opR1, opH2ovov, opT1}, 0, 0));
+
+  // R1 [F,T2]
+  terms.add_sum(wdt.contract(1, {opR1, opH1ov, opT2}, 0, 0));
+
+  // R1 [V,T2]
+  terms.add_sum(wdt.contract(1, {opR1, opH2ovvv, opT2}, 0, 0));
+  terms.add_sum(wdt.contract(1, {opR1, opH2ooov, opT2}, 0, 0));
 
   // R1 [[F,T1],T1]
-  //  auto r1_7a = wdt.contract(rational(1, 2), {opR1, opH1ov, opT1, opT1}, 0,
-  //  0);
-  //  auto r1_7b = wdt.contract(-1, {opR1, opT1, opH1ov, opT1}, 0, 0);
-  //  auto r1_7c = wdt.contract(rational(1, 2), {opR1, opT1, opT1, opH1ov}, 0,
-  //  0);
-  //  for (const auto &term : {r1_7a, r1_7b, r1_7c}) {
-  //    terms.add(term);
-  //  }
+  terms.add_sum(wdt.contract(r1_2, {opR1, opH1ov, opT1, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(-1, {opR1, opT1, opH1ov, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH1ov}, 0, 0));
 
   // R1 [[V,T1],T1]
-  //  auto r1_8a = wdt.contract(rational(1, 2), {opR1, opH2ooov, opT1, opT1}, 0,
-  //  0);
-  //  auto r1_8b = wdt.contract(-1, {opR1, opT1, opH2ooov, opT1}, 0, 0);
-  //  auto r1_8c = wdt.contract(rational(1, 2), {opR1, opT1, opT1, opH2ooov}, 0,
-  //  0);
-  //  for (const auto &term : {r1_8a, r1_8b, r1_8c}) {
-  //    terms.add(term);
-  //  }
-  //  auto r1_9a = wdt.contract(rational(1, 2), {opR1, opH2ovvv, opT1, opT1}, 0,
-  //  0);
-  //  auto r1_9b = wdt.contract(-1, {opR1, opT1, opH2ovvv, opT1}, 0, 0);
-  //  auto r1_9c = wdt.contract(rational(1, 2), {opR1, opT1, opT1, opH2ovvv}, 0,
-  //  0);
-  //  for (const auto &term : {r1_9a, r1_9b, r1_9c}) {
-  //    terms.add(term);
-  //  }
+  terms.add_sum(wdt.contract(r1_2, {opR1, opH2ooov, opT1, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2ooov, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH2ooov}, 0, 0));
 
-  // R1 [[V,T1],T2] = R1 (V T1 T2 - T1 V T2 - T2 V T1 + T2 T1 V)
-  //  auto r1_10a = wdt.contract(1, {opR1, opH2oovv, opT1, opT2}, 0, 0);
-  //  auto r1_10b = wdt.contract(-1, {opR1, opT1, opH2oovv, opT2}, 0, 0);
-  //  auto r1_10c = wdt.contract(-1, {opR1, opT2, opH2oovv, opT1}, 0, 0);
-  //  auto r1_10d = wdt.contract(1, {opR1, opT2, opT1, opH2oovv}, 0, 0);
-  //  for (const auto &term : {r1_10a, r1_10b, r1_10c, r1_10d}) {
-  //    terms.add(term);
-  //  }
+  terms.add_sum(wdt.contract(r1_2, {opR1, opH2ovvv, opT1, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2ovvv, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH2ovvv}, 0, 0));
+  // this term is correct but it gives two 1/2 contributions
 
   // R1 1/3! [[[V,T1],T1],T1] = 1/6 R1 (V T1 T1 T1 - 3 T1 V T1 T1 + 3 T1 T1 V T1
-  // -
-  // T1 T1 T1 V)
-  //  rational r1_6(1, 6);
-  //  rational r1_2(1, 2);
-  //  auto r1_11a = wdt.contract(+r1_6, {opR1, opH2oovv, opT1, opT1, opT1}, 0,
-  //  0);
-  //  auto r1_11b = wdt.contract(-r1_2, {opR1, opT1, opH2oovv, opT1, opT1}, 0,
-  //  0);
-  //  auto r1_11c = wdt.contract(+r1_2, {opR1, opT1, opT1, opH2oovv, opT1}, 0,
-  //  0);
-  //  auto r1_11d = wdt.contract(-r1_6, {opR1, opT1, opT1, opT1, opH2oovv}, 0,
-  //  0);
-  //  for (const auto &term : {r1_11a, r1_11b, r1_11c, r1_11d}) {
-  //    terms.add(term);
-  //  }
+  // - T1 T1 T1 V)
+  terms.add_sum(wdt.contract(+r1_6, {opR1, opH2oovv, opT1, opT1, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(-r1_2, {opR1, opT1, opH2oovv, opT1, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(+r1_2, {opR1, opT1, opT1, opH2oovv, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(-r1_6, {opR1, opT1, opT1, opT1, opH2oovv}, 0, 0));
+  // this term is correct but it gives two 1/2 contributions
+
+  // R1 [[V,T1],T2] = R1 (V T1 T2 - T1 V T2 - T2 V T1 + T2 T1 V)
+  terms.add_sum(wdt.contract(1, {opR1, opH2oovv, opT1, opT2}, 0, 0));
+  terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2oovv, opT2}, 0, 0));
+  terms.add_sum(wdt.contract(-1, {opR1, opT2, opH2oovv, opT1}, 0, 0));
+  terms.add_sum(wdt.contract(1, {opR1, opT2, opT1, opH2oovv}, 0, 0));
 
   cout << "Sum of all terms:" << endl;
   cout << terms << endl;
