@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 /// Type of orbital space
 // enum class OrbitalSpaceType { Core, Active, Virtual, RI, None };
