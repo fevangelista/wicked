@@ -70,6 +70,9 @@ void srcc() {
   auto opR1 = make_diag_operator("R1", {o}, {v});
   auto opR2 = make_diag_operator("R2", {o, o}, {v, v});
 
+  bool singles = false;
+  bool doubles = true;
+
   WDiagTheorem wdt;
   WSum terms;
 
@@ -80,51 +83,75 @@ void srcc() {
   //  auto e2 = wdt.contract(1, {opH2oovv, opT2}, 0, 0);
   //  auto e3 = wdt.contract(r1_2, {opH2oovv, opT1, opT1}, 0, 0);
 
-  // R1 F
-  terms.add_sum(wdt.contract(1, {opR1, opH1vo}, 0, 0));
+  if (singles) {
+    // R1 F
+    terms.add_sum(wdt.contract(1, {opR1, opH1vo}, 0, 0));
 
-  // R1 [F,T1]
-  terms.add_sum(wdt.contract(1, {opR1, opH1vv, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(1, {opR1, opH1oo, opT1}, 0, 0));
+    // R1 [F,T1]
+    terms.add_sum(wdt.contract(1, {opR1, opH1vv, opT1}, 0, 0));
+    terms.add_sum(wdt.contract(1, {opR1, opH1oo, opT1}, 0, 0));
 
-  // R1 [V,T1]
-  terms.add_sum(wdt.contract(1, {opR1, opH2ovov, opT1}, 0, 0));
+    // R1 [V,T1]
+    terms.add_sum(wdt.contract(1, {opR1, opH2ovov, opT1}, 0, 0));
 
-  // R1 [F,T2]
-  terms.add_sum(wdt.contract(1, {opR1, opH1ov, opT2}, 0, 0));
+    // R1 [F,T2]
+    terms.add_sum(wdt.contract(1, {opR1, opH1ov, opT2}, 0, 0));
 
-  // R1 [V,T2]
-  terms.add_sum(wdt.contract(1, {opR1, opH2ovvv, opT2}, 0, 0));
-  terms.add_sum(wdt.contract(1, {opR1, opH2ooov, opT2}, 0, 0));
+    // R1 [V,T2]
+    terms.add_sum(wdt.contract(1, {opR1, opH2ovvv, opT2}, 0, 0));
+    terms.add_sum(wdt.contract(1, {opR1, opH2ooov, opT2}, 0, 0));
 
-  // R1 [[F,T1],T1]
-  terms.add_sum(wdt.contract(r1_2, {opR1, opH1ov, opT1, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(-1, {opR1, opT1, opH1ov, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH1ov}, 0, 0));
+    // R1 [[F,T1],T1]
+    terms.add_sum(wdt.contract(r1_2, {opR1, opH1ov, opT1, opT1}, 0, 0));
+    terms.add_sum(wdt.contract(-1, {opR1, opT1, opH1ov, opT1}, 0, 0));
+    terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH1ov}, 0, 0));
 
-  // R1 [[V,T1],T1]
-  terms.add_sum(wdt.contract(r1_2, {opR1, opH2ooov, opT1, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2ooov, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH2ooov}, 0, 0));
+    // R1 [[V,T1],T1]
+    terms.add_sum(wdt.contract(r1_2, {opR1, opH2ooov, opT1, opT1}, 0, 0));
+    terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2ooov, opT1}, 0, 0));
+    terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH2ooov}, 0, 0));
 
-  terms.add_sum(wdt.contract(r1_2, {opR1, opH2ovvv, opT1, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2ovvv, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH2ovvv}, 0, 0));
-  // this term is correct but it gives two 1/2 contributions
+    terms.add_sum(wdt.contract(r1_2, {opR1, opH2ovvv, opT1, opT1}, 0, 0));
+    terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2ovvv, opT1}, 0, 0));
+    terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH2ovvv}, 0, 0));
+    // this term is correct but it gives two 1/2 contributions
 
-  // R1 1/3! [[[V,T1],T1],T1] = 1/6 R1 (V T1 T1 T1 - 3 T1 V T1 T1 + 3 T1 T1 V T1
-  // - T1 T1 T1 V)
-  terms.add_sum(wdt.contract(+r1_6, {opR1, opH2oovv, opT1, opT1, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(-r1_2, {opR1, opT1, opH2oovv, opT1, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(+r1_2, {opR1, opT1, opT1, opH2oovv, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(-r1_6, {opR1, opT1, opT1, opT1, opH2oovv}, 0, 0));
-  // this term is correct but it gives two 1/2 contributions
+    // R1 1/3! [[[V,T1],T1],T1] = 1/6 R1 (V T1 T1 T1 - 3 T1 V T1 T1 + 3 T1 T1 V
+    // T1
+    // - T1 T1 T1 V)
+    terms.add_sum(
+        wdt.contract(+r1_6, {opR1, opH2oovv, opT1, opT1, opT1}, 0, 0));
+    terms.add_sum(
+        wdt.contract(-r1_2, {opR1, opT1, opH2oovv, opT1, opT1}, 0, 0));
+    terms.add_sum(
+        wdt.contract(+r1_2, {opR1, opT1, opT1, opH2oovv, opT1}, 0, 0));
+    terms.add_sum(
+        wdt.contract(-r1_6, {opR1, opT1, opT1, opT1, opH2oovv}, 0, 0));
+    // this term is correct but it gives two 1/2 contributions
 
-  // R1 [[V,T1],T2] = R1 (V T1 T2 - T1 V T2 - T2 V T1 + T2 T1 V)
-  terms.add_sum(wdt.contract(1, {opR1, opH2oovv, opT1, opT2}, 0, 0));
-  terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2oovv, opT2}, 0, 0));
-  terms.add_sum(wdt.contract(-1, {opR1, opT2, opH2oovv, opT1}, 0, 0));
-  terms.add_sum(wdt.contract(1, {opR1, opT2, opT1, opH2oovv}, 0, 0));
+    // R1 [[V,T1],T2] = R1 (V T1 T2 - T1 V T2 - T2 V T1 + T2 T1 V)
+    terms.add_sum(wdt.contract(1, {opR1, opH2oovv, opT1, opT2}, 0, 0));
+    terms.add_sum(wdt.contract(-1, {opR1, opT1, opH2oovv, opT2}, 0, 0));
+    terms.add_sum(wdt.contract(-1, {opR1, opT2, opH2oovv, opT1}, 0, 0));
+    terms.add_sum(wdt.contract(1, {opR1, opT2, opT1, opH2oovv}, 0, 0));
+  }
+
+  if (doubles) {
+    // R2 V
+    terms.add_sum(wdt.contract(1, {opR2, opH2vvoo}, 0, 0));
+
+    //    // R2 [F,T2]
+    //    terms.add_sum(wdt.contract(1, {opR2, opH1vv, opT2}, 0, 0));
+
+    //    // R2 [V,T2]
+    //    terms.add_sum(wdt.contract(1, {opR2, opH2oooo, opT2}, 0, 0));
+
+    //    // R2 [V,T2]
+    //    terms.add_sum(wdt.contract(1, {opR2, opH2vvvv, opT2}, 0, 0));
+
+    //    // R2 [V,T2]
+    //    terms.add_sum(wdt.contract(1, {opR2, opH2ovov, opT2}, 0, 0));
+  }
 
   cout << "Sum of all terms:" << endl;
   cout << terms << endl;
