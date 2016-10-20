@@ -19,3 +19,4 @@ matrix:
 script:
 - cmake --CMAKE_CXX_COMPILER_ID=clang-3.6 .
 - make
+- make test

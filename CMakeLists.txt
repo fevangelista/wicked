@@ -18,7 +18,7 @@ add_executable(wicked ${SRC_LIST})
 # CTest
 enable_testing()
 #include(CTest)
-#add_subdirectory(test)
+add_subdirectory(test)
 
 include_directories(src)
 include_directories(src/algebra)
