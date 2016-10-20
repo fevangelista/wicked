@@ -8,15 +8,15 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
+            - llvm-toolchain-precise-3.9
             - george-edison55-precise-backports
           packages:
-            - clang-3.6
+            - clang-3.9
             - cmake
             - cmake-data
-      env: COMPILER=clang++-3.6
+      env: COMPILER=clang++-3.9
 
 script:
-- cmake --CMAKE_CXX_COMPILER_ID=clang-3.6 .
+- cmake --CMAKE_CXX_COMPILER_ID=clang-3.9 .
 - make
 - make test
