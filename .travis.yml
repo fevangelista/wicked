@@ -3,13 +3,13 @@ dist: precise
 
 matrix:
   include:
-    - compiler: clang
+    - compiler: gcc
       apt:
         sources:
         - ubuntu-toolchain-r-test
         - george-edison55-precise-backports
         packages:
-        - cmake
+        - cmake-3.5
         - cmake-data
         - g++-4.9
         - gcc-4.9
