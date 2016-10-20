@@ -4,17 +4,34 @@ dist: precise
 matrix:
   include:
     - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
-            - george-edison55-precise-backports
-          packages:
-            - clang-3.7
-            - cmake-3.4
-            - cmake-data
-      env: COMPILER=clang++-3.7
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - george-edison55-precise-backports
+        packages:
+        - cmake
+        - cmake-data
+        - g++-4.9
+        - gcc-4.9
+      env:
+        - CXX_COMPILER='g++-4.9'
+        - C_COMPILER='gcc-4.9'
+        - BUILD_TYPE='release'
+        - NAME='gcc'
+        - VERSION='4.9'
+
+#   - compiler: clang
+#     addons:
+#       apt:
+#         sources:
+#           - ubuntu-toolchain-r-test
+#           - llvm-toolchain-precise-3.7
+#           - george-edison55-precise-backports
+#         packages:
+#           - clang-3.7
+#           - cmake-3.4
+#           - cmake-data
+#     env: COMPILER=clang++-3.7
 
 script:
 - cmake --CMAKE_CXX_COMPILER_ID=clang-3.7 .
