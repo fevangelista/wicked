@@ -34,6 +34,6 @@ matrix:
 #     env: COMPILER=clang++-3.7
 
 script:
-- cmake --CMAKE_CXX_COMPILER_ID=clang-3.7 .
+- cmake-3.5 .
 - make
 - make test
