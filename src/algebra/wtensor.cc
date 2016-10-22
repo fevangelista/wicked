@@ -6,8 +6,8 @@
 #include "helpers.h"
 #include "wtensor.h"
 
-WTensor::WTensor(std::string label, std::vector<WIndex> &lower,
-                 std::vector<WIndex> &upper, SymmetryType symmetry)
+WTensor::WTensor(std::string label, const std::vector<WIndex> &lower,
+                 const std::vector<WIndex> &upper, SymmetryType symmetry)
     : label_(label), lower_(lower), upper_(upper), symmetry_(symmetry) {}
 
 bool WTensor::operator<(WTensor const &other) const {
@@ -94,6 +94,11 @@ std::string WTensor::latex() const {
   }
   return (label_wo_num + "^{" + to_string(str_vec_upper, " ") + "}_{" +
           to_string(str_vec_lower, " ") + "}");
+}
+
+std::ostream &operator<<(std::ostream &os, const WTensor &tensor) {
+  os << tensor.str();
+  return os;
 }
 
 // std::string WTensor::ambit() {

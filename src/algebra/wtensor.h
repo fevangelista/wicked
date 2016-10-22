@@ -15,8 +15,8 @@ public:
   // ==> Constructors <==
   explicit WTensor() {}
 
-  explicit WTensor(std::string label, std::vector<WIndex> &lower,
-                   std::vector<WIndex> &upper,
+  WTensor(std::string label, const std::vector<WIndex> &lower,
+                   const std::vector<WIndex> &upper,
                    SymmetryType symmetry = Antisymmetric);
 
   // ==> Class public interface <==
@@ -68,5 +68,9 @@ private:
   std::vector<WIndex> upper_;
   SymmetryType symmetry_;
 };
+
+
+/// Print to an output stream
+std::ostream &operator<<(std::ostream &os, const WTensor &tensor);
 
 #endif // _wicked_wtensor_h_

@@ -18,6 +18,9 @@ public:
   std::map<WAlgebraicTerm, scalar_t> &sum() { return sum_; }
 
   /// Add a term that can optionally be scaled
+  void add(const WAlgebraicTerm &term, scalar_t factor = 1);
+
+  /// Add a term that can optionally be scaled
   void add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
            scalar_t scale = 1);
 
@@ -26,9 +29,11 @@ public:
 
   /// Add a sum
   WSum &operator+=(WSum &sum);
+  WSum &operator+=(WSum &&sum);
 
   /// Substract a sum
   WSum &operator-=(WSum &sum);
+  WSum &operator-=(WSum &&sum);
 
   /// Return a string representation
   std::string str() const;

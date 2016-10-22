@@ -6,6 +6,21 @@
 
 WSum::WSum() {}
 
+void WSum::add(const WAlgebraicTerm &term, scalar_t factor) {
+  auto search = sum_.find(term);
+
+  if (search != sum_.end()) {
+    /// Found, then just add the factor to the existing term
+    search->second += factor;
+    if (search->second == 0) {
+      std::cout << "\n Term cancellation!" << std::endl;
+      sum_.erase(search);
+    }
+  } else {
+    sum_[term] = factor;
+  }
+}
+
 void WSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
                scalar_t scale) {
 
@@ -26,10 +41,38 @@ void WSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
   }
 }
 
-void WSum::add_sum(WSum&& sum, scalar_t scale) {
+void WSum::add_sum(WSum &&sum, scalar_t scale) {
   for (const auto &kv : sum.sum()) {
     add(kv, scale);
   }
+}
+
+WSum &WSum::operator+=(WSum &sum) {
+  for (auto &kv : sum.sum()) {
+    add(kv);
+  }
+  return *this;
+}
+
+WSum &WSum::operator+=(WSum &&sum) {
+  for (auto &kv : sum.sum()) {
+    add(kv);
+  }
+  return *this;
+}
+
+WSum &WSum::operator-=(WSum &sum) {
+  for (auto &kv : sum.sum()) {
+    add(kv, -1);
+  }
+  return *this;
+}
+
+WSum &WSum::operator-=(WSum &&sum) {
+  for (auto &kv : sum.sum()) {
+    add(kv, -1);
+  }
+  return *this;
 }
 
 std::string WSum::str() const {
