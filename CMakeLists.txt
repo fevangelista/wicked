@@ -9,6 +9,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
 aux_source_directory(src SRC_LIST)
 aux_source_directory(src/algebra SRC_LIST)
 aux_source_directory(src/diagrams SRC_LIST)
+
+add_library(wicked_lib ${SRC_LIST})
 add_executable(wicked ${SRC_LIST})
 
 #add_subdirectory(pybind11)
@@ -18,7 +20,7 @@ add_executable(wicked ${SRC_LIST})
 # CTest
 enable_testing()
 #include(CTest)
-add_subdirectory(test)
+add_subdirectory(tests)
 
 include_directories(src)
 include_directories(src/algebra)
