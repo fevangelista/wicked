@@ -52,13 +52,12 @@ int main(int argc, const char *argv[]) {
   e1_term.add(WTensor("t", {v0}, {o0}));
   WSum e1_sum;
   e1_sum.add(e1_term);
-  e1_sum.add(e1_term);
 
   e1_sum -= sum;
 
-  cout << "Sum of all terms:" << endl;
-  cout << sum << endl;
-  cout << e1_sum << endl;
+//  cout << "Sum of all terms:" << endl;
+//  cout << sum << endl;
+//  cout << e1_sum << endl;
   auto size = e1_sum.sum().size();
   return size;
 }
