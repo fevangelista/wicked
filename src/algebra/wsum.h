@@ -25,7 +25,9 @@ public:
            scalar_t scale = 1);
 
   /// Add a term that can optionally be scaled
-  void add_sum(WSum&& sum, scalar_t scale = 1);
+  void add_sum(WSum &&sum, scalar_t scale = 1);
+
+  bool operator==(WSum &sum);
 
   /// Add a sum
   WSum &operator+=(WSum &sum);
@@ -51,5 +53,12 @@ private:
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const WSum &sum);
+
+/// The syntax used to input a tensor expression
+enum class TensorSyntax { Wicked, TCE };
+
+///// Create a sum from a string
+WSum string_to_sum(const std::string &s,
+                   TensorSyntax syntax = TensorSyntax::Wicked);
 
 #endif // _wicked_wsum_h_

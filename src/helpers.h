@@ -4,15 +4,25 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <regex>
 
 #include "wicked-def.h"
 
 // Returns a comma separated list of the indices
 std::string to_string(const std::vector<std::string> &svec,
                       const std::string &sep = ",");
-
 std::string to_string(const scalar_t r);
 std::string to_latex(const scalar_t r);
+
+/// Split a string
+std::vector<std::string> split(const std::string& s);
+
+/// Find all occurences of a pattern
+std::vector<std::string> findall(const std::string& s,const std::string& regex);
+
+/// Split indices
+std::vector<std::string> split_indices(const std::string& s);
+
 
 // A class to count indices
 class index_counter {

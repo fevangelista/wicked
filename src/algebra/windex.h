@@ -59,6 +59,9 @@ std::ostream &operator<<(std::ostream &os, const WIndex &idx);
 std::vector<std::vector<WIndex>> make_indices_from_space_labels(
     const std::vector<std::vector<std::string>> &labels_space);
 
+/// Helper function to convert a string to a WIndex object
+WIndex string_to_index(const std::string& s);
+
 /// A function that takes two lists of indices and creates a index map for the
 /// second list that voids duplicates
 index_map_t remap(const std::vector<WIndex> &idx_vec1,

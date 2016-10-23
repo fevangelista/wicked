@@ -87,7 +87,7 @@ private:
   /// The largest allowed cumulant
   int maxcumulant_ = 100;
 
-  WDiagPrint print_ = WDiagPrint::All;
+  WDiagPrint print_ = WDiagPrint::No;
 };
 
 #endif // _wicked_diag_theorem_h_

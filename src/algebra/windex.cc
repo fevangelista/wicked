@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#include "helpers.h"
 #include "windex.h"
 
 WIndex::WIndex() : index_(std::make_pair(-1, -1)) {}
@@ -53,6 +54,20 @@ std::vector<std::vector<WIndex>> make_indices_from_space_labels(
     indices.push_back(indices_space);
   }
   return indices;
+}
+
+WIndex string_to_index(const std::string &s) {
+  int space = -1;
+  int p = -1;
+  for (int i : range(osi->num_spaces())) {
+    const std::string &label = osi->label(i);
+    size_t size = label.size();
+    if (s.compare(0, size, label) == 0) {
+      space = i;
+      p = std::stoi(s.substr(size));
+    }
+  }
+  return WIndex(space,p);
 }
 
 index_map_t remap(const std::vector<WIndex> &idx_vec1,
