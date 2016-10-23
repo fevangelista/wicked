@@ -24,6 +24,10 @@ public:
   WSum contract(scalar_t factor, const std::vector<WDiagOperator> &ops,
                 int minrank, int maxrank);
 
+  /// Contract a product of sums of operators
+  WSum contract(scalar_t factor, const std::vector<WSum> &sums,
+                int minrank, int maxrank);
+
 private:
   std::vector<std::vector<int>> contractions_;
   std::vector<std::vector<WDiagVertex>> elementary_contractions_;

@@ -14,8 +14,11 @@ public:
 
   // ==> Class public interface <==
 
-  /// Return the map (term,factor)
+  /// Return a map term -> factor
   std::map<WAlgebraicTerm, scalar_t> &sum() { return sum_; }
+
+  /// Return a vector of pairs (term,factor)
+  std::vector<std::pair<WAlgebraicTerm, scalar_t>> vector() const;
 
   /// Add a term that can optionally be scaled
   void add(const WAlgebraicTerm &term, scalar_t factor = 1);

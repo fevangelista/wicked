@@ -6,6 +6,14 @@
 
 WSum::WSum() {}
 
+std::vector<std::pair<WAlgebraicTerm, scalar_t>> WSum::vector() const {
+  std::vector<std::pair<WAlgebraicTerm, scalar_t>> vec;
+  for (auto& kv : sum_){
+      vec.push_back(kv);
+  }
+  return vec;
+}
+
 void WSum::add(const WAlgebraicTerm &term, scalar_t factor) {
   auto search = sum_.find(term);
 
@@ -104,7 +112,7 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     factor_re = "\\s*([+-]?\\d*)?/?(\\d*)?\\s+"; // ";
   }
 
-//  std::cout << "Parsing tensors: " << std::endl;
+  //  std::cout << "Parsing tensors: " << std::endl;
   auto tensors = findall(s, tensor_re);
 
   WAlgebraicTerm term;
@@ -126,7 +134,7 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     }
     term.add(WTensor(label, lower, upper));
   }
-//  std::cout << "Parsing factor: " << std::endl;
+  //  std::cout << "Parsing factor: " << std::endl;
 
   auto factor_vec = findall(s, factor_re);
   //  for (auto f : factor) {

@@ -36,6 +36,8 @@ void WAlgebraicTerm::reindex(index_map_t &idx_map) {
 scalar_t WAlgebraicTerm::canonicalize() {
   scalar_t factor(1);
 
+  std::cout << "\n  Canonicalizing:\n" << *this << std::endl;
+
   // 1. Sort the tensors according to a score function
   using score_t =
       std::tuple<std::string, int, std::vector<int>, std::vector<int>, WTensor>;
