@@ -31,6 +31,9 @@ public:
   /// Return the particle rank of this vertex (sum creation + sum annilation)
   int rank() const;
 
+  /// Comparison operator used for sorting
+  bool operator<(WDiagVertex const &other) const;
+
   // compound assignment
   WDiagVertex &operator+=(const WDiagVertex &rhs);
 

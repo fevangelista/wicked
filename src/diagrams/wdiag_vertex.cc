@@ -35,6 +35,10 @@ int WDiagVertex::rank() const {
   return r;
 }
 
+bool WDiagVertex::operator<(WDiagVertex const &other) const {
+  return vertex_ < other.vertex_;
+}
+
 WDiagVertex &WDiagVertex::operator+=(const WDiagVertex &rhs) {
   for (int s = 0; s < osi->num_spaces(); ++s) {
     vertex_[s].first += rhs.vertex_[s].first;

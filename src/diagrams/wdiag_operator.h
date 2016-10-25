@@ -34,6 +34,9 @@ public:
   /// Return the particle rank of this operator (sum creation + sum annilation)
   int rank() const;
 
+  /// Comparison operator used for sorting
+  bool operator<(WDiagOperator const &other) const;
+
   /// Return a string representation of the operator
   std::string str() const;
 

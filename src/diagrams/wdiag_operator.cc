@@ -9,19 +9,19 @@ WDiagOperator::WDiagOperator(const std::string &label,
                              const std::vector<int> &cre,
                              const std::vector<int> &ann)
     : label_(label), vertex_(cre, ann), factor_(1) {
-    for (int s = 0; s < osi->num_spaces(); ++s) {
-      factor_ /= static_cast<scalar_t>(factorial(num_cre(s)));
-    }
-    for (int s = 0; s < osi->num_spaces(); ++s) {
-      factor_ /= static_cast<scalar_t>(factorial(num_ann(s)));
-    }
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    factor_ /= static_cast<scalar_t>(factorial(num_cre(s)));
+  }
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    factor_ /= static_cast<scalar_t>(factorial(num_ann(s)));
+  }
 }
 
 const std::string &WDiagOperator::label() const { return label_; }
 
-scalar_t WDiagOperator::factor() const {return factor_;}
+scalar_t WDiagOperator::factor() const { return factor_; }
 
-WDiagVertex WDiagOperator::vertex() const {return vertex_;}
+WDiagVertex WDiagOperator::vertex() const { return vertex_; }
 
 int WDiagOperator::num_indices(int space, bool creation) const {
   return creation ? vertex_.cre(space) : vertex_.ann(space);
@@ -31,8 +31,16 @@ int WDiagOperator::num_cre(int space) const { return vertex_.cre(space); }
 
 int WDiagOperator::num_ann(int space) const { return vertex_.ann(space); }
 
-int WDiagOperator::rank() const {
-  return vertex_.rank();
+int WDiagOperator::rank() const { return vertex_.rank(); }
+
+bool WDiagOperator::operator<(WDiagOperator const &other) const {
+  // Compare the labels
+  if (label_ < other.label_)
+    return true;
+  if (label_ > other.label_)
+    return false;
+  // Compare the vertices
+  return vertex_ < other.vertex_;
 }
 
 std::string WDiagOperator::str() const {
@@ -83,11 +91,10 @@ WDiagOperator make_diag_operator(const std::string &label,
   return WDiagOperator(label, cre, ann);
 }
 
-int operators_rank(const std::vector<WDiagOperator> &ops)
-{
-    int r = 0;
-    for (const auto& op : ops){
-        r += op.rank();
-    }
-    return r;
+int operators_rank(const std::vector<WDiagOperator> &ops) {
+  int r = 0;
+  for (const auto &op : ops) {
+    r += op.rank();
+  }
+  return r;
 }
