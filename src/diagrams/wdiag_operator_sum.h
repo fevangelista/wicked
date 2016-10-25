@@ -15,14 +15,9 @@ public:
   /// Construct an empty sum
   WDiagOperatorSum();
 
-  /// Construct sum with one diagram
-  WDiagOperatorSum(WDiagOperator dop, scalar_t factor = 1);
-
   /// Construct sum with a vector of diagrams
-  WDiagOperatorSum(std::vector<WDiagOperator> vec_dop, scalar_t factor = 1);
-
-  /// Add a diagram to this sum
-  void add(const WDiagOperator &dop, scalar_t factor = 1);
+  WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
+                   scalar_t factor = scalar_t(1));
 
   /// Add a vector of diagrams to this sum
   void add(const std::vector<WDiagOperator> &vec_dop, scalar_t factor = 1);
@@ -35,20 +30,21 @@ public:
   /// subtraction assignment
   WDiagOperatorSum &operator-=(WDiagOperatorSum &rhs);
   /// multiplication assignment
-  WDiagOperatorSum &operator*=(WDiagOperatorSum &rhs);
+  WDiagOperatorSum &operator*=(scalar_t factor);
   /// division assignment
-  WDiagOperatorSum &operator/=(WDiagOperatorSum &rhs);
+  WDiagOperatorSum &operator/=(scalar_t factor);
 
-  //  /// Return a string representation of the operator
-  //  std::string str() const;
-
-  //  /// Write a string representation of the operator to a stream
-  //  friend std::ostream &operator<<(std::ostream &os, const WDiagOperator
-  //  &op);
+  /// Return a string representation of the operator
+  std::string str() const;
 
 private:
   /// A vector containing pairs ((op1, op2, ...), factor)
   dop_sum_t sum_;
 };
+
+/// Write a string representation of the operator to a stream
+std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum);
+
+WDiagOperatorSum commutator(WDiagOperatorSum &A, WDiagOperatorSum &B);
 
 #endif // _wicked_diag_operator_set_h_

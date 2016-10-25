@@ -8,18 +8,20 @@ using namespace std;
 WDiagOperator::WDiagOperator(const std::string &label,
                              const std::vector<int> &cre,
                              const std::vector<int> &ann)
-    : label_(label), vertex_(cre, ann), factor_(1) {
-  for (int s = 0; s < osi->num_spaces(); ++s) {
-    factor_ /= static_cast<scalar_t>(factorial(num_cre(s)));
-  }
-  for (int s = 0; s < osi->num_spaces(); ++s) {
-    factor_ /= static_cast<scalar_t>(factorial(num_ann(s)));
-  }
-}
+    : label_(label), vertex_(cre, ann) {}
 
 const std::string &WDiagOperator::label() const { return label_; }
 
-scalar_t WDiagOperator::factor() const { return factor_; }
+scalar_t WDiagOperator::factor() const {
+  scalar_t result = 1;
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    result /= static_cast<scalar_t>(factorial(num_cre(s)));
+  }
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    result /= static_cast<scalar_t>(factorial(num_ann(s)));
+  }
+  return result;
+}
 
 WDiagVertex WDiagOperator::vertex() const { return vertex_; }
 

@@ -7,6 +7,7 @@
 #include "helpers.h"
 #include "orbital_space.h"
 #include "wdiag_operator.h"
+#include "wdiag_operator_sum.h"
 #include "wdiag_theorem.h"
 #include "wsum.h"
 
@@ -35,7 +36,7 @@ int main(int argc, const char *argv[]) {
   //    cout << kv.first << " " << kv.second.get() << endl;
   //  }
   srcc();
-  //    mr();
+//      mr();
 
   return 0;
 }
@@ -135,6 +136,14 @@ void srcc() {
     terms.add_sum(wdt.contract(-1, {opR1, opT2, opH2oovv, opT1}, 0, 0));
     terms.add_sum(wdt.contract(1, {opR1, opT2, opT1, opH2oovv}, 0, 0));
   }
+
+  WDiagOperatorSum T1({opT1});
+  WDiagOperatorSum F({opH1oo,opH1ov,opH1vo,opH1vv});
+  WDiagOperatorSum T1F = commutator(T1,F);
+
+  cout << T1 << endl;
+  cout << F << endl;
+  cout << T1F << endl;
 
   if (doubles) {
     // R2 V

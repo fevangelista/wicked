@@ -47,9 +47,6 @@ private:
   /// The label of the operator
   std::string label_;
 
-  /// The factor associated with this operator
-  scalar_t factor_;
-
   /// The number of creation/annihilation operators in each space
   WDiagVertex vertex_;
 };
