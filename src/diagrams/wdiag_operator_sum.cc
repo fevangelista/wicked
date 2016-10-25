@@ -1,4 +1,4 @@
-#include "wdiag_operator_set.h"
+#include "wdiag_operator_sum.h"
 
 WDiagOperatorSum::WDiagOperatorSum() {}
 
