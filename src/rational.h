@@ -20,8 +20,8 @@ public:
   void numerator(int value);
   /// set the denominator
   void denominator(int value);
-  /// return a string representation
-  std::string str() const;
+  /// return a string representation, and optionally show the sign
+  std::string str(bool sign = false) const;
   /// return a LaTeX representation
   std::string latex() const;
 

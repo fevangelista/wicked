@@ -6,10 +6,12 @@
 #include <string>
 #include <vector>
 
-#include "combinatorics.h"
+#include "wicked-def.h"
 #include "windex.h"
-#include "wsqoperator.h"
-#include "wtensor.h"
+
+class WSQOperator;
+class WTensor;
+class WIndex;
 
 /// A class to represent a term in a SQ expression. A term includes:
 /// 1) a product of tensors

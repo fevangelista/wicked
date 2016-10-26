@@ -1,9 +1,12 @@
 #include <iostream>
 
 #include "orbital_space.h"
+#include "walgebraicterm.h"
 #include "wdiag_operator.h"
 #include "wdiag_theorem.h"
 #include "wsum.h"
+#include "wsqoperator.h"
+#include "wtensor.h"
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"

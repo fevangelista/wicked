@@ -2,6 +2,7 @@
 #define _wicked_wicked_def_h_
 
 #include <vector>
+
 #include "rational.h"
 
 /// Enums

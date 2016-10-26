@@ -1,8 +1,9 @@
+#include "helpers.h"
 #include "wdiag_operator_sum.h"
 
 WDiagOperatorSum::WDiagOperatorSum() {}
 
-WDiagOperatorSum::WDiagOperatorSum(const std::vector<WDiagOperator>& vec_dop,
+WDiagOperatorSum::WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
                                    scalar_t factor) {
   add(vec_dop, factor);
 }
@@ -53,14 +54,16 @@ WDiagOperatorSum &WDiagOperatorSum::operator/=(scalar_t factor) {
 }
 
 std::string WDiagOperatorSum::str() const {
-  std::string s;
+  std::vector<std::string> str_vec;
   for (auto &vec_dop_factor : sum_) {
-    s += vec_dop_factor.second.str();
+    std::string s;
+    s += vec_dop_factor.second.str(true);
     for (auto &dop : vec_dop_factor.first) {
       s += ' ' + dop.str();
     }
+    str_vec.push_back(s);
   }
-  return s;
+  return to_string(str_vec,"\n");
 }
 
 std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum) {
@@ -90,5 +93,22 @@ WDiagOperatorSum commutator(WDiagOperatorSum &A, WDiagOperatorSum &B) {
       result.add(vec_BA, -factor_A * factor_B);
     }
   }
+  return result;
+}
+
+WDiagOperatorSum exp(WDiagOperatorSum &A, int order) {
+  WDiagOperatorSum result;
+  result.add({});
+  //  WDiagOperatorSum temp1;
+  //  temp1.add({});
+  //  for (int k = 1; k <= order; k++){
+  //      temp1 *= A;
+  //      result.add(temp);
+  //  }
+  return result;
+}
+
+WDiagOperatorSum BCH_expansion(WDiagOperatorSum &A, WDiagOperatorSum &B) {
+  WDiagOperatorSum result;
   return result;
 }

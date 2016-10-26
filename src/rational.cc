@@ -56,23 +56,24 @@ rational &rational::operator/=(const rational &rhs) {
   return *this;
 }
 
-std::string rational::str() const {
+std::string rational::str(bool sign) const {
   std::string s;
   if (numerator_ == 0) {
     s = "0";
   } else {
+    if (sign and (numerator_ > 0)) {
+      s = '+';
+    }
     if (denominator_ == 1) {
-      s = std::to_string(numerator_);
+      s += std::to_string(numerator_);
     } else {
-      s = std::to_string(numerator_) + "/" + std::to_string(denominator_);
+      s += std::to_string(numerator_) + "/" + std::to_string(denominator_);
     }
   }
   return s;
 }
 
-std::string rational::latex() const {
-  return str();
-}
+std::string rational::latex() const { return str(); }
 
 rational operator+(rational lhs, const rational &rhs) {
   lhs += rhs;

@@ -3,13 +3,17 @@
 
 #include "helpers.h"
 #include "wsum.h"
+#include "walgebraicterm.h"
+#include "wequationterm.h"
+#include "wtensor.h"
+#include "wsqoperator.h"
 
 WSum::WSum() {}
 
 std::vector<std::pair<WAlgebraicTerm, scalar_t>> WSum::vector() const {
   std::vector<std::pair<WAlgebraicTerm, scalar_t>> vec;
-  for (auto& kv : sum_){
-      vec.push_back(kv);
+  for (auto &kv : sum_) {
+    vec.push_back(kv);
   }
   return vec;
 }
@@ -94,6 +98,19 @@ std::string WSum::str() const {
     str_vec.push_back(kv.second.str() + ' ' + kv.first.str());
   }
   return (to_string(str_vec, "\n"));
+}
+
+std::vector<WEquationTerm>
+WSum::to_projective_equation(const std::string &residual_label) {
+  std::vector<WEquationTerm> result;
+
+  return result;
+}
+
+std::vector<WEquationTerm> WSum::to_manybody_equation() {
+  std::vector<WEquationTerm> result;
+
+  return result;
 }
 
 std::ostream &operator<<(std::ostream &os, const WSum &sum) {

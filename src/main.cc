@@ -6,9 +6,12 @@
 #include "wicked-def.h"
 #include "helpers.h"
 #include "orbital_space.h"
+#include "walgebraicterm.h"
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"
 #include "wdiag_theorem.h"
+#include "wsqoperator.h"
+#include "wtensor.h"
 #include "wsum.h"
 
 using namespace std;
@@ -36,7 +39,7 @@ int main(int argc, const char *argv[]) {
   //    cout << kv.first << " " << kv.second.get() << endl;
   //  }
   srcc();
-//      mr();
+  //      mr();
 
   return 0;
 }
@@ -138,12 +141,28 @@ void srcc() {
   }
 
   WDiagOperatorSum T1({opT1});
-  WDiagOperatorSum F({opH1oo,opH1ov,opH1vo,opH1vv});
-  WDiagOperatorSum T1F = commutator(T1,F);
+  WDiagOperatorSum T2({opT2});
+  WDiagOperatorSum R1({opR1});
+  WDiagOperatorSum R2({opR2});
+  WDiagOperatorSum F;
+  for (const auto &op : {opH1oo, opH1ov, opH1vo, opH1vv}) {
+    F.add({op});
+  }
 
-  cout << T1 << endl;
-  cout << F << endl;
-  cout << T1F << endl;
+  WDiagOperatorSum V;
+  for (const auto &op : {opH2oooo, opH2ovoo, opH2ooov, opH2ovov, opH2vvoo,
+                         opH2oovv, opH2vvov, opH2ovvv, opH2vvvv}) {
+    V.add({op});
+  }
+
+  WDiagOperatorSum T1F = commutator(T1, F);
+
+  auto res = wdt.contract_sum(1, T1F, 0, 0);
+  cout << res << endl;
+
+  //  cout << T1 << endl;
+  //  cout << F << endl;
+  //  cout << T1F << endl;
 
   if (doubles) {
     // R2 V

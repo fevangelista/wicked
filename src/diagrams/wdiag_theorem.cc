@@ -7,8 +7,11 @@
 #include "stl_utils.hpp"
 #include "walgebraicterm.h"
 #include "wdiag_operator.h"
+#include "wdiag_operator_sum.h"
 #include "wdiag_theorem.h"
 #include "wsum.h"
+#include "wtensor.h"
+#include "wsqoperator.h"
 
 #define PRINT(detail, code)                                                    \
   if (print_ >= detail) {                                                      \
@@ -82,24 +85,29 @@ WSum WDiagTheorem::contract(scalar_t factor,
   return result;
 }
 
-WSum contract(scalar_t factor, const std::vector<WSum> &sums,
-              int minrank, int maxrank)
-{
-    WSum result;
+WSum WDiagTheorem::contract_sum(scalar_t factor, WDiagOperatorSum &dop_sum,
+                                int minrank, int maxrank) {
+  WSum result;
 
-    std::vector<int> r;
-    std::vector<std::vector<std::pair<WAlgebraicTerm,scalar_t>>> ops_vec;
-    for (const auto& sum : sums){
-        const auto op_vec = sum.vector();
-        r.push_back(op_vec.size());
-        ops_vec.push_back(op_vec);
-    }
+  for (const auto &dop_factor : dop_sum.sum()) {
+    scalar_t this_factor = dop_factor.second;
+    const std::vector<WDiagOperator> &ops = dop_factor.first;
+    result += contract(factor * this_factor, ops, minrank, maxrank);
+  }
 
-//    product_space_iterator(r,[&]);
+  //    std::vector<int> r;
+  //    std::vector<std::vector<std::pair<WAlgebraicTerm,scalar_t>>> ops_vec;
+  //    for (const auto& sum : sums){
+  //        const auto op_vec = sum.vector();
+  //        r.push_back(op_vec.size());
+  //        ops_vec.push_back(op_vec);
+  //    }
 
-//    contract(factor,ops,minrank,maxrank);
+  //    product_space_iterator(r,[&]);
 
-    return result;
+  //    contract(factor,ops,minrank,maxrank);
+
+  return result;
 }
 
 void WDiagTheorem::generate_contractions(

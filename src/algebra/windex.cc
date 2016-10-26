@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "helpers.h"
+#include "orbital_space.h"
 #include "windex.h"
 
 WIndex::WIndex() : index_(std::make_pair(-1, -1)) {}

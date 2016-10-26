@@ -1,4 +1,5 @@
 #include "wicked-def.h"
+#include "windex.h"
 #include "wsqoperator.h"
 
 WSQOperator::WSQOperator(SQOperatorType type, WIndex index)

@@ -8,6 +8,7 @@ class WSQOperator;
 class WTensor;
 class WAlgebraicTerm;
 class WDiagOperator;
+class WDiagOperatorSum;
 class WDiagVertex;
 class WSum;
 
@@ -25,8 +26,8 @@ public:
                 int minrank, int maxrank);
 
   /// Contract a product of sums of operators
-  WSum contract(scalar_t factor, const std::vector<WSum> &sums,
-                int minrank, int maxrank);
+  WSum contract_sum(scalar_t factor, WDiagOperatorSum &dop_sum, int minrank,
+                    int maxrank);
 
 private:
   std::vector<std::vector<int>> contractions_;

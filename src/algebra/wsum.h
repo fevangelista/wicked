@@ -1,10 +1,13 @@
 #ifndef _wicked_wsum_h_
 #define _wicked_wsum_h_
 
+#include <map>
 #include <vector>
 
 #include "wicked-def.h"
-#include "walgebraicterm.h"
+
+class WAlgebraicTerm;
+class WEquationTerm;
 
 /// A class to represent a sum of SQ terms.
 class WSum {
@@ -45,6 +48,13 @@ public:
 
   /// Return a LaTeX representation
   std::string latex() const;
+
+  /// Convert this sum to a vector of projective equations
+  std::vector<WEquationTerm>
+  to_projective_equation(const std::string &residual_label);
+
+  /// Convert this sum to a vector of many-body equations
+  std::vector<WEquationTerm> to_manybody_equation();
 
 private:
   // ==> Class private data <==

@@ -2,6 +2,11 @@
 
 #include "wicked-def.h"
 #include "helpers.h"
+#include "orbital_space.h"
+#include "combinatorics.h"
+#include "windex.h"
+#include "wsqoperator.h"
+#include "wtensor.h"
 #include "walgebraicterm.h"
 
 WAlgebraicTerm::WAlgebraicTerm() {}

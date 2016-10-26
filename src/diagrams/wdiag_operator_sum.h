@@ -29,9 +29,9 @@ public:
   WDiagOperatorSum &operator+=(WDiagOperatorSum &rhs);
   /// subtraction assignment
   WDiagOperatorSum &operator-=(WDiagOperatorSum &rhs);
-  /// multiplication assignment
+  /// multiplication assignment (scalar)
   WDiagOperatorSum &operator*=(scalar_t factor);
-  /// division assignment
+  /// division assignment (scalar)
   WDiagOperatorSum &operator/=(scalar_t factor);
 
   /// Return a string representation of the operator
@@ -45,6 +45,16 @@ private:
 /// Write a string representation of the operator to a stream
 std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum);
 
+// Helper functions
+
+/// Creates a new object with the commutator [A,B]
 WDiagOperatorSum commutator(WDiagOperatorSum &A, WDiagOperatorSum &B);
+
+/// Creates a new object with the exponential exp(A) truncated at a given order
+WDiagOperatorSum exp(WDiagOperatorSum &A, int order);
+
+/// Creates a new object with the Baker-Campbell-Hausdorff expansion of the
+/// quantity exp(-A) B exp(A) truncated at a given order
+WDiagOperatorSum BCH_expansion(WDiagOperatorSum &A, WDiagOperatorSum &B);
 
 #endif // _wicked_diag_operator_set_h_

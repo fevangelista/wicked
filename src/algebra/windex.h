@@ -1,9 +1,8 @@
 #ifndef _wicked_windex_h_
 #define _wicked_windex_h_
 
+#include <map>
 #include <string>
-
-#include "orbital_space.h"
 
 /// This class represents an orbital index that appears in a second quantized
 /// expression.  It holds information about the space type (via

@@ -3,9 +3,7 @@
 
 #include <string>
 
-//#include "wicked-def.h"
-#include "orbital_space.h"
-#include "windex.h"
+class WIndex;
 
 enum SQOperatorType { Creation, Annihilation };
 
