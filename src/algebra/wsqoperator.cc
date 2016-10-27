@@ -43,6 +43,15 @@ std::string WSQOperator::latex() const {
   return (str_);
 }
 
+std::string WSQOperator::ambit() const {
+  std::string str_("\\hat{a}");
+  str_ += (type() == Creation ? "^" : "_");
+  str_ += "{";
+  str_ += index().ambit();
+  str_ += "}";
+  return (str_);
+}
+
 std::ostream &operator<<(std::ostream &os, const WSQOperator &op) {
   os << op.str();
   return os;

@@ -75,6 +75,8 @@ std::string rational::str(bool sign) const {
 
 std::string rational::latex() const { return str(); }
 
+std::string rational::ambit() const { return str(); }
+
 rational operator+(rational lhs, const rational &rhs) {
   lhs += rhs;
   return lhs;

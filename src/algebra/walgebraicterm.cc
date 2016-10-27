@@ -41,7 +41,7 @@ void WAlgebraicTerm::reindex(index_map_t &idx_map) {
 scalar_t WAlgebraicTerm::canonicalize() {
   scalar_t factor(1);
 
-  std::cout << "\n  Canonicalizing:\n" << *this << std::endl;
+  //  std::cout << "\n  Canonicalizing:\n" << *this << std::endl;
 
   // 1. Sort the tensors according to a score function
   using score_t =
@@ -251,6 +251,18 @@ std::string WAlgebraicTerm::latex() const {
     str_vec.push_back(op.latex());
   }
   str_vec.push_back("\\}");
+  return (to_string(str_vec, " "));
+}
+
+std::string WAlgebraicTerm::ambit() const {
+  std::vector<std::string> str_vec;
+  for (const WTensor &tensor : tensors_) {
+    str_vec.push_back(tensor.ambit());
+  }
+  if (operators_.size()) {
+    throw "Trying to convert an WAlgebraicTerm object with operator tersm to "
+          "ambit.";
+  }
   return (to_string(str_vec, " "));
 }
 

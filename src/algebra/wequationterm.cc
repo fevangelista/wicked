@@ -21,6 +21,13 @@ std::string WEquationTerm::str() const {
   return (to_string(str_vec, " "));
 }
 
+std::string WEquationTerm::ambit() const {
+  std::vector<std::string> str_vec;
+  str_vec.push_back(lhs_.ambit() + " += " + factor_.ambit());
+  str_vec.push_back(rhs_.ambit());
+  return (to_string(str_vec, " * ") + ";");
+}
+
 std::ostream &operator<<(std::ostream &os, const WEquationTerm &eterm) {
   os << eterm.str();
   return os;

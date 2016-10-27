@@ -96,6 +96,19 @@ std::string WTensor::latex() const {
           to_string(str_vec_lower, " ") + "}");
 }
 
+std::string WTensor::ambit() const {
+  std::vector<std::string> str_vec;
+  for (const WIndex &index : upper_) {
+    str_vec.push_back(index.ambit());
+  }
+  for (const WIndex &index : lower_) {
+    str_vec.push_back(index.ambit());
+  }
+
+  return (str_vec.size() > 0 ? (label_ + "[" + to_string(str_vec, ",") + "]")
+                             : label_);
+}
+
 std::ostream &operator<<(std::ostream &os, const WTensor &tensor) {
   os << tensor.str();
   return os;

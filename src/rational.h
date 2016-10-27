@@ -24,6 +24,8 @@ public:
   std::string str(bool sign = false) const;
   /// return a LaTeX representation
   std::string latex() const;
+  /// return an ambit (C++ code) representation
+  std::string ambit() const;
 
   /// addition assignment
   rational &operator+=(const rational &rhs);

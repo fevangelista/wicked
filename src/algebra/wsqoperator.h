@@ -31,7 +31,7 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
-  /// Return an ambit representation
+  /// Return an ambit (C++ code) representation
   std::string ambit() const;
 
 private:

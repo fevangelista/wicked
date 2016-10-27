@@ -18,7 +18,7 @@ public:
   // ==> Class public interface <==
 
   /// Return a map term -> factor
-  std::map<WAlgebraicTerm, scalar_t> &sum() { return sum_; }
+  std::map<WAlgebraicTerm, scalar_t> &terms() { return terms_; }
 
   /// Return a vector of pairs (term,factor)
   std::vector<std::pair<WAlgebraicTerm, scalar_t>> vector() const;
@@ -31,17 +31,17 @@ public:
            scalar_t scale = 1);
 
   /// Add a term that can optionally be scaled
-  void add_sum(WSum &&sum, scalar_t scale = 1);
+  void add_sum(WSum &&terms, scalar_t scale = 1);
 
-  bool operator==(WSum &sum);
+  bool operator==(WSum &terms);
 
   /// Add a sum
-  WSum &operator+=(WSum &sum);
-  WSum &operator+=(WSum &&sum);
+  WSum &operator+=(WSum &terms);
+  WSum &operator+=(WSum &&terms);
 
   /// Substract a sum
-  WSum &operator-=(WSum &sum);
-  WSum &operator-=(WSum &&sum);
+  WSum &operator-=(WSum &terms);
+  WSum &operator-=(WSum &&terms);
 
   /// Return a string representation
   std::string str() const;
@@ -49,17 +49,17 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
-  /// Convert this sum to a vector of projective equations
-  std::vector<WEquationTerm>
-  to_projective_equation(const std::string &residual_label);
+//  /// Convert this sum to a vector of projective equations
+//  std::vector<WEquationTerm>
+//  to_projective_equation(const std::string &residual_label);
 
   /// Convert this sum to a vector of many-body equations
-  std::vector<WEquationTerm> to_manybody_equation();
+  std::vector<WEquationTerm> to_manybody_equation(const std::string& label);
 
 private:
   // ==> Class private data <==
 
-  std::map<WAlgebraicTerm, scalar_t> sum_;
+  std::map<WAlgebraicTerm, scalar_t> terms_;
 
   // ==> Class private functions <==
 };

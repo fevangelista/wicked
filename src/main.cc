@@ -7,6 +7,7 @@
 #include "helpers.h"
 #include "orbital_space.h"
 #include "walgebraicterm.h"
+#include "wequationterm.h"
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"
 #include "wdiag_theorem.h"
@@ -75,7 +76,7 @@ void srcc() {
   auto opR2 = make_diag_operator("R2", {o, o}, {v, v});
 
   bool singles = false;
-  bool doubles = true;
+  bool doubles = false;
 
   WDiagTheorem wdt;
   WSum terms;
@@ -157,8 +158,11 @@ void srcc() {
 
   WDiagOperatorSum T1F = commutator(T1, F);
 
-  auto res = wdt.contract_sum(1, T1F, 0, 0);
+  auto res = wdt.contract_sum(1, T1F, 0, 2);
   cout << res << endl;
+  for (const auto &eq : res.to_manybody_equation("R")) {
+    cout << "  " << eq.ambit() << endl;
+  }
 
   //  cout << T1 << endl;
   //  cout << F << endl;
@@ -181,8 +185,8 @@ void srcc() {
     //    terms.add_sum(wdt.contract(1, {opR2, opH2ovov, opT2}, 0, 0));
   }
 
-  cout << "Sum of all terms:" << endl;
-  cout << terms << endl;
+  //  cout << "Sum of all terms:" << endl;
+  //  cout << terms << endl;
 }
 
 void mr() {

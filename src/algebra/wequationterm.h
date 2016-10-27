@@ -20,6 +20,9 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
+  /// Return an ambit (C++ code) representation
+  std::string ambit() const;
+
 private:
   // ==> Class private data <==
 

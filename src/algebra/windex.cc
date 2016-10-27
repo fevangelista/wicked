@@ -24,6 +24,10 @@ std::string WIndex::latex() const {
   return osi->label(space()) + "_{" + std::to_string(index()) + "}";
 }
 
+std::string WIndex::ambit() const {
+  return str();
+}
+
 std::ostream &operator<<(std::ostream &os, const WIndex &idx) {
   os << idx.str();
   return os;
