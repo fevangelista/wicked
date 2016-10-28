@@ -1,6 +1,6 @@
 sudo: required
 dist: precise
-language: cpp
+language: cpp python
 
 matrix:
   include:
@@ -14,6 +14,8 @@ matrix:
             - g++-4.9
             - cmake
             - cmake-data
+            - python3.5
+            - python3.5-dev
       env: COMPILER=g++-4.9
     - compiler: gcc
       addons:
@@ -25,6 +27,8 @@ matrix:
             - g++-5
             - cmake
             - cmake-data
+            - python3.5
+            - python3.5-dev
       env: COMPILER=g++-5
     - compiler: clang
       addons:
@@ -37,6 +41,8 @@ matrix:
             - clang-3.6
             - cmake
             - cmake-data
+            - python3.5
+            - python3.5-dev
       env: COMPILER=clang++-3.6
     - compiler: clang
       addons:
@@ -49,6 +55,8 @@ matrix:
             - clang-3.7
             - cmake
             - cmake-data
+            - python3.5
+            - python3.5-dev
       env: COMPILER=clang++-3.7
 
 script:
