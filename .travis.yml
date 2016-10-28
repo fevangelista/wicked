@@ -41,8 +41,6 @@ matrix:
             - clang-3.6
             - cmake
             - cmake-data
-            - python2.7
-            - python2.7-dev
       env: COMPILER=clang++-3.6
     - compiler: clang
       addons:
