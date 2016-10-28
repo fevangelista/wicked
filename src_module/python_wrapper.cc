@@ -58,7 +58,13 @@ PYBIND11_PLUGIN(pywicked) {
   py::class_<WDiagOperatorSum, std::shared_ptr<WDiagOperatorSum>>(
       m, "WDiagOperatorSum")
       .def(py::init<>())
+      .def(
+          py::init<const std::vector<std::vector<WDiagOperator>> &, scalar_t>(),
+          py::arg("vec_vec_dop"), py::arg("factor") = rational(1))
       .def("add", &WDiagOperatorSum::add);
+
+  m.def("commutator", &commutator,
+        "Create the commutator of two WDiagOperatorSum objects");
 
   py::class_<WDiagTheorem, std::shared_ptr<WDiagTheorem>>(m, "WDiagTheorem")
       .def(py::init<>())
