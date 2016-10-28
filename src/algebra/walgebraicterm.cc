@@ -260,10 +260,10 @@ std::string WAlgebraicTerm::ambit() const {
     str_vec.push_back(tensor.ambit());
   }
   if (operators_.size()) {
-    throw "Trying to convert an WAlgebraicTerm object with operator tersm to "
+    throw "Trying to convert an WAlgebraicTerm object with operator terms to "
           "ambit.";
   }
-  return (to_string(str_vec, " "));
+  return (to_string(str_vec, " * "));
 }
 
 std::ostream &operator<<(std::ostream &os, const WAlgebraicTerm &term) {

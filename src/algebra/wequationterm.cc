@@ -21,6 +21,10 @@ std::string WEquationTerm::str() const {
   return (to_string(str_vec, " "));
 }
 
+std::string WEquationTerm::latex() const {
+  return str();
+}
+
 std::string WEquationTerm::ambit() const {
   std::vector<std::string> str_vec;
   str_vec.push_back(lhs_.ambit() + " += " + factor_.ambit());

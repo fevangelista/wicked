@@ -15,9 +15,14 @@ public:
   /// Construct an empty sum
   WDiagOperatorSum();
 
+//  /// Construct sum with a vector of diagrams
+//  WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
+//                   scalar_t factor = scalar_t(1));
+
   /// Construct sum with a vector of diagrams
-  WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
+  WDiagOperatorSum(const std::vector<std::vector<WDiagOperator>> &vec_vec_dop,
                    scalar_t factor = scalar_t(1));
+
 
   /// Add a vector of diagrams to this sum
   void add(const std::vector<WDiagOperator> &vec_dop, scalar_t factor = 1);

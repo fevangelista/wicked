@@ -141,14 +141,11 @@ void srcc() {
     terms.add_sum(wdt.contract(1, {opR1, opT2, opT1, opH2oovv}, 0, 0));
   }
 
-  WDiagOperatorSum T1({opT1});
-  WDiagOperatorSum T2({opT2});
-  WDiagOperatorSum R1({opR1});
-  WDiagOperatorSum R2({opR2});
-  WDiagOperatorSum F;
-  for (const auto &op : {opH1oo, opH1ov, opH1vo, opH1vv}) {
-    F.add({op});
-  }
+  WDiagOperatorSum T1({{opT1}});
+  WDiagOperatorSum T2({{opT2}});
+  WDiagOperatorSum R1({{opR1}});
+  WDiagOperatorSum R2({{opR2}});
+  WDiagOperatorSum F({{opH1oo}, {opH1ov}, {opH1vo}, {opH1vv}});
 
   WDiagOperatorSum V;
   for (const auto &op : {opH2oooo, opH2ovoo, opH2ooov, opH2ovov, opH2vvoo,

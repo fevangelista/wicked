@@ -3,9 +3,17 @@
 
 WDiagOperatorSum::WDiagOperatorSum() {}
 
-WDiagOperatorSum::WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
-                                   scalar_t factor) {
-  add(vec_dop, factor);
+//WDiagOperatorSum::WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
+//                                   scalar_t factor) {
+//  add(vec_dop, factor);
+//}
+
+WDiagOperatorSum::WDiagOperatorSum(
+    const std::vector<std::vector<WDiagOperator>> &vec_vec_dop,
+    scalar_t factor) {
+  for (const auto &vec_dop : vec_vec_dop) {
+    add(vec_dop, factor);
+  }
 }
 
 void WDiagOperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
@@ -63,7 +71,7 @@ std::string WDiagOperatorSum::str() const {
     }
     str_vec.push_back(s);
   }
-  return to_string(str_vec,"\n");
+  return to_string(str_vec, "\n");
 }
 
 std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum) {
