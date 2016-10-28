@@ -13,7 +13,6 @@ matrix:
           packages:
             - g++-4.9
             - cmake
-            - cmake-data
       env: COMPILER=g++-4.9
     - compiler: gcc
       addons:
@@ -24,7 +23,6 @@ matrix:
           packages:
             - g++-5
             - cmake
-            - cmake-data
       env: COMPILER=g++-5
     - compiler: clang
       addons:
@@ -36,7 +34,6 @@ matrix:
           packages:
             - clang-3.6
             - cmake
-            - cmake-data
       env: COMPILER=clang++-3.6
     - compiler: clang
       addons:
@@ -48,7 +45,6 @@ matrix:
           packages:
             - clang-3.7
             - cmake
-            - cmake-data
       env: COMPILER=clang++-3.7
 
 script:
