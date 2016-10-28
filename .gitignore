@@ -32,7 +32,6 @@ CMakeCache.txt
 CMakeFiles/
 Makefile
 cmake_install.cmake
-pybind11/
 pywicked.config
 pywicked.creator
 pywicked.creator.user
