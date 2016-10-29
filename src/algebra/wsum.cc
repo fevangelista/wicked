@@ -10,14 +10,6 @@
 
 WSum::WSum() {}
 
-std::vector<std::pair<WAlgebraicTerm, scalar_t>> WSum::vector() const {
-  std::vector<std::pair<WAlgebraicTerm, scalar_t>> vec;
-  for (auto &kv : terms_) {
-    vec.push_back(kv);
-  }
-  return vec;
-}
-
 void WSum::add(const WAlgebraicTerm &term, scalar_t factor) {
   auto search = terms_.find(term);
 
@@ -53,40 +45,26 @@ void WSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
   }
 }
 
-void WSum::add_sum(WSum &&sum, scalar_t scale) {
+void WSum::add_sum(const WSum& sum, scalar_t scale) {
   for (const auto &kv : sum.terms()) {
     add(kv, scale);
   }
 }
 
-bool WSum::operator==(WSum &sum) {
+bool WSum::operator==(const WSum &sum) {
   return terms_.size() == sum.terms_.size() &&
          std::equal(terms_.begin(), terms_.end(), sum.terms_.begin());
 }
 
-WSum &WSum::operator+=(WSum &sum) {
-  for (auto &kv : sum.terms()) {
+WSum &WSum::operator+=(const WSum &sum) {
+  for (const auto &kv : sum.terms()) {
     add(kv);
   }
   return *this;
 }
 
-WSum &WSum::operator+=(WSum &&sum) {
-  for (auto &kv : sum.terms()) {
-    add(kv);
-  }
-  return *this;
-}
-
-WSum &WSum::operator-=(WSum &sum) {
-  for (auto &kv : sum.terms()) {
-    add(kv, -1);
-  }
-  return *this;
-}
-
-WSum &WSum::operator-=(WSum &&sum) {
-  for (auto &kv : sum.terms()) {
+WSum &WSum::operator-=(const WSum &sum) {
+  for (const auto &kv : sum.terms()) {
     add(kv, -1);
   }
   return *this;

@@ -3,10 +3,10 @@
 import pywicked as pw
 
 opT1 = pw.make_diag_operator("T1",["v"],["c"])
-opT2 = pw.make_diag_operator("T1",["v", "v"],["c", "c"])
+opT2 = pw.make_diag_operator("T2",["v", "v"],["c", "c"])
 
 opR1 = pw.make_diag_operator("R1",["c"],["v"])
-opR2 = pw.make_diag_operator("R1",["c", "c"],["v", "v"])
+opR2 = pw.make_diag_operator("R2",["c", "c"],["v", "v"])
 
 opH1oo = pw.make_diag_operator("f", ["c"], ["c"]);
 opH1ov = pw.make_diag_operator("f", ["c"], ["v"]);
@@ -23,9 +23,28 @@ opH2vvov = pw.make_diag_operator("v", ["v", "v"], ["c", "v"]);
 opH2ovvv = pw.make_diag_operator("v", ["c", "v"], ["v", "v"]);
 opH2vvvv = pw.make_diag_operator("v", ["v", "v"], ["v", "v"]);
 
-T1 = pw.WDiagOperatorSum([ [opT1] ]);
-F = pw.WDiagOperatorSum([ [opH1oo],[opH1ov],[opH1vo],[opH1vv] ]);
+T1 = pw.WDiagOperatorSum([ [opT1] ]); # + opT1
+T2 = pw.WDiagOperatorSum([ [opT2] ]); # + opT1
+F = pw.WDiagOperatorSum([ [opH1oo],[opH1ov],[opH1vo],[opH1vv] ]); # + opH1oo + opH1ov + opH1vo + opH1vv
+V = pw.WDiagOperatorSum([ [opH2oooo],[opH2ovoo],[opH2ooov],[opH2ovov],[opH2vvoo],[opH2oovv],[opH2vvov],[opH2ovvv],[opH2vvvv]]); # + opH1oo + opH1ov + opH1vo + opH1vv
 
+T1_squared = pw.WDiagOperatorSum([ [opT1,opT1] ]); # + opT1 * opT1
+
+wdt = pw.WDiagTheorem()
+
+FT2_c = pw.commutator(V, T1);
+FT2T2_c = pw.commutator(FT2_c, T1);
+
+#print T1F_c.str()
+
+sum = wdt.contract_sum(pw.rational(1,2),FT2T2_c, 0, 4);
+
+print sum.str()
+
+eqs = sum.to_manybody_equation("R")
+
+for eq in eqs:
+    print eq.ambit()
 
 #WDiagOperatorSum T2({{opT2}});
 #WDiagOperatorSum R1({{opR1}});
@@ -37,18 +56,6 @@ F = pw.WDiagOperatorSum([ [opH1oo],[opH1ov],[opH1vo],[opH1vv] ]);
 #                       opH2oovv, opH2vvov, opH2ovvv, opH2vvvv}) {
 #  V.add({op});
 #}
-
-
-wdt = pw.WDiagTheorem()
-
-T1F_c = pw.commutator(T1, F);
-
-sum = wdt.contract_sum(pw.rational(1),T1F_c, 0, 2);
-eqs = sum.to_manybody_equation("R")
-for eq in eqs:
-    print eq.ambit()
-
-
 
 
 

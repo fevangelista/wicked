@@ -3,7 +3,7 @@
 
 WDiagOperatorSum::WDiagOperatorSum() {}
 
-//WDiagOperatorSum::WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
+// WDiagOperatorSum::WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
 //                                   scalar_t factor) {
 //  add(vec_dop, factor);
 //}
@@ -31,7 +31,7 @@ void WDiagOperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
   }
 }
 
-dop_sum_t &WDiagOperatorSum::sum() { return sum_; }
+const dop_sum_t &WDiagOperatorSum::sum() const { return sum_; }
 
 WDiagOperatorSum &WDiagOperatorSum::operator+=(WDiagOperatorSum &rhs) {
   for (auto &vec_dop_factor : rhs.sum()) {
@@ -79,10 +79,11 @@ std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum) {
   return os;
 }
 
-WDiagOperatorSum commutator(WDiagOperatorSum &A, WDiagOperatorSum &B) {
+WDiagOperatorSum commutator(const WDiagOperatorSum &A,
+                            const WDiagOperatorSum &B) {
   WDiagOperatorSum result;
-  for (auto &vec_factor_A : A.sum()) {
-    for (auto &vec_factor_B : B.sum()) {
+  for (const auto &vec_factor_A : A.sum()) {
+    for (const auto &vec_factor_B : B.sum()) {
       auto &vec_A = vec_factor_A.first;
       auto &vec_B = vec_factor_B.first;
 
@@ -104,7 +105,7 @@ WDiagOperatorSum commutator(WDiagOperatorSum &A, WDiagOperatorSum &B) {
   return result;
 }
 
-WDiagOperatorSum exp(WDiagOperatorSum &A, int order) {
+WDiagOperatorSum exp(const WDiagOperatorSum &A, int order) {
   WDiagOperatorSum result;
   result.add({});
   //  WDiagOperatorSum temp1;
@@ -116,7 +117,8 @@ WDiagOperatorSum exp(WDiagOperatorSum &A, int order) {
   return result;
 }
 
-WDiagOperatorSum BCH_expansion(WDiagOperatorSum &A, WDiagOperatorSum &B) {
+WDiagOperatorSum BCH_expansion(const WDiagOperatorSum &A,
+                               const WDiagOperatorSum &B) {
   WDiagOperatorSum result;
   return result;
 }

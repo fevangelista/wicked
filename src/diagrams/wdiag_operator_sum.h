@@ -15,20 +15,19 @@ public:
   /// Construct an empty sum
   WDiagOperatorSum();
 
-//  /// Construct sum with a vector of diagrams
-//  WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
-//                   scalar_t factor = scalar_t(1));
+  //  /// Construct sum with a vector of diagrams
+  //  WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
+  //                   scalar_t factor = scalar_t(1));
 
   /// Construct sum with a vector of diagrams
   WDiagOperatorSum(const std::vector<std::vector<WDiagOperator>> &vec_vec_dop,
                    scalar_t factor = scalar_t(1));
 
-
   /// Add a vector of diagrams to this sum
   void add(const std::vector<WDiagOperator> &vec_dop, scalar_t factor = 1);
 
   /// Return the sum object
-  dop_sum_t &sum();
+  const dop_sum_t &sum() const;
 
   /// addition assignment
   WDiagOperatorSum &operator+=(WDiagOperatorSum &rhs);
@@ -53,13 +52,14 @@ std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum);
 // Helper functions
 
 /// Creates a new object with the commutator [A,B]
-WDiagOperatorSum commutator(WDiagOperatorSum &A, WDiagOperatorSum &B);
+WDiagOperatorSum commutator(const WDiagOperatorSum &A,
+                            const WDiagOperatorSum &B);
 
 /// Creates a new object with the exponential exp(A) truncated at a given order
-WDiagOperatorSum exp(WDiagOperatorSum &A, int order);
+WDiagOperatorSum exp(const WDiagOperatorSum &A, int order);
 
 /// Creates a new object with the Baker-Campbell-Hausdorff expansion of the
 /// quantity exp(-A) B exp(A) truncated at a given order
-WDiagOperatorSum BCH_expansion(WDiagOperatorSum &A, WDiagOperatorSum &B);
+WDiagOperatorSum BCH_expansion(const WDiagOperatorSum &A, const WDiagOperatorSum &B);
 
 #endif // _wicked_diag_operator_set_h_

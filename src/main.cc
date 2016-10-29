@@ -146,16 +146,19 @@ void srcc() {
   WDiagOperatorSum R1({{opR1}});
   WDiagOperatorSum R2({{opR2}});
   WDiagOperatorSum F({{opH1oo}, {opH1ov}, {opH1vo}, {opH1vv}});
+  WDiagOperatorSum V({{opH2oooo},
+                      {opH2ovoo},
+                      {opH2ooov},
+                      {opH2ovov},
+                      {opH2vvoo},
+                      {opH2oovv},
+                      {opH2vvov},
+                      {opH2ovvv},
+                      {opH2vvvv}});
 
-  WDiagOperatorSum V;
-  for (const auto &op : {opH2oooo, opH2ovoo, opH2ooov, opH2ovov, opH2vvoo,
-                         opH2oovv, opH2vvov, opH2ovvv, opH2vvvv}) {
-    V.add({op});
-  }
-
-  WDiagOperatorSum T1F = commutator(T1, F);
-
-  auto res = wdt.contract_sum(1, T1F, 0, 2);
+  WDiagOperatorSum VT1T1 = commutator(commutator(V, T1), T1);
+  WDiagOperatorSum VT1T1T1 = commutator(commutator(commutator(V, T1), T1), T1);
+  auto res = wdt.contract_sum(scalar_t(1, 6), VT1T1T1, 0, 2);
   cout << res << endl;
   for (const auto &eq : res.to_manybody_equation("R")) {
     cout << "  " << eq.ambit() << endl;

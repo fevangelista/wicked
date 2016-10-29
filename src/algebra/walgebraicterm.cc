@@ -38,14 +38,46 @@ void WAlgebraicTerm::reindex(index_map_t &idx_map) {
   }
 }
 
+std::vector<std::pair<std::vector<int>, std::string>>
+WAlgebraicTerm::tensor_connectivity(std::vector<WIndex> indices) const {
+  std::vector<std::pair<std::vector<int>, std::string>> result;
+  sort(indices.begin(), indices.end());
+  for (const auto &tensor : tensors_) {
+
+    std::vector<WIndex> indices2 = tensor.lower();
+    sort(indices2.begin(), indices2.end());
+
+    std::vector<WIndex> indices3 = tensor.upper();
+    sort(indices3.begin(), indices3.end());
+
+    std::vector<WIndex> common_lower_indices;
+    set_intersection(indices.begin(), indices.end(), indices2.begin(),
+                     indices2.end(), back_inserter(common_lower_indices));
+
+    std::vector<WIndex> common_upper_indices;
+    set_intersection(indices.begin(), indices.end(), indices3.begin(),
+                     indices3.end(), back_inserter(common_upper_indices));
+    result.push_back(std::make_pair(num_indices_per_space(common_lower_indices),
+                                    tensor.label()));
+    result.push_back(std::make_pair(num_indices_per_space(common_upper_indices),
+                                    tensor.label()));
+  }
+  std::sort(result.begin(), result.end());
+  return result;
+}
+
 scalar_t WAlgebraicTerm::canonicalize() {
   scalar_t factor(1);
 
-  //  std::cout << "\n  Canonicalizing:\n" << *this << std::endl;
-
   // 1. Sort the tensors according to a score function
+  //  using score_t =
+  //      std::tuple<std::string, int, std::vector<int>, std::vector<int>,
+  //                 std::vector<std::pair<std::vector<int>, std::string>>,
+  //                 std::vector<std::pair<std::vector<int>, std::string>>,
+  //                 WTensor>;
   using score_t =
       std::tuple<std::string, int, std::vector<int>, std::vector<int>, WTensor>;
+
   std::vector<score_t> scores;
 
   int n = 0;
@@ -60,6 +92,17 @@ scalar_t WAlgebraicTerm::canonicalize() {
     std::vector<int> num_low = num_indices_per_space(tensor.lower());
     std::vector<int> num_upp = num_indices_per_space(tensor.upper());
 
+    // d) connectivity of lower indices
+    std::vector<std::pair<std::vector<int>, std::string>> lower_conn =
+        tensor_connectivity(tensor.lower());
+
+    // d) connectivity of upper indices
+    std::vector<std::pair<std::vector<int>, std::string>> upper_conn =
+        tensor_connectivity(tensor.upper());
+
+    //    scores.push_back(std::make_tuple(label, rank, num_low, num_upp,
+    //    lower_conn,
+    //                                     upper_conn, tensor));
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, tensor));
     n += 1;
   }
@@ -85,6 +128,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
 
   // b. Assign indices to tensors operators
   for (const auto &tensor : tensors_) {
+    // lower indices
     for (const auto &l : tensor.lower()) {
       if (is_operator_index.count(l) == 0) {
         // this index is not shared with an operator
@@ -102,6 +146,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
         }
       }
     }
+    // upper indices
     for (const auto &u : tensor.upper()) {
       if (is_operator_index.count(u) == 0) {
         if (index_map.count(u) == 0) {

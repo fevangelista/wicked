@@ -18,10 +18,7 @@ public:
   // ==> Class public interface <==
 
   /// Return a map term -> factor
-  std::map<WAlgebraicTerm, scalar_t> &terms() { return terms_; }
-
-  /// Return a vector of pairs (term,factor)
-  std::vector<std::pair<WAlgebraicTerm, scalar_t>> vector() const;
+  const std::map<WAlgebraicTerm, scalar_t> &terms() const { return terms_; }
 
   /// Add a term that can optionally be scaled
   void add(const WAlgebraicTerm &term, scalar_t factor = 1);
@@ -31,17 +28,15 @@ public:
            scalar_t scale = 1);
 
   /// Add a term that can optionally be scaled
-  void add_sum(WSum &&terms, scalar_t scale = 1);
+  void add_sum(const WSum &terms, scalar_t scale = 1);
 
-  bool operator==(WSum &terms);
+  bool operator==(const WSum &terms);
 
   /// Add a sum
-  WSum &operator+=(WSum &terms);
-  WSum &operator+=(WSum &&terms);
+  WSum &operator+=(const WSum &terms);
 
   /// Substract a sum
-  WSum &operator-=(WSum &terms);
-  WSum &operator-=(WSum &&terms);
+  WSum &operator-=(const WSum &terms);
 
   /// Return a string representation
   std::string str() const;

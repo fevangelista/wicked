@@ -76,6 +76,11 @@ private:
 
   std::string operator_str() const;
   std::string tensor_str() const;
+
+  // Used in the canonicalization routine to find how the indices of a tensor
+  // connect to all the other tensors
+  std::vector<std::pair<std::vector<int>, std::string>>
+  tensor_connectivity(std::vector<WIndex> indices) const;
 };
 
 // Helper functions
@@ -83,7 +88,8 @@ private:
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const WAlgebraicTerm &term);
 
-std::ostream &operator<<(std::ostream &os, const std::pair<WAlgebraicTerm,scalar_t> &term);
+std::ostream &operator<<(std::ostream &os,
+                         const std::pair<WAlgebraicTerm, scalar_t> &term);
 
 ///// Create an operator
 WAlgebraicTerm make_algebraic_term(const std::string &label,
@@ -93,8 +99,8 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
 ///// A class to represent a term in a SQ expression. A term includes:
 ///// 1) a product of tensors
 ///// 2) a product of operators normal ordered with respect to the vacuum
-//class WScala {
-//public:
+// class WScala {
+// public:
 //}
 
 #endif // _wicked_algebraic_term_h_

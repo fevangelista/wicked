@@ -73,9 +73,25 @@ std::string rational::str(bool sign) const {
   return s;
 }
 
-std::string rational::latex() const { return str(); }
+std::string rational::latex() const {
+  std::string s;
+  if (numerator_ == 0) {
+    s = "0";
+  } else {
+    if (denominator_ == 1) {
+      s += std::to_string(numerator_);
+    } else {
+      s += "\frac{" + std::to_string(numerator_) + "}{" +
+           std::to_string(denominator_) + "}";
+    }
+  }
+  return s;
+}
 
-std::string rational::ambit() const { return str(); }
+std::string rational::ambit() const {
+  return std::to_string(static_cast<double>(numerator_) /
+                        static_cast<double>(denominator_));
+}
 
 rational operator+(rational lhs, const rational &rhs) {
   lhs += rhs;
