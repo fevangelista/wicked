@@ -95,18 +95,6 @@ WSum WDiagTheorem::contract_sum(scalar_t factor, WDiagOperatorSum &dop_sum,
     result += contract(factor * this_factor, ops, minrank, maxrank);
   }
 
-  //    std::vector<int> r;
-  //    std::vector<std::vector<std::pair<WAlgebraicTerm,scalar_t>>> ops_vec;
-  //    for (const auto& sum : sums){
-  //        const auto op_vec = sum.vector();
-  //        r.push_back(op_vec.size());
-  //        ops_vec.push_back(op_vec);
-  //    }
-
-  //    product_space_iterator(r,[&]);
-
-  //    contract(factor,ops,minrank,maxrank);
-
   return result;
 }
 
@@ -646,9 +634,6 @@ std::vector<int> WDiagTheorem::vertex_vec_to_pos(
               ? std::make_tuple(v, s, true,
                                 ops_off + i) // start from the leftmost operator
               : std::make_tuple(v, s, false, ops_off + i);
-      //                + nops - 1 -
-      //                                    i); // start from the rightmost
-      //                                    operator
       if (op_map.count(key) == 0) {
         PRINT(WDiagPrint::All, print_key(key, -1););
         cout << " NOT FOUND!!!" << endl;
@@ -657,11 +642,6 @@ std::vector<int> WDiagTheorem::vertex_vec_to_pos(
         int sqop_pos = op_map[key];
         result.push_back(sqop_pos);
         PRINT(WDiagPrint::All, print_key(key, sqop_pos););
-        //        upper.push_back(sqops[sqop_pos].index());
-        // assign a position to this operator
-        //        sign_order[sqop_pos] = sorted_position;
-        //        bit_map[sqop_pos] = true;
-        //        sorted_position += 1;
       }
     }
     // update the creator's offset

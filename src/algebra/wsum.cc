@@ -45,7 +45,7 @@ void WSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
   }
 }
 
-void WSum::add_sum(const WSum& sum, scalar_t scale) {
+void WSum::add_sum(const WSum &sum, scalar_t scale) {
   for (const auto &kv : sum.terms()) {
     add(kv, scale);
   }
