@@ -66,17 +66,21 @@ WAlgebraicTerm::tensor_connectivity(std::vector<WIndex> indices) const {
   return result;
 }
 
+#define NEW_CANONICALIZATION 1
 scalar_t WAlgebraicTerm::canonicalize() {
   scalar_t factor(1);
 
-  // 1. Sort the tensors according to a score function
-  //  using score_t =
-  //      std::tuple<std::string, int, std::vector<int>, std::vector<int>,
-  //                 std::vector<std::pair<std::vector<int>, std::string>>,
-  //                 std::vector<std::pair<std::vector<int>, std::string>>,
-  //                 WTensor>;
+// 1. Sort the tensors according to a score function
+#if NEW_CANONICALIZATION
+  using score_t =
+      std::tuple<std::string, int, std::vector<int>, std::vector<int>,
+                 std::vector<std::pair<std::vector<int>, std::string>>,
+                 std::vector<std::pair<std::vector<int>, std::string>>,
+                 WTensor>;
+#else
   using score_t =
       std::tuple<std::string, int, std::vector<int>, std::vector<int>, WTensor>;
+#endif
 
   std::vector<score_t> scores;
 
@@ -100,17 +104,25 @@ scalar_t WAlgebraicTerm::canonicalize() {
     std::vector<std::pair<std::vector<int>, std::string>> upper_conn =
         tensor_connectivity(tensor.upper());
 
-    //    scores.push_back(std::make_tuple(label, rank, num_low, num_upp,
-    //    lower_conn,
-    //                                     upper_conn, tensor));
+// e) store the score
+#if NEW_CANONICALIZATION
+    scores.push_back(std::make_tuple(label, rank, num_low, num_upp, lower_conn,
+                                     upper_conn, tensor));
+#else
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, tensor));
     n += 1;
+#endif
   }
-  std::sort(scores.begin(), scores.end());
 
+  // sort and rearrange tensors
+  std::sort(scores.begin(), scores.end());
   tensors_.clear();
   for (const auto &score : scores) {
+#if NEW_CANONICALIZATION
+    tensors_.push_back(std::get<6>(score));
+#else
     tensors_.push_back(std::get<4>(score));
+#endif
   }
 
   // 2. Relabel indices of tensors and operators

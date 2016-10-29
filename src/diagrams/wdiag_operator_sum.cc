@@ -34,15 +34,15 @@ void WDiagOperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
 
 const dop_sum_t &WDiagOperatorSum::sum() const { return sum_; }
 
-WDiagOperatorSum &WDiagOperatorSum::operator+=(WDiagOperatorSum &rhs) {
-  for (auto &vec_dop_factor : rhs.sum()) {
+WDiagOperatorSum &WDiagOperatorSum::operator+=(const WDiagOperatorSum &rhs) {
+  for (const auto &vec_dop_factor : rhs.sum()) {
     add(vec_dop_factor.first, vec_dop_factor.second);
   }
   return *this;
 }
 
-WDiagOperatorSum &WDiagOperatorSum::operator-=(WDiagOperatorSum &rhs) {
-  for (auto &vec_dop_factor : rhs.sum()) {
+WDiagOperatorSum &WDiagOperatorSum::operator-=(const WDiagOperatorSum &rhs) {
+  for (const auto &vec_dop_factor : rhs.sum()) {
     add(vec_dop_factor.first, -vec_dop_factor.second);
   }
   return *this;
@@ -87,12 +87,12 @@ WDiagOperatorSum make_operator(const std::string &label,
     auto s_vec = split(s, std::regex("[->]+"));
 
     std::vector<std::string> ann_labels;
-    for (char c : s_vec[0]){
-        ann_labels.push_back(std::string(1,c));
+    for (char c : s_vec[0]) {
+      ann_labels.push_back(std::string(1, c));
     }
     std::vector<std::string> cre_labels;
-    for (char c : s_vec[1]){
-        cre_labels.push_back(std::string(1,c));
+    for (char c : s_vec[1]) {
+      cre_labels.push_back(std::string(1, c));
     }
     std::vector<int> cre(osi->num_spaces());
     std::vector<int> ann(osi->num_spaces());
@@ -148,8 +148,17 @@ WDiagOperatorSum exp(const WDiagOperatorSum &A, int order) {
   return result;
 }
 
-WDiagOperatorSum BCH_expansion(const WDiagOperatorSum &A,
-                               const WDiagOperatorSum &B) {
+WDiagOperatorSum bch_series(const WDiagOperatorSum &A,
+                            const WDiagOperatorSum &B, int n) {
   WDiagOperatorSum result;
+  result += A;
+  WDiagOperatorSum temp(A);
+  for (int k = 1; k <= n; k++) {
+    WDiagOperatorSum comm = commutator(temp, B);
+    comm *= scalar_t(1, k);
+    result += comm;
+    temp = comm;
+  }
+
   return result;
 }

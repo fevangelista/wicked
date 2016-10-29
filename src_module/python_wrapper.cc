@@ -25,10 +25,10 @@ PYBIND11_PLUGIN(pywicked) {
       .def(py::init<int>())
       .def(py::init<int, int>());
 
-  py::enum_<DMStructure>(m,"DMStructure")
-      .value("DoublyOccupied", DMStructure::DoublyOccupied)
-      .value("Unoccupied", DMStructure::Unoccupied)
-      .value("General", DMStructure::General);
+  py::enum_<RDMType>(m, "rdmtype")
+      .value("occupied", RDMType::Occupied)
+      .value("unoccupied", RDMType::Unoccupied)
+      .value("general", RDMType::General);
 
   py::class_<OrbitalSpaceInfo, std::shared_ptr<OrbitalSpaceInfo>>(
       m, "OrbitalSpaceInfo")
@@ -73,10 +73,15 @@ PYBIND11_PLUGIN(pywicked) {
       .def(
           py::init<const std::vector<std::vector<WDiagOperator>> &, scalar_t>(),
           py::arg("vec_vec_dop"), py::arg("factor") = rational(1))
-      .def("add", &WDiagOperatorSum::add);
+      .def("add", &WDiagOperatorSum::add)
+      .def("str", &WDiagOperatorSum::str);
 
   m.def("commutator", &commutator,
         "Create the commutator of two WDiagOperatorSum objects");
+
+  m.def("bch_series", &bch_series, "Creates the Baker-Campbell-Hausdorff "
+                                   "expansion of exp(-B) A exp(B) truncated at "
+                                   "a given order n");
 
   m.def("make_operator", &make_operator, "Create a WDiagOperatorSum object");
 

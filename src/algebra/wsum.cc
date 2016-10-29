@@ -17,7 +17,7 @@ void WSum::add(const WAlgebraicTerm &term, scalar_t factor) {
     /// Found, then just add the factor to the existing term
     search->second += factor;
     if (search->second == 0) {
-      std::cout << "\n Term cancellation!" << std::endl;
+//      std::cout << "\n Term cancellation!" << std::endl;
       terms_.erase(search);
     }
   } else {
@@ -37,7 +37,7 @@ void WSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
     /// Found, then just add the factor to the existing term
     search->second += scale * factor;
     if (search->second == 0) {
-      std::cout << "\n Term cancellation!" << std::endl;
+//      std::cout << "\n Term cancellation!" << std::endl;
       terms_.erase(search);
     }
   } else {

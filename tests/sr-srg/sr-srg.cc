@@ -38,9 +38,9 @@ bool test_Aoo_Boo() {
 
 int main(int argc, const char *argv[]) {
   osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->add_space("o", DMStructure::DoublyOccupied,
+  osi->add_space("o", RDMType::Occupied,
                  {"i", "j", "k", "l", "m", "n"});
-  osi->add_space("v", DMStructure::Unoccupied, {"a", "b", "c", "d", "e", "f"});
+  osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
 
   auto test_functions = {
       //            Expectation,  test function,  User friendly description

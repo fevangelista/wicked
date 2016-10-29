@@ -229,14 +229,14 @@ WDiagTheorem::generate_elementary_contractions(
                                    << s << std::endl;)
 
     // differentiate between various types of spaces
-    DMStructure dmstruc = osi->dmstructure(s);
+    RDMType dmstruc = osi->dmstructure(s);
 
     // Pairwise contractions creation-annihilation:
     // _____
     // |   |
     // a^+ a
 
-    if (dmstruc == DMStructure::DoublyOccupied) {
+    if (dmstruc == RDMType::Occupied) {
       PRINT(WDiagPrint::Summary, cout << "\n    * c/a pairwise contractions"
                                       << endl;)
       // loop over the creation operators of each operator
@@ -263,7 +263,7 @@ WDiagTheorem::generate_elementary_contractions(
     // |   |
     // a   a^+
 
-    if (dmstruc == DMStructure::Unoccupied) {
+    if (dmstruc == RDMType::Unoccupied) {
       PRINT(WDiagPrint::Summary, cout << "\n    * a/c pairwise contractions"
                                       << endl;)
       // loop over the creation operators of each operator
@@ -291,7 +291,7 @@ WDiagTheorem::generate_elementary_contractions(
     // |   |   |   |
     // a^+ a   a   a^+
 
-    if (dmstruc == DMStructure::General) {
+    if (dmstruc == RDMType::General) {
 
       // compute the largest possible cumulant
       int sumcre = 0;
@@ -446,14 +446,14 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
       sorted_position += 1;
     }
 
-    DMStructure dmstruc = osi->dmstructure(s);
+    RDMType dmstruc = osi->dmstructure(s);
 
     // Pairwise contractions creation-annihilation:
     // ________
     // |      |
     // a^+(i) a(j) = delta(i,j)
 
-    if (dmstruc == DMStructure::DoublyOccupied) {
+    if (dmstruc == RDMType::Occupied) {
       // Reindex the annihilator (j) to the creator (i)
       WIndex cre_index = sqops[pos_cre_sqops[0]].index();
       WIndex ann_index = sqops[pos_ann_sqops[0]].index();
@@ -465,7 +465,7 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
     // |    |
     // a(i) a^+(j) = delta(i,j)
 
-    if (dmstruc == DMStructure::Unoccupied) {
+    if (dmstruc == RDMType::Unoccupied) {
       // Reindex the creator (j) to the annihilator (i)
       WIndex cre_index = sqops[pos_cre_sqops[0]].index();
       WIndex ann_index = sqops[pos_ann_sqops[0]].index();
@@ -479,7 +479,7 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
     // |   |   |   |
     // a^+ a   a   a^+
 
-    if (dmstruc == DMStructure::General) {
+    if (dmstruc == RDMType::General) {
       std::vector<WIndex> lower;
       std::vector<WIndex> upper;
       // collect indices of creation operators for the upper indices

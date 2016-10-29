@@ -53,7 +53,7 @@
 
 //  std::vector<int> maxcontr_space;
 //  for (int s = 0; s < nspace; ++s) {
-//    // DMStructure dms = osi->dmstructure(s);
+//    // RDMType dms = osi->dmstructure(s);
 //    maxcontr_space.push_back((naop_space[s] + nbop_space[s]) / 2);
 //  }
 
@@ -393,7 +393,7 @@
 //    auto legs = contraction_layout_to_edges(A_legs[s], B_legs[s]);
 
 //    // differentiate between various types of spaces
-//    DMStructure dmstruc = osi->dmstructure(s);
+//    RDMType dmstruc = osi->dmstructure(s);
 
 //    // Create density matrices and cumulants
 //    for (const auto &c : legs) {
@@ -403,7 +403,7 @@
 //      // pair contractions
 //      if (order == 2) {
 //        // pairwise contraction with Kronecker delta
-//        if (dmstruc == DMStructure::Delta) {
+//        if (dmstruc == RDMType::Delta) {
 
 //        }
 //        // pairwise contraction with density matrix

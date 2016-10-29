@@ -10,9 +10,9 @@
 // enum class OrbitalSpaceType { Core, Active, Virtual, RI, None };
 
 /// Type of orbital space
-enum class DMStructure {
+enum class RDMType {
   // Single creation/annihilation contractions that yields a Kronecker delta
-  DoublyOccupied,
+  Occupied,
   // Single annihilation/creation contractions that yields a Kronecker delta
   Unoccupied,
   General // Multi-leg contractions
@@ -25,7 +25,7 @@ class OrbitalSpaceInfo {
 
   /// This type holds infomation about a space
   using t_space_info =
-      std::tuple<std::string, DMStructure, std::vector<std::string>>;
+      std::tuple<std::string, RDMType, std::vector<std::string>>;
 
 public:
   OrbitalSpaceInfo();
@@ -37,7 +37,7 @@ public:
   void reset();
 
   /// Add an elementary space
-  void add_space(const std::string &label, DMStructure structure,
+  void add_space(const std::string &label, RDMType structure,
                  const std::vector<std::string> &indices);
 
   /// Return the number of elementary spaces
@@ -47,7 +47,7 @@ public:
   const std::string &label(int pos) const;
 
   /// The structure of the density matrices for an orbital space
-  DMStructure dmstructure(int pos) const;
+  RDMType dmstructure(int pos) const;
 
   /// The indices of an orbital space
   const std::vector<std::string> &indices(int pos) const;

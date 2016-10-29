@@ -47,9 +47,9 @@ int main(int argc, const char *argv[]) {
 
 void srcc() {
   osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->add_space("o", DMStructure::DoublyOccupied,
+  osi->add_space("o", RDMType::Occupied,
                  {"i", "j", "k", "l", "m", "n"});
-  osi->add_space("v", DMStructure::Unoccupied, {"a", "b", "c", "d", "e", "f"});
+  osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
   // Convenience variables
   std::string o = "o";
   std::string v = "v";
