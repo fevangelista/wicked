@@ -14,15 +14,16 @@ std::string to_string(const std::vector<std::string> &svec,
 std::string to_string(const scalar_t r);
 std::string to_latex(const scalar_t r);
 
-/// Split a string
-std::vector<std::string> split(const std::string& s);
+/// Split a string.  Default delimiters are spaces (\s) and/or commas
+std::vector<std::string> split(const std::string &s,
+                               std::regex re = std::regex("[\\s,]+"));
 
 /// Find all occurences of a pattern
-std::vector<std::string> findall(const std::string& s,const std::string& regex);
+std::vector<std::string> findall(const std::string &s,
+                                 const std::string &regex);
 
 /// Split indices
-std::vector<std::string> split_indices(const std::string& s);
-
+std::vector<std::string> split_indices(const std::string &s);
 
 // A class to count indices
 class index_counter {

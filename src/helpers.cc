@@ -102,10 +102,8 @@ inline std::string& trim(std::string& s)
 
 
 
-std::vector<std::string> split(const std::string& s)
+std::vector<std::string> split(const std::string& s, regex re)
 {
-    // Delimiters are spaces (\s) and/or commas
-    regex re("[\\s,]+");
     sregex_token_iterator it(s.begin(), s.end(), re, -1);
     sregex_token_iterator reg_end;
 

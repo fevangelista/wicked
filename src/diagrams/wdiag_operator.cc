@@ -60,13 +60,15 @@ std::string WDiagOperator::str() const {
 
 //  s += " -> ";
   for (int i = 0; i < osi->num_spaces(); ++i) {
-    for (int j = 0; j < num_indices(i, true); j++)
-      s += osi->label(i) + "+";
-  }
-  for (int i = 0; i < osi->num_spaces(); ++i) {
     for (int j = 0; j < num_indices(i, false); j++)
-      s += ' ' + osi->label(i);
+      s += osi->label(i);
   }
+  s += "->";
+  for (int i = 0; i < osi->num_spaces(); ++i) {
+    for (int j = 0; j < num_indices(i, true); j++)
+      s += osi->label(i);
+  }
+
   s += ")";
 
 

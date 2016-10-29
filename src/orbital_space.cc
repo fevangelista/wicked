@@ -36,9 +36,15 @@ const std::vector<std::string> &OrbitalSpaceInfo::indices(int pos) const {
   return std::get<2>(space_info_[pos]);
 }
 
-int OrbitalSpaceInfo::label_to_space(const std::string &label) const
-{
-  return label_to_pos_.at(label);
+int OrbitalSpaceInfo::label_to_space(const std::string &label) const {
+  auto search = label_to_pos_.find(label);
+  if (search != label_to_pos_.end()) {
+  } else {
+    std::cout << "\n  Could not find label :'" << label
+              << "' in OrbitalSpaceInfo" << std::endl;
+    exit(1);
+  }
+  return search->second;
 }
 
 void OrbitalSpaceInfo::reset() {
@@ -48,10 +54,7 @@ void OrbitalSpaceInfo::reset() {
 }
 
 void OrbitalSpaceInfo::default_spaces() {
-  add_space("c", DMStructure::DoublyOccupied,
-            {"m", "n", "o", "p"});
-  add_space("a", DMStructure::General,
-            {"u", "v", "w", "x", "y", "z"});
-  add_space("v", DMStructure::Unoccupied,
-            {"e", "f", "g", "h"});
+  add_space("c", DMStructure::DoublyOccupied, {"m", "n", "o", "p"});
+  add_space("a", DMStructure::General, {"u", "v", "w", "x", "y", "z"});
+  add_space("v", DMStructure::Unoccupied, {"e", "f", "g", "h"});
 }

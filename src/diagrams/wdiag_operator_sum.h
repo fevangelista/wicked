@@ -51,6 +51,15 @@ std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum);
 
 // Helper functions
 
+/// Helper function to create a sum of diagrammatic operators
+/// @param components a vector of strings of the form "oo->vv" which specify the
+/// components of this operator
+/// E.g.
+/// auto T1 = make_operator("T1", {"o->v"});
+/// auto F = make_operator("F", {"o->o","o->v","v->o","v->v"});
+WDiagOperatorSum make_operator(const std::string &label,
+                               const std::vector<std::string> &components);
+
 /// Creates a new object with the commutator [A,B]
 WDiagOperatorSum commutator(const WDiagOperatorSum &A,
                             const WDiagOperatorSum &B);
@@ -60,6 +69,7 @@ WDiagOperatorSum exp(const WDiagOperatorSum &A, int order);
 
 /// Creates a new object with the Baker-Campbell-Hausdorff expansion of the
 /// quantity exp(-A) B exp(A) truncated at a given order
-WDiagOperatorSum BCH_expansion(const WDiagOperatorSum &A, const WDiagOperatorSum &B);
+WDiagOperatorSum BCH_expansion(const WDiagOperatorSum &A,
+                               const WDiagOperatorSum &B);
 
 #endif // _wicked_diag_operator_set_h_

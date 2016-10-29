@@ -25,6 +25,18 @@ PYBIND11_PLUGIN(pywicked) {
       .def(py::init<int>())
       .def(py::init<int, int>());
 
+  py::enum_<DMStructure>(m,"DMStructure")
+      .value("DoublyOccupied", DMStructure::DoublyOccupied)
+      .value("Unoccupied", DMStructure::Unoccupied)
+      .value("General", DMStructure::General);
+
+  py::class_<OrbitalSpaceInfo, std::shared_ptr<OrbitalSpaceInfo>>(
+      m, "OrbitalSpaceInfo")
+      .def(py::init<>())
+      .def("default_spaces", &OrbitalSpaceInfo::default_spaces)
+      .def("reset", &OrbitalSpaceInfo::reset)
+      .def("add_space", &OrbitalSpaceInfo::add_space);
+
   py::class_<WIndex, std::shared_ptr<WIndex>>(m, "WIndex")
       .def(py::init<int, int>());
 
@@ -66,6 +78,8 @@ PYBIND11_PLUGIN(pywicked) {
   m.def("commutator", &commutator,
         "Create the commutator of two WDiagOperatorSum objects");
 
+  m.def("make_operator", &make_operator, "Create a WDiagOperatorSum object");
+
   py::class_<WDiagTheorem, std::shared_ptr<WDiagTheorem>>(m, "WDiagTheorem")
       .def(py::init<>())
       .def("contract", &WDiagTheorem::contract)
@@ -84,11 +98,6 @@ PYBIND11_PLUGIN(pywicked) {
   //      .value("Beta", SpinType::Beta)
   //      .export_values();
 
-  //  py::class_<OrbitalSpaceInfo, std::shared_ptr<OrbitalSpaceInfo>>(
-  //      m, "OrbitalSpaceInfo")
-  //      .def(py::init<>())
-  //      .def("default_spaces", &OrbitalSpaceInfo::default_spaces);
-
   //  py::class_<WDiagOperator, std::shared_ptr<WDiagOperator>>(m, "WOperator")
   //      .def(py::init<const std::string &, const std::vector<int> &,
   //                    const std::vector<int> &>())
@@ -102,6 +111,8 @@ PYBIND11_PLUGIN(pywicked) {
 
   osi = std::make_shared<OrbitalSpaceInfo>();
   osi->default_spaces();
+
+  m.attr("osi") = py::cast(osi);
 
   return m.ptr();
 }

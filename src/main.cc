@@ -54,8 +54,8 @@ void srcc() {
   std::string o = "o";
   std::string v = "v";
 
-  auto opT1 = make_diag_operator("t", {v}, {o});
-  auto opT2 = make_diag_operator("t", {v, v}, {o, o});
+  auto opT1 = make_diag_operator("t1", {v}, {o});
+  auto opT2 = make_diag_operator("t2", {v, v}, {o, o});
 
   auto opH1oo = make_diag_operator("f", {o}, {o});
   auto opH1ov = make_diag_operator("f", {o}, {v});
@@ -72,8 +72,8 @@ void srcc() {
   auto opH2ovvv = make_diag_operator("v", {o, v}, {v, v});
   auto opH2vvvv = make_diag_operator("v", {v, v}, {v, v});
 
-  auto opR1 = make_diag_operator("R1", {o}, {v});
-  auto opR2 = make_diag_operator("R2", {o, o}, {v, v});
+  auto opR1 = make_diag_operator("r1", {o}, {v});
+  auto opR2 = make_diag_operator("r2", {o, o}, {v, v});
 
   bool singles = false;
   bool doubles = false;
@@ -141,20 +141,12 @@ void srcc() {
     terms.add_sum(wdt.contract(1, {opR1, opT2, opT1, opH2oovv}, 0, 0));
   }
 
-  WDiagOperatorSum T1({{opT1}});
-  WDiagOperatorSum T2({{opT2}});
-  WDiagOperatorSum R1({{opR1}});
-  WDiagOperatorSum R2({{opR2}});
-  WDiagOperatorSum F({{opH1oo}, {opH1ov}, {opH1vo}, {opH1vv}});
-  WDiagOperatorSum V({{opH2oooo},
-                      {opH2ovoo},
-                      {opH2ooov},
-                      {opH2ovov},
-                      {opH2vvoo},
-                      {opH2oovv},
-                      {opH2vvov},
-                      {opH2ovvv},
-                      {opH2vvvv}});
+  WDiagOperatorSum T1 = make_operator("T1", {"o->v"});
+  WDiagOperatorSum T2 = make_operator("T2", {"oo->vv"});
+  WDiagOperatorSum F = make_operator("F", {"o->o", "ov->vv", "v->o", "v->v"});
+  WDiagOperatorSum V =
+      make_operator("V", {"oo->oo", "oo->ov", "oo->vv", "ov->oo", "ov->ov",
+                          "ov->vv", "vv->oo", "vv->ov", "vv->vv"});
 
   WDiagOperatorSum VT1T1 = commutator(commutator(V, T1), T1);
   WDiagOperatorSum VT1T1T1 = commutator(commutator(commutator(V, T1), T1), T1);
@@ -167,6 +159,7 @@ void srcc() {
   //  cout << T1 << endl;
   //  cout << F << endl;
   //  cout << T1F << endl;
+
 
   if (doubles) {
     // R2 V

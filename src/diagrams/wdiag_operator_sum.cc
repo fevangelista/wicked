@@ -1,4 +1,5 @@
 #include "helpers.h"
+#include "orbital_space.h"
 #include "wdiag_operator_sum.h"
 
 WDiagOperatorSum::WDiagOperatorSum() {}
@@ -77,6 +78,36 @@ std::string WDiagOperatorSum::str() const {
 std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum) {
   os << opsum.str();
   return os;
+}
+
+WDiagOperatorSum make_operator(const std::string &label,
+                               const std::vector<std::string> &components) {
+  WDiagOperatorSum result;
+  for (const std::string &s : components) {
+    auto s_vec = split(s, std::regex("[->]+"));
+
+    std::vector<std::string> ann_labels;
+    for (char c : s_vec[0]){
+        ann_labels.push_back(std::string(1,c));
+    }
+    std::vector<std::string> cre_labels;
+    for (char c : s_vec[1]){
+        cre_labels.push_back(std::string(1,c));
+    }
+    std::vector<int> cre(osi->num_spaces());
+    std::vector<int> ann(osi->num_spaces());
+    for (const auto &label : cre_labels) {
+      int space = osi->label_to_space(label);
+      cre[space] += 1;
+    }
+    for (const auto &label : ann_labels) {
+      int space = osi->label_to_space(label);
+      ann[space] += 1;
+    }
+
+    result.add({WDiagOperator(label, cre, ann)});
+  }
+  return result;
 }
 
 WDiagOperatorSum commutator(const WDiagOperatorSum &A,
