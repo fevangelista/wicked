@@ -14,6 +14,12 @@ public:
 
   // ==> Class public interface <==
 
+  /// Return the left-hand side of the equation
+  const WAlgebraicTerm& lhs() const;
+
+  /// Return the right-hand side of the equation
+  const WAlgebraicTerm& rhs() const;
+
   /// Return a string representation
   std::string str() const;
 

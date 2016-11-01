@@ -85,7 +85,7 @@ WSum WDiagTheorem::contract(scalar_t factor,
   return result;
 }
 
-WSum WDiagTheorem::contract_sum(scalar_t factor, WDiagOperatorSum &dop_sum,
+WSum WDiagTheorem::contract_sum(scalar_t factor, const WDiagOperatorSum& dop_sum,
                                 int minrank, int maxrank) {
   WSum result;
 

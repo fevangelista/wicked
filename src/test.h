@@ -5,6 +5,16 @@
 #include <tuple>
 #include <string>
 
+#ifdef PRINT_DEBUG
+#define TEST_DEBUG_PRINT(code)                                                 \
+  {                                                                            \
+    std::cout << "\n  ---DEBUG---" << std::endl;                                            \
+    code std::cout << "  ---DEBUG---" << std::endl;                                       \
+  }
+#else
+#define TEST_DEBUG_PRINT(code){}
+#endif
+
 enum TestResult { TestPass, TestFail, TestException };
 
 bool wicked_test(std::vector<std::tuple<TestResult, bool (*)(), const char *>>

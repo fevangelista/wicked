@@ -26,7 +26,7 @@ public:
                 int minrank, int maxrank);
 
   /// Contract a product of sums of operators
-  WSum contract_sum(scalar_t factor, WDiagOperatorSum &dop_sum, int minrank,
+  WSum contract_sum(scalar_t factor, const WDiagOperatorSum &dop_sum, int minrank,
                     int maxrank);
 
 private:

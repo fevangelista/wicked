@@ -2,9 +2,10 @@
 #define _wicked_helpers_h_
 
 #include <iostream>
+#include <map>
+#include <regex>
 #include <string>
 #include <vector>
-#include <regex>
 
 #include "wicked-def.h"
 
@@ -24,6 +25,24 @@ std::vector<std::string> findall(const std::string &s,
 
 /// Split indices
 std::vector<std::string> split_indices(const std::string &s);
+
+template <class T, class F>
+void add_to_map(std::map<T, F> &m, const T &key, const F &value) {
+  // find the key
+  auto search = m.find(key);
+
+  if (search != m.end()) {
+    // found key: just add the factor to the existing term
+    search->second += value;
+    // if after addition the result is zero, eliminate from map
+    if (search->second == 0) {
+      m.erase(search);
+    }
+  } else {
+    // key not found:
+    m[key] = value;
+  }
+}
 
 // A class to count indices
 class index_counter {

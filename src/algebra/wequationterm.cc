@@ -12,6 +12,10 @@ WEquationTerm::WEquationTerm(const WAlgebraicTerm &lhs,
                              const WAlgebraicTerm &rhs, scalar_t factor)
     : lhs_(lhs), rhs_(rhs), factor_(factor) {}
 
+const WAlgebraicTerm &WEquationTerm::lhs() const { return lhs_; }
+
+const WAlgebraicTerm &WEquationTerm::rhs() const { return rhs_; }
+
 std::string WEquationTerm::str() const {
   std::vector<std::string> str_vec;
   str_vec.push_back(lhs_.str());
@@ -21,9 +25,7 @@ std::string WEquationTerm::str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string WEquationTerm::latex() const {
-  return str();
-}
+std::string WEquationTerm::latex() const { return str(); }
 
 std::string WEquationTerm::ambit() const {
   std::vector<std::string> str_vec;

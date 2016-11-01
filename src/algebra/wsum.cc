@@ -49,6 +49,29 @@ void WSum::add_sum(const WSum &sum, scalar_t scale) {
   }
 }
 
+WSum &WSum::canonicalize() {
+  std::map<WAlgebraicTerm, scalar_t> canonical_terms;
+  for (auto &kv : terms_) {
+    WAlgebraicTerm term = kv.first;
+    scalar_t factor = term.canonicalize();
+    factor *= kv.second;
+
+    add_to_map(canonical_terms, term, factor);
+  }
+  terms_ = canonical_terms;
+  return *this;
+}
+
+WSum &WSum::reindex(index_map_t &idx_map) {
+  std::map<WAlgebraicTerm, scalar_t> reindexed_terms;
+  for (auto &kv : terms_) {
+    WAlgebraicTerm term = kv.first;
+    term.reindex(idx_map);
+    add_to_map(reindexed_terms, term, kv.second);
+  }
+  return *this;
+}
+
 bool WSum::operator==(const WSum &sum) {
   return terms_.size() == sum.terms_.size() &&
          std::equal(terms_.begin(), terms_.end(), sum.terms_.begin());
@@ -119,7 +142,7 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     factor_re = "\\s*([+-]?\\d*)?/?(\\d*)?\\s+"; // ";
   }
 
-  //  std::cout << "Parsing tensors: " << std::endl;
+//  std::cout << "Parsing tensors: " << std::endl;
   auto tensors = findall(s, tensor_re);
 
   WAlgebraicTerm term;
@@ -141,19 +164,21 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     }
     term.add(WTensor(label, lower, upper));
   }
-  //  std::cout << "Parsing factor: " << std::endl;
+//  std::cout << "Parsing factor: " << std::endl;
 
   auto factor_vec = findall(s, factor_re);
-  //  for (auto f : factor) {
-  //    std::cout << "Factor: " << f << std::endl;
-  //  }
+//  for (auto f : factor_vec) {
+//    std::cout << "Factor: " << f << std::endl;
+//  }
   int numerator = 1;
   int denominator = 1;
-  if (factor_vec[0] != "") {
-    numerator = std::stoi(factor_vec[0]);
-  }
-  if (factor_vec[1] != "") {
-    denominator = std::stoi(factor_vec[1]);
+  if (factor_vec.size() > 1) {
+    if (factor_vec[0] != "") {
+      numerator = std::stoi(factor_vec[0]);
+    }
+    if (factor_vec[1] != "") {
+      denominator = std::stoi(factor_vec[1]);
+    }
   }
   scalar_t factor(numerator, denominator);
 

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "wicked-def.h"
+#include "windex.h"
 
 class WAlgebraicTerm;
 class WEquationTerm;
@@ -30,6 +31,12 @@ public:
   /// Add a term that can optionally be scaled
   void add_sum(const WSum &terms, scalar_t scale = 1);
 
+  /// Canonicalize this sum
+  WSum &canonicalize();
+
+  /// Reindex this sum
+  WSum &reindex(index_map_t &idx_map);
+
   bool operator==(const WSum &terms);
 
   /// Add a sum
@@ -44,12 +51,8 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
-//  /// Convert this sum to a vector of projective equations
-//  std::vector<WEquationTerm>
-//  to_projective_equation(const std::string &residual_label);
-
   /// Convert this sum to a vector of many-body equations
-  std::vector<WEquationTerm> to_manybody_equation(const std::string& label);
+  std::vector<WEquationTerm> to_manybody_equation(const std::string &label);
 
 private:
   // ==> Class private data <==

@@ -1,61 +1,98 @@
 #include <iostream>
 
+#define PRINT_DEBUG 1
+
 #include "wicked.h"
 #include "test.h"
 
 using namespace std;
 
+WDiagTheorem wdt;
+
 bool test_energy1() {
-  WDiagTheorem wdt;
-  std::string o = "o";
-  std::string v = "v";
-  auto opT1 = make_diag_operator("t", {v}, {o});
-  auto opFov = make_diag_operator("f", {o}, {v});
+  auto T1 = make_operator("t", {"o->v"});
+  auto Fov = make_operator("f", {"v->o"});
 
   // <F T1>
-  auto e1 = wdt.contract(1, {opFov, opT1}, 0, 0);
-  auto e1_test = string_to_sum("f^{v0}_{o0} t^{o0}_{v0}");
-  return (e1 == e1_test);
+  auto val = wdt.contract_sum(1, Fov * T1, 0, 0);
+  auto val_test = string_to_sum("f^{v0}_{o0} t^{o0}_{v0}");
+  return (val == val_test);
 }
 
 bool test_energy2() {
-  WDiagTheorem wdt;
-  std::string o = "o";
-  std::string v = "v";
-  auto opT2 = make_diag_operator("t", {v, v}, {o, o});
-  auto opVoovv = make_diag_operator("v", {o, o}, {v, v});
+  auto T2 = make_operator("t", {"oo->vv"});
+  auto Voovv = make_operator("v", {"vv->oo"});
 
   // <V T2>
-  auto energy = wdt.contract(1, {opVoovv, opT2}, 0, 0);
-  auto energy_test = string_to_sum("1/4 t^{o0,o1}_{v0,v1} v^{v0,v1}_{o0,o1}");
-  return (energy == energy_test);
+  auto val = wdt.contract_sum(1, Voovv * T2, 0, 0);
+  auto val_test = string_to_sum("1/4 t^{o0,o1}_{v0,v1} v^{v0,v1}_{o0,o1}");
+  return (val == val_test);
 }
 
 bool test_energy3() {
-  WDiagTheorem wdt;
-  std::string o = "o";
-  std::string v = "v";
-  auto opT1 = make_diag_operator("t", {v}, {o});
-  auto opVoovv = make_diag_operator("v", {o, o}, {v, v});
+  auto T1 = make_operator("t", {"o->v"});
+  auto Voovv = make_operator("v", {"vv->oo"});
 
   // 1/2 <V T1 T1>
-  auto energy = wdt.contract(scalar_t(1, 2), {opVoovv, opT1, opT1}, 0, 0);
-  auto energy_test =
+  auto val = wdt.contract_sum(scalar_t(1, 2), Voovv * T1 * T1, 0, 0);
+  auto val_test =
       string_to_sum("1/2 t^{o0}_{v0} t^{o1}_{v1} v^{v0,v1}_{o0,o1}");
-  return (energy == energy_test);
+  return (val == val_test);
 }
 
 bool test_r1_1() {
-  WDiagTheorem wdt;
-  std::string o = "o";
-  std::string v = "v";
-  auto opR1 = make_diag_operator("R1", {o}, {v});
-  auto opFvo = make_diag_operator("f", {v}, {o});
+  auto Fvo = make_operator("f", {"o->v"});
 
   // <R1 F>
-  auto r1 = wdt.contract(1, {opR1, opFvo}, 0, 0);
-  auto r1_test = string_to_sum("R1^{v0}_{o0} f^{o0}_{v0}");
-  return (r1 == r1_test);
+  auto sum = wdt.contract_sum(1, Fvo, 2, 2);
+  WSum val;
+  for (const auto &eq : sum.to_manybody_equation("r")) {
+      val.add(eq.rhs());
+  }
+  auto val_test = string_to_sum("f^{o0}_{v0}").canonicalize();
+
+  TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
+  return (val == val_test);
+}
+
+bool test_r1_2() {
+  auto T1 = make_operator("t", {"o->v"});
+  auto R1 = make_operator("r", {"v->o"});
+  auto Fvv = make_operator("f", {"v->v"});
+
+  // <R1 T1 F>
+  auto sum = wdt.contract_sum(1, Fvv * T1, 2, 2);
+  WSum val;
+  for (const auto &eq : sum.to_manybody_equation("r")) {
+      val.add(eq.rhs());
+  }
+  auto val_test = string_to_sum("f^{v1}_{v0} t^{o0}_{v1}");
+  val_test.canonicalize();
+
+  TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
+
+  return (val == val_test);
+}
+
+bool test_r1_3() {
+  auto T1 = make_operator("t", {"o->v"});
+  auto R1 = make_operator("r", {"v->o"});
+  auto Foo = make_operator("f", {"o->o"});
+
+  // <R1 T1 F>
+  auto sum = wdt.contract_sum(1, Foo * T1, 2, 2);
+  TEST_DEBUG_PRINT(cout << "Result: " << sum << endl;)
+  WSum val;
+  for (const auto &eq : sum.to_manybody_equation("r")) {
+      val.add(eq.rhs());
+  }
+  auto val_test = string_to_sum("-1 f^{o0}_{o1} t^{o1}_{v0}");
+//  val_test.canonicalize();
+  TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
+  return (val == val_test);
 }
 
 int main(int argc, const char *argv[]) {
@@ -71,7 +108,9 @@ int main(int argc, const char *argv[]) {
       std::make_tuple(TestPass, test_energy1, "CCSD Energy <F T1>"),
       std::make_tuple(TestPass, test_energy2, "CCSD Energy <V T2>"),
       std::make_tuple(TestPass, test_energy3, "CCSD Energy 1/2 <V T1 T1>"),
-      std::make_tuple(TestPass, test_r1_1,    "CCSD T1 Residual <R1 F>"),
+      std::make_tuple(TestPass, test_r1_1, "CCSD T1 Residual F"),
+      std::make_tuple(TestPass, test_r1_2, "CCSD T1 Residual Fvv T1"),
+      std::make_tuple(TestPass, test_r1_3, "CCSD T1 Residual Foo T1"),
 
   };
 

@@ -30,6 +30,8 @@ public:
   /// subtraction assignment
   WDiagOperatorSum &operator-=(const WDiagOperatorSum &rhs);
   /// multiplication assignment (scalar)
+  WDiagOperatorSum &operator*=(const WDiagOperatorSum &rhs);
+  /// multiplication assignment (scalar)
   WDiagOperatorSum &operator*=(scalar_t factor);
   /// division assignment (scalar)
   WDiagOperatorSum &operator/=(scalar_t factor);
@@ -41,6 +43,9 @@ private:
   /// A vector containing pairs ((op1, op2, ...), factor)
   dop_sum_t sum_;
 };
+
+/// multiplication
+WDiagOperatorSum operator*(WDiagOperatorSum lhs, const WDiagOperatorSum &rhs);
 
 /// Write a string representation of the operator to a stream
 std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum);

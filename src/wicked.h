@@ -10,8 +10,10 @@
 #include "wsum.h"
 #include "wtensor.h"
 #include "walgebraicterm.h"
+#include "wequationterm.h"
 
 #include "wdiag_operator.h"
+#include "wdiag_operator_sum.h"
 #include "wdiag_theorem.h"
 
 
