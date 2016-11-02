@@ -1,6 +1,6 @@
 #include <iostream>
 
-//#define PRINT_DEBUG 1
+#define PRINT_DEBUG 1
 
 #include "wicked.h"
 #include "test.h"
@@ -281,8 +281,8 @@ test_return_t test_r2_1() {
   }
   auto val_test = string_to_sum("1 v^{o0,o1}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass, {"CCSD T2 Residual Vvvoo (1)"});
 }
@@ -299,8 +299,8 @@ test_return_t test_r2_2() {
   }
   auto val_test = string_to_sum("-2 f^{v2}_{v0} t^{o0,o1}_{v1,v2}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Fvv,T2] (2)"});
 }
@@ -317,8 +317,8 @@ test_return_t test_r2_3() {
   }
   auto val_test = string_to_sum("2 f^{o0}_{o2} t^{o1,o2}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Foo,T2] (3)"});
 }
@@ -335,8 +335,8 @@ test_return_t test_r2_4() {
   }
   auto val_test = string_to_sum("1/2 t^{o2,o3}_{v0,v1} v^{o0,o1}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Voooo,T2] (4)"});
 }
@@ -353,8 +353,8 @@ test_return_t test_r2_5() {
   }
   auto val_test = string_to_sum("1/2 t^{o0,o1}_{v2,v3} v^{v2,v3}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Vvvvv,T2] (5)"});
 }
@@ -371,8 +371,8 @@ test_return_t test_r2_6() {
   }
   auto val_test = string_to_sum("-4 t^{o0,o2}_{v0,v2} v^{o1,v2}_{o2,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Vovov,T2] (6)"});
 }
@@ -389,8 +389,8 @@ test_return_t test_r2_7() {
   }
   auto val_test = string_to_sum("-2 t^{o0}_{v2} v^{o1,v2}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Vvvov,T2] (7)"});
 }
@@ -406,9 +406,9 @@ test_return_t test_r2_8() {
     val.add(eq.rhs(), eq.rhs_factor());
   }
   auto val_test = string_to_sum("-2 t^{o2}_{v0} v^{o0,o1}_{o2,v1}");
-  TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Result: " << val << endl;);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Vovoo,T2] (8)"});
 }
@@ -433,11 +433,31 @@ test_return_t test_r2_9_12() {
       string_to_sum(
           "1/4 t^{o2,o3}_{v0,v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
+  bool pass = (val == val_test);
 
   return make_return_t(TestPass, pass,
-                       {"CCSD T2 Residual 1/2 [[Voovv,T2],T2] (9)"});
+                       {"CCSD T2 Residual 1/2 [[Voovv,T2],T2] (9-12)"});
+}
+
+test_return_t test_r2_13() {
+  auto T1 = make_operator("t", {"o->v"});
+  auto Voooo = make_operator("v", {"oo->oo"});
+
+  // 1/2 [[Voooo,T1],T1]
+  auto sum = wdt.contract_sum(scalar_t(1, 2),
+                              commutator(commutator(Voooo, T1), T1), 4, 4);
+  WSum val;
+  for (const auto &eq : sum.to_manybody_equation("r")) {
+    val.add(eq.rhs(), eq.rhs_factor());
+  }
+  auto val_test = string_to_sum("1 t^{o2}_{v0} t^{o3}_{v1} v^{o0,o1}_{o2,o3}");
+  TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
+  bool pass = (val == val_test);
+
+  return make_return_t(TestPass, pass,
+                       {"CCSD T2 Residual 1/2 [[Voooo,T1],T1] (13-)"});
 }
 
 test_return_t test_r2_31() {
@@ -456,8 +476,8 @@ test_return_t test_r2_31() {
   auto val_test = string_to_sum(
       "t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
-  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;) bool pass =
-          (val == val_test);
+  TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
+  bool pass = (val == val_test);
 
   return make_return_t(
       TestPass, pass, {"CCSD T2 Residual 1/24 [[[[Voovv,T1],T1],T1],T1] (31)"});
@@ -477,7 +497,8 @@ int main(int argc, const char *argv[]) {
       test_r1_3,    test_r1_4,    test_r1_5,    test_r1_6,    test_r1_7,
       test_r1_8,    test_r1_9,    test_r1_10,   test_r1_11,   test_r1_12_14,
       test_r2_1,    test_r2_2,    test_r2_3,    test_r2_4,    test_r2_5,
-      test_r2_6,    test_r2_7,    test_r2_8,    test_r2_9_12, test_r2_31};
+      test_r2_6,    test_r2_7,    test_r2_8,    test_r2_9_12, test_r2_13,
+      test_r2_31};
 
   // Run the tests
   bool success = wicked_test(test_functions);

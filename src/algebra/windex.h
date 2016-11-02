@@ -40,7 +40,7 @@ public:
 private:
   // ==> Class private data <==
 
-  /// Store the orbital space type and label of an index (type,label)
+  /// Store the orbital space type and label of an index (space,p)
   std::pair<int, int> index_;
 };
 

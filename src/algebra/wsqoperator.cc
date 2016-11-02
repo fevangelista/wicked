@@ -18,7 +18,20 @@ void WSQOperator::reindex(index_map_t &idx_map) {
 }
 
 bool WSQOperator::operator<(WSQOperator const &other) const {
-  return operator_ < other.operator_;
+  // first compare the type
+  if (operator_.first < other.operator_.first) {
+    return true;
+  }
+  if (operator_.first > other.operator_.first) {
+    return false;
+  }
+  // same type
+  // if creation, then just compare the index
+  if (operator_.first == Creation) {
+    return operator_.second < other.operator_.second;
+  }
+  // if annihilation, flip comparison
+  return other.operator_.second < operator_.second;
 }
 
 bool WSQOperator::operator==(WSQOperator const &other) const {

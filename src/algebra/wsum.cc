@@ -104,8 +104,6 @@ WSum::to_manybody_equation(const std::string &label) {
   std::vector<WEquationTerm> result;
 
   for (const auto &term_factor : terms_) {
-//      std::cout << "\n  " << term_factor.first << "  " << term_factor.second << std::endl;
-
     std::vector<WIndex> lower;
     std::vector<WIndex> upper;
     const WAlgebraicTerm &term = term_factor.first;
