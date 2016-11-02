@@ -104,6 +104,8 @@ WSum::to_manybody_equation(const std::string &label) {
   std::vector<WEquationTerm> result;
 
   for (const auto &term_factor : terms_) {
+//      std::cout << "\n  " << term_factor.first << "  " << term_factor.second << std::endl;
+
     std::vector<WIndex> lower;
     std::vector<WIndex> upper;
     const WAlgebraicTerm &term = term_factor.first;
@@ -116,7 +118,10 @@ WSum::to_manybody_equation(const std::string &label) {
       }
     }
     WAlgebraicTerm rhs, lhs;
-    lhs.add(WTensor(label, lower, upper));
+    WTensor lhs_tensor(label, lower, upper);
+    lhs.add(lhs_tensor);
+    factor *= lhs_tensor.symmetry_factor();
+
     for (const auto &tensor : term.tensors()) {
       rhs.add(tensor);
     }
@@ -124,6 +129,16 @@ WSum::to_manybody_equation(const std::string &label) {
   }
 
   return result;
+}
+
+WSum operator+(WSum lhs, const WSum &rhs) {
+  lhs += rhs;
+  return lhs;
+}
+
+WSum operator-(WSum lhs, const WSum &rhs) {
+  lhs -= rhs;
+  return lhs;
 }
 
 std::ostream &operator<<(std::ostream &os, const WSum &sum) {
@@ -142,7 +157,7 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     factor_re = "\\s*([+-]?\\d*)?/?(\\d*)?\\s+"; // ";
   }
 
-//  std::cout << "Parsing tensors: " << std::endl;
+  //  std::cout << "Parsing tensors: " << std::endl;
   auto tensors = findall(s, tensor_re);
 
   WAlgebraicTerm term;
@@ -164,12 +179,12 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     }
     term.add(WTensor(label, lower, upper));
   }
-//  std::cout << "Parsing factor: " << std::endl;
+  //  std::cout << "Parsing factor: " << std::endl;
 
   auto factor_vec = findall(s, factor_re);
-//  for (auto f : factor_vec) {
-//    std::cout << "Factor: " << f << std::endl;
-//  }
+  //  for (auto f : factor_vec) {
+  //    std::cout << "Factor: " << f << std::endl;
+  //  }
   int numerator = 1;
   int denominator = 1;
   if (factor_vec.size() > 1) {

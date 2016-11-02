@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "helpers.h"
+#include "combinatorics.h"
 #include "orbital_space.h"
 #include "windex.h"
 
@@ -24,9 +25,7 @@ std::string WIndex::latex() const {
   return osi->label(space()) + "_{" + std::to_string(index()) + "}";
 }
 
-std::string WIndex::ambit() const {
-  return str();
-}
+std::string WIndex::ambit() const { return str(); }
 
 std::ostream &operator<<(std::ostream &os, const WIndex &idx) {
   os << idx.str();
@@ -72,7 +71,7 @@ WIndex string_to_index(const std::string &s) {
       p = std::stoi(s.substr(size));
     }
   }
-  return WIndex(space,p);
+  return WIndex(space, p);
 }
 
 index_map_t remap(const std::vector<WIndex> &idx_vec1,
@@ -109,4 +108,13 @@ std::vector<int> num_indices_per_space(const std::vector<WIndex> &indices) {
     counter[index.space()] += 1;
   }
   return counter;
+}
+
+int symmetry_factor(const std::vector<WIndex> &indices) {
+  int result = 1;
+  std::vector<int> idx_per_space = num_indices_per_space(indices);
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    result *= factorial(idx_per_space[s]);
+  }
+  return result;
 }

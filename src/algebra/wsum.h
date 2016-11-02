@@ -62,6 +62,11 @@ private:
   // ==> Class private functions <==
 };
 
+/// addition
+WSum operator+(WSum lhs, const WSum &rhs);
+/// subtraction
+WSum operator-(WSum lhs, const WSum &rhs);
+
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const WSum &sum);
 

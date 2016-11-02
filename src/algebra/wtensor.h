@@ -45,6 +45,9 @@ public:
   /// Return the rank of the tensor
   int rank() const { return lower_.size() + upper_.size(); }
 
+  /// Return the symmetry factor of this vector
+  int symmetry_factor() const;
+
   /// Comparison operator used for sorting
   bool operator<(WTensor const &other) const;
 

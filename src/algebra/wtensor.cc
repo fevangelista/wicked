@@ -10,6 +10,10 @@ WTensor::WTensor(std::string label, const std::vector<WIndex> &lower,
                  const std::vector<WIndex> &upper, SymmetryType symmetry)
     : label_(label), lower_(lower), upper_(upper), symmetry_(symmetry) {}
 
+int WTensor::symmetry_factor() const {
+  return ::symmetry_factor(upper_) * ::symmetry_factor(lower_);
+}
+
 bool WTensor::operator<(WTensor const &other) const {
   // Compare the labels
   if (label_ < other.label_)

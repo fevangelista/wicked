@@ -230,7 +230,9 @@ scalar_t WAlgebraicTerm::canonicalize() {
   for (const auto &sqop : operators_) {
     int type = (sqop.type() == Creation) ? 0 : 1;
     int s = sqop.index().space();
-    int index = sqop.index().index();
+    // Annihilation operators are written in reverse order
+    int index = (sqop.type() == Creation) ? sqop.index().index()
+                                          : -sqop.index().index();
     sorting_vec.push_back(std::make_tuple(type, s, index, pos));
     pos += 1;
   }
