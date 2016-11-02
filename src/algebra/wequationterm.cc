@@ -16,6 +16,8 @@ const WAlgebraicTerm &WEquationTerm::lhs() const { return lhs_; }
 
 const WAlgebraicTerm &WEquationTerm::rhs() const { return rhs_; }
 
+scalar_t WEquationTerm::rhs_factor() const { return factor_; }
+
 std::string WEquationTerm::str() const {
   std::vector<std::string> str_vec;
   str_vec.push_back(lhs_.str());

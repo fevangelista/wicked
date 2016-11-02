@@ -76,3 +76,79 @@ bool wicked_test(std::vector<std::tuple<TestResult, bool (*)(), const char *>>
 
   return success;
 }
+
+bool wicked_test(
+    std::vector<std::tuple<TestResult, bool, std::vector<std::string>> (*)()>
+        test_functions) {
+
+  std::vector<std::tuple<std::string, TestResult, double>> results;
+
+  printf(ANSI_COLOR_RESET);
+
+  printf("\n %-68s %s", "Description", "Result");
+  printf("\n %s", std::string(79, '-').c_str());
+
+  bool success = true;
+  for (auto test_function : test_functions) {
+    double result = 0.0;
+    TestResult tresult = TestPass, report_result = TestPass;
+    std::string exception;
+    std::tuple<TestResult, bool, std::vector<std::string>> call;
+    try {
+      call = test_function();
+      result = std::get<1>(call);
+
+      // Did the test pass based on returned value?
+      tresult = (result == true) ? TestPass : TestFail;
+      // Was the tresult the expected result? If so color green else red.
+      report_result = tresult == std::get<0>(call) ? TestPass : TestFail;
+    } catch (std::exception &e) {
+      // was an exception expected?
+      tresult = TestException;
+      report_result = tresult == std::get<0>(call) ? TestPass : TestException;
+
+      if (report_result == TestException) {
+        exception = e.what();
+      }
+    }
+    printf("\n %-68s", std::get<2>(call)[0].c_str());
+    switch (report_result) {
+    case TestPass:
+      printf(ANSI_COLOR_GREEN);
+      break;
+    case TestFail:
+      printf(ANSI_COLOR_RED);
+      break;
+    default:
+      printf(ANSI_COLOR_YELLOW);
+    }
+    switch (tresult) {
+    case TestPass:
+      printf(" Passed" ANSI_COLOR_RESET);
+      break;
+    case TestFail:
+      printf(" Failed" ANSI_COLOR_RESET);
+      break;
+    default:
+      printf(" Exception" ANSI_COLOR_RESET);
+    }
+
+    if (report_result == TestException)
+      printf("\n    Unexpected: %s", exception.c_str());
+    if (report_result != TestPass)
+      success = false;
+  }
+  printf("\n %s", std::string(79, '-').c_str());
+  printf("\n Tests: %s\n", success ? "All passed" : "Some failed");
+
+  return success;
+}
+
+test_return_t make_return_t(TestResult result, bool pass,
+                            const std::vector<const char *> &cstr_vec) {
+  std::vector<std::string> str_vec;
+  for (const char *cstr : cstr_vec) {
+    str_vec.push_back(cstr);
+  }
+  return std::make_tuple(result, pass, str_vec);
+}

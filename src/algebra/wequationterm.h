@@ -20,6 +20,9 @@ public:
   /// Return the right-hand side of the equation
   const WAlgebraicTerm& rhs() const;
 
+  /// Return the factor for the left-hand side equation
+  scalar_t rhs_factor() const;
+
   /// Return a string representation
   std::string str() const;
 
