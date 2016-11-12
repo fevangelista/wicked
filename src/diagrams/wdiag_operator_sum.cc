@@ -175,6 +175,7 @@ WDiagOperatorSum bch_series(const WDiagOperatorSum &A,
   WDiagOperatorSum result;
   result += A;
   WDiagOperatorSum temp(A);
+
   for (int k = 1; k <= n; k++) {
     WDiagOperatorSum comm = commutator(temp, B);
     comm *= scalar_t(1, k);

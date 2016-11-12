@@ -21,34 +21,42 @@ void srcc();
 void mr();
 
 int main(int argc, const char *argv[]) {
-  //  for (int i : range(19)) {
-  //    cout << i << endl;
+
+  osi = std::make_shared<OrbitalSpaceInfo>();
+  osi->add_space("o", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
+  osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
+
+  auto T1 = make_operator("t", {"o->v"});
+  auto Vooov = make_operator("h", {"ov->oo"});
+
+  WDiagTheorem wdt;
+
+  // 1/2 [[Vooov,T1],T1]
+  auto comm = commutator(commutator(Vooov, T1), T1);
+  comm *= scalar_t(1, 2);
+  auto bch = bch_series(Vooov, T1, 2);
+
+  cout << "\n comm:\n" << comm << endl;
+  cout << "\n bch:\n" << bch << endl;
+
+  wdt.set_print(WDiagPrint::Basic);
+  auto sum = wdt.contract_sum(1, bch, 2, 2);
+  cout << sum << endl;
+  //  WSum val;
+  //  for (const auto &eq : sum.to_manybody_equation("r")) {
+  //      cout << eq << endl;
+  ////    val.add(eq.rhs(), eq.rhs_factor());
   //  }
-  //  std::vector<MyInt> vec; //{1, 4, 9, 19, 12, 21};
 
-  //  cout << "\nAdding 1" << endl;
-  //  vec.push_back(MyInt(1));
-
-  //  cout << "\nAdding 4" << endl;
-  //  vec.push_back(MyInt(4));
-
-  //  cout << "\nAdding 9" << endl;
-  //  vec.push_back(MyInt(9));
-
-  //  cout << "\nBegin loop" << endl;
-  //  for (auto kv : enumerate(vec)) {
-  //    cout << kv.first << " " << kv.second.get() << endl;
-  //  }
-  srcc();
-  //      mr();
-
+  //  cout << "\n" << val << endl;
+  //  //  auto val_test = string_to_sum("-1 t^{o1}_{v0} t^{o2}_{v1}
+  //  v^{o0,v1}_{o1,o2}");
   return 0;
 }
 
 void srcc() {
   osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->add_space("o", RDMType::Occupied,
-                 {"i", "j", "k", "l", "m", "n"});
+  osi->add_space("o", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
   osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
   // Convenience variables
   std::string o = "o";
@@ -160,7 +168,6 @@ void srcc() {
   //  cout << F << endl;
   //  cout << T1F << endl;
 
-
   if (doubles) {
     // R2 V
     terms.add_sum(wdt.contract(1, {opR2, opH2vvoo}, 0, 0));
@@ -242,83 +249,3 @@ void mr() {
     //    }
   }
 }
-
-/*
- *   auto opT1ca = WDiagOperator("T1", {1, 0, 0}, {0, 1, 0});
-  auto opT1cv = WDiagOperator("T1", {1, 0, 0}, {0, 0, 1});
-  auto opT1av = WDiagOperator("T1", {0, 1, 0}, {0, 0, 1});
-
-  auto opT2ccaa = WDiagOperator("T2", {2, 0, 0}, {0, 2, 0});
-  auto opT2ccav = WDiagOperator("T2", {2, 0, 0}, {0, 1, 1});
-  auto opT2ccvv = WDiagOperator("T2", {2, 0, 0}, {0, 0, 2});
-  auto opT2caaa = WDiagOperator("T2", {1, 1, 0}, {0, 2, 0});
-  auto opT2caav = WDiagOperator("T2", {1, 1, 0}, {0, 1, 1});
-  auto opT2cavv = WDiagOperator("T2", {1, 1, 0}, {0, 0, 2});
-  auto opT2aaav = WDiagOperator("T2", {0, 2, 0}, {0, 1, 1});
-  auto opT2aavv = WDiagOperator("T2", {0, 2, 0}, {0, 0, 2});
-
-  auto opH1cc = WDiagOperator("H1", {1, 0, 0}, {1, 0, 0});
-  auto opH1ca = WDiagOperator("H1", {1, 0, 0}, {0, 1, 0});
-  auto opH1cv = WDiagOperator("H1", {1, 0, 0}, {0, 0, 1});
-  auto opH1ac = WDiagOperator("H1", {0, 1, 0}, {1, 0, 0});
-  auto opH1aa = WDiagOperator("H1", {0, 1, 0}, {0, 1, 0});
-  auto opH1av = WDiagOperator("H1", {0, 1, 0}, {0, 0, 1});
-  auto opH1vc = WDiagOperator("H1", {0, 0, 1}, {1, 0, 0});
-  auto opH1va = WDiagOperator("H1", {0, 0, 1}, {0, 1, 0});
-  auto opH1vv = WDiagOperator("H1", {0, 0, 1}, {0, 0, 1});
-
-  auto opH2cccc = WDiagOperator("H2", {2, 0, 0}, {2, 0, 0});
-  auto opH2ccca = WDiagOperator("H2", {2, 0, 0}, {1, 1, 0});
-  auto opH2cccv = WDiagOperator("H2", {2, 0, 0}, {1, 0, 1});
-  auto opH2ccaa = WDiagOperator("H2", {2, 0, 0}, {0, 2, 0});
-  auto opH2ccav = WDiagOperator("H2", {2, 0, 0}, {0, 1, 1});
-  auto opH2ccvv = WDiagOperator("H2", {2, 0, 0}, {0, 0, 2});
-
-  auto opH2cacc = WDiagOperator("H2", {1, 1, 0}, {2, 0, 0});
-  auto opH2caca = WDiagOperator("H2", {1, 1, 0}, {1, 1, 0});
-  auto opH2cacv = WDiagOperator("H2", {1, 1, 0}, {1, 0, 1});
-  auto opH2caaa = WDiagOperator("H2", {1, 1, 0}, {0, 2, 0});
-  auto opH2caav = WDiagOperator("H2", {1, 1, 0}, {0, 1, 1});
-  auto opH2cavv = WDiagOperator("H2", {1, 1, 0}, {0, 0, 2});
-
-  auto opH2cvcc = WDiagOperator("H2", {1, 0, 1}, {2, 0, 0});
-  auto opH2cvca = WDiagOperator("H2", {1, 0, 1}, {1, 1, 0});
-  auto opH2cvcv = WDiagOperator("H2", {1, 0, 1}, {1, 0, 1});
-  auto opH2cvaa = WDiagOperator("H2", {1, 0, 1}, {0, 2, 0});
-  auto opH2cvav = WDiagOperator("H2", {1, 0, 1}, {0, 1, 1});
-  auto opH2cvvv = WDiagOperator("H2", {1, 0, 1}, {0, 0, 2});
-
-  auto opH2aacc = WDiagOperator("H2", {0, 2, 0}, {2, 0, 0});
-  auto opH2aaca = WDiagOperator("H2", {0, 2, 0}, {1, 1, 0});
-  auto opH2aacv = WDiagOperator("H2", {0, 2, 0}, {1, 0, 1});
-  auto opH2aaaa = WDiagOperator("H2", {0, 2, 0}, {0, 2, 0});
-  auto opH2aaav = WDiagOperator("H2", {0, 2, 0}, {0, 1, 1});
-  auto opH2aavv = WDiagOperator("H2", {0, 2, 0}, {0, 0, 2});
-
-  auto opH2avcc = WDiagOperator("H2", {0, 1, 1}, {2, 0, 0});
-  auto opH2avca = WDiagOperator("H2", {0, 1, 1}, {1, 1, 0});
-  auto opH2avcv = WDiagOperator("H2", {0, 1, 1}, {1, 0, 1});
-  auto opH2avaa = WDiagOperator("H2", {0, 1, 1}, {0, 2, 0});
-  auto opH2avav = WDiagOperator("H2", {0, 1, 1}, {0, 1, 1});
-  auto opH2avvv = WDiagOperator("H2", {0, 1, 1}, {0, 0, 2});
-
-  auto opH2vvcc = WDiagOperator("H2", {0, 0, 2}, {2, 0, 0});
-  auto opH2vvca = WDiagOperator("H2", {0, 0, 2}, {1, 1, 0});
-  auto opH2vvcv = WDiagOperator("H2", {0, 0, 2}, {1, 0, 1});
-  auto opH2vvaa = WDiagOperator("H2", {0, 0, 2}, {0, 2, 0});
-  auto opH2vvav = WDiagOperator("H2", {0, 0, 2}, {0, 1, 1});
-  auto opH2vvvv = WDiagOperator("H2", {0, 0, 2}, {0, 0, 2});
-
-  std::vector<WDiagOperator> opT = {opT1ca,   opT1cv,   opT1av,   opT2ccaa,
-                                opT2ccav, opT2ccvv, opT2caaa, opT2caav,
-                                opT2cavv, opT2aaav, opT2aavv};
-
-  std::vector<WDiagOperator> opH = {
-      opH1cc,   opH1ca,   opH1cv,   opH1ac,   opH1aa,   opH1av,   opH1vc,
-      opH1va,   opH1vv,   opH2cccc, opH2ccca, opH2cccv, opH2ccaa, opH2ccav,
-      opH2ccvv, opH2cacc, opH2caca, opH2cacv, opH2caaa, opH2caav, opH2cavv,
-      opH2cvcc, opH2cvca, opH2cvcv, opH2cvaa, opH2cvav, opH2cvvv, opH2aacc,
-      opH2aaca, opH2aacv, opH2aaaa, opH2aaav, opH2aavv, opH2avcc, opH2avca,
-      opH2avcv, opH2avaa, opH2avav, opH2avvv, opH2vvcc, opH2vvca, opH2vvcv,
-      opH2vvaa, opH2vvav, opH2vvvv};
-      */

@@ -70,6 +70,7 @@ generate_direct_product_combinations(std::vector<int> &n, std::vector<int> &k);
 std::vector<std::vector<int>> generate_permutations(int n,
                                                     std::vector<int> &labels);
 
+// Computes the sign of a permutation of integers
 int permutation_sign(const std::vector<int> &vec);
 
 template <typename T>

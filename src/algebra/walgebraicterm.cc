@@ -1,5 +1,7 @@
 #include <algorithm>
 
+#include "stl_utils.hpp"
+
 #include "wicked-def.h"
 #include "helpers.h"
 #include "orbital_space.h"
@@ -8,6 +10,8 @@
 #include "wsqoperator.h"
 #include "wtensor.h"
 #include "walgebraicterm.h"
+
+using namespace std;
 
 WAlgebraicTerm::WAlgebraicTerm() {}
 
@@ -38,29 +42,34 @@ void WAlgebraicTerm::reindex(index_map_t &idx_map) {
   }
 }
 
-std::vector<std::pair<std::vector<int>, std::string>>
-WAlgebraicTerm::tensor_connectivity(std::vector<WIndex> indices) const {
-  std::vector<std::pair<std::vector<int>, std::string>> result;
+std::vector<std::pair<std::string, std::vector<int>>>
+WAlgebraicTerm::tensor_connectivity(const WTensor &t, bool upper) const {
+  std::vector<std::pair<std::string, std::vector<int>>> result;
+  auto indices = upper ? t.upper() : t.lower();
   sort(indices.begin(), indices.end());
   for (const auto &tensor : tensors_) {
+    if (not(t == tensor)) {
 
-    std::vector<WIndex> indices2 = tensor.lower();
-    sort(indices2.begin(), indices2.end());
+      std::vector<WIndex> indices2 = upper ? tensor.lower() : tensor.upper();
+      sort(indices2.begin(), indices2.end());
 
-    std::vector<WIndex> indices3 = tensor.upper();
-    sort(indices3.begin(), indices3.end());
+      std::vector<WIndex> indices3 = tensor.upper();
+      sort(indices3.begin(), indices3.end());
 
-    std::vector<WIndex> common_lower_indices;
-    set_intersection(indices.begin(), indices.end(), indices2.begin(),
-                     indices2.end(), back_inserter(common_lower_indices));
+      std::vector<WIndex> common_lower_indices;
+      set_intersection(indices.begin(), indices.end(), indices2.begin(),
+                       indices2.end(), back_inserter(common_lower_indices));
 
-    std::vector<WIndex> common_upper_indices;
-    set_intersection(indices.begin(), indices.end(), indices3.begin(),
-                     indices3.end(), back_inserter(common_upper_indices));
-    result.push_back(std::make_pair(num_indices_per_space(common_lower_indices),
-                                    tensor.label()));
-    result.push_back(std::make_pair(num_indices_per_space(common_upper_indices),
-                                    tensor.label()));
+      std::vector<WIndex> common_upper_indices;
+      set_intersection(indices.begin(), indices.end(), indices3.begin(),
+                       indices3.end(), back_inserter(common_upper_indices));
+
+      result.push_back(std::make_pair(
+          tensor.label(), num_indices_per_space(common_lower_indices)));
+      //      result.push_back(std::make_pair(
+      //          "u" + tensor.label(),
+      //          num_indices_per_space(common_upper_indices)));
+    }
   }
   std::sort(result.begin(), result.end());
   return result;
@@ -74,8 +83,8 @@ scalar_t WAlgebraicTerm::canonicalize() {
 #if NEW_CANONICALIZATION
   using score_t =
       std::tuple<std::string, int, std::vector<int>, std::vector<int>,
-                 std::vector<std::pair<std::vector<int>, std::string>>,
-                 std::vector<std::pair<std::vector<int>, std::string>>,
+                 std::vector<std::pair<std::string, std::vector<int>>>,
+                 std::vector<std::pair<std::string, std::vector<int>>>,
                  WTensor>;
 #else
   using score_t =
@@ -83,6 +92,8 @@ scalar_t WAlgebraicTerm::canonicalize() {
 #endif
 
   std::vector<score_t> scores;
+
+  //  std::cout << "\n Canonicalizing: " << str() << std::endl;
 
   int n = 0;
   for (const auto &tensor : tensors_) {
@@ -97,17 +108,29 @@ scalar_t WAlgebraicTerm::canonicalize() {
     std::vector<int> num_upp = num_indices_per_space(tensor.upper());
 
     // d) connectivity of lower indices
-    std::vector<std::pair<std::vector<int>, std::string>> lower_conn =
-        tensor_connectivity(tensor.lower());
+    auto lower_conn = tensor_connectivity(tensor, false);
 
     // d) connectivity of upper indices
-    std::vector<std::pair<std::vector<int>, std::string>> upper_conn =
-        tensor_connectivity(tensor.upper());
+    auto upper_conn = tensor_connectivity(tensor, true);
 
 // e) store the score
 #if NEW_CANONICALIZATION
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, lower_conn,
                                      upper_conn, tensor));
+//    std::cout << "\nScore = " << label << " " << rank << " ";
+//    PRINT_ELEMENTS(num_low);
+//    std::cout << " ";
+//    PRINT_ELEMENTS(num_upp);
+//    std::cout << " ";
+//    for (const auto &str_vec : lower_conn) {
+//      std::cout << str_vec.first << " ";
+//      PRINT_ELEMENTS(str_vec.second);
+//    }
+//    for (const auto &str_vec : upper_conn) {
+//      std::cout << " " << str_vec.first << " ";
+//      PRINT_ELEMENTS(str_vec.second);
+//    }
+
 #else
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, tensor));
     n += 1;
@@ -248,6 +271,155 @@ scalar_t WAlgebraicTerm::canonicalize() {
   }
   factor *= permutation_sign(sign_order);
   operators_ = new_sqops;
+
+  //  std::cout << "\n  " << str();
+
+  canonicalize_best();
+
+  return factor;
+}
+
+scalar_t WAlgebraicTerm::canonicalize_tensor_indices() {
+  scalar_t sign(1);
+  // Sort tensor indices according to canonical form
+  for (auto &tensor : tensors_) {
+    {
+      std::vector<std::tuple<int, int, int, WIndex>> upper_sort;
+      int upos = 0;
+      for (const auto &index : tensor.upper()) {
+        upper_sort.push_back(
+            std::make_tuple(index.space(), index.index(), upos, index));
+        upos += 1;
+      }
+      std::sort(upper_sort.begin(), upper_sort.end());
+
+      std::vector<int> usign;
+      std::vector<WIndex> new_upper;
+      for (const auto &tpl : upper_sort) {
+        usign.push_back(std::get<2>(tpl));
+        new_upper.push_back(std::get<3>(tpl));
+      }
+      tensor.set_upper(new_upper);
+      sign *= permutation_sign(usign);
+    }
+
+    {
+      std::vector<std::tuple<int, int, int, WIndex>> lower_sort;
+      int lpos = 0;
+      for (const auto &index : tensor.lower()) {
+        lower_sort.push_back(
+            std::make_tuple(index.space(), index.index(), lpos, index));
+        lpos += 1;
+      }
+      std::sort(lower_sort.begin(), lower_sort.end());
+
+      std::vector<int> lsign;
+      std::vector<WIndex> new_lower;
+      for (const auto &tpl : lower_sort) {
+        lsign.push_back(std::get<2>(tpl));
+        new_lower.push_back(std::get<3>(tpl));
+      }
+      tensor.set_lower(new_lower);
+      sign *= permutation_sign(lsign);
+    }
+  }
+  return sign;
+}
+
+scalar_t WAlgebraicTerm::canonicalize_best() {
+  scalar_t factor(1);
+
+  // find classes of equivalent indices
+  std::map<std::pair<std::string, int>, std::vector<WIndex>> equiv_classes;
+  for (const auto &tensor : tensors_) {
+    std::string label = tensor.label();
+    for (int i : num_indices_per_space(tensor.upper())) {
+      label += "_" + to_string(i);
+    }
+    for (int i : num_indices_per_space(tensor.lower())) {
+      label += "_" + to_string(i);
+    }
+    for (const auto &idx : tensor.upper()) {
+      auto fingerprint = std::make_tuple(label + "u", idx.space());
+      equiv_classes[fingerprint].push_back(idx);
+    }
+    for (const auto &idx : tensor.lower()) {
+      auto fingerprint = std::make_tuple(label + "l", idx.space());
+      equiv_classes[fingerprint].push_back(idx);
+    }
+  }
+
+  cout << str() << '\n';
+  cout << "Index equivalence classes:\n";
+  for (const auto &kv : equiv_classes) {
+    cout << kv.first.first << " " << kv.first.second << " ";
+    PRINT_ELEMENTS(kv.second);
+    cout << '\n';
+  }
+
+  std::set<WIndex> sqops_indices;
+  for (const auto &sqop : operators_) {
+    sqops_indices.insert(sqop.index());
+  }
+
+  // find the unique classes
+  std::set<std::vector<WIndex>> unique_equiv_classes;
+  for (const auto &kv : equiv_classes) {
+    // must have at least two elements (otherwise there is no need to relabel)
+    if (kv.second.size() > 1) {
+      bool is_op_index = false;
+      for (const auto &idx : kv.second) {
+        if (sqops_indices.count(idx) != 0)
+          is_op_index = true;
+      }
+      if (not is_op_index) {
+        std::vector<WIndex> indices = kv.second;
+        std::sort(indices.begin(), indices.end());
+        unique_equiv_classes.insert(indices);
+      }
+    }
+  }
+
+  int numeqcl = unique_equiv_classes.size();
+  cout << "Index unique equivalence classes:\n";
+  for (const auto &v : unique_equiv_classes) {
+    PRINT_ELEMENTS(v);
+    cout << '\n';
+  }
+
+//  // for each equivalence class holds all permutations of indices
+//  std::vector<std::vector<std::vector<WIndex>>>
+//      unique_equiv_classes_permutations;
+
+//  std::vector<int> r;
+//  for (const auto &v : unique_equiv_classes) {
+//    std::vector<std::vector<WIndex>> permutations;
+//    do {
+//      permutations.push_back(v);
+//    } while (std::next_permutation(v.begin(), v.end()));
+//    r.push_back(permutations.size());
+//    unique_equiv_classes_permutations.push_back(permutations);
+//  }
+
+//  auto prod_space = product_space(r);
+
+//  for (const auto &el : prod_space) {
+//    cout << "Considering the following permutations" << '\n';
+//    for (int n = 0; n < numeqcl; n++) {
+//        PRINT_ELEMENTS(unique_equiv_classes_permutations[n][0]);
+//        cout << " -> ";
+//        PRINT_ELEMENTS(unique_equiv_classes_permutations[n][el[n]]);
+//        cout << '\n';
+//    }
+//  }
+
+  //
+
+  // loop over direct product of unique equivalence classes and generate
+  // permutations of indices
+
+  // resort indices in the tensors
+  // find "best" representation
 
   return factor;
 }

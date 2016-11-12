@@ -32,6 +32,25 @@ std::ostream &operator<<(std::ostream &os, const WIndex &idx) {
   return os;
 }
 
+int canonicalize_indices(std::vector<WIndex> &indices)
+{
+    std::vector<std::pair<WIndex,int>> vec_pairs;
+    int n = 0;
+    for (const auto& n_index : enumerate(indices)){
+        vec_pairs.push_back(std::make_pair(n_index.second,n_index.first));
+    }
+
+    std::sort(vec_pairs.begin(),vec_pairs.end());
+
+    std::vector<int> perm;
+    indices.clear();
+    for (const auto& pairs : vec_pairs){
+        perm.push_back(pairs.second);
+        indices.push_back(pairs.first);
+    }
+    return permutation_sign(perm);
+}
+
 // std::string WIndex::ambit() const {
 //  std::string s;
 //  s += osi->label(space_);

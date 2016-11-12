@@ -57,4 +57,15 @@ int vertices_rank(const std::vector<WDiagVertex> &vertices);
 /// 0
 int vertices_space(const std::vector<WDiagVertex> &vertices);
 
+/// Return a nice string representation of a vector of vertices
+std::string to_string(const std::vector<WDiagVertex> &vertex_vec);
+
+/// Comparison operator used for sorting
+bool operator<(std::vector<WDiagVertex> const &rhs,
+               std::vector<WDiagVertex> const &lhs);
+
+std::string signature(const WDiagVertex& vertex);
+
+std::string signature(const std::vector<WDiagVertex>& vertex_vec);
+
 #endif // _wicked_diag_vertex_h_

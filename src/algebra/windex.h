@@ -52,6 +52,9 @@ using index_map_t = std::map<WIndex, WIndex>;
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const WIndex &idx);
 
+/// Canonicalize a set of indices
+int canonicalize_indices(std::vector<WIndex> &indices);
+
 /// Helper function that converts multiple vectors of space types
 /// (OrbitalSpaceType) to vectors of indices (WIndex) labeled staring with zero.
 /// Indices are assigned in an incremental way with no duplicates

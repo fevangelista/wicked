@@ -51,6 +51,12 @@ public:
   /// Canonicalize this term and return the overall phase factor
   scalar_t canonicalize();
 
+  /// Canonicalize the indices of all tensors
+  scalar_t canonicalize_tensor_indices();
+
+  /// Canonicalize this term and return the overall phase factor
+  scalar_t canonicalize_best();
+
   /// Comparison operator used for sorting
   bool operator<(const WAlgebraicTerm &term) const;
 
@@ -79,8 +85,8 @@ private:
 
   // Used in the canonicalization routine to find how the indices of a tensor
   // connect to all the other tensors
-  std::vector<std::pair<std::vector<int>, std::string>>
-  tensor_connectivity(std::vector<WIndex> indices) const;
+  std::vector<std::pair<std::string, std::vector<int>>>
+  tensor_connectivity(const WTensor& t, bool upper) const;
 };
 
 // Helper functions

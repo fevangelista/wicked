@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "wdiag_vertex.h"
 #include "helpers.h"
 #include "orbital_space.h"
@@ -84,4 +86,53 @@ int vertices_space(const std::vector<WDiagVertex> &vertices) {
     }
   }
   return -1;
+}
+
+std::string to_string(const std::vector<WDiagVertex> &vertex_vec) {
+  // print the creation operator above
+  std::vector<std::string> cre_line, ann_line;
+  for (const auto &vertex : vertex_vec) {
+    for (int s = 0; s < osi->num_spaces(); ++s) {
+      cre_line.push_back(to_string(vertex.cre(s)));
+    }
+    cre_line.push_back(" ");
+  }
+  // print the annihilation operator above
+  for (const auto &vertex : vertex_vec) {
+    for (int s = 0; s < osi->num_spaces(); ++s) {
+      ann_line.push_back(to_string(vertex.ann(s)));
+    }
+    ann_line.push_back(" ");
+  }
+  return to_string(cre_line, " ") + "\n" + to_string(ann_line, " ");
+}
+
+bool operator<(std::vector<WDiagVertex> const &rhs,
+               std::vector<WDiagVertex> const &lhs) {
+  assert(rhs.size() == lhs.size());
+  for (int i = 0; i < rhs.size(); i++) {
+    if (rhs[i] < lhs[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::string signature(const WDiagVertex &vertex) {
+  std::string str;
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    str += std::to_string(vertex.cre(s));
+  }
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    str += to_string(vertex.ann(s));
+  }
+  return str;
+}
+
+std::string signature(const std::vector<WDiagVertex> &vertex_vec) {
+  std::string s;
+  for (const auto &vertex : vertex_vec) {
+    s += signature(vertex);
+  }
+  return s;
 }

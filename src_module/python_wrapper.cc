@@ -30,6 +30,13 @@ PYBIND11_PLUGIN(pywicked) {
       .value("unoccupied", RDMType::Unoccupied)
       .value("general", RDMType::General);
 
+  py::enum_<WDiagPrint>(m, "WDiagPrint")
+      .value("no", WDiagPrint::No)
+      .value("basic", WDiagPrint::Basic)
+      .value("summary", WDiagPrint::Summary)
+      .value("detailed", WDiagPrint::Detailed)
+      .value("all", WDiagPrint::All);
+
   py::class_<OrbitalSpaceInfo, std::shared_ptr<OrbitalSpaceInfo>>(
       m, "OrbitalSpaceInfo")
       .def(py::init<>())
@@ -47,16 +54,22 @@ PYBIND11_PLUGIN(pywicked) {
 
   py::class_<WAlgebraicTerm, std::shared_ptr<WAlgebraicTerm>>(m,
                                                               "WAlgebraicTerm")
-      .def(py::init<>());
+      .def(py::init<>())
+      .def("str", &WAlgebraicTerm::str)
+      .def("latex", &WAlgebraicTerm::latex)
+      .def("ambit", &WAlgebraicTerm::ambit);
 
   py::class_<WEquationTerm, std::shared_ptr<WEquationTerm>>(m, "WEquationTerm")
       .def(py::init<const WAlgebraicTerm &, const WAlgebraicTerm &, scalar_t>())
+      .def("lhs", &WEquationTerm::lhs)
+      .def("rhs", &WEquationTerm::rhs)
       .def("str", &WEquationTerm::str)
       .def("latex", &WEquationTerm::latex)
       .def("ambit", &WEquationTerm::ambit);
 
   py::class_<WSum, std::shared_ptr<WSum>>(m, "WSum")
       .def(py::init<>())
+      .def("canonicalize", &WSum::canonicalize)
       .def("to_manybody_equation", &WSum::to_manybody_equation)
       .def("str", &WSum::str);
 
@@ -88,7 +101,8 @@ PYBIND11_PLUGIN(pywicked) {
   py::class_<WDiagTheorem, std::shared_ptr<WDiagTheorem>>(m, "WDiagTheorem")
       .def(py::init<>())
       .def("contract", &WDiagTheorem::contract)
-      .def("contract_sum", &WDiagTheorem::contract_sum);
+      .def("contract_sum", &WDiagTheorem::contract_sum)
+      .def("set_print", &WDiagTheorem::set_print);
 
   //  py::class_make_diag_operator(const std::string &label,
   //                                   const std::vector<std::string>

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 
 #include "combinatorics.h"
 #include "helpers.h"
@@ -45,24 +46,13 @@ WSum WDiagTheorem::contract(scalar_t factor,
 
   elementary_contractions_ = generate_elementary_contractions(ops);
 
-  std::vector<int> a(100, -1);
-  // create a vector of
-  std::vector<WDiagVertex> free_vertex_vec;
-  for (const auto &op : ops) {
-    free_vertex_vec.push_back(op.vertex());
-  }
-
-  PRINT(WDiagPrint::Summary, std::cout << "\nPossible contractions:"
-                                       << std::endl;)
-  generate_contractions(a, 0, elementary_contractions_, free_vertex_vec);
-  PRINT(WDiagPrint::Summary, std::cout << "\nTotal:" << ncontractions_
-                                       << std::endl;)
+  generate_composite_contractions(ops);
 
   int ops_rank = operators_rank(ops);
-  for (const auto &contraction : contractions_) {
+  for (const auto &contraction_vec : contractions_) {
     std::vector<std::vector<WDiagVertex>> vertices;
     int contr_rank = 0;
-    for (int c : contraction) {
+    for (int c : contraction_vec) {
       contr_rank += vertices_rank(elementary_contractions_[c]);
     }
     int term_rank = ops_rank - contr_rank;
@@ -71,8 +61,11 @@ WSum WDiagTheorem::contract(scalar_t factor,
       PRINT(WDiagPrint::Basic, cout << "\n  Operator rank "
                                     << ops_rank - contr_rank << endl;)
 
+      auto ops_contractions = canonicalize_contraction(ops, contraction_vec);
+      const auto &contractions = ops_contractions.second;
+
       std::pair<WAlgebraicTerm, scalar_t> term_factor =
-          evaluate_contraction(ops, contraction, factor);
+          evaluate_contraction(ops, contractions, factor);
       PRINT(WDiagPrint::Summary, cout << term_factor << endl;)
 
       WAlgebraicTerm &term = term_factor.first;
@@ -85,8 +78,9 @@ WSum WDiagTheorem::contract(scalar_t factor,
   return result;
 }
 
-WSum WDiagTheorem::contract_sum(scalar_t factor, const WDiagOperatorSum& dop_sum,
-                                int minrank, int maxrank) {
+WSum WDiagTheorem::contract_sum(scalar_t factor,
+                                const WDiagOperatorSum &dop_sum, int minrank,
+                                int maxrank) {
   WSum result;
 
   for (const auto &dop_factor : dop_sum.sum()) {
@@ -98,7 +92,263 @@ WSum WDiagTheorem::contract_sum(scalar_t factor, const WDiagOperatorSum& dop_sum
   return result;
 }
 
-void WDiagTheorem::generate_contractions(
+void WDiagTheorem::set_print(WDiagPrint print) { print_ = print; }
+
+void print_contraction(
+    const std::vector<WDiagOperator> &ops,
+    const std::vector<std::vector<WDiagVertex>> &contractions,
+    const std::vector<int> ops_perm, const std::vector<int> contr_perm) {
+
+  std::vector<WDiagVertex> op_vertex_vec;
+  for (int o : ops_perm) {
+    op_vertex_vec.push_back(ops[o].vertex());
+  }
+
+  for (int o : ops_perm) {
+    cout << setw(2) << ops[o].label() << "    ";
+  }
+  cout << endl;
+  cout << to_string(op_vertex_vec) << endl;
+  for (int c : contr_perm) {
+    std::vector<WDiagVertex> permuted_contr;
+    for (int o : ops_perm) {
+      permuted_contr.push_back(contractions[c][o]);
+    }
+    cout << "\n" << to_string(permuted_contr) << endl;
+  }
+  cout << endl;
+}
+
+std::string
+contraction_signature(const std::vector<WDiagOperator> &ops,
+                      const std::vector<std::vector<WDiagVertex>> &contractions,
+                      const std::vector<int> &ops_perm,
+                      const std::vector<int> &contr_perm) {
+
+  std::string s;
+  int nops = ops.size();
+  for (int i = 0; i < nops; i++) {
+    s += ops[ops_perm[i]].label();
+    s += signature(ops[ops_perm[i]].vertex());
+  }
+
+  // 2. Compare contractions
+  int ncontr = contractions.size();
+  for (int i = 0; i < ncontr; i++) {
+    for (int j = 0; j < nops; j++) {
+      s += signature(contractions[contr_perm[i]][ops_perm[j]]);
+    }
+  }
+  return s;
+}
+
+std::pair<std::vector<WDiagOperator>, std::vector<std::vector<WDiagVertex>>>
+WDiagTheorem::canonicalize_contraction(
+    const std::vector<WDiagOperator> &ops,
+    const std::vector<int> &contraction_vec) {
+  std::vector<std::vector<WDiagVertex>> contractions;
+  for (int c : contraction_vec) {
+    contractions.push_back(elementary_contractions_[c]);
+  }
+
+  // PRINT(WDiagPrint::Basic,
+
+  // create a connectivity matrix
+  int nops = ops.size();
+  int_matrix conn_mat(nops, nops);
+  for (int c : contraction_vec) {
+    std::vector<int> connections;
+    for (int i = 0; i < nops; ++i) {
+      if (elementary_contractions_[c][i].rank() > 0) {
+        connections.push_back(i);
+      }
+    }
+    int nconn = connections.size();
+    for (int i = 0; i < nconn; i++) {
+      for (int j = i + 1; j < nconn; j++) {
+        conn_mat(connections[i], connections[j]) = 1;
+        conn_mat(connections[j], connections[i]) = 1;
+      }
+    }
+  }
+
+  cout << conn_mat.str() << endl;
+
+  const int maxops = 16;
+  std::vector<std::bitset<maxops>> left_masks(nops);
+  // create a mask for each operator
+  for (int i = 0; i < nops; i++) {
+    for (int j = 0; j < i; j++) {
+      if (conn_mat(j, i) != 0) {
+        left_masks[i][j] = true;
+      }
+    }
+  }
+  cout << "\nOperator masks:" << endl;
+  for (const auto &mask : left_masks) {
+    cout << mask << endl;
+  }
+
+  // setup vectors that will store the best permutations
+  std::vector<int> best_ops_perm(ops.size());
+  std::vector<int> best_contr_perm(contractions.size());
+  std::iota(best_ops_perm.begin(), best_ops_perm.end(), 0);
+  std::iota(best_contr_perm.begin(), best_contr_perm.end(), 0);
+
+  cout << "Contraction to canonicalize:" << endl;
+  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
+
+  std::vector<std::pair<std::string,
+                        std::pair<std::vector<int>, std::vector<int>>>> scores;
+  // Loop over all permutations of operators
+  std::vector<int> ops_perm(ops.size());
+  std::iota(ops_perm.begin(), ops_perm.end(), 0);
+  do {
+    cout << "Permutation: ";
+    PRINT_ELEMENTS(ops_perm);
+
+    bool allowed = true;
+    for (int i = 0; i < nops; i++) {
+      std::bitset<maxops> i_mask;
+      int i_perm = ops_perm[i];
+      // create a mask of operators to the left of i
+      for (int j = 0; j < i; j++) {
+        i_mask[ops_perm[j]] = true;
+      }
+      if ((i_mask & left_masks[i_perm]) != left_masks[i_perm]) {
+        allowed = false;
+      }
+    }
+    if (not allowed) {
+      cout << " is not allowed!";
+    }
+    cout << endl;
+
+    if (allowed) {
+      cout << "  Contraction permutations:" << endl;
+      std::vector<int> contr_perm(contractions.size());
+      std::iota(contr_perm.begin(), contr_perm.end(), 0);
+      do {
+        PRINT_ELEMENTS(contr_perm);
+
+        auto signature =
+            contraction_signature(ops, contractions, ops_perm, contr_perm);
+        scores.push_back(
+            std::make_pair(signature, std::make_pair(ops_perm, contr_perm)));
+
+        //        compare_contraction_perm(ops, contractions, ops_perm,
+        //        contr_perm,
+        //                                 best_ops_perm, best_contr_perm);
+
+        cout << endl;
+      } while (std::next_permutation(contr_perm.begin(), contr_perm.end()));
+    }
+  } while (std::next_permutation(ops_perm.begin(), ops_perm.end()));
+
+  std::sort(scores.begin(), scores.end());
+
+  best_ops_perm = scores.begin()->second.first;
+  best_contr_perm = scores.begin()->second.second;
+
+  cout << "\n Best permutation of operators:    ";
+  PRINT_ELEMENTS(best_ops_perm);
+  cout << "\n Best permutation of contractions: ";
+  PRINT_ELEMENTS(best_contr_perm);
+  cout << endl;
+
+  std::vector<WDiagOperator> best_ops;
+  for (int o : best_ops_perm) {
+    best_ops.push_back(ops[o]);
+  }
+
+  std::vector<std::vector<WDiagVertex>> best_contractions;
+  for (int c : best_contr_perm) {
+    best_contractions.push_back(contractions[c]);
+  }
+
+  // TODO: check if there is a sign change
+
+  cout << "Canonical contraction:" << endl;
+  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
+
+  return std::make_pair(best_ops, best_contractions);
+}
+
+void WDiagTheorem::generate_composite_contractions(
+    const std::vector<WDiagOperator> &ops) {
+  std::vector<int> a(100, -1);
+  // create a vector that keeps track of the free (uncontracted vertices)
+  std::vector<WDiagVertex> free_vertex_vec;
+  for (const auto &op : ops) {
+    free_vertex_vec.push_back(op.vertex());
+  }
+
+  // generate all contractions
+  PRINT(WDiagPrint::Summary, std::cout << "\nPossible contractions:"
+                                       << std::endl;)
+  generate_contractions_backtrack(a, 0, elementary_contractions_,
+                                  free_vertex_vec);
+  PRINT(WDiagPrint::Summary, std::cout << "\nTotal:" << ncontractions_
+                                       << std::endl;)
+}
+
+void WDiagTheorem::compare_contraction_perm(
+    const std::vector<WDiagOperator> &ops,
+    const std::vector<std::vector<WDiagVertex>> &contractions,
+    const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
+    std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm) {
+  //  // 1. Compare operators
+  //  int nops = ops.size();
+  //  for (int i = 0; i < nops; i++) {
+  //    if (ops[ops_perm[i]] < ops[best_ops_perm[i]]) {
+  //      return;
+  //    }
+  //  }
+
+  //  // 2. Compare contractions
+  //  int ncontr = contractions.size();
+  //  for (int j = 0; j < nops; j++) {
+  //    for (int i = 0; i < ncontr; i++) {
+  //      if (contractions[contr_perm[i]][ops_perm[j]] <
+  //          contractions[best_contr_perm[i]][best_ops_perm[j]]) {
+  //        return;
+  //      }
+  //    }
+  //  }
+  //  best_ops_perm = ops_perm;
+  //  best_contr_perm = contr_perm;
+
+  // 1. Compare operators
+  int nops = ops.size();
+  bool ops_better = false;
+  for (int i = 0; i < nops; i++) {
+    if (ops[best_ops_perm[i]] < ops[ops_perm[i]]) {
+      ops_better = true;
+      break;
+    }
+  }
+
+  // 2. Compare contractions
+  int ncontr = contractions.size();
+  bool contr_better = false;
+  for (int i = 0; i < ncontr; i++) {
+    for (int j = 0; j < nops; j++) {
+      if (contractions[best_contr_perm[i]][best_ops_perm[j]] <
+          contractions[contr_perm[i]][ops_perm[j]]) {
+        contr_better = true;
+        break;
+      }
+    }
+  }
+  if (ops_better and contr_better) {
+    cout << "\n Found better contraction" << endl;
+    best_ops_perm = ops_perm;
+    best_contr_perm = contr_perm;
+    print_contraction(ops, contractions, ops_perm, contr_perm);
+  }
+}
+
+void WDiagTheorem::generate_contractions_backtrack(
     std::vector<int> a, int k,
     const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
     std::vector<WDiagVertex> &free_vertex_vec) {
@@ -112,7 +362,7 @@ void WDiagTheorem::generate_contractions(
   for (const auto &c : candidates) {
     a[k - 1] = c;
     make_move(a, k, el_contr_vec, free_vertex_vec);
-    generate_contractions(a, k, el_contr_vec, free_vertex_vec);
+    generate_contractions_backtrack(a, k, el_contr_vec, free_vertex_vec);
     unmake_move(a, k, el_contr_vec, free_vertex_vec);
   }
 }
@@ -134,7 +384,8 @@ std::vector<int> WDiagTheorem::construct_candidates(
     const auto &el_contr = el_contr_vec[c];
 
     // test if this contraction is compatible, that is if the number of
-    // operators we want to contract is less than or equal to the number of free
+    // operators we want to contract is less than or equal to the number of
+    // free
     // (uncontracted) operators
     bool compatible = true;
     for (int A = 0; A < nops; A++) {
@@ -366,11 +617,13 @@ WDiagTheorem::generate_elementary_contractions(
   return contr_vec;
 }
 
-std::pair<WAlgebraicTerm, scalar_t>
-WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
-                                   const std::vector<int> &contraction,
-                                   scalar_t factor) {
+std::pair<WAlgebraicTerm, scalar_t> WDiagTheorem::evaluate_contraction(
+    const std::vector<WDiagOperator> &ops,
+    const std::vector<std::vector<WDiagVertex>> &contractions,
+    scalar_t factor) {
   PRINT(WDiagPrint::Basic, cout << "\n----------------------------" << endl;)
+
+  // build a map of equivalent operators
 
   // 1. Create tensors, lay out the second quantized operators on a vector,
   // and create mappings
@@ -383,18 +636,6 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   //                   op space cre    n
   std::map<std::tuple<int, int, bool, int>, int> &op_map =
       std::get<2>(tensors_sqops_op_map);
-
-  PRINT(
-      WDiagPrint::Summary, cout << "  Contraction(s):" << endl;
-      for (int c
-           : contraction) {
-        const auto &vertex_vec = elementary_contractions_[c];
-        for (const auto &vertex : vertex_vec) {
-          cout << vertex;
-        }
-        cout << endl;
-      } cout
-      << endl;)
 
   // 2. Apply the contractions to the second quantized operators and add new
   // tensors (density matrices, cumulants)
@@ -411,27 +652,28 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   // a counter that keeps track of the number of sq operators contracted
   int nsqops_contracted = 0;
 
-  // a sign factor that keeps into account a negative sign introduced by sorting
+  // a sign factor that keeps into account a negative sign introduced by
+  // sorting
   // the operators in a unoccupied-unoccupied contraction
   int unoccupied_sign = 1;
 
   index_map_t pair_contraction_reindex_map;
   // Loop over elementary contractions
-  for (int c : contraction) {
+  for (const std::vector<WDiagVertex> &contraction : contractions) {
     std::vector<bool> bit_map(sqops.size(), false);
 
     // Find the rank and space of this contraction
-    const auto &vertex_vec = elementary_contractions_[c];
-    int rank = vertices_rank(vertex_vec);
-    int s = vertices_space(vertex_vec);
+    //    const auto &contraction = elementary_contractions_[c];
+    int rank = vertices_rank(contraction);
+    int s = vertices_space(contraction);
     nsqops_contracted += rank;
 
     // find the position of the creation operators
     std::vector<int> pos_cre_sqops =
-        vertex_vec_to_pos(vertex_vec, ops_offset, op_map, true);
+        vertex_vec_to_pos(contraction, ops_offset, op_map, true);
     // find the position of the annihilation operators
     std::vector<int> pos_ann_sqops =
-        vertex_vec_to_pos(vertex_vec, ops_offset, op_map, false);
+        vertex_vec_to_pos(contraction, ops_offset, op_map, false);
 
     // mark the creation operators contracted and their order
     for (int c : pos_cre_sqops) {
@@ -535,7 +777,7 @@ WDiagTheorem::evaluate_contraction(const std::vector<WDiagOperator> &ops,
   }
 
   // find the combinatorial factor associated with this contraction
-  scalar_t comb_factor = combinatorial_factor(ops, contraction);
+  scalar_t comb_factor = combinatorial_factor(ops, contractions);
 
   WAlgebraicTerm term;
 
@@ -654,9 +896,9 @@ std::vector<int> WDiagTheorem::vertex_vec_to_pos(
   return result;
 }
 
-scalar_t
-WDiagTheorem::combinatorial_factor(const std::vector<WDiagOperator> &ops,
-                                   const std::vector<int> &contraction) {
+scalar_t WDiagTheorem::combinatorial_factor(
+    const std::vector<WDiagOperator> &ops,
+    const std::vector<std::vector<WDiagVertex>> &contractions) {
 
   scalar_t factor = 1;
 
@@ -667,10 +909,9 @@ WDiagTheorem::combinatorial_factor(const std::vector<WDiagOperator> &ops,
   }
 
   // for each contraction find the combinatorial factor
-  for (int c : contraction) {
-    const auto &vertex_vec = elementary_contractions_[c];
-    for (int v = 0; v < vertex_vec.size(); v++) {
-      const WDiagVertex &vertex = vertex_vec[v];
+  for (const auto &contraction : contractions) {
+    for (int v = 0; v < contraction.size(); v++) {
+      const WDiagVertex &vertex = contraction[v];
       for (int s = 0; s < osi->num_spaces(); s++) {
         int kcre = vertex.cre(s);
         int kann = vertex.ann(s);
@@ -684,10 +925,13 @@ WDiagTheorem::combinatorial_factor(const std::vector<WDiagOperator> &ops,
     }
   }
 
-  std::map<int, int> contraction_count;
-  for (int c : contraction) {
-    contraction_count[c] += 1;
+  std::map<std::vector<WDiagVertex>, int> contraction_count;
+  for (const auto &contraction : contractions) {
+    contraction_count[contraction] += 1;
   }
+  //  for (int c : contraction) {
+  //    contraction_count[c] += 1;
+  //  }
   for (const auto &kv : contraction_count) {
     factor /= binomial(kv.second, 1);
   }

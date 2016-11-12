@@ -26,6 +26,30 @@ std::vector<std::string> findall(const std::string &s,
 /// Split indices
 std::vector<std::string> split_indices(const std::string &s);
 
+/// A range iterator class used to loop over
+class int_matrix {
+private:
+  size_t nrows_;
+  size_t ncols_;
+  std::vector<int> m_;
+
+public:
+  int_matrix(size_t nrows, size_t ncols)
+      : nrows_(nrows), ncols_(ncols), m_(nrows * ncols, 0) {}
+  int &operator()(size_t i, size_t j) { return m_[i * ncols_ + j]; }
+  int operator()(size_t i, size_t j) const { return m_[i * ncols_ + j]; }
+  std::string str() {
+    std::string s;
+    for (int i = 0; i < nrows_; ++i) {
+      for (int j = 0; j < ncols_; ++j) {
+        s += " " + std::to_string(m_[i * ncols_ + j]);
+      }
+      s += '\n';
+    }
+    return s;
+  }
+};
+
 template <class T, class F>
 void add_to_map(std::map<T, F> &m, const T &key, const F &value) {
   // find the key
