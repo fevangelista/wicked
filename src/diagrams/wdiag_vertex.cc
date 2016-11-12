@@ -107,17 +107,6 @@ std::string to_string(const std::vector<WDiagVertex> &vertex_vec) {
   return to_string(cre_line, " ") + "\n" + to_string(ann_line, " ");
 }
 
-bool operator<(std::vector<WDiagVertex> const &rhs,
-               std::vector<WDiagVertex> const &lhs) {
-  assert(rhs.size() == lhs.size());
-  for (int i = 0; i < rhs.size(); i++) {
-    if (rhs[i] < lhs[i]) {
-      return true;
-    }
-  }
-  return false;
-}
-
 std::string signature(const WDiagVertex &vertex) {
   std::string str;
   for (int s = 0; s < osi->num_spaces(); ++s) {

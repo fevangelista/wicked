@@ -151,7 +151,13 @@ WDiagTheorem::canonicalize_contraction(
     contractions.push_back(elementary_contractions_[c]);
   }
 
-  // PRINT(WDiagPrint::Basic,
+  for (const auto &op : ops) {
+    if (op.rank() % 2 != 0) {
+      cout << "\n\n  WDiagTheorem::canonicalize_contraction cannot yet handle "
+              "operators with an even number of sqops.\n";
+      exit(1);
+    }
+  }
 
   // create a connectivity matrix
   int nops = ops.size();
@@ -172,8 +178,6 @@ WDiagTheorem::canonicalize_contraction(
     }
   }
 
-  cout << conn_mat.str() << endl;
-
   const int maxops = 16;
   std::vector<std::bitset<maxops>> left_masks(nops);
   // create a mask for each operator
@@ -184,10 +188,10 @@ WDiagTheorem::canonicalize_contraction(
       }
     }
   }
-  cout << "\nOperator masks:" << endl;
-  for (const auto &mask : left_masks) {
-    cout << mask << endl;
-  }
+//  cout << "\nOperator masks:" << endl;
+//  for (const auto &mask : left_masks) {
+//    cout << mask << endl;
+//  }
 
   // setup vectors that will store the best permutations
   std::vector<int> best_ops_perm(ops.size());
@@ -195,8 +199,8 @@ WDiagTheorem::canonicalize_contraction(
   std::iota(best_ops_perm.begin(), best_ops_perm.end(), 0);
   std::iota(best_contr_perm.begin(), best_contr_perm.end(), 0);
 
-  cout << "Contraction to canonicalize:" << endl;
-  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
+//  cout << "Contraction to canonicalize:" << endl;
+//  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
 
   std::vector<std::pair<std::string,
                         std::pair<std::vector<int>, std::vector<int>>>> scores;
@@ -204,8 +208,8 @@ WDiagTheorem::canonicalize_contraction(
   std::vector<int> ops_perm(ops.size());
   std::iota(ops_perm.begin(), ops_perm.end(), 0);
   do {
-    cout << "Permutation: ";
-    PRINT_ELEMENTS(ops_perm);
+    //    cout << "Permutation: ";
+    //    PRINT_ELEMENTS(ops_perm);
 
     bool allowed = true;
     for (int i = 0; i < nops; i++) {
@@ -219,29 +223,35 @@ WDiagTheorem::canonicalize_contraction(
         allowed = false;
       }
     }
-    if (not allowed) {
-      cout << " is not allowed!";
-    }
-    cout << endl;
+    //    if (not allowed) {
+    //      cout << " is not allowed!";
+    //    }
+    //    cout << endl;
 
     if (allowed) {
-      cout << "  Contraction permutations:" << endl;
-      std::vector<int> contr_perm(contractions.size());
-      std::iota(contr_perm.begin(), contr_perm.end(), 0);
-      do {
-        PRINT_ELEMENTS(contr_perm);
+      // find the "best" contraction permutation directly
 
-        auto signature =
-            contraction_signature(ops, contractions, ops_perm, contr_perm);
-        scores.push_back(
-            std::make_pair(signature, std::make_pair(ops_perm, contr_perm)));
+      std::vector<std::pair<std::vector<WDiagVertex>, int>> sorted_contractions;
 
-        //        compare_contraction_perm(ops, contractions, ops_perm,
-        //        contr_perm,
-        //                                 best_ops_perm, best_contr_perm);
+      int ncontr = contractions.size();
+      for (int i = 0; i < ncontr; i++) {
+        std::vector<WDiagVertex> permuted_contr;
+        for (int j = 0; j < nops; j++) {
+          permuted_contr.push_back(contractions[i][ops_perm[j]]);
+        }
+        sorted_contractions.push_back(std::make_pair(permuted_contr, i));
+      }
+      std::sort(sorted_contractions.begin(), sorted_contractions.end());
 
-        cout << endl;
-      } while (std::next_permutation(contr_perm.begin(), contr_perm.end()));
+      std::vector<int> contr_perm;
+      for (int i = 0; i < ncontr; i++) {
+        contr_perm.push_back(sorted_contractions[i].second);
+      }
+
+      auto signature =
+          contraction_signature(ops, contractions, ops_perm, contr_perm);
+      scores.push_back(
+          std::make_pair(signature, std::make_pair(ops_perm, contr_perm)));
     }
   } while (std::next_permutation(ops_perm.begin(), ops_perm.end()));
 
@@ -250,11 +260,11 @@ WDiagTheorem::canonicalize_contraction(
   best_ops_perm = scores.begin()->second.first;
   best_contr_perm = scores.begin()->second.second;
 
-  cout << "\n Best permutation of operators:    ";
-  PRINT_ELEMENTS(best_ops_perm);
-  cout << "\n Best permutation of contractions: ";
-  PRINT_ELEMENTS(best_contr_perm);
-  cout << endl;
+  //  cout << "\n Best permutation of operators:    ";
+  //  PRINT_ELEMENTS(best_ops_perm);
+  //  cout << "\n Best permutation of contractions: ";
+  //  PRINT_ELEMENTS(best_contr_perm);
+  //  cout << endl;
 
   std::vector<WDiagOperator> best_ops;
   for (int o : best_ops_perm) {
@@ -268,8 +278,8 @@ WDiagTheorem::canonicalize_contraction(
 
   // TODO: check if there is a sign change
 
-  cout << "Canonical contraction:" << endl;
-  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
+//  cout << "Canonical contraction:" << endl;
+//  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
 
   return std::make_pair(best_ops, best_contractions);
 }

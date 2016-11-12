@@ -39,7 +39,7 @@ int main(int argc, const char *argv[]) {
   cout << "\n comm:\n" << comm << endl;
   cout << "\n bch:\n" << bch << endl;
 
-  wdt.set_print(WDiagPrint::Basic);
+//  wdt.set_print(WDiagPrint::Basic);
   auto sum = wdt.contract_sum(1, bch, 2, 2);
   cout << sum << endl;
   //  WSum val;

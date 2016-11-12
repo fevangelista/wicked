@@ -274,7 +274,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
 
   //  std::cout << "\n  " << str();
 
-  canonicalize_best();
+//  canonicalize_best();
 
   return factor;
 }
