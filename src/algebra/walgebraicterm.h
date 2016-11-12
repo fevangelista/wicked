@@ -54,9 +54,6 @@ public:
   /// Canonicalize the indices of all tensors
   scalar_t canonicalize_tensor_indices();
 
-  /// Canonicalize this term and return the overall phase factor
-  scalar_t canonicalize_best();
-
   /// Comparison operator used for sorting
   bool operator<(const WAlgebraicTerm &term) const;
 

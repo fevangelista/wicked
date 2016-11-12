@@ -326,104 +326,6 @@ scalar_t WAlgebraicTerm::canonicalize_tensor_indices() {
   return sign;
 }
 
-scalar_t WAlgebraicTerm::canonicalize_best() {
-  scalar_t factor(1);
-
-  // find classes of equivalent indices
-  std::map<std::pair<std::string, int>, std::vector<WIndex>> equiv_classes;
-  for (const auto &tensor : tensors_) {
-    std::string label = tensor.label();
-    for (int i : num_indices_per_space(tensor.upper())) {
-      label += "_" + to_string(i);
-    }
-    for (int i : num_indices_per_space(tensor.lower())) {
-      label += "_" + to_string(i);
-    }
-    for (const auto &idx : tensor.upper()) {
-      auto fingerprint = std::make_tuple(label + "u", idx.space());
-      equiv_classes[fingerprint].push_back(idx);
-    }
-    for (const auto &idx : tensor.lower()) {
-      auto fingerprint = std::make_tuple(label + "l", idx.space());
-      equiv_classes[fingerprint].push_back(idx);
-    }
-  }
-
-  cout << str() << '\n';
-  cout << "Index equivalence classes:\n";
-  for (const auto &kv : equiv_classes) {
-    cout << kv.first.first << " " << kv.first.second << " ";
-    PRINT_ELEMENTS(kv.second);
-    cout << '\n';
-  }
-
-  std::set<WIndex> sqops_indices;
-  for (const auto &sqop : operators_) {
-    sqops_indices.insert(sqop.index());
-  }
-
-  // find the unique classes
-  std::set<std::vector<WIndex>> unique_equiv_classes;
-  for (const auto &kv : equiv_classes) {
-    // must have at least two elements (otherwise there is no need to relabel)
-    if (kv.second.size() > 1) {
-      bool is_op_index = false;
-      for (const auto &idx : kv.second) {
-        if (sqops_indices.count(idx) != 0)
-          is_op_index = true;
-      }
-      if (not is_op_index) {
-        std::vector<WIndex> indices = kv.second;
-        std::sort(indices.begin(), indices.end());
-        unique_equiv_classes.insert(indices);
-      }
-    }
-  }
-
-  int numeqcl = unique_equiv_classes.size();
-  cout << "Index unique equivalence classes:\n";
-  for (const auto &v : unique_equiv_classes) {
-    PRINT_ELEMENTS(v);
-    cout << '\n';
-  }
-
-//  // for each equivalence class holds all permutations of indices
-//  std::vector<std::vector<std::vector<WIndex>>>
-//      unique_equiv_classes_permutations;
-
-//  std::vector<int> r;
-//  for (const auto &v : unique_equiv_classes) {
-//    std::vector<std::vector<WIndex>> permutations;
-//    do {
-//      permutations.push_back(v);
-//    } while (std::next_permutation(v.begin(), v.end()));
-//    r.push_back(permutations.size());
-//    unique_equiv_classes_permutations.push_back(permutations);
-//  }
-
-//  auto prod_space = product_space(r);
-
-//  for (const auto &el : prod_space) {
-//    cout << "Considering the following permutations" << '\n';
-//    for (int n = 0; n < numeqcl; n++) {
-//        PRINT_ELEMENTS(unique_equiv_classes_permutations[n][0]);
-//        cout << " -> ";
-//        PRINT_ELEMENTS(unique_equiv_classes_permutations[n][el[n]]);
-//        cout << '\n';
-//    }
-//  }
-
-  //
-
-  // loop over direct product of unique equivalence classes and generate
-  // permutations of indices
-
-  // resort indices in the tensors
-  // find "best" representation
-
-  return factor;
-}
-
 bool WAlgebraicTerm::operator<(const WAlgebraicTerm &other) const {
   if (tensors_ > other.tensors_) {
     return false;
@@ -536,3 +438,102 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
   }
   return term;
 }
+
+
+//scalar_t WAlgebraicTerm::canonicalize_best() {
+//  scalar_t factor(1);
+
+//  // find classes of equivalent indices
+//  std::map<std::pair<std::string, int>, std::vector<WIndex>> equiv_classes;
+//  for (const auto &tensor : tensors_) {
+//    std::string label = tensor.label();
+//    for (int i : num_indices_per_space(tensor.upper())) {
+//      label += "_" + to_string(i);
+//    }
+//    for (int i : num_indices_per_space(tensor.lower())) {
+//      label += "_" + to_string(i);
+//    }
+//    for (const auto &idx : tensor.upper()) {
+//      auto fingerprint = std::make_tuple(label + "u", idx.space());
+//      equiv_classes[fingerprint].push_back(idx);
+//    }
+//    for (const auto &idx : tensor.lower()) {
+//      auto fingerprint = std::make_tuple(label + "l", idx.space());
+//      equiv_classes[fingerprint].push_back(idx);
+//    }
+//  }
+
+//  cout << str() << '\n';
+//  cout << "Index equivalence classes:\n";
+//  for (const auto &kv : equiv_classes) {
+//    cout << kv.first.first << " " << kv.first.second << " ";
+//    PRINT_ELEMENTS(kv.second);
+//    cout << '\n';
+//  }
+
+//  std::set<WIndex> sqops_indices;
+//  for (const auto &sqop : operators_) {
+//    sqops_indices.insert(sqop.index());
+//  }
+
+//  // find the unique classes
+//  std::set<std::vector<WIndex>> unique_equiv_classes;
+//  for (const auto &kv : equiv_classes) {
+//    // must have at least two elements (otherwise there is no need to relabel)
+//    if (kv.second.size() > 1) {
+//      bool is_op_index = false;
+//      for (const auto &idx : kv.second) {
+//        if (sqops_indices.count(idx) != 0)
+//          is_op_index = true;
+//      }
+//      if (not is_op_index) {
+//        std::vector<WIndex> indices = kv.second;
+//        std::sort(indices.begin(), indices.end());
+//        unique_equiv_classes.insert(indices);
+//      }
+//    }
+//  }
+
+//  int numeqcl = unique_equiv_classes.size();
+//  cout << "Index unique equivalence classes:\n";
+//  for (const auto &v : unique_equiv_classes) {
+//    PRINT_ELEMENTS(v);
+//    cout << '\n';
+//  }
+
+//  // for each equivalence class holds all permutations of indices
+//  std::vector<std::vector<std::vector<WIndex>>>
+//      unique_equiv_classes_permutations;
+
+//  std::vector<int> r;
+//  for (const auto &v : unique_equiv_classes) {
+//    std::vector<std::vector<WIndex>> permutations;
+//    do {
+//      permutations.push_back(v);
+//    } while (std::next_permutation(v.begin(), v.end()));
+//    r.push_back(permutations.size());
+//    unique_equiv_classes_permutations.push_back(permutations);
+//  }
+
+//  auto prod_space = product_space(r);
+
+//  for (const auto &el : prod_space) {
+//    cout << "Considering the following permutations" << '\n';
+//    for (int n = 0; n < numeqcl; n++) {
+//        PRINT_ELEMENTS(unique_equiv_classes_permutations[n][0]);
+//        cout << " -> ";
+//        PRINT_ELEMENTS(unique_equiv_classes_permutations[n][el[n]]);
+//        cout << '\n';
+//    }
+//  }
+
+  //
+
+  // loop over direct product of unique equivalence classes and generate
+  // permutations of indices
+
+  // resort indices in the tensors
+  // find "best" representation
+
+//  return factor;
+//}
