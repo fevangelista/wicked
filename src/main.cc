@@ -27,7 +27,7 @@ int main(int argc, const char *argv[]) {
   osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
 
   auto T1 = make_operator("t", {"o->v"});
-  auto Vooov = make_operator("h", {"ov->oo"});
+  auto Vooov = make_operator("v", {"ov->oo"});
 
   WDiagTheorem wdt;
 

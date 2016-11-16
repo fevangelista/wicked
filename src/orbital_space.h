@@ -46,6 +46,9 @@ public:
   /// The label of an orbital space
   const std::string &label(int pos) const;
 
+  /// The label of an index that belongs to a given orbital space
+  const std::string index_label(int pos, int idx) const;
+
   /// The structure of the density matrices for an orbital space
   RDMType dmstructure(int pos) const;
 

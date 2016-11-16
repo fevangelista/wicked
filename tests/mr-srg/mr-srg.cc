@@ -5,34 +5,35 @@
 
 using namespace std;
 
-bool test_Aoo_Boo() {
+test_return_t test_Aoo_Boo() {
   WDiagTheorem wdt;
-  std::string o = "o";
-  std::string v = "v";
-  auto opAoo = make_diag_operator("A", {o}, {o});
-  auto opBoo = make_diag_operator("B", {o}, {o});
+  auto Acc = make_operator("a", {"c->c"});
+  auto Bcc = make_operator("b", {"c->c"});
 
   // [Aoo,Boo]
-  auto c1 = wdt.contract(1, {opAoo, opBoo}, 0, 2);
-  auto c2 = wdt.contract(1, {opBoo, opAoo}, 0, 2);
-  c1 -= c2;
-  //  cout << "\n" << c1 << endl;
-  auto e1_test = string_to_sum("f^{v0}_{o0} t^{o0}_{v0}");
-  return true; //(c1 == e1_test);
+  auto sum = wdt.contract_sum(1, commutator(Acc, Bcc), 0, 4);
+
+  auto sum_test =
+      string_to_sum("-a^{c0}_{c2} b^{c2}_{c1} { a+(c1) a-(c0) }") +
+      string_to_sum("a^{c2}_{c0} b^{c1}_{c2} { a+(c0) a-(c1) }");
+
+  cout << '\n' << sum << endl;
+  cout << '\n' << sum_test << endl;
+
+  bool pass = (sum == sum_test);
+  return make_return_t(TestPass, pass, {"[Acc,Bcc]"});
 }
 
 int main(int argc, const char *argv[]) {
 
   // Define the orbital space
   osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->add_space("o", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
+  osi->add_space("c", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
+  osi->add_space("a", RDMType::General, {"u", "v", "w", "x", "y", "z"});
   osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
 
   // Assemble the tests
-  auto test_functions = {
-      //            Expectation,  test function,  User friendly description
-      std::make_tuple(TestPass, test_Aoo_Boo, "[Aoo,Boo]"),
-  };
+  auto test_functions = {test_Aoo_Boo};
 
   // Run the tests
   bool success = wicked_test(test_functions);

@@ -8,8 +8,7 @@ std::shared_ptr<OrbitalSpaceInfo> get_osi() { return osi; }
 
 OrbitalSpaceInfo::OrbitalSpaceInfo() {}
 
-void OrbitalSpaceInfo::add_space(const std::string &label,
-                                 RDMType structure,
+void OrbitalSpaceInfo::add_space(const std::string &label, RDMType structure,
                                  const std::vector<std::string> &indices) {
   size_t pos = space_info_.size();
   label_to_pos_[label] = pos;
@@ -26,6 +25,14 @@ void OrbitalSpaceInfo::add_space(const std::string &label,
 
 const std::string &OrbitalSpaceInfo::label(int pos) const {
   return std::get<0>(space_info_[pos]);
+}
+
+const std::string OrbitalSpaceInfo::index_label(int pos, int idx) const {
+  const std::vector<std::string> &index_labels = std::get<2>(space_info_[pos]);
+  if (idx < index_labels.size()) {
+    return std::get<2>(space_info_[pos])[idx];
+  }
+  return std::get<0>(space_info_[pos]) + "_{" + std::to_string(idx) + "}";
 }
 
 RDMType OrbitalSpaceInfo::dmstructure(int pos) const {

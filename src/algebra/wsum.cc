@@ -99,6 +99,14 @@ std::string WSum::str() const {
   return (to_string(str_vec, "\n"));
 }
 
+std::string WSum::latex() const {
+  std::vector<std::string> str_vec;
+  for (auto &kv : terms_) {
+    str_vec.push_back(kv.second.latex() + ' ' + kv.first.latex());
+  }
+  return (to_string(str_vec, " \\\\ \n"));
+}
+
 std::vector<WEquationTerm>
 WSum::to_manybody_equation(const std::string &label) {
   std::vector<WEquationTerm> result;
@@ -147,16 +155,21 @@ std::ostream &operator<<(std::ostream &os, const WSum &sum) {
 WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
   WSum sum;
 
+//  std::cout << "\n  Parsing: \"" << s << "\"" << std::endl;
+
   //"f^{v0}_{o0} t^{o0}_{v0}"
   std::string factor_re;
   std::string tensor_re;
+  std::string operator_re;
   if (syntax == TensorSyntax::Wicked) {
     tensor_re = "([a-zA-Z0-9]+)\\^\\{([\\w,\\s]*)\\}_\\{([\\w,\\s]*)\\}";
-    factor_re = "\\s*([+-]?\\d*)?/?(\\d*)?\\s+"; // ";
+    operator_re = "a([+-]{1,1})\\(([\\w,\\d]*)\\)";
+    factor_re = "^\\s*([+-]?\\d*)?/?(\\d*)?\\s*";
   }
 
   //  std::cout << "Parsing tensors: " << std::endl;
   auto tensors = findall(s, tensor_re);
+  auto operators = findall(s, operator_re);
 
   WAlgebraicTerm term;
   for (size_t n = 0; n < tensors.size(); n += 3) {
@@ -177,16 +190,30 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     }
     term.add(WTensor(label, lower, upper));
   }
-  //  std::cout << "Parsing factor: " << std::endl;
+
+//  for (auto s : operators) {
+//    std::cout << s << std::endl;
+//  }
+
+  for (size_t n = 0; n < operators.size(); n += 2) {
+    SQOperatorType type = operators[n] == "+" ? Creation : Annihilation;
+    WIndex index = string_to_index(operators[n + 1]);
+    term.add(WSQOperator(type, index));
+  }
+
+//  std::cout << "Parsing factor: " << std::endl;
 
   auto factor_vec = findall(s, factor_re);
-  //  for (auto f : factor_vec) {
-  //    std::cout << "Factor: " << f << std::endl;
-  //  }
+//  for (auto f : factor_vec) {
+//    std::cout << "Factor: " << f << std::endl;
+//  }
   int numerator = 1;
   int denominator = 1;
-  if (factor_vec.size() > 1) {
-    if (factor_vec[0] != "") {
+  if (factor_vec.size() == 2) {
+    if (factor_vec[0] == "") {
+    } else if (factor_vec[0] == "-") {
+      numerator = -1;
+    } else {
       numerator = std::stoi(factor_vec[0]);
     }
     if (factor_vec[1] != "") {
@@ -194,6 +221,7 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     }
   }
   scalar_t factor(numerator, denominator);
+//  std::cout << term << std::endl;
 
   sum.add(term, factor);
   return sum;
