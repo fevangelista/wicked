@@ -5,23 +5,57 @@
 
 using namespace std;
 
-test_return_t test_Aoo_Boo() {
+test_return_t test_Faa_Tca() {
   WDiagTheorem wdt;
-  auto Acc = make_operator("a", {"c->c"});
-  auto Bcc = make_operator("b", {"c->c"});
+  auto Faa = make_operator("f", {"a->a"});
+  auto Tca = make_operator("t", {"c->a"});
 
-  // [Aoo,Boo]
-  auto sum = wdt.contract_sum(1, commutator(Acc, Bcc), 0, 4);
+  // [Faa,Tca]
+  auto sum = wdt.contract_sum(1, commutator(Faa, Tca), 0, 2);
 
   auto sum_test =
-      string_to_sum("-a^{c0}_{c2} b^{c2}_{c1} { a+(c1) a-(c0) }") +
-      string_to_sum("a^{c2}_{c0} b^{c1}_{c2} { a+(c0) a-(c1) }");
-
-  cout << '\n' << sum << endl;
-  cout << '\n' << sum_test << endl;
+      string_to_sum(
+          "eta1^{a2}_{a1} f^{a1}_{a0} t^{c0}_{a2} { a+(a0) a-(c0) }") +
+      string_to_sum(
+          "f^{a1}_{a0} gamma1^{a2}_{a1} t^{c0}_{a2} { a+(a0) a-(c0) }");
 
   bool pass = (sum == sum_test);
-  return make_return_t(TestPass, pass, {"[Acc,Bcc]"});
+  return make_return_t(TestPass, pass, {"[Faa,Tca]"});
+}
+
+test_return_t test_Fvv_Tcv() {
+  WDiagTheorem wdt;
+  //  wdt.set_print(WDiagPrint::Basic);
+  auto Fvv = make_operator("f", {"v->v"});
+  auto Tcv = make_operator("t", {"c->v"});
+
+  // [Fvv,Tcv]
+  auto sum = wdt.contract_sum(1, commutator(Fvv, Tcv), 0, 2);
+
+  auto sum_test = string_to_sum("f^{v1}_{v0} t^{c0}_{v1} { a+(v0) a-(c0) }");
+
+  bool pass = (sum == sum_test);
+  return make_return_t(TestPass, pass, {"[Fvv,Tcv]"});
+}
+
+test_return_t test_Faa_Tav() {
+  WDiagTheorem wdt;
+  auto Faa = make_operator("f", {"a->a"});
+  auto Tav = make_operator("t", {"a->v"});
+
+  // [Faa,Tav]
+  auto sum = wdt.contract_sum(1, commutator(Faa, Tav), 0, 2);
+
+  cout << "\n\n" << sum.latex() << endl;
+
+  auto sum_test =
+      string_to_sum(
+          "eta1^{a2}_{a1} f^{a1}_{a0} t^{c0}_{a2} { a+(a0) a-(c0) }") +
+      string_to_sum(
+          "f^{a1}_{a0} gamma1^{a2}_{a1} t^{c0}_{a2} { a+(a0) a-(c0) }");
+
+  bool pass = (sum == sum_test);
+  return make_return_t(TestPass, pass, {"[Faa,Tav]"});
 }
 
 int main(int argc, const char *argv[]) {
@@ -33,7 +67,7 @@ int main(int argc, const char *argv[]) {
   osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
 
   // Assemble the tests
-  auto test_functions = {test_Aoo_Boo};
+  auto test_functions = {test_Faa_Tca, test_Fvv_Tcv, test_Faa_Tav};
 
   // Run the tests
   bool success = wicked_test(test_functions);

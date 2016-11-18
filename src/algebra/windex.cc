@@ -32,7 +32,6 @@ std::ostream &operator<<(std::ostream &os, const WIndex &idx) {
 
 int canonicalize_indices(std::vector<WIndex> &indices) {
   std::vector<std::pair<WIndex, int>> vec_pairs;
-  int n = 0;
   for (const auto &n_index : enumerate(indices)) {
     vec_pairs.push_back(std::make_pair(n_index.second, n_index.first));
   }

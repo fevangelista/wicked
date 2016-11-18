@@ -93,8 +93,19 @@ WSum &WSum::operator-=(const WSum &sum) {
 
 std::string WSum::str() const {
   std::vector<std::string> str_vec;
+  int n = 0;
   for (auto &kv : terms_) {
-    str_vec.push_back(kv.second.str() + ' ' + kv.first.str());
+    std::string term_str;
+    if (n == 0) {
+      term_str += kv.second.str(false);
+    } else {
+      term_str += kv.second.str(true);
+    }
+    if ((term_str.size() > 1) and (term_str != "-")) {
+      term_str += " ";
+    }
+    str_vec.push_back(term_str + kv.first.str());
+    n++;
   }
   return (to_string(str_vec, "\n"));
 }
@@ -155,7 +166,7 @@ std::ostream &operator<<(std::ostream &os, const WSum &sum) {
 WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
   WSum sum;
 
-//  std::cout << "\n  Parsing: \"" << s << "\"" << std::endl;
+  //  std::cout << "\n  Parsing: \"" << s << "\"" << std::endl;
 
   //"f^{v0}_{o0} t^{o0}_{v0}"
   std::string factor_re;
@@ -191,9 +202,9 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     term.add(WTensor(label, lower, upper));
   }
 
-//  for (auto s : operators) {
-//    std::cout << s << std::endl;
-//  }
+  //  for (auto s : operators) {
+  //    std::cout << s << std::endl;
+  //  }
 
   for (size_t n = 0; n < operators.size(); n += 2) {
     SQOperatorType type = operators[n] == "+" ? Creation : Annihilation;
@@ -201,12 +212,12 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     term.add(WSQOperator(type, index));
   }
 
-//  std::cout << "Parsing factor: " << std::endl;
+  //  std::cout << "Parsing factor: " << std::endl;
 
   auto factor_vec = findall(s, factor_re);
-//  for (auto f : factor_vec) {
-//    std::cout << "Factor: " << f << std::endl;
-//  }
+  //  for (auto f : factor_vec) {
+  //    std::cout << "Factor: " << f << std::endl;
+  //  }
   int numerator = 1;
   int denominator = 1;
   if (factor_vec.size() == 2) {
@@ -221,7 +232,7 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     }
   }
   scalar_t factor(numerator, denominator);
-//  std::cout << term << std::endl;
+  //  std::cout << term << std::endl;
 
   sum.add(term, factor);
   return sum;

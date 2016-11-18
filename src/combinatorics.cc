@@ -205,27 +205,6 @@ std::vector<std::vector<int>> product_space(const std::vector<int> &r) {
   return elements;
 }
 
-void test_product_space() {
-  int maxn = 30;
-
-  std::cout << "testing product space" << std::endl;
-
-  std::vector<std::vector<int>> tests{{1, 1, 1}, {2, 1, 1}};
-  std::vector<std::vector<std::vector<int>>> results{{{0, 0, 0}},
-                                                     {{0, 0, 0}, {0, 0, 1}}};
-  for (const auto &test : tests) {
-    auto results = product_space(test);
-    std::sort(results.begin(), results.end());
-    bool pass = true;
-    // TODO: add check
-    //    for (int n = 0; n < resul)
-    //    for (auto &result : results) {
-
-    //      PRINT_ELEMENTS(result);
-    //    }
-  }
-}
-
 void generalized_combinations_with_repetitions_iterator(
     const std::vector<int> &r, const std::vector<int> &k,
     const std::function<void(const std::vector<std::vector<int>> &)> &func) {

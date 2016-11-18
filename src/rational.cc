@@ -65,7 +65,12 @@ std::string rational::str(bool sign) const {
       s = '+';
     }
     if (denominator_ == 1) {
-      s += std::to_string(numerator_);
+      if (numerator_ == 1) {
+      } else if (numerator_ == -1) {
+        s += "-";
+      } else {
+        s += std::to_string(numerator_);
+      }
     } else {
       s += std::to_string(numerator_) + "/" + std::to_string(denominator_);
     }
@@ -79,9 +84,14 @@ std::string rational::latex() const {
     s = "0";
   } else {
     if (denominator_ == 1) {
-      s += std::to_string(numerator_);
+      if (numerator_ == 1) {
+      } else if (numerator_ == -1) {
+        s += "-";
+      } else {
+        s += std::to_string(numerator_);
+      }
     } else {
-      s += "\frac{" + std::to_string(numerator_) + "}{" +
+      s += "\\frac{" + std::to_string(numerator_) + "}{" +
            std::to_string(denominator_) + "}";
     }
   }

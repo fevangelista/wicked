@@ -188,10 +188,10 @@ WDiagTheorem::canonicalize_contraction(
       }
     }
   }
-//  cout << "\nOperator masks:" << endl;
-//  for (const auto &mask : left_masks) {
-//    cout << mask << endl;
-//  }
+  //  cout << "\nOperator masks:" << endl;
+  //  for (const auto &mask : left_masks) {
+  //    cout << mask << endl;
+  //  }
 
   // setup vectors that will store the best permutations
   std::vector<int> best_ops_perm(ops.size());
@@ -199,8 +199,8 @@ WDiagTheorem::canonicalize_contraction(
   std::iota(best_ops_perm.begin(), best_ops_perm.end(), 0);
   std::iota(best_contr_perm.begin(), best_contr_perm.end(), 0);
 
-//  cout << "Contraction to canonicalize:" << endl;
-//  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
+  //  cout << "Contraction to canonicalize:" << endl;
+  //  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
 
   std::vector<std::pair<std::string,
                         std::pair<std::vector<int>, std::vector<int>>>> scores;
@@ -278,8 +278,8 @@ WDiagTheorem::canonicalize_contraction(
 
   // TODO: check if there is a sign change
 
-//  cout << "Canonical contraction:" << endl;
-//  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
+  //  cout << "Canonical contraction:" << endl;
+  //  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
 
   return std::make_pair(best_ops, best_contractions);
 }
@@ -562,7 +562,7 @@ WDiagTheorem::generate_elementary_contractions(
         sumann += ops[A].num_ann(s);
       }
       int max_half_legs = std::min(std::min(sumcre, sumann), maxcumulant_);
-      int max_legs = 2 * max_half_legs;
+//      int max_legs = 2 * max_half_legs;
 
       // loop over all possible contractions from 2 to max_legs
       for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
@@ -616,8 +616,6 @@ WDiagTheorem::generate_elementary_contractions(
             // exclude operators that have legs only on one operator
             if (ncontracted > 1) {
               contr_vec.push_back(new_contr);
-              PRINT_ELEMENTS(new_contr, "      ");
-              cout << endl;
             }
           }
         }
@@ -722,7 +720,10 @@ std::pair<WAlgebraicTerm, scalar_t> WDiagTheorem::evaluate_contraction(
       WIndex cre_index = sqops[pos_cre_sqops[0]].index();
       WIndex ann_index = sqops[pos_ann_sqops[0]].index();
       pair_contraction_reindex_map[cre_index] = ann_index;
-      unoccupied_sign *= -1;
+      unoccupied_sign *= -1; // this factor is to compensate for the fact that
+                             // we order operator in a canonical form in which
+                             // annihilators are to the left of creation
+                             // operators
     }
 
     // 2k-legged contractions (k >= 2) of k creation and k annihilation
@@ -745,7 +746,20 @@ std::pair<WAlgebraicTerm, scalar_t> WDiagTheorem::evaluate_contraction(
       // reverse the lower indices
       std::reverse(lower.begin(), lower.end());
       // prepare the label
-      std::string label = "Lambda" + std::to_string(rank / 2);
+      std::string label;
+      if (rank == 2) {
+        if (pos_cre_sqops[0] < pos_ann_sqops[0]) {
+          label = "gamma" + std::to_string(rank / 2);
+        } else {
+          label = "eta" + std::to_string(rank / 2);
+          unoccupied_sign *= -1; // this factor is to compensate for the fact
+                                 // that we order operator in a canonical form
+                                 // in which annihilators are to the left of
+                                 // creation operators
+        }
+      } else {
+        label = "lambda" + std::to_string(rank / 2);
+      }
       // add the cumulant to the list of tensors
       tensors.push_back(WTensor(label, lower, upper));
     }

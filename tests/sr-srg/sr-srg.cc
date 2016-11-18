@@ -5,7 +5,7 @@
 
 using namespace std;
 
-bool test_Aoo_Boo() {
+bool test_Acc_Bcc() {
   WDiagTheorem wdt;
   std::string o = "o";
   std::string v = "v";
@@ -31,7 +31,7 @@ int main(int argc, const char *argv[]) {
   // Assemble the tests
   auto test_functions = {
       //            Expectation,  test function,  User friendly description
-      std::make_tuple(TestPass, test_Aoo_Boo, "[Aoo,Boo]"),
+      std::make_tuple(TestPass, test_Acc_Bcc, "[Aoo,Boo]"),
   };
 
   // Run the tests

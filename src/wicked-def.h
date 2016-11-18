@@ -6,9 +6,7 @@
 #include "rational.h"
 
 /// Enums
-enum TensorType { Amplitude, Integral, OneDensity, OneHole, Cumulant };
-
-enum SymmetryType { Symmetric, Antisymmetric };
+enum SymmetryType { Symmetric, Antisymmetric, Nonsymmetric };
 
 /// Rational numbers
 using scalar_t = rational;

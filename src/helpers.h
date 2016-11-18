@@ -114,7 +114,7 @@ private:
 
 public:
   enumerate_class(std::vector<T, A> &vec)
-      : vec_(vec), last(vec.size()), iter(0) {}
+      : last(vec.size()), iter(0), vec_(vec) {}
 
   // Iterable functions
   const enumerate_class &begin() const { return *this; }

@@ -71,7 +71,8 @@ PYBIND11_PLUGIN(pywicked) {
       .def(py::init<>())
       .def("canonicalize", &WSum::canonicalize)
       .def("to_manybody_equation", &WSum::to_manybody_equation)
-      .def("str", &WSum::str);
+      .def("str", &WSum::str)
+      .def("latex", &WSum::latex);
 
   py::class_<WDiagOperator, std::shared_ptr<WDiagOperator>>(m, "WDiagOperator")
       .def(py::init<const std::string &, const std::vector<int> &,

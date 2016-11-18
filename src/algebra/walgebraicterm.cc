@@ -95,7 +95,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
 
   //  std::cout << "\n Canonicalizing: " << str() << std::endl;
 
-  int n = 0;
+//  int n = 0;
   for (const auto &tensor : tensors_) {
     // a) label
     const std::string &label = tensor.label();
@@ -133,7 +133,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
 
 #else
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, tensor));
-    n += 1;
+//    n += 1;
 #endif
   }
 
@@ -274,7 +274,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
 
   //  std::cout << "\n  " << str();
 
-//  canonicalize_best();
+  //  canonicalize_best();
 
   return factor;
 }
@@ -379,11 +379,13 @@ std::string WAlgebraicTerm::latex() const {
   for (const WTensor &tensor : tensors_) {
     str_vec.push_back(tensor.latex());
   }
-  str_vec.push_back("\\{");
-  for (const auto &op : operators_) {
-    str_vec.push_back(op.latex());
+  if (operators_.size()) {
+    str_vec.push_back("\\{");
+    for (const auto &op : operators_) {
+      str_vec.push_back(op.latex());
+    }
+    str_vec.push_back("\\}");
   }
-  str_vec.push_back("\\}");
   return (to_string(str_vec, " "));
 }
 
@@ -439,8 +441,7 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
   return term;
 }
 
-
-//scalar_t WAlgebraicTerm::canonicalize_best() {
+// scalar_t WAlgebraicTerm::canonicalize_best() {
 //  scalar_t factor(1);
 
 //  // find classes of equivalent indices
@@ -527,13 +528,13 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
 //    }
 //  }
 
-  //
+//
 
-  // loop over direct product of unique equivalence classes and generate
-  // permutations of indices
+// loop over direct product of unique equivalence classes and generate
+// permutations of indices
 
-  // resort indices in the tensors
-  // find "best" representation
+// resort indices in the tensors
+// find "best" representation
 
 //  return factor;
 //}
