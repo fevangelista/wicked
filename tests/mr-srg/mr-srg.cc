@@ -5,6 +5,26 @@
 
 using namespace std;
 
+test_return_t test_Fac_Tca() {
+  WDiagTheorem wdt;
+  auto Fac = make_operator("f", {"a->c"});
+  auto Tca = make_operator("t", {"c->a"});
+
+  // [Fac,Tca]
+  auto sum = wdt.contract_sum(1, commutator(Fac, Tca), 0, 2);
+
+  auto sum_test =
+      string_to_sum("eta1^{a1}_{a0} f^{a0}_{c0} t^{c0}_{a1}") +
+      string_to_sum(
+          "eta1^{a1}_{a0} f^{a0}_{c0} t^{c1}_{a1} { a+(c0) a-(c1) }") +
+      string_to_sum("-f^{a0}_{c0} t^{c0}_{a1} { a+(a1) a-(a0) }") +
+      string_to_sum(
+          "f^{a0}_{c0} gamma1^{a1}_{a0} t^{c1}_{a1} { a+(c0) a-(c1) }");
+
+  bool pass = (sum == sum_test);
+  return make_return_t(TestPass, pass, {"[Fac,Tca]"});
+}
+
 test_return_t test_Faa_Tca() {
   WDiagTheorem wdt;
   auto Faa = make_operator("f", {"a->a"});
@@ -46,13 +66,11 @@ test_return_t test_Faa_Tav() {
   // [Faa,Tav]
   auto sum = wdt.contract_sum(1, commutator(Faa, Tav), 0, 2);
 
-  cout << "\n\n" << sum.latex() << endl;
-
   auto sum_test =
       string_to_sum(
-          "eta1^{a2}_{a1} f^{a1}_{a0} t^{c0}_{a2} { a+(a0) a-(c0) }") +
+          "-eta1^{a2}_{a1} f^{a0}_{a2} t^{a1}_{v0} { a+(v0) a-(a0) }") +
       string_to_sum(
-          "f^{a1}_{a0} gamma1^{a2}_{a1} t^{c0}_{a2} { a+(a0) a-(c0) }");
+          "-f^{a0}_{a1} gamma1^{a1}_{a2} t^{a2}_{v0} { a+(v0) a-(a0) }");
 
   bool pass = (sum == sum_test);
   return make_return_t(TestPass, pass, {"[Faa,Tav]"});
@@ -67,7 +85,8 @@ int main(int argc, const char *argv[]) {
   osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
 
   // Assemble the tests
-  auto test_functions = {test_Faa_Tca, test_Fvv_Tcv, test_Faa_Tav};
+  auto test_functions = {test_Fac_Tca, test_Faa_Tca, test_Fvv_Tcv,
+                         test_Faa_Tav};
 
   // Run the tests
   bool success = wicked_test(test_functions);
