@@ -2,7 +2,7 @@
 
 #include "orbital_space.h"
 
-std::shared_ptr<OrbitalSpaceInfo> osi;
+std::shared_ptr<OrbitalSpaceInfo> osi = std::make_shared<OrbitalSpaceInfo>();
 
 std::shared_ptr<OrbitalSpaceInfo> get_osi() { return osi; }
 

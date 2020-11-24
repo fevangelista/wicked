@@ -2,14 +2,14 @@
 #include "orbital_space.h"
 #include "wdiag_operator_sum.h"
 
-WDiagOperatorSum::WDiagOperatorSum() {}
+OperatorSum::OperatorSum() {}
 
-// WDiagOperatorSum::WDiagOperatorSum(const std::vector<WDiagOperator> &vec_dop,
+// OperatorSum::OperatorSum(const std::vector<WDiagOperator> &vec_dop,
 //                                   scalar_t factor) {
 //  add(vec_dop, factor);
 //}
 
-WDiagOperatorSum::WDiagOperatorSum(
+OperatorSum::OperatorSum(
     const std::vector<std::vector<WDiagOperator>> &vec_vec_dop,
     scalar_t factor) {
   for (const auto &vec_dop : vec_vec_dop) {
@@ -17,7 +17,7 @@ WDiagOperatorSum::WDiagOperatorSum(
   }
 }
 
-void WDiagOperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
+void OperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
                            scalar_t factor) {
   auto search = sum_.find(vec_dop);
 
@@ -32,24 +32,24 @@ void WDiagOperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
   }
 }
 
-const dop_sum_t &WDiagOperatorSum::sum() const { return sum_; }
+const dop_sum_t &OperatorSum::sum() const { return sum_; }
 
-WDiagOperatorSum &WDiagOperatorSum::operator+=(const WDiagOperatorSum &rhs) {
+OperatorSum &OperatorSum::operator+=(const OperatorSum &rhs) {
   for (const auto &vec_dop_factor : rhs.sum()) {
     add(vec_dop_factor.first, vec_dop_factor.second);
   }
   return *this;
 }
 
-WDiagOperatorSum &WDiagOperatorSum::operator-=(const WDiagOperatorSum &rhs) {
+OperatorSum &OperatorSum::operator-=(const OperatorSum &rhs) {
   for (const auto &vec_dop_factor : rhs.sum()) {
     add(vec_dop_factor.first, -vec_dop_factor.second);
   }
   return *this;
 }
 
-WDiagOperatorSum &WDiagOperatorSum::operator*=(const WDiagOperatorSum &rhs) {
-  WDiagOperatorSum result;
+OperatorSum &OperatorSum::operator*=(const OperatorSum &rhs) {
+  OperatorSum result;
   for (const auto &r_vec_dop_factor : sum()) {
     for (const auto &l_vec_dop_factor : rhs.sum()) {
       std::vector<WDiagOperator> prod;
@@ -64,21 +64,21 @@ WDiagOperatorSum &WDiagOperatorSum::operator*=(const WDiagOperatorSum &rhs) {
   return *this;
 }
 
-WDiagOperatorSum &WDiagOperatorSum::operator*=(scalar_t factor) {
+OperatorSum &OperatorSum::operator*=(scalar_t factor) {
   for (auto &vec_dop_factor : sum_) {
     vec_dop_factor.second *= factor;
   }
   return *this;
 }
 
-WDiagOperatorSum &WDiagOperatorSum::operator/=(scalar_t factor) {
+OperatorSum &OperatorSum::operator/=(scalar_t factor) {
   for (auto &vec_dop_factor : sum_) {
     vec_dop_factor.second /= factor;
   }
   return *this;
 }
 
-std::string WDiagOperatorSum::str() const {
+std::string OperatorSum::str() const {
   std::vector<std::string> str_vec;
   for (auto &vec_dop_factor : sum_) {
     std::string s;
@@ -91,20 +91,20 @@ std::string WDiagOperatorSum::str() const {
   return to_string(str_vec, "\n");
 }
 
-WDiagOperatorSum operator*(WDiagOperatorSum lhs, const WDiagOperatorSum &rhs)
+OperatorSum operator*(OperatorSum lhs, const OperatorSum &rhs)
 {
     lhs *= rhs;
     return lhs;
 }
 
-std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum) {
+std::ostream &operator<<(std::ostream &os, const OperatorSum &opsum) {
   os << opsum.str();
   return os;
 }
 
-WDiagOperatorSum make_operator(const std::string &label,
+OperatorSum make_operator(const std::string &label,
                                const std::vector<std::string> &components) {
-  WDiagOperatorSum result;
+  OperatorSum result;
   for (const std::string &s : components) {
     auto s_vec = split(s, std::regex("[->]+"));
 
@@ -132,9 +132,9 @@ WDiagOperatorSum make_operator(const std::string &label,
   return result;
 }
 
-WDiagOperatorSum commutator(const WDiagOperatorSum &A,
-                            const WDiagOperatorSum &B) {
-  WDiagOperatorSum result;
+OperatorSum commutator(const OperatorSum &A,
+                            const OperatorSum &B) {
+  OperatorSum result;
   for (const auto &vec_factor_A : A.sum()) {
     for (const auto &vec_factor_B : B.sum()) {
       auto &vec_A = vec_factor_A.first;
@@ -158,10 +158,10 @@ WDiagOperatorSum commutator(const WDiagOperatorSum &A,
   return result;
 }
 
-WDiagOperatorSum exp(const WDiagOperatorSum &A, int order) {
-  WDiagOperatorSum result;
+OperatorSum exp(const OperatorSum &A, int order) {
+  OperatorSum result;
   result.add({});
-  //  WDiagOperatorSum temp1;
+  //  OperatorSum temp1;
   //  temp1.add({});
   //  for (int k = 1; k <= order; k++){
   //      temp1 *= A;
@@ -170,14 +170,14 @@ WDiagOperatorSum exp(const WDiagOperatorSum &A, int order) {
   return result;
 }
 
-WDiagOperatorSum bch_series(const WDiagOperatorSum &A,
-                            const WDiagOperatorSum &B, int n) {
-  WDiagOperatorSum result;
+OperatorSum bch_series(const OperatorSum &A,
+                            const OperatorSum &B, int n) {
+  OperatorSum result;
   result += A;
-  WDiagOperatorSum temp(A);
+  OperatorSum temp(A);
 
   for (int k = 1; k <= n; k++) {
-    WDiagOperatorSum comm = commutator(temp, B);
+    OperatorSum comm = commutator(temp, B);
     comm *= scalar_t(1, k);
     result += comm;
     temp = comm;

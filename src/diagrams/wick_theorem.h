@@ -8,26 +8,26 @@ class WSQOperator;
 class WTensor;
 class WAlgebraicTerm;
 class WDiagOperator;
-class WDiagOperatorSum;
+class OperatorSum;
 class WDiagVertex;
 class WSum;
 
 enum class WDiagPrint { No, Basic, Summary, Detailed, All };
 
 /// A class to contract a product of operators
-class WDiagTheorem {
+class WickTheorem {
 
 public:
   /// Constructor
-  WDiagTheorem();
+  WickTheorem();
 
   /// Contract a product of operators
   WSum contract(scalar_t factor, const std::vector<WDiagOperator> &ops,
                 int minrank, int maxrank);
 
   /// Contract a product of sums of operators
-  WSum contract_sum(scalar_t factor, const WDiagOperatorSum &dop_sum,
-                    int minrank, int maxrank);
+  WSum contract(scalar_t factor, const OperatorSum &dop_sum, int minrank,
+                int maxrank);
 
   void set_print(WDiagPrint print);
 
@@ -112,7 +112,7 @@ private:
   /// The largest allowed cumulant
   int maxcumulant_ = 100;
 
-  WDiagPrint print_ = WDiagPrint::No;
+  WDiagPrint print_ = WDiagPrint::All;
 };
 
 #endif // _wicked_diag_theorem_h_

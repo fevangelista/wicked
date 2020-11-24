@@ -6,7 +6,7 @@
 using namespace std;
 
 test_return_t test_Fac_Tca() {
-  WDiagTheorem wdt;
+  WickTheorem wdt;
   auto Fac = make_operator("f", {"a->c"});
   auto Tca = make_operator("t", {"c->a"});
 
@@ -26,7 +26,7 @@ test_return_t test_Fac_Tca() {
 }
 
 test_return_t test_Faa_Tca() {
-  WDiagTheorem wdt;
+  WickTheorem wdt;
   auto Faa = make_operator("f", {"a->a"});
   auto Tca = make_operator("t", {"c->a"});
 
@@ -44,7 +44,7 @@ test_return_t test_Faa_Tca() {
 }
 
 test_return_t test_Fvv_Tcv() {
-  WDiagTheorem wdt;
+  WickTheorem wdt;
   //  wdt.set_print(WDiagPrint::Basic);
   auto Fvv = make_operator("f", {"v->v"});
   auto Tcv = make_operator("t", {"c->v"});
@@ -59,7 +59,7 @@ test_return_t test_Fvv_Tcv() {
 }
 
 test_return_t test_Faa_Tav() {
-  WDiagTheorem wdt;
+  WickTheorem wdt;
   auto Faa = make_operator("f", {"a->a"});
   auto Tav = make_operator("t", {"a->v"});
 

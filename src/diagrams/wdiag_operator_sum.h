@@ -4,20 +4,20 @@
 #include <map>
 #include <vector>
 
-#include "wicked-def.h"
 #include "wdiag_operator.h"
+#include "wicked-def.h"
 
 using dop_sum_t = std::map<std::vector<WDiagOperator>, scalar_t>;
 
 /// A class to represent operators
-class WDiagOperatorSum {
+class OperatorSum {
 public:
   /// Construct an empty sum
-  WDiagOperatorSum();
+  OperatorSum();
 
   /// Construct sum with a vector of diagrams
-  WDiagOperatorSum(const std::vector<std::vector<WDiagOperator>> &vec_vec_dop,
-                   scalar_t factor = scalar_t(1));
+  OperatorSum(const std::vector<std::vector<WDiagOperator>> &vec_vec_dop,
+              scalar_t factor = scalar_t(1));
 
   /// Add a vector of diagrams to this sum
   void add(const std::vector<WDiagOperator> &vec_dop, scalar_t factor = 1);
@@ -26,15 +26,15 @@ public:
   const dop_sum_t &sum() const;
 
   /// addition assignment
-  WDiagOperatorSum &operator+=(const WDiagOperatorSum &rhs);
+  OperatorSum &operator+=(const OperatorSum &rhs);
   /// subtraction assignment
-  WDiagOperatorSum &operator-=(const WDiagOperatorSum &rhs);
+  OperatorSum &operator-=(const OperatorSum &rhs);
   /// multiplication assignment (scalar)
-  WDiagOperatorSum &operator*=(const WDiagOperatorSum &rhs);
+  OperatorSum &operator*=(const OperatorSum &rhs);
   /// multiplication assignment (scalar)
-  WDiagOperatorSum &operator*=(scalar_t factor);
+  OperatorSum &operator*=(scalar_t factor);
   /// division assignment (scalar)
-  WDiagOperatorSum &operator/=(scalar_t factor);
+  OperatorSum &operator/=(scalar_t factor);
 
   /// Return a string representation of the operator
   std::string str() const;
@@ -45,10 +45,10 @@ private:
 };
 
 /// multiplication
-WDiagOperatorSum operator*(WDiagOperatorSum lhs, const WDiagOperatorSum &rhs);
+OperatorSum operator*(OperatorSum lhs, const OperatorSum &rhs);
 
 /// Write a string representation of the operator to a stream
-std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum);
+std::ostream &operator<<(std::ostream &os, const OperatorSum &opsum);
 
 // Helper functions
 
@@ -58,19 +58,17 @@ std::ostream &operator<<(std::ostream &os, const WDiagOperatorSum &opsum);
 /// E.g.
 /// auto T1 = make_operator("T1", {"o->v"});
 /// auto F = make_operator("F", {"o->o","o->v","v->o","v->v"});
-WDiagOperatorSum make_operator(const std::string &label,
-                               const std::vector<std::string> &components);
+OperatorSum make_operator(const std::string &label,
+                          const std::vector<std::string> &components);
 
 /// Creates a new object with the commutator [A,B]
-WDiagOperatorSum commutator(const WDiagOperatorSum &A,
-                            const WDiagOperatorSum &B);
+OperatorSum commutator(const OperatorSum &A, const OperatorSum &B);
 
 /// Creates a new object with the exponential exp(A) truncated at a given order
-WDiagOperatorSum exp(const WDiagOperatorSum &A, int order);
+OperatorSum exp(const OperatorSum &A, int order);
 
 /// Creates a new object with the Baker-Campbell-Hausdorff expansion of the
 /// quantity exp(-B) A exp(B) truncated at a given order n
-WDiagOperatorSum bch_series(const WDiagOperatorSum &A,
-                            const WDiagOperatorSum &B, int n);
+OperatorSum bch_series(const OperatorSum &A, const OperatorSum &B, int n);
 
 #endif // _wicked_diag_operator_set_h_

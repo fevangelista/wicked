@@ -2,14 +2,14 @@
 
 #include "stl_utils.hpp"
 
-#include "wicked-def.h"
+#include "combinatorics.h"
 #include "helpers.h"
 #include "orbital_space.h"
-#include "combinatorics.h"
+#include "walgebraicterm.h"
+#include "wicked-def.h"
 #include "windex.h"
 #include "wsqoperator.h"
 #include "wtensor.h"
-#include "walgebraicterm.h"
 
 using namespace std;
 
@@ -95,7 +95,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
 
   //  std::cout << "\n Canonicalizing: " << str() << std::endl;
 
-//  int n = 0;
+  //  int n = 0;
   for (const auto &tensor : tensors_) {
     // a) label
     const std::string &label = tensor.label();
@@ -117,19 +117,19 @@ scalar_t WAlgebraicTerm::canonicalize() {
 #if NEW_CANONICALIZATION
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, lower_conn,
                                      upper_conn, tensor));
-//    std::cout << "\nScore = " << label << " " << rank << " ";
-//    PRINT_ELEMENTS(num_low);
-//    std::cout << " ";
-//    PRINT_ELEMENTS(num_upp);
-//    std::cout << " ";
-//    for (const auto &str_vec : lower_conn) {
-//      std::cout << str_vec.first << " ";
-//      PRINT_ELEMENTS(str_vec.second);
-//    }
-//    for (const auto &str_vec : upper_conn) {
-//      std::cout << " " << str_vec.first << " ";
-//      PRINT_ELEMENTS(str_vec.second);
-//    }
+    //    std::cout << "\nScore = " << label << " " << rank << " ";
+    //    PRINT_ELEMENTS(num_low);
+    //    std::cout << " ";
+    //    PRINT_ELEMENTS(num_upp);
+    //    std::cout << " ";
+    //    for (const auto &str_vec : lower_conn) {
+    //      std::cout << str_vec.first << " ";
+    //      PRINT_ELEMENTS(str_vec.second);
+    //    }
+    //    for (const auto &str_vec : upper_conn) {
+    //      std::cout << " " << str_vec.first << " ";
+    //      PRINT_ELEMENTS(str_vec.second);
+    //    }
 
 #else
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, tensor));
@@ -427,14 +427,14 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
   term.add(tensor);
 
   // Add the creation operators
-  for (const WIndex c : cre_ind) {
+  for (const WIndex &c : cre_ind) {
     WSQOperator sqop(Creation, c);
     term.add(sqop);
   }
 
   // Add the annihilation operators
   std::reverse(ann_ind.begin(), ann_ind.end()); // reverse the annihilation ops
-  for (const WIndex a : ann_ind) {
+  for (const WIndex &a : ann_ind) {
     WSQOperator sqop(Annihilation, a);
     term.add(sqop);
   }

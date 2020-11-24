@@ -2,9 +2,9 @@
 #define _wicked_orbital_space_h_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 /// Type of orbital space
 // enum class OrbitalSpaceType { Core, Active, Virtual, RI, None };

@@ -6,7 +6,7 @@
 using namespace std;
 
 bool test_Acc_Bcc() {
-  WDiagTheorem wdt;
+  WickTheorem wdt;
   std::string o = "o";
   std::string v = "v";
   auto opAoo = make_diag_operator("A", {o}, {o});

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-WDiagTheorem wdt;
+WickTheorem wdt;
 
 test_return_t test_energy1() {
   auto T1 = make_operator("t", {"o->v"});

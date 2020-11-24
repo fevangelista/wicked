@@ -14,7 +14,7 @@
 
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"
-#include "wdiag_theorem.h"
+#include "wick_theorem.h"
 
 
 #endif // #ifndef _wicked_h_

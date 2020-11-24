@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 #include "combinatorics.h"
 #include "helpers.h"
@@ -9,10 +9,10 @@
 #include "walgebraicterm.h"
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"
-#include "wdiag_theorem.h"
+#include "wick_theorem.h"
+#include "wsqoperator.h"
 #include "wsum.h"
 #include "wtensor.h"
-#include "wsqoperator.h"
 
 #define PRINT(detail, code)                                                    \
   if (print_ >= detail) {                                                      \
@@ -28,21 +28,22 @@ void print_contraction(const std::vector<WDiagOperator> &ops,
 
 using namespace std;
 
-WDiagTheorem::WDiagTheorem() {}
+WickTheorem::WickTheorem() {}
 
-WSum WDiagTheorem::contract(scalar_t factor,
-                            const std::vector<WDiagOperator> &ops, int minrank,
-                            int maxrank) {
+WSum WickTheorem::contract(scalar_t factor,
+                           const std::vector<WDiagOperator> &ops, int minrank,
+                           int maxrank) {
 
   WSum result;
   ncontractions_ = 0;
   contractions_.clear();
   elementary_contractions_.clear();
 
-  PRINT(WDiagPrint::Summary,
-        std::cout << "\nContracting the following operators:" << std::endl;
-        for (auto &op
-             : ops) { std::cout << "    " << op; })
+  PRINT(
+      WDiagPrint::Summary,
+      std::cout << "\nContracting the following operators:" << std::endl;
+      for (auto &op
+           : ops) { std::cout << "    " << op; })
 
   elementary_contractions_ = generate_elementary_contractions(ops);
 
@@ -58,8 +59,8 @@ WSum WDiagTheorem::contract(scalar_t factor,
     int term_rank = ops_rank - contr_rank;
 
     if ((term_rank >= minrank) and (term_rank <= maxrank)) {
-      PRINT(WDiagPrint::Basic, cout << "\n  Operator rank "
-                                    << ops_rank - contr_rank << endl;)
+      PRINT(WDiagPrint::Basic,
+            cout << "\n  Operator rank " << ops_rank - contr_rank << endl;)
 
       auto ops_contractions = canonicalize_contraction(ops, contraction_vec);
       const auto &contractions = ops_contractions.second;
@@ -78,9 +79,8 @@ WSum WDiagTheorem::contract(scalar_t factor,
   return result;
 }
 
-WSum WDiagTheorem::contract_sum(scalar_t factor,
-                                const WDiagOperatorSum &dop_sum, int minrank,
-                                int maxrank) {
+WSum WickTheorem::contract(scalar_t factor, const OperatorSum &dop_sum,
+                           int minrank, int maxrank) {
   WSum result;
 
   for (const auto &dop_factor : dop_sum.sum()) {
@@ -92,7 +92,7 @@ WSum WDiagTheorem::contract_sum(scalar_t factor,
   return result;
 }
 
-void WDiagTheorem::set_print(WDiagPrint print) { print_ = print; }
+void WickTheorem::set_print(WDiagPrint print) { print_ = print; }
 
 void print_contraction(
     const std::vector<WDiagOperator> &ops,
@@ -143,9 +143,8 @@ contraction_signature(const std::vector<WDiagOperator> &ops,
 }
 
 std::pair<std::vector<WDiagOperator>, std::vector<std::vector<WDiagVertex>>>
-WDiagTheorem::canonicalize_contraction(
-    const std::vector<WDiagOperator> &ops,
-    const std::vector<int> &contraction_vec) {
+WickTheorem::canonicalize_contraction(const std::vector<WDiagOperator> &ops,
+                                      const std::vector<int> &contraction_vec) {
   std::vector<std::vector<WDiagVertex>> contractions;
   for (int c : contraction_vec) {
     contractions.push_back(elementary_contractions_[c]);
@@ -153,7 +152,7 @@ WDiagTheorem::canonicalize_contraction(
 
   for (const auto &op : ops) {
     if (op.rank() % 2 != 0) {
-      cout << "\n\n  WDiagTheorem::canonicalize_contraction cannot yet handle "
+      cout << "\n\n  WickTheorem::canonicalize_contraction cannot yet handle "
               "operators with an even number of sqops.\n";
       exit(1);
     }
@@ -202,8 +201,9 @@ WDiagTheorem::canonicalize_contraction(
   //  cout << "Contraction to canonicalize:" << endl;
   //  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
 
-  std::vector<std::pair<std::string,
-                        std::pair<std::vector<int>, std::vector<int>>>> scores;
+  std::vector<
+      std::pair<std::string, std::pair<std::vector<int>, std::vector<int>>>>
+      scores;
   // Loop over all permutations of operators
   std::vector<int> ops_perm(ops.size());
   std::iota(ops_perm.begin(), ops_perm.end(), 0);
@@ -284,7 +284,7 @@ WDiagTheorem::canonicalize_contraction(
   return std::make_pair(best_ops, best_contractions);
 }
 
-void WDiagTheorem::generate_composite_contractions(
+void WickTheorem::generate_composite_contractions(
     const std::vector<WDiagOperator> &ops) {
   std::vector<int> a(100, -1);
   // create a vector that keeps track of the free (uncontracted vertices)
@@ -294,15 +294,15 @@ void WDiagTheorem::generate_composite_contractions(
   }
 
   // generate all contractions
-  PRINT(WDiagPrint::Summary, std::cout << "\nPossible contractions:"
-                                       << std::endl;)
+  PRINT(WDiagPrint::Summary,
+        std::cout << "\nPossible contractions:" << std::endl;)
   generate_contractions_backtrack(a, 0, elementary_contractions_,
                                   free_vertex_vec);
-  PRINT(WDiagPrint::Summary, std::cout << "\nTotal:" << ncontractions_
-                                       << std::endl;)
+  PRINT(WDiagPrint::Summary,
+        std::cout << "\nTotal:" << ncontractions_ << std::endl;)
 }
 
-void WDiagTheorem::compare_contraction_perm(
+void WickTheorem::compare_contraction_perm(
     const std::vector<WDiagOperator> &ops,
     const std::vector<std::vector<WDiagVertex>> &contractions,
     const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
@@ -358,7 +358,7 @@ void WDiagTheorem::compare_contraction_perm(
   }
 }
 
-void WDiagTheorem::generate_contractions_backtrack(
+void WickTheorem::generate_contractions_backtrack(
     std::vector<int> a, int k,
     const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
     std::vector<WDiagVertex> &free_vertex_vec) {
@@ -377,7 +377,7 @@ void WDiagTheorem::generate_contractions_backtrack(
   }
 }
 
-std::vector<int> WDiagTheorem::construct_candidates(
+std::vector<int> WickTheorem::construct_candidates(
     std::vector<int> &a, int k,
     const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
     const std::vector<WDiagVertex> &free_vertex_vec) {
@@ -415,7 +415,7 @@ std::vector<int> WDiagTheorem::construct_candidates(
   return candidates;
 }
 
-void WDiagTheorem::make_move(
+void WickTheorem::make_move(
     const std::vector<int> &a, int k,
     const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
     std::vector<WDiagVertex> &free_vertex_vec) {
@@ -435,7 +435,7 @@ void WDiagTheorem::make_move(
   }
 }
 
-void WDiagTheorem::unmake_move(
+void WickTheorem::unmake_move(
     const std::vector<int> &a, int k,
     const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
     std::vector<WDiagVertex> &free_vertex_vec) {
@@ -455,27 +455,28 @@ void WDiagTheorem::unmake_move(
   }
 }
 
-void WDiagTheorem::process_contraction(
+void WickTheorem::process_contraction(
     const std::vector<int> &a, int k,
     std::vector<WDiagVertex> &free_vertex_vec) {
   contractions_.push_back(std::vector<int>(a.begin(), a.begin() + k));
 
-  PRINT(WDiagPrint::Summary, cout << " " << ncontractions_ << ":";
-        for (int i = 0; i < k; ++i) { cout << " " << a[i]; })
+  PRINT(
+      WDiagPrint::Summary, cout << " " << ncontractions_ << ":";
+      for (int i = 0; i < k; ++i) { cout << " " << a[i]; })
 
   WDiagVertex free_ops;
   for (const auto &free_vertex : free_vertex_vec) {
     free_ops += free_vertex;
   }
 
-  PRINT(WDiagPrint::Summary, cout << " " << free_ops
-                                  << " rank = " << free_ops.rank() << endl;)
+  PRINT(WDiagPrint::Summary,
+        cout << " " << free_ops << " rank = " << free_ops.rank() << endl;)
 
   ncontractions_++;
 }
 
 std::vector<std::vector<WDiagVertex>>
-WDiagTheorem::generate_elementary_contractions(
+WickTheorem::generate_elementary_contractions(
     const std::vector<WDiagOperator> &ops) {
 
   int nops = ops.size();
@@ -483,11 +484,19 @@ WDiagTheorem::generate_elementary_contractions(
   // a vector that holds all the contractions
   std::vector<std::vector<WDiagVertex>> contr_vec;
 
+  for (int op = 0; op < nops; ++op) {
+    for (int s = 0; s < osi->num_spaces(); s++) {
+      cout << "\n op = " << op << " s = " << s
+           << " cre = " << ops[op].num_cre(s)
+           << " ann = " << ops[op].num_ann(s);
+    }
+  }
+
   // loop over orbital spaces
   for (int s = 0; s < osi->num_spaces(); s++) {
     PRINT(WDiagPrint::Summary, std::cout
                                    << "\n  => Basic contractions for space "
-                                   << s << std::endl;)
+                                   << osi->label(s) << std::endl;)
 
     // differentiate between various types of spaces
     RDMType dmstruc = osi->dmstructure(s);
@@ -498,13 +507,15 @@ WDiagTheorem::generate_elementary_contractions(
     // a^+ a
 
     if (dmstruc == RDMType::Occupied) {
-      PRINT(WDiagPrint::Summary, cout << "\n    * c/a pairwise contractions"
-                                      << endl;)
+      PRINT(WDiagPrint::Summary,
+            cout << "\n    * c/a pairwise contractions" << endl;)
       // loop over the creation operators of each operator
       for (int c = 0; c < nops; c++) {
         // loop over the annihilation operators of each operator (right to the
         // creation operators)
         for (int a = c + 1; a < nops; a++) {
+          PRINT(WDiagPrint::Summary, cout << "\n " << c << " " << a << endl;)
+
           // check if contraction is viable
           if ((ops[c].num_cre(s) > 0) and (ops[a].num_ann(s) > 0)) {
             std::vector<WDiagVertex> new_contr(nops);
@@ -525,13 +536,15 @@ WDiagTheorem::generate_elementary_contractions(
     // a   a^+
 
     if (dmstruc == RDMType::Unoccupied) {
-      PRINT(WDiagPrint::Summary, cout << "\n    * a/c pairwise contractions"
-                                      << endl;)
+      PRINT(WDiagPrint::Summary,
+            cout << "\n    * a/c pairwise contractions" << endl;)
       // loop over the creation operators of each operator
       for (int a = 0; a < nops; a++) {
         // loop over the annihilation operators of each operator (right to the
         // creation operators)
         for (int c = a + 1; c < nops; c++) {
+          PRINT(WDiagPrint::Summary, cout << "\n " << c << " " << a << endl;)
+
           // check if contraction is viable
           if ((ops[c].num_cre(s) > 0) and (ops[a].num_ann(s) > 0)) {
             std::vector<WDiagVertex> new_contr(nops);
@@ -562,7 +575,7 @@ WDiagTheorem::generate_elementary_contractions(
         sumann += ops[A].num_ann(s);
       }
       int max_half_legs = std::min(std::min(sumcre, sumann), maxcumulant_);
-//      int max_legs = 2 * max_half_legs;
+      //      int max_legs = 2 * max_half_legs;
 
       // loop over all possible contractions from 2 to max_legs
       for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
@@ -625,7 +638,7 @@ WDiagTheorem::generate_elementary_contractions(
   return contr_vec;
 }
 
-std::pair<WAlgebraicTerm, scalar_t> WDiagTheorem::evaluate_contraction(
+std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
     const std::vector<WDiagOperator> &ops,
     const std::vector<std::vector<WDiagVertex>> &contractions,
     scalar_t factor) {
@@ -826,7 +839,7 @@ std::pair<WAlgebraicTerm, scalar_t> WDiagTheorem::evaluate_contraction(
 
 std::tuple<std::vector<WTensor>, std::vector<WSQOperator>,
            std::map<std::tuple<int, int, bool, int>, int>>
-WDiagTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
+WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
 
   std::vector<WSQOperator> sqops;
   std::vector<WTensor> tensors;
@@ -876,7 +889,7 @@ WDiagTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
   return make_tuple(tensors, sqops, op_map);
 }
 
-std::vector<int> WDiagTheorem::vertex_vec_to_pos(
+std::vector<int> WickTheorem::vertex_vec_to_pos(
     const std::vector<WDiagVertex> &vertex_vec,
     std::vector<WDiagVertex> &ops_offset,
     std::map<std::tuple<int, int, bool, int>, int> &op_map, bool creation) {
@@ -920,7 +933,7 @@ std::vector<int> WDiagTheorem::vertex_vec_to_pos(
   return result;
 }
 
-scalar_t WDiagTheorem::combinatorial_factor(
+scalar_t WickTheorem::combinatorial_factor(
     const std::vector<WDiagOperator> &ops,
     const std::vector<std::vector<WDiagVertex>> &contractions) {
 

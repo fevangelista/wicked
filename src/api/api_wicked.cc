@@ -1,24 +1,28 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "../src/rational.h"
-#include "../src/orbital_space.h"
-#include "../src/algebra/windex.h"
-#include "../src/algebra/wtensor.h"
-#include "../src/algebra/wsqoperator.h"
 #include "../src/algebra/walgebraicterm.h"
 #include "../src/algebra/wequationterm.h"
+#include "../src/algebra/windex.h"
+#include "../src/algebra/wsqoperator.h"
 #include "../src/algebra/wsum.h"
+#include "../src/algebra/wtensor.h"
 #include "../src/diagrams/wdiag_operator.h"
 #include "../src/diagrams/wdiag_operator_sum.h"
-#include "../src/diagrams/wdiag_theorem.h"
+#include "../src/diagrams/wick_theorem.h"
+#include "../src/orbital_space.h"
+#include "../src/rational.h"
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
 
 namespace py = pybind11;
+using namespace pybind11::literals;
 
-PYBIND11_PLUGIN(pywicked) {
-  py::module m("pywicked", "Wicked python interface");
+// auto osi = std::make_shared<OrbitalSpaceInfo>();
+// osi->default_spaces();
+
+PYBIND11_MODULE(wicked, m) {
+  m.doc() = "Wicked python interface";
 
   py::class_<rational, std::shared_ptr<rational>>(m, "rational")
       .def(py::init<>())
@@ -81,29 +85,33 @@ PYBIND11_PLUGIN(pywicked) {
 
   m.def("make_diag_operator", &make_diag_operator, "Make an operator");
 
-  py::class_<WDiagOperatorSum, std::shared_ptr<WDiagOperatorSum>>(
-      m, "WDiagOperatorSum")
+  py::class_<OperatorSum, std::shared_ptr<OperatorSum>>(m, "OperatorSum")
       .def(py::init<>())
       .def(
           py::init<const std::vector<std::vector<WDiagOperator>> &, scalar_t>(),
           py::arg("vec_vec_dop"), py::arg("factor") = rational(1))
-      .def("add", &WDiagOperatorSum::add)
-      .def("str", &WDiagOperatorSum::str);
+      .def("add", &OperatorSum::add)
+      .def("str", &OperatorSum::str);
 
   m.def("commutator", &commutator,
-        "Create the commutator of two WDiagOperatorSum objects");
+        "Create the commutator of two OperatorSum objects");
 
-  m.def("bch_series", &bch_series, "Creates the Baker-Campbell-Hausdorff "
-                                   "expansion of exp(-B) A exp(B) truncated at "
-                                   "a given order n");
+  m.def("bch_series", &bch_series,
+        "Creates the Baker-Campbell-Hausdorff "
+        "expansion of exp(-B) A exp(B) truncated at "
+        "a given order n");
 
-  m.def("make_operator", &make_operator, "Create a WDiagOperatorSum object");
+  m.def("operator", &make_operator, "Create a OperatorSum object");
 
-  py::class_<WDiagTheorem, std::shared_ptr<WDiagTheorem>>(m, "WDiagTheorem")
+  py::class_<WickTheorem, std::shared_ptr<WickTheorem>>(m, "WickTheorem")
       .def(py::init<>())
-      .def("contract", &WDiagTheorem::contract)
-      .def("contract_sum", &WDiagTheorem::contract_sum)
-      .def("set_print", &WDiagTheorem::set_print);
+      .def("contract",
+           py::overload_cast<scalar_t, const std::vector<WDiagOperator> &, int,
+                             int>(&WickTheorem::contract))
+      .def("contract",
+           py::overload_cast<scalar_t, const OperatorSum &, int, int>(
+               &WickTheorem::contract))
+      .def("set_print", &WickTheorem::set_print);
 
   //  py::class_make_diag_operator(const std::string &label,
   //                                   const std::vector<std::string>
@@ -129,10 +137,22 @@ PYBIND11_PLUGIN(pywicked) {
 
   //  std::cout << "Initializing the pywicked module." << std::endl;
 
-  osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->default_spaces();
+  m.def(
+      "reset", []() { osi->reset(); }, "Reset the orbital space");
 
-  m.attr("osi") = py::cast(osi);
+  m.def("add_space", [](const std::string &label, const std::string &type,
+                        const std::vector<std::string> &indices) {
+    RDMType structure(RDMType::General);
+    if ((type == "occupied") or (type == "core")) {
+      structure = RDMType::Occupied;
+    } else if ((type == "unoccupied") or (type == "virtual")) {
+      structure = RDMType::Occupied;
+    }
+    osi->add_space(label, structure, indices);
+  });
 
-  return m.ptr();
+  //  osi = std::make_shared<OrbitalSpaceInfo>();
+  //  osi->default_spaces();
+
+  //  m.attr("osi") = py::cast(osi);
 }

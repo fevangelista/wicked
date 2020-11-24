@@ -1,12 +1,12 @@
 #include <iostream>
-#include <sstream>
 #include <iterator>
+#include <sstream>
 
 #include "helpers.h"
 
 using std::regex;
-using std::string;
 using std::sregex_token_iterator;
+using std::string;
 
 std::string to_string(const std::vector<std::string> &strvec,
                       const std::string &sep) {
@@ -43,33 +43,32 @@ std::string to_latex(const scalar_t r) {
          std::to_string(r.denominator()) + "}";
 }
 
-
 // trim from start
-inline std::string& ltrim(std::string& s)
-{
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-    return s;
+inline std::string &ltrim(std::string &s) {
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char c) {
+            return not std::isspace(c);
+          }));
+  return s;
 }
 
 // trim from end
-inline std::string& rtrim(std::string& s)
-{
-    s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-    return s;
+inline std::string &rtrim(std::string &s) {
+  s.erase(std::find_if(s.rbegin(), s.rend(),
+                       [](unsigned char c) { return not std::isspace(c); })
+              .base(),
+          s.end());
+  return s;
 }
 
 // trim from both ends
-inline std::string& trim(std::string& s)
-{
-    return ltrim(rtrim(s));
-}
+inline std::string &trim(std::string &s) { return ltrim(rtrim(s)); }
 
 ///**
 // * @brief readlines
 // * @param file
 // * @return
 // */
-//std::vector<std::string> readlines(const std::string& file)
+// std::vector<std::string> readlines(const std::string& file)
 //{
 //    std::vector<std::string> result;
 //    std::string line;
@@ -100,51 +99,45 @@ inline std::string& trim(std::string& s)
 //    return result;
 //}
 
+std::vector<std::string> split(const std::string &s, regex re) {
+  sregex_token_iterator it(s.begin(), s.end(), re, -1);
+  sregex_token_iterator reg_end;
 
-
-std::vector<std::string> split(const std::string& s, regex re)
-{
-    sregex_token_iterator it(s.begin(), s.end(), re, -1);
-    sregex_token_iterator reg_end;
-
-    std::vector<std::string> result;
-    for (; it != reg_end; ++it) {
-        result.push_back(it->str());
-    }
-    return result;
+  std::vector<std::string> result;
+  for (; it != reg_end; ++it) {
+    result.push_back(it->str());
+  }
+  return result;
 }
 
-std::vector<std::string> findall(const string& s,const string& regex)
-{
-    std::vector<std::string> result;
-    std::regex this_regex(regex);
-    try {
-        std::sregex_iterator next(s.begin(), s.end(), this_regex);
-        std::sregex_iterator end;
-        std::vector<std::string> matches;
-        for (; next != end; ++next) {
-            std::smatch match = *next;
-            for (size_t k = 1; k < match.size(); ++k){
-                result.push_back(match[k]);
-            }
-        }
-    } catch (std::regex_error& e) {
-        // Syntax error in the regular expression
+std::vector<std::string> findall(const string &s, const string &regex) {
+  std::vector<std::string> result;
+  std::regex this_regex(regex);
+  try {
+    std::sregex_iterator next(s.begin(), s.end(), this_regex);
+    std::sregex_iterator end;
+    std::vector<std::string> matches;
+    for (; next != end; ++next) {
+      std::smatch match = *next;
+      for (size_t k = 1; k < match.size(); ++k) {
+        result.push_back(match[k]);
+      }
     }
-    return result;
+  } catch (std::regex_error &e) {
+    // Syntax error in the regular expression
+  }
+  return result;
 }
 
+std::vector<std::string> split_indices(const std::string &idx) {
+  std::istringstream f(idx);
+  std::string s;
+  std::vector<std::string> v;
 
-std::vector<std::string> split_indices(const std::string& idx)
-{
-    std::istringstream f(idx);
-    std::string s;
-    std::vector<std::string> v;
+  while (std::getline(f, s, ',')) {
+    std::string trimmed = trim(s);
+    v.push_back(trimmed);
+  }
 
-    while (std::getline(f, s, ',')) {
-        std::string trimmed = trim(s);
-        v.push_back(trimmed);
-    }
-
-    return v;
+  return v;
 }
