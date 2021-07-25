@@ -11,16 +11,16 @@
 //#include "wdiag_operator.h"
 //#include "wdiag_operator_sum.h"
 //#include "wick_theorem.h"
-//#include "wsqoperator.h"
+//#include "sqoperator.h"
 //#include "wtensor.h"
 //#include "wsum.h"
 
-//using namespace std;
+// using namespace std;
 
-//void srcc();
-//void mr();
+// void srcc();
+// void mr();
 
-//int main(int argc, const char *argv[]) {
+// int main(int argc, const char *argv[]) {
 
 //  osi = std::make_shared<OrbitalSpaceInfo>();
 //  osi->add_space("o", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
@@ -42,7 +42,7 @@
 ////  wdt.set_print(WDiagPrint::Basic);
 //  auto sum = wdt.contract_sum(1, bch, 2, 2);
 //  cout << sum << endl;
-//  //  WSum val;
+//  //  TermSum val;
 //  //  for (const auto &eq : sum.to_manybody_equation("r")) {
 //  //      cout << eq << endl;
 //  ////    val.add(eq.rhs(), eq.rhs_factor());
@@ -54,7 +54,7 @@
 //  return 0;
 //}
 
-//void srcc() {
+// void srcc() {
 //  osi = std::make_shared<OrbitalSpaceInfo>();
 //  osi->add_space("o", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
 //  osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
@@ -87,7 +87,7 @@
 //  bool doubles = false;
 
 //  WickTheorem wdt;
-//  WSum terms;
+//  TermSum terms;
 
 //  rational r1_6(1, 6);
 //  rational r1_2(1, 2);
@@ -129,7 +129,8 @@
 //    terms.add_sum(wdt.contract(r1_2, {opR1, opT1, opT1, opH2ovvv}, 0, 0));
 //    // this term is correct but it gives two 1/2 contributions
 
-//    // R1 1/3! [[[V,T1],T1],T1] = 1/6 R1 (V T1 T1 T1 - 3 T1 V T1 T1 + 3 T1 T1 V
+//    // R1 1/3! [[[V,T1],T1],T1] = 1/6 R1 (V T1 T1 T1 - 3 T1 V T1 T1 + 3 T1 T1
+//    V
 //    // T1
 //    // - T1 T1 T1 V)
 //    terms.add_sum(
@@ -189,7 +190,7 @@
 //  //  cout << terms << endl;
 //}
 
-//void mr() {
+// void mr() {
 //  osi = std::make_shared<OrbitalSpaceInfo>();
 //  osi->default_spaces();
 
@@ -232,7 +233,7 @@
 //    cout << opH1aa;
 //    WickTheorem wdt;
 //    //    wdt.contract(1.0, {opH2aaaa, opT2aavv});
-//    WSum terms;
+//    TermSum terms;
 //    auto c1 = wdt.contract(1, {opT1aa, opH1aa}, 0, 0);
 //    auto c2 = wdt.contract(-1, {opH1aa, opT1aa}, 0, 0);
 //    //    for (const auto &c1_term : c1) {

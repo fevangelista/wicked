@@ -5,14 +5,16 @@
 #include "combinatorics.h"
 #include "helpers.h"
 #include "orbital_space.h"
+#include "sqoperator.h"
 #include "stl_utils.hpp"
+#include "term_sum.h"
 #include "walgebraicterm.h"
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"
 #include "wick_theorem.h"
-#include "wsqoperator.h"
-#include "wsum.h"
 #include "wtensor.h"
+
+#include "log.h"
 
 #define PRINT(detail, code)                                                    \
   if (print_ >= detail) {                                                      \
@@ -23,18 +25,18 @@ void print_key(std::tuple<int, int, bool, int> key, int n);
 void print_contraction(const std::vector<WDiagOperator> &ops,
                        const std::vector<WTensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
-                       const std::vector<WSQOperator> &sqops,
+                       const std::vector<SQOperator> &sqops,
                        const std::vector<int> sign_order);
 
 using namespace std;
 
 WickTheorem::WickTheorem() {}
 
-WSum WickTheorem::contract(scalar_t factor,
-                           const std::vector<WDiagOperator> &ops, int minrank,
-                           int maxrank) {
+TermSum WickTheorem::contract(scalar_t factor,
+                              const std::vector<WDiagOperator> &ops,
+                              int minrank, int maxrank) {
 
-  WSum result;
+  TermSum result;
   ncontractions_ = 0;
   contractions_.clear();
   elementary_contractions_.clear();
@@ -43,7 +45,7 @@ WSum WickTheorem::contract(scalar_t factor,
       WDiagPrint::Summary,
       std::cout << "\nContracting the following operators:" << std::endl;
       for (auto &op
-           : ops) { std::cout << "    " << op; })
+           : ops) { std::cout << " " << op; })
 
   elementary_contractions_ = generate_elementary_contractions(ops);
 
@@ -79,9 +81,9 @@ WSum WickTheorem::contract(scalar_t factor,
   return result;
 }
 
-WSum WickTheorem::contract(scalar_t factor, const OperatorSum &dop_sum,
-                           int minrank, int maxrank) {
-  WSum result;
+TermSum WickTheorem::contract(scalar_t factor, const OperatorSum &dop_sum,
+                              int minrank, int maxrank) {
+  TermSum result;
 
   for (const auto &dop_factor : dop_sum.sum()) {
     scalar_t this_factor = dop_factor.second;
@@ -650,7 +652,7 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
   // and create mappings
   auto tensors_sqops_op_map = contration_tensors_sqops(ops);
   std::vector<WTensor> &tensors = std::get<0>(tensors_sqops_op_map);
-  std::vector<WSQOperator> &sqops = std::get<1>(tensors_sqops_op_map);
+  std::vector<SQOperator> &sqops = std::get<1>(tensors_sqops_op_map);
   // this map takes the operator index (op), orbital space (s), the sqop type,
   // and an index and maps it to the operators as they are stored in a vector
   //  std::map<std::tuple<int, int, bool, int>, int> op_map;
@@ -718,8 +720,8 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
     if (dmstruc == RDMType::Occupied) {
       // Reindex the annihilator (j) to the creator (i)
-      WIndex cre_index = sqops[pos_cre_sqops[0]].index();
-      WIndex ann_index = sqops[pos_ann_sqops[0]].index();
+      Index cre_index = sqops[pos_cre_sqops[0]].index();
+      Index ann_index = sqops[pos_ann_sqops[0]].index();
       pair_contraction_reindex_map[ann_index] = cre_index;
     }
 
@@ -730,8 +732,8 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
     if (dmstruc == RDMType::Unoccupied) {
       // Reindex the creator (j) to the annihilator (i)
-      WIndex cre_index = sqops[pos_cre_sqops[0]].index();
-      WIndex ann_index = sqops[pos_ann_sqops[0]].index();
+      Index cre_index = sqops[pos_cre_sqops[0]].index();
+      Index ann_index = sqops[pos_ann_sqops[0]].index();
       pair_contraction_reindex_map[cre_index] = ann_index;
       unoccupied_sign *= -1; // this factor is to compensate for the fact that
                              // we order operator in a canonical form in which
@@ -746,8 +748,8 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
     // a^+ a   a   a^+
 
     if (dmstruc == RDMType::General) {
-      std::vector<WIndex> lower;
-      std::vector<WIndex> upper;
+      std::vector<Index> lower;
+      std::vector<Index> upper;
       // collect indices of creation operators for the upper indices
       for (int c : pos_cre_sqops) {
         upper.push_back(sqops[c].index());
@@ -781,7 +783,8 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
   // assign an order to the uncontracted operators
   // creation operators come before annihilation operators
-  for (SQOperatorType type : {Creation, Annihilation}) {
+  for (SQOperatorType type :
+       {SQOperatorType::Creation, SQOperatorType::Annihilation}) {
     for (int s = 0; s < osi->num_spaces(); s++) {
       for (int i = 0; i < sqops.size(); i++) {
         if ((sign_order[i] == -1) and (sqops[i].index().space() == s) and
@@ -800,7 +803,7 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
   PRINT(WDiagPrint::All, PRINT_ELEMENTS(sign_order, "\n  positions: "););
 
-  std::vector<std::pair<int, WSQOperator>> sorted_sqops;
+  std::vector<std::pair<int, SQOperator>> sorted_sqops;
   sorted_position = 0;
   for (const auto &sqop : sqops) {
     sorted_sqops.push_back(std::make_pair(sign_order[sorted_position], sqop));
@@ -837,11 +840,11 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
   return std::make_pair(term, sign * factor * comb_factor);
 }
 
-std::tuple<std::vector<WTensor>, std::vector<WSQOperator>,
+std::tuple<std::vector<WTensor>, std::vector<SQOperator>,
            std::map<std::tuple<int, int, bool, int>, int>>
 WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
 
-  std::vector<WSQOperator> sqops;
+  std::vector<SQOperator> sqops;
   std::vector<WTensor> tensors;
   std::map<std::tuple<int, int, bool, int>, int> op_map;
 
@@ -853,11 +856,11 @@ WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
     const auto &op = ops[o];
 
     // Loop over creation operators (lower indices)
-    std::vector<WIndex> lower;
+    std::vector<Index> lower;
     for (int s = 0; s < osi->num_spaces(); s++) {
       for (int c = 0; c < op.num_cre(s); c++) {
-        WIndex idx(s, ic.next_index(s)); // get next available index
-        sqops.push_back(WSQOperator(Creation, idx));
+        Index idx(s, ic.next_index(s)); // get next available index
+        sqops.push_back(SQOperator(SQOperatorType::Creation, idx));
         lower.push_back(idx);
         auto key = std::make_tuple(o, s, true, c);
         op_map[key] = n;
@@ -869,11 +872,11 @@ WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
     // Loop over annihilation operators (upper indices)
     // the annihilation operators are layed out in a reversed order (hence the
     // need to reverse the upper indices of the tensor, see below)
-    std::vector<WIndex> upper;
+    std::vector<Index> upper;
     for (int s = osi->num_spaces() - 1; s >= 0; s--) {
       for (int a = op.num_ann(s) - 1; a >= 0; a--) {
-        WIndex idx(s, ic.next_index(s)); // get next available index
-        sqops.push_back(WSQOperator(Annihilation, idx));
+        Index idx(s, ic.next_index(s)); // get next available index
+        sqops.push_back(SQOperator(SQOperatorType::Annihilation, idx));
         upper.push_back(idx);
         auto key = std::make_tuple(o, s, false, a);
         op_map[key] = n;
@@ -986,7 +989,7 @@ void print_key(std::tuple<int, int, bool, int> key, int n) {
 void print_contraction(const std::vector<WDiagOperator> &ops,
                        const std::vector<WTensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
-                       const std::vector<WSQOperator> &sqops,
+                       const std::vector<SQOperator> &sqops,
                        const std::vector<int> sign_order) {
   for (const auto &bit_map : bit_map_vec) {
     int ntrue = std::count(bit_map.begin(), bit_map.end(), true);
@@ -1020,7 +1023,7 @@ void print_contraction(const std::vector<WDiagOperator> &ops,
     cout << endl;
   }
   for (const auto &sqop : sqops) {
-    cout << ((sqop.type() == Creation) ? " + " : " - ");
+    cout << ((sqop.type() == SQOperatorType::Creation) ? " + " : " - ");
   }
   cout << endl;
   for (const auto &sqop : sqops) {

@@ -7,23 +7,22 @@
 #include <vector>
 
 /// Type of orbital space
-// enum class OrbitalSpaceType { Core, Active, Virtual, RI, None };
-
-/// Type of orbital space
 enum class RDMType {
   // Single creation/annihilation contractions that yields a Kronecker delta
   Occupied,
   // Single annihilation/creation contractions that yields a Kronecker delta
   Unoccupied,
-  General // Multi-leg contractions
+  // Multi-leg contractions
+  General
 };
 
 /// Spin types
 enum class SpinType { SpinOrbital, SpinFree, Alpha, Beta };
 
 class OrbitalSpaceInfo {
-
-  /// This type holds infomation about a space
+private:
+  /// This type holds infomation about a space in a tuple
+  /// (<label>, type of RDM, labels)
   using t_space_info =
       std::tuple<std::string, RDMType, std::vector<std::string>>;
 

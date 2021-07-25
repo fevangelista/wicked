@@ -4,25 +4,25 @@
 
 #include "combinatorics.h"
 #include "helpers.h"
+#include "index.h"
 #include "orbital_space.h"
+#include "sqoperator.h"
 #include "walgebraicterm.h"
 #include "wicked-def.h"
-#include "windex.h"
-#include "wsqoperator.h"
 #include "wtensor.h"
 
 using namespace std;
 
 WAlgebraicTerm::WAlgebraicTerm() {}
 
-void WAlgebraicTerm::add(const WSQOperator &op) { operators_.push_back(op); }
+void WAlgebraicTerm::add(const SQOperator &op) { operators_.push_back(op); }
 
 void WAlgebraicTerm::add(const WTensor &tensor) { tensors_.push_back(tensor); }
 
 int WAlgebraicTerm::nops() const { return operators_.size(); }
 
-std::vector<WIndex> WAlgebraicTerm::indices() const {
-  std::vector<WIndex> result;
+std::vector<Index> WAlgebraicTerm::indices() const {
+  std::vector<Index> result;
   for (const auto &t : tensors_) {
     const auto t_idx = t.indices();
     result.insert(result.end(), t_idx.begin(), t_idx.end());
@@ -50,17 +50,17 @@ WAlgebraicTerm::tensor_connectivity(const WTensor &t, bool upper) const {
   for (const auto &tensor : tensors_) {
     if (not(t == tensor)) {
 
-      std::vector<WIndex> indices2 = upper ? tensor.lower() : tensor.upper();
+      std::vector<Index> indices2 = upper ? tensor.lower() : tensor.upper();
       sort(indices2.begin(), indices2.end());
 
-      std::vector<WIndex> indices3 = tensor.upper();
+      std::vector<Index> indices3 = tensor.upper();
       sort(indices3.begin(), indices3.end());
 
-      std::vector<WIndex> common_lower_indices;
+      std::vector<Index> common_lower_indices;
       set_intersection(indices.begin(), indices.end(), indices2.begin(),
                        indices2.end(), back_inserter(common_lower_indices));
 
-      std::vector<WIndex> common_upper_indices;
+      std::vector<Index> common_upper_indices;
       set_intersection(indices.begin(), indices.end(), indices3.begin(),
                        indices3.end(), back_inserter(common_upper_indices));
 
@@ -153,7 +153,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
   std::vector<int> sqop_index_count(osi->num_spaces(), 0);
   std::vector<int> tens_index_count(osi->num_spaces(), 0);
   index_map_t index_map;
-  std::map<WIndex, bool> is_operator_index;
+  std::map<Index, bool> is_operator_index;
 
   // a. Assign indices to free operators
   for (const auto &sqop : operators_) {
@@ -169,14 +169,14 @@ scalar_t WAlgebraicTerm::canonicalize() {
         // this index is not shared with an operator
         if (index_map.count(l) == 0) {
           int s = l.space();
-          index_map[l] = WIndex(s, tens_index_count[s]);
+          index_map[l] = Index(s, tens_index_count[s]);
           tens_index_count[s] += 1;
         }
       } else {
         // this index is shared with an operator
         if (index_map.count(l) == 0) {
           int s = l.space();
-          index_map[l] = WIndex(s, sqop_index_count[s]);
+          index_map[l] = Index(s, sqop_index_count[s]);
           sqop_index_count[s] += 1;
         }
       }
@@ -186,13 +186,13 @@ scalar_t WAlgebraicTerm::canonicalize() {
       if (is_operator_index.count(u) == 0) {
         if (index_map.count(u) == 0) {
           int s = u.space();
-          index_map[u] = WIndex(s, tens_index_count[s]);
+          index_map[u] = Index(s, tens_index_count[s]);
           tens_index_count[s] += 1;
         }
       } else {
         if (index_map.count(u) == 0) {
           int s = u.space();
-          index_map[u] = WIndex(s, sqop_index_count[s]);
+          index_map[u] = Index(s, sqop_index_count[s]);
           sqop_index_count[s] += 1;
         }
       }
@@ -205,17 +205,17 @@ scalar_t WAlgebraicTerm::canonicalize() {
   for (auto &tensor : tensors_) {
     scalar_t sign = 1;
     {
-      std::vector<std::tuple<int, int, int, WIndex>> upper_sort;
+      std::vector<std::tuple<int, int, int, Index>> upper_sort;
       int upos = 0;
       for (const auto &index : tensor.upper()) {
         upper_sort.push_back(
-            std::make_tuple(index.space(), index.index(), upos, index));
+            std::make_tuple(index.space(), index.pos(), upos, index));
         upos += 1;
       }
       std::sort(upper_sort.begin(), upper_sort.end());
 
       std::vector<int> usign;
-      std::vector<WIndex> new_upper;
+      std::vector<Index> new_upper;
       for (const auto &tpl : upper_sort) {
         usign.push_back(std::get<2>(tpl));
         new_upper.push_back(std::get<3>(tpl));
@@ -225,17 +225,17 @@ scalar_t WAlgebraicTerm::canonicalize() {
     }
 
     {
-      std::vector<std::tuple<int, int, int, WIndex>> lower_sort;
+      std::vector<std::tuple<int, int, int, Index>> lower_sort;
       int lpos = 0;
       for (const auto &index : tensor.lower()) {
         lower_sort.push_back(
-            std::make_tuple(index.space(), index.index(), lpos, index));
+            std::make_tuple(index.space(), index.pos(), lpos, index));
         lpos += 1;
       }
       std::sort(lower_sort.begin(), lower_sort.end());
 
       std::vector<int> lsign;
-      std::vector<WIndex> new_lower;
+      std::vector<Index> new_lower;
       for (const auto &tpl : lower_sort) {
         lsign.push_back(std::get<2>(tpl));
         new_lower.push_back(std::get<3>(tpl));
@@ -251,11 +251,11 @@ scalar_t WAlgebraicTerm::canonicalize() {
   std::vector<std::tuple<int, int, int, int>> sorting_vec;
   int pos = 0;
   for (const auto &sqop : operators_) {
-    int type = (sqop.type() == Creation) ? 0 : 1;
+    int type = (sqop.type() == SQOperatorType::Creation) ? 0 : 1;
     int s = sqop.index().space();
     // Annihilation operators are written in reverse order
-    int index = (sqop.type() == Creation) ? sqop.index().index()
-                                          : -sqop.index().index();
+    int index = (sqop.type() == SQOperatorType::Creation) ? sqop.index().pos()
+                                                          : -sqop.index().pos();
     sorting_vec.push_back(std::make_tuple(type, s, index, pos));
     pos += 1;
   }
@@ -263,7 +263,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
   std::sort(sorting_vec.begin(), sorting_vec.end());
 
   std::vector<int> sign_order;
-  std::vector<WSQOperator> new_sqops;
+  std::vector<SQOperator> new_sqops;
   for (const auto &tpl : sorting_vec) {
     int idx = std::get<3>(tpl);
     sign_order.push_back(idx);
@@ -284,17 +284,17 @@ scalar_t WAlgebraicTerm::canonicalize_tensor_indices() {
   // Sort tensor indices according to canonical form
   for (auto &tensor : tensors_) {
     {
-      std::vector<std::tuple<int, int, int, WIndex>> upper_sort;
+      std::vector<std::tuple<int, int, int, Index>> upper_sort;
       int upos = 0;
       for (const auto &index : tensor.upper()) {
         upper_sort.push_back(
-            std::make_tuple(index.space(), index.index(), upos, index));
+            std::make_tuple(index.space(), index.pos(), upos, index));
         upos += 1;
       }
       std::sort(upper_sort.begin(), upper_sort.end());
 
       std::vector<int> usign;
-      std::vector<WIndex> new_upper;
+      std::vector<Index> new_upper;
       for (const auto &tpl : upper_sort) {
         usign.push_back(std::get<2>(tpl));
         new_upper.push_back(std::get<3>(tpl));
@@ -304,17 +304,17 @@ scalar_t WAlgebraicTerm::canonicalize_tensor_indices() {
     }
 
     {
-      std::vector<std::tuple<int, int, int, WIndex>> lower_sort;
+      std::vector<std::tuple<int, int, int, Index>> lower_sort;
       int lpos = 0;
       for (const auto &index : tensor.lower()) {
         lower_sort.push_back(
-            std::make_tuple(index.space(), index.index(), lpos, index));
+            std::make_tuple(index.space(), index.pos(), lpos, index));
         lpos += 1;
       }
       std::sort(lower_sort.begin(), lower_sort.end());
 
       std::vector<int> lsign;
-      std::vector<WIndex> new_lower;
+      std::vector<Index> new_lower;
       for (const auto &tpl : lower_sort) {
         lsign.push_back(std::get<2>(tpl));
         new_lower.push_back(std::get<3>(tpl));
@@ -419,23 +419,23 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
   WAlgebraicTerm term;
 
   auto indices = make_indices_from_space_labels({cre, ann});
-  std::vector<WIndex> &cre_ind = indices[0];
-  std::vector<WIndex> &ann_ind = indices[1];
+  std::vector<Index> &cre_ind = indices[0];
+  std::vector<Index> &ann_ind = indices[1];
 
   // Add the tensor
   WTensor tensor(label, cre_ind, ann_ind);
   term.add(tensor);
 
   // Add the creation operators
-  for (const WIndex &c : cre_ind) {
-    WSQOperator sqop(Creation, c);
+  for (const Index &c : cre_ind) {
+    SQOperator sqop(SQOperatorType::Creation, c);
     term.add(sqop);
   }
 
   // Add the annihilation operators
   std::reverse(ann_ind.begin(), ann_ind.end()); // reverse the annihilation ops
-  for (const WIndex &a : ann_ind) {
-    WSQOperator sqop(Annihilation, a);
+  for (const Index &a : ann_ind) {
+    SQOperator sqop(SQOperatorType::Annihilation, a);
     term.add(sqop);
   }
   return term;
@@ -445,7 +445,7 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
 //  scalar_t factor(1);
 
 //  // find classes of equivalent indices
-//  std::map<std::pair<std::string, int>, std::vector<WIndex>> equiv_classes;
+//  std::map<std::pair<std::string, int>, std::vector<Index>> equiv_classes;
 //  for (const auto &tensor : tensors_) {
 //    std::string label = tensor.label();
 //    for (int i : num_indices_per_space(tensor.upper())) {
@@ -472,13 +472,13 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
 //    cout << '\n';
 //  }
 
-//  std::set<WIndex> sqops_indices;
+//  std::set<Index> sqops_indices;
 //  for (const auto &sqop : operators_) {
 //    sqops_indices.insert(sqop.index());
 //  }
 
 //  // find the unique classes
-//  std::set<std::vector<WIndex>> unique_equiv_classes;
+//  std::set<std::vector<Index>> unique_equiv_classes;
 //  for (const auto &kv : equiv_classes) {
 //    // must have at least two elements (otherwise there is no need to relabel)
 //    if (kv.second.size() > 1) {
@@ -488,7 +488,7 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
 //          is_op_index = true;
 //      }
 //      if (not is_op_index) {
-//        std::vector<WIndex> indices = kv.second;
+//        std::vector<Index> indices = kv.second;
 //        std::sort(indices.begin(), indices.end());
 //        unique_equiv_classes.insert(indices);
 //      }
@@ -503,12 +503,12 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
 //  }
 
 //  // for each equivalence class holds all permutations of indices
-//  std::vector<std::vector<std::vector<WIndex>>>
+//  std::vector<std::vector<std::vector<Index>>>
 //      unique_equiv_classes_permutations;
 
 //  std::vector<int> r;
 //  for (const auto &v : unique_equiv_classes) {
-//    std::vector<std::vector<WIndex>> permutations;
+//    std::vector<std::vector<Index>> permutations;
 //    do {
 //      permutations.push_back(v);
 //    } while (std::next_permutation(v.begin(), v.end()));

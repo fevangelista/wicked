@@ -1,14 +1,14 @@
-#ifndef _wicked_wterm_h_
-#define _wicked_wterm_h_
+#ifndef _wicked_term_h_
+#define _wicked_term_h_
 
-#include <string>
-#include <vector>
 #include <map>
 #include <numeric>
+#include <string>
+#include <vector>
 
 #include "combinatorics.h"
-#include "windex.h"
-#include "wsqoperator.h"
+#include "index.h"
+#include "sqoperator.h"
 #include "wtensor.h"
 
 /// A class to represent a term in a SQ expression. A term includes:
@@ -22,11 +22,11 @@ public:
 
   // ==> Class public interface <==
 
-  /// Add one or more WSQOperator
-  void add(const WSQOperator &op);
+  /// Add one or more SQOperator
+  void add(const SQOperator &op);
 
   /// Add a tensor
-  void add(const WTensor& tensor);
+  void add(const WTensor &tensor);
 
   /// Return the scalar factor
   scalar_t factor() const;
@@ -44,16 +44,20 @@ public:
   std::vector<int> noperators_per_space() const;
 
   /// Return the SQ operators
-  const std::vector<std::vector<WSQOperator>> &operators() const { return operators_; }
+  const std::vector<std::vector<SQOperator>> &operators() const {
+    return operators_;
+  }
 
   /// Return the SQ operators in space n
-  const std::vector<WSQOperator> &operators(int n) const { return operators_[n]; }
+  const std::vector<SQOperator> &operators(int n) const {
+    return operators_[n];
+  }
 
   /// Return the tensors
   const std::vector<WTensor> &tensors() const { return tensors_; }
 
   /// Return a vector containing all indices used in this term
-  std::vector<WIndex> indices() const;
+  std::vector<Index> indices() const;
 
   /// Reindex this term
   void reindex(index_map_t &idx_map);
@@ -77,7 +81,7 @@ private:
   // ==> Class private data <==
 
   scalar_t factor_ = 1;
-  std::vector<std::vector<WSQOperator>> operators_;
+  std::vector<std::vector<SQOperator>> operators_;
   std::vector<WTensor> tensors_;
 
   // ==> Class private functions <==
@@ -95,4 +99,4 @@ WTerm make_operator(const std::string &label,
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const WTerm &term);
 
-#endif // _wicked_wterm_h_
+#endif // _wicked_term_h_

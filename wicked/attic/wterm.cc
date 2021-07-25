@@ -1,13 +1,13 @@
 #include <algorithm>
 
-#include "wterm.h"
 #include "helpers.h"
 #include "wicked-def.h"
+#include "wterm.h"
 
 WTerm::WTerm()
-    : operators_(std::vector<std::vector<WSQOperator>>(osi->num_spaces())) {}
+    : operators_(std::vector<std::vector<SQOperator>>(osi->num_spaces())) {}
 
-void WTerm::add(const WSQOperator &op) {
+void WTerm::add(const SQOperator &op) {
   operators_[op.index().space()].push_back(op);
 }
 
@@ -33,8 +33,8 @@ std::vector<int> WTerm::noperators_per_space() const {
   return counter;
 }
 
-std::vector<WIndex> WTerm::indices() const {
-  std::vector<WIndex> result;
+std::vector<Index> WTerm::indices() const {
+  std::vector<Index> result;
   for (const auto &t : tensors_) {
     const auto t_idx = t.indices();
     result.insert(result.end(), t_idx.begin(), t_idx.end());
@@ -118,7 +118,7 @@ std::string WTerm::str() const {
   if (noperators() > 0) {
     str_vec.push_back("{");
     for (const auto &op_space : operators_) {
-      for (const WSQOperator &q : op_space) {
+      for (const SQOperator &q : op_space) {
         str_vec.push_back(q.str());
       }
     }
@@ -142,7 +142,7 @@ std::string WTerm::operator_str() const {
   if (noperators() > 0) {
     str_vec.push_back("{");
     for (const auto &op_space : operators_) {
-      for (const WSQOperator &q : op_space) {
+      for (const SQOperator &q : op_space) {
         str_vec.push_back(q.str());
       }
     }
@@ -160,7 +160,7 @@ std::string WTerm::latex() const {
   if (noperators() > 0) {
     str_vec.push_back("\\{");
     for (const auto &op_space : operators_) {
-      for (const WSQOperator &q : op_space) {
+      for (const SQOperator &q : op_space) {
         str_vec.push_back(q.latex());
       }
     }
@@ -181,23 +181,23 @@ WTerm make_operator(const std::string &label,
   WTerm term;
 
   auto indices = make_indices_from_space_labels({cre, ann});
-  std::vector<WIndex> &cre_ind = indices[0];
-  std::vector<WIndex> &ann_ind = indices[1];
+  std::vector<Index> &cre_ind = indices[0];
+  std::vector<Index> &ann_ind = indices[1];
 
   // Add the tensor
   WTensor tensor(label, cre_ind, ann_ind);
   term.add(tensor);
 
   // Add the creation operators
-  for (const WIndex c : cre_ind) {
-    WSQOperator sqop(Creation, c);
+  for (const Index c : cre_ind) {
+    SQOperator sqop(Creation, c);
     term.add(sqop);
   }
 
   // Add the annihilation operators
   std::reverse(ann_ind.begin(), ann_ind.end()); // reverse the annihilation ops
-  for (const WIndex a : ann_ind) {
-    WSQOperator sqop(Annihilation, a);
+  for (const Index a : ann_ind) {
+    SQOperator sqop(Annihilation, a);
     term.add(sqop);
   }
   return term;

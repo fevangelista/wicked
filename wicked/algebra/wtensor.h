@@ -1,11 +1,11 @@
-#ifndef _wicked_wtensor_h_
-#define _wicked_wtensor_h_
+#ifndef _wicked_tensor_h_
+#define _wicked_tensor_h_
 
 #include <string>
 #include <vector>
 
+#include "index.h"
 #include "wicked-def.h"
-#include "windex.h"
 
 /// This class represents a tensor labeled with orbital indices.
 /// It holds information about the label and the indices of the tensor.
@@ -15,9 +15,9 @@ public:
   // ==> Constructors <==
   explicit WTensor() {}
 
-  WTensor(std::string label, const std::vector<WIndex> &lower,
-                   const std::vector<WIndex> &upper,
-                   SymmetryType symmetry = Antisymmetric);
+  WTensor(std::string label, const std::vector<Index> &lower,
+          const std::vector<Index> &upper,
+          SymmetryType symmetry = Antisymmetric);
 
   // ==> Class public interface <==
 
@@ -25,19 +25,19 @@ public:
   const std::string &label() const { return label_; }
 
   /// Return a reference to the lower indices
-  const std::vector<WIndex> &lower() const { return lower_; }
+  const std::vector<Index> &lower() const { return lower_; }
 
   /// Return a reference to the upper indices
-  const std::vector<WIndex> &upper() const { return upper_; }
+  const std::vector<Index> &upper() const { return upper_; }
 
   /// Set the lower indices
-  void set_lower(const std::vector<WIndex> &indices) { lower_ = indices; }
+  void set_lower(const std::vector<Index> &indices) { lower_ = indices; }
 
   /// Set the upper indices
-  void set_upper(const std::vector<WIndex> &indices) { upper_ = indices; }
+  void set_upper(const std::vector<Index> &indices) { upper_ = indices; }
 
   /// Return a vector containing all indices
-  std::vector<WIndex> indices() const;
+  std::vector<Index> indices() const;
 
   /// Reindex this tensor
   void reindex(index_map_t &idx_map);
@@ -67,13 +67,12 @@ private:
   // ==> Class private data <==
 
   std::string label_;
-  std::vector<WIndex> lower_;
-  std::vector<WIndex> upper_;
+  std::vector<Index> lower_;
+  std::vector<Index> upper_;
   SymmetryType symmetry_;
 };
-
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const WTensor &tensor);
 
-#endif // _wicked_wtensor_h_
+#endif // _wicked_tensor_h_

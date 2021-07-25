@@ -1,5 +1,5 @@
-#ifndef _wicked_wicked_def_h_
-#define _wicked_wicked_def_h_
+#ifndef _wicked_icked_def_h_
+#define _wicked_icked_def_h_
 
 #include <vector>
 
@@ -11,4 +11,4 @@ enum SymmetryType { Symmetric, Antisymmetric, Nonsymmetric };
 /// Rational numbers
 using scalar_t = rational;
 
-#endif // #ifndef _wicked_wicked_def_h_
+#endif // #ifndef _wicked_icked_def_h_

@@ -1,28 +1,29 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "../src/algebra/walgebraicterm.h"
-#include "../src/algebra/wequationterm.h"
-#include "../src/algebra/windex.h"
-#include "../src/algebra/wsqoperator.h"
-#include "../src/algebra/wsum.h"
-#include "../src/algebra/wtensor.h"
-#include "../src/diagrams/wdiag_operator.h"
-#include "../src/diagrams/wdiag_operator_sum.h"
-#include "../src/diagrams/wick_theorem.h"
-#include "../src/orbital_space.h"
-#include "../src/rational.h"
+#include "../wicked/algebra/sqoperator.h"
+#include "../wicked/algebra/term_sum.h"
+#include "../wicked/algebra/walgebraicterm.h"
+#include "../wicked/algebra/wequationterm.h"
+#include "../wicked/algebra/wtensor.h"
+#include "../wicked/diagrams/wdiag_operator.h"
+#include "../wicked/diagrams/wdiag_operator_sum.h"
+#include "../wicked/diagrams/wick_theorem.h"
+#include "../wicked/orbital_space.h"
+#include "../wicked/rational.h"
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;
-
-// auto osi = std::make_shared<OrbitalSpaceInfo>();
-// osi->default_spaces();
+void export_Index(py::module &m);
+void export_SQOperator(py::module &m);
 
 PYBIND11_MODULE(wicked, m) {
   m.doc() = "Wicked python interface";
+
+  export_Index(m);
+  export_SQOperator(m);
 
   py::class_<rational, std::shared_ptr<rational>>(m, "rational")
       .def(py::init<>())
@@ -48,13 +49,7 @@ PYBIND11_MODULE(wicked, m) {
       .def("reset", &OrbitalSpaceInfo::reset)
       .def("add_space", &OrbitalSpaceInfo::add_space);
 
-  py::class_<WIndex, std::shared_ptr<WIndex>>(m, "WIndex")
-      .def(py::init<int, int>());
-
   py::class_<WTensor, std::shared_ptr<WTensor>>(m, "WTensor");
-
-  py::class_<WSQOperator, std::shared_ptr<WSQOperator>>(m, "WSQOperator")
-      .def(py::init<SQOperatorType, WIndex>());
 
   py::class_<WAlgebraicTerm, std::shared_ptr<WAlgebraicTerm>>(m,
                                                               "WAlgebraicTerm")
@@ -71,12 +66,12 @@ PYBIND11_MODULE(wicked, m) {
       .def("latex", &WEquationTerm::latex)
       .def("ambit", &WEquationTerm::ambit);
 
-  py::class_<WSum, std::shared_ptr<WSum>>(m, "WSum")
+  py::class_<TermSum, std::shared_ptr<TermSum>>(m, "TermSum")
       .def(py::init<>())
-      .def("canonicalize", &WSum::canonicalize)
-      .def("to_manybody_equation", &WSum::to_manybody_equation)
-      .def("str", &WSum::str)
-      .def("latex", &WSum::latex);
+      .def("canonicalize", &TermSum::canonicalize)
+      .def("to_manybody_equation", &TermSum::to_manybody_equation)
+      .def("str", &TermSum::str)
+      .def("latex", &TermSum::latex, "sep"_a = " \\\\ \n");
 
   py::class_<WDiagOperator, std::shared_ptr<WDiagOperator>>(m, "WDiagOperator")
       .def(py::init<const std::string &, const std::vector<int> &,
@@ -146,7 +141,7 @@ PYBIND11_MODULE(wicked, m) {
     if ((type == "occupied") or (type == "core")) {
       structure = RDMType::Occupied;
     } else if ((type == "unoccupied") or (type == "virtual")) {
-      structure = RDMType::Occupied;
+      structure = RDMType::Unoccupied;
     }
     osi->add_space(label, structure, indices);
   });

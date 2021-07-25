@@ -1,5 +1,5 @@
-#ifndef _wicked_wequation_term_h_
-#define _wicked_wequation_term_h_
+#ifndef _wicked_equation_term_h_
+#define _wicked_equation_term_h_
 
 #include <vector>
 
@@ -10,15 +10,15 @@ class WEquationTerm {
 public:
   // ==> Constructor <==
   WEquationTerm(const WAlgebraicTerm &lhs, const WAlgebraicTerm &rhs,
-               scalar_t factor);
+                scalar_t factor);
 
   // ==> Class public interface <==
 
   /// Return the left-hand side of the equation
-  const WAlgebraicTerm& lhs() const;
+  const WAlgebraicTerm &lhs() const;
 
   /// Return the right-hand side of the equation
-  const WAlgebraicTerm& rhs() const;
+  const WAlgebraicTerm &rhs() const;
 
   /// Return the factor for the left-hand side equation
   scalar_t rhs_factor() const;
@@ -48,4 +48,4 @@ private:
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const WEquationTerm &eterm);
 
-#endif // _wicked_wequation_term_h_
+#endif // _wicked_equation_term_h_

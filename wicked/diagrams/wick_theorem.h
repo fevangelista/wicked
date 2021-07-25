@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 
-class WSQOperator;
+class SQOperator;
 class WTensor;
 class WAlgebraicTerm;
 class WDiagOperator;
 class OperatorSum;
 class WDiagVertex;
-class WSum;
+class TermSum;
 
 enum class WDiagPrint { No, Basic, Summary, Detailed, All };
 
@@ -22,12 +22,12 @@ public:
   WickTheorem();
 
   /// Contract a product of operators
-  WSum contract(scalar_t factor, const std::vector<WDiagOperator> &ops,
-                int minrank, int maxrank);
+  TermSum contract(scalar_t factor, const std::vector<WDiagOperator> &ops,
+                   int minrank, int maxrank);
 
   /// Contract a product of sums of operators
-  WSum contract(scalar_t factor, const OperatorSum &dop_sum, int minrank,
-                int maxrank);
+  TermSum contract(scalar_t factor, const OperatorSum &dop_sum, int minrank,
+                   int maxrank);
 
   void set_print(WDiagPrint print);
 
@@ -92,7 +92,7 @@ private:
       scalar_t factor);
 
   /// Return the tensors and operators correspoding to a product of operators
-  std::tuple<std::vector<WTensor>, std::vector<WSQOperator>,
+  std::tuple<std::vector<WTensor>, std::vector<SQOperator>,
              std::map<std::tuple<int, int, bool, int>, int>>
   contration_tensors_sqops(const std::vector<WDiagOperator> &ops);
 

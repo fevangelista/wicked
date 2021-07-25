@@ -48,7 +48,7 @@ test_return_t test_r1_1() {
 
   // Fov
   auto sum = wdt.contract_sum(1, Fvo, 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -66,7 +66,7 @@ test_return_t test_r1_2() {
 
   // [Fvv,T1]
   auto sum = wdt.contract_sum(1, Fvv * T1, 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -85,7 +85,7 @@ test_return_t test_r1_3() {
 
   // [Foo,T1]
   auto sum = wdt.contract_sum(1, Foo * T1, 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -102,7 +102,7 @@ test_return_t test_r1_4() {
 
   // [Vovov,T1]
   auto sum = wdt.contract_sum(1, Vovov * T1, 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -119,7 +119,7 @@ test_return_t test_r1_5() {
 
   // [Fvo,T2]
   auto sum = wdt.contract_sum(1, Fvo * T2, 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -136,7 +136,7 @@ test_return_t test_r1_6() {
 
   // [Vovvv,T2]
   auto sum = wdt.contract_sum(1, Vovvv * T2, 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -153,7 +153,7 @@ test_return_t test_r1_7() {
 
   // [Vooov,T2]
   auto sum = wdt.contract_sum(1, Vooov * T2, 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -172,7 +172,7 @@ test_return_t test_r1_8() {
   // 1/2 [[Fov,T1],T1]
   auto sum = wdt.contract_sum(scalar_t(1, 2),
                               commutator(commutator(Fov, T1), T1), 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -192,7 +192,7 @@ test_return_t test_r1_9() {
   // 1/2 [[Vooov,T1],T1]
   auto sum = wdt.contract_sum(scalar_t(1, 2),
                               commutator(commutator(Vooov, T1), T1), 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -212,7 +212,7 @@ test_return_t test_r1_10() {
   // 1/2 [[Vovvv,T1],T1]
   auto sum = wdt.contract_sum(scalar_t(1, 2),
                               commutator(commutator(Vovvv, T1), T1), 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -233,7 +233,7 @@ test_return_t test_r1_11() {
   auto sum = wdt.contract_sum(
       scalar_t(1, 6), commutator(commutator(commutator(Voovv, T1), T1), T1), 2,
       2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -254,7 +254,7 @@ test_return_t test_r1_12_14() {
 
   // [[Voovv,T1],T2]
   auto sum = wdt.contract_sum(1, commutator(commutator(Voovv, T1), T2), 2, 2);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -275,7 +275,7 @@ test_return_t test_r2_1() {
 
   // Vvvoo
   auto sum = wdt.contract_sum(1, Vvvoo, 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -293,7 +293,7 @@ test_return_t test_r2_2() {
 
   // [Fvv,T2]
   auto sum = wdt.contract_sum(1, Fvv * T2, 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -311,7 +311,7 @@ test_return_t test_r2_3() {
 
   // [Foo,T2]
   auto sum = wdt.contract_sum(1, Foo * T2, 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -329,7 +329,7 @@ test_return_t test_r2_4() {
 
   // [Voooo,T2]
   auto sum = wdt.contract_sum(1, Voooo * T2, 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -347,7 +347,7 @@ test_return_t test_r2_5() {
 
   // [Vvvvv,T2]
   auto sum = wdt.contract_sum(1, Vvvvv * T2, 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -365,7 +365,7 @@ test_return_t test_r2_6() {
 
   // [Vovov,T2]
   auto sum = wdt.contract_sum(1, Vovov * T2, 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -383,7 +383,7 @@ test_return_t test_r2_7() {
 
   // [Vvvov,T2]
   auto sum = wdt.contract_sum(1, Vvvov * T1, 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -401,7 +401,7 @@ test_return_t test_r2_8() {
 
   // [Vovoo,T2]
   auto sum = wdt.contract_sum(1, Vovoo * T1, 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -420,7 +420,7 @@ test_return_t test_r2_9_12() {
   // 1/2 [[Voovv,T2],T2]
   auto sum = wdt.contract_sum(scalar_t(1, 2),
                               commutator(commutator(Voovv, T2), T2), 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -447,7 +447,7 @@ test_return_t test_r2_13() {
   // 1/2 [[Voooo,T1],T1]
   auto sum = wdt.contract_sum(scalar_t(1, 2),
                               commutator(commutator(Voooo, T1), T1), 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -467,7 +467,7 @@ test_return_t test_r2_14() {
   // 1/2 [[Vvvvv,T1],T1]
   auto sum = wdt.contract_sum(scalar_t(1, 2),
                               commutator(commutator(Vvvvv, T1), T1), 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -487,7 +487,7 @@ test_return_t test_r2_15() {
   // 1/2 [[Vovov,T1],T1]
   auto sum = wdt.contract_sum(scalar_t(1, 2),
                               commutator(commutator(Vovov, T1), T1), 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -508,7 +508,7 @@ test_return_t test_r2_16_17() {
 
   // [[Fov,T1],T2]
   auto sum = wdt.contract_sum(1, commutator(commutator(Fov, T1), T2), 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -529,7 +529,7 @@ test_return_t test_r2_18_21_22() {
 
   // [[Vooov,T1],T2]
   auto sum = wdt.contract_sum(1, commutator(commutator(Vooov, T1), T2), 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -552,7 +552,7 @@ test_return_t test_r2_19_20_23() {
 
   // [[Vovvv,T1],T2]
   auto sum = wdt.contract_sum(1, commutator(commutator(Vovvv, T1), T2), 4, 4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -576,7 +576,7 @@ test_return_t test_r2_24() {
   auto sum = wdt.contract_sum(
       scalar_t(1, 6), commutator(commutator(commutator(Vovvv, T1), T1), T1), 4,
       4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -598,7 +598,7 @@ test_return_t test_r2_25() {
   auto sum = wdt.contract_sum(
       scalar_t(1, 6), commutator(commutator(commutator(Vooov, T1), T1), T1), 4,
       4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -621,7 +621,7 @@ test_return_t test_r2_26_30() {
   auto sum = wdt.contract_sum(
       scalar_t(1, 2), commutator(commutator(commutator(Voovv, T1), T1), T2), 4,
       4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
@@ -653,7 +653,7 @@ test_return_t test_r2_31() {
       scalar_t(1, 24),
       commutator(commutator(commutator(commutator(Voovv, T1), T1), T1), T1), 4,
       4);
-  WSum val;
+  TermSum val;
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }

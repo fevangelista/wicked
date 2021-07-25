@@ -6,12 +6,12 @@
 #include <string>
 #include <vector>
 
+#include "index.h"
 #include "wicked-def.h"
-#include "windex.h"
 
-class WSQOperator;
+class SQOperator;
 class WTensor;
-class WIndex;
+class Index;
 
 /// A class to represent a term in a SQ expression. A term includes:
 /// 1) a product of tensors
@@ -24,8 +24,8 @@ public:
 
   // ==> Class public interface <==
 
-  /// Add one or more WSQOperator
-  void add(const WSQOperator &op);
+  /// Add one or more SQOperator
+  void add(const SQOperator &op);
 
   /// Add a tensor
   void add(const WTensor &tensor);
@@ -37,13 +37,13 @@ public:
   int nops() const;
 
   /// Return the SQ operators
-  const std::vector<WSQOperator> &ops() const { return operators_; }
+  const std::vector<SQOperator> &ops() const { return operators_; }
 
   /// Return the tensors
   const std::vector<WTensor> &tensors() const { return tensors_; }
 
   /// Return a vector containing all indices used in this term
-  std::vector<WIndex> indices() const;
+  std::vector<Index> indices() const;
 
   /// Reindex this term
   void reindex(index_map_t &idx_map);
@@ -72,7 +72,7 @@ public:
 private:
   // ==> Class private data <==
 
-  std::vector<WSQOperator> operators_;
+  std::vector<SQOperator> operators_;
   std::vector<WTensor> tensors_;
 
   // ==> Class private functions <==
@@ -83,7 +83,7 @@ private:
   // Used in the canonicalization routine to find how the indices of a tensor
   // connect to all the other tensors
   std::vector<std::pair<std::string, std::vector<int>>>
-  tensor_connectivity(const WTensor& t, bool upper) const;
+  tensor_connectivity(const WTensor &t, bool upper) const;
 };
 
 // Helper functions

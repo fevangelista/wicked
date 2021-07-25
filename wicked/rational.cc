@@ -85,13 +85,19 @@ std::string rational::latex() const {
   } else {
     if (denominator_ == 1) {
       if (numerator_ == 1) {
+        s += "+";
       } else if (numerator_ == -1) {
         s += "-";
       } else {
         s += std::to_string(numerator_);
       }
     } else {
-      s += "\\frac{" + std::to_string(numerator_) + "}{" +
+      if (numerator_ > 0) {
+        s += "+";
+      } else {
+        s += "-";
+      }
+      s += "\\frac{" + std::to_string(std::abs(numerator_)) + "}{" +
            std::to_string(denominator_) + "}";
     }
   }

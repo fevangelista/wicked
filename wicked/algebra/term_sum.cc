@@ -2,15 +2,15 @@
 #include <iostream>
 
 #include "helpers.h"
-#include "wsum.h"
+#include "sqoperator.h"
+#include "term_sum.h"
 #include "walgebraicterm.h"
 #include "wequationterm.h"
 #include "wtensor.h"
-#include "wsqoperator.h"
 
-WSum::WSum() {}
+TermSum::TermSum() {}
 
-void WSum::add(const WAlgebraicTerm &term, scalar_t factor) {
+void TermSum::add(const WAlgebraicTerm &term, scalar_t factor) {
   auto search = terms_.find(term);
 
   if (search != terms_.end()) {
@@ -24,8 +24,8 @@ void WSum::add(const WAlgebraicTerm &term, scalar_t factor) {
   }
 }
 
-void WSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
-               scalar_t scale) {
+void TermSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
+                  scalar_t scale) {
 
   const WAlgebraicTerm &term = term_factor.first;
   scalar_t factor = term_factor.second;
@@ -43,13 +43,13 @@ void WSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
   }
 }
 
-void WSum::add_sum(const WSum &sum, scalar_t scale) {
+void TermSum::add_sum(const TermSum &sum, scalar_t scale) {
   for (const auto &kv : sum.terms()) {
     add(kv, scale);
   }
 }
 
-WSum &WSum::canonicalize() {
+TermSum &TermSum::canonicalize() {
   std::map<WAlgebraicTerm, scalar_t> canonical_terms;
   for (auto &kv : terms_) {
     WAlgebraicTerm term = kv.first;
@@ -62,7 +62,7 @@ WSum &WSum::canonicalize() {
   return *this;
 }
 
-WSum &WSum::reindex(index_map_t &idx_map) {
+TermSum &TermSum::reindex(index_map_t &idx_map) {
   std::map<WAlgebraicTerm, scalar_t> reindexed_terms;
   for (auto &kv : terms_) {
     WAlgebraicTerm term = kv.first;
@@ -72,26 +72,26 @@ WSum &WSum::reindex(index_map_t &idx_map) {
   return *this;
 }
 
-bool WSum::operator==(const WSum &sum) {
+bool TermSum::operator==(const TermSum &sum) {
   return terms_.size() == sum.terms_.size() &&
          std::equal(terms_.begin(), terms_.end(), sum.terms_.begin());
 }
 
-WSum &WSum::operator+=(const WSum &sum) {
+TermSum &TermSum::operator+=(const TermSum &sum) {
   for (const auto &kv : sum.terms()) {
     add(kv);
   }
   return *this;
 }
 
-WSum &WSum::operator-=(const WSum &sum) {
+TermSum &TermSum::operator-=(const TermSum &sum) {
   for (const auto &kv : sum.terms()) {
     add(kv, -1);
   }
   return *this;
 }
 
-std::string WSum::str() const {
+std::string TermSum::str() const {
   std::vector<std::string> str_vec;
   int n = 0;
   for (auto &kv : terms_) {
@@ -110,25 +110,25 @@ std::string WSum::str() const {
   return (to_string(str_vec, "\n"));
 }
 
-std::string WSum::latex() const {
+std::string TermSum::latex(const std::string &sep) const {
   std::vector<std::string> str_vec;
   for (auto &kv : terms_) {
     str_vec.push_back(kv.second.latex() + ' ' + kv.first.latex());
   }
-  return (to_string(str_vec, " \\\\ \n"));
+  return (to_string(str_vec, sep));
 }
 
 std::vector<WEquationTerm>
-WSum::to_manybody_equation(const std::string &label) {
+TermSum::to_manybody_equation(const std::string &label) {
   std::vector<WEquationTerm> result;
 
   for (const auto &term_factor : terms_) {
-    std::vector<WIndex> lower;
-    std::vector<WIndex> upper;
+    std::vector<Index> lower;
+    std::vector<Index> upper;
     const WAlgebraicTerm &term = term_factor.first;
     scalar_t factor = term_factor.second;
     for (const auto &op : term.ops()) {
-      if (op.type() == Creation) {
+      if (op.type() == SQOperatorType::Creation) {
         lower.push_back(op.index());
       } else {
         upper.push_back(op.index());
@@ -148,23 +148,23 @@ WSum::to_manybody_equation(const std::string &label) {
   return result;
 }
 
-WSum operator+(WSum lhs, const WSum &rhs) {
+TermSum operator+(TermSum lhs, const TermSum &rhs) {
   lhs += rhs;
   return lhs;
 }
 
-WSum operator-(WSum lhs, const WSum &rhs) {
+TermSum operator-(TermSum lhs, const TermSum &rhs) {
   lhs -= rhs;
   return lhs;
 }
 
-std::ostream &operator<<(std::ostream &os, const WSum &sum) {
+std::ostream &operator<<(std::ostream &os, const TermSum &sum) {
   os << sum.str();
   return os;
 }
 
-WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
-  WSum sum;
+TermSum string_to_sum(const std::string &s, TensorSyntax syntax) {
+  TermSum sum;
 
   //  std::cout << "\n  Parsing: \"" << s << "\"" << std::endl;
 
@@ -188,14 +188,14 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
 
     // Proecess the upper indices
     auto upper_idx = split_indices(tensors[n + 1]);
-    std::vector<WIndex> upper;
+    std::vector<Index> upper;
     for (const auto &idx : upper_idx) {
       upper.push_back(string_to_index(idx));
     }
 
     // Process the lower indices
     auto lower_idx = split_indices(tensors[n + 2]);
-    std::vector<WIndex> lower;
+    std::vector<Index> lower;
     for (const auto &idx : lower_idx) {
       lower.push_back(string_to_index(idx));
     }
@@ -207,9 +207,10 @@ WSum string_to_sum(const std::string &s, TensorSyntax syntax) {
   //  }
 
   for (size_t n = 0; n < operators.size(); n += 2) {
-    SQOperatorType type = operators[n] == "+" ? Creation : Annihilation;
-    WIndex index = string_to_index(operators[n + 1]);
-    term.add(WSQOperator(type, index));
+    SQOperatorType type = operators[n] == "+" ? SQOperatorType::Creation
+                                              : SQOperatorType::Annihilation;
+    Index index = string_to_index(operators[n + 1]);
+    term.add(SQOperator(type, index));
   }
 
   //  std::cout << "Parsing factor: " << std::endl;

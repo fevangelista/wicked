@@ -2,10 +2,10 @@
 #include <iostream>
 
 #include "helpers.h"
-#include "wicked-def.h"
+#include "sqoperator.h"
 #include "walgebraicterm.h"
 #include "wequationterm.h"
-#include "wsqoperator.h"
+#include "wicked-def.h"
 #include "wtensor.h"
 
 WEquationTerm::WEquationTerm(const WAlgebraicTerm &lhs,

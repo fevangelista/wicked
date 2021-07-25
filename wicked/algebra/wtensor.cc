@@ -6,8 +6,8 @@
 #include "helpers.h"
 #include "wtensor.h"
 
-WTensor::WTensor(std::string label, const std::vector<WIndex> &lower,
-                 const std::vector<WIndex> &upper, SymmetryType symmetry)
+WTensor::WTensor(std::string label, const std::vector<Index> &lower,
+                 const std::vector<Index> &upper, SymmetryType symmetry)
     : label_(label), lower_(lower), upper_(upper), symmetry_(symmetry) {}
 
 int WTensor::symmetry_factor() const {
@@ -33,12 +33,12 @@ bool WTensor::operator==(WTensor const &other) const {
          (upper_ == other.upper_);
 }
 
-std::vector<WIndex> WTensor::indices() const {
-  std::vector<WIndex> vec;
-  for (const WIndex &idx : upper_) {
+std::vector<Index> WTensor::indices() const {
+  std::vector<Index> vec;
+  for (const Index &idx : upper_) {
     vec.push_back(idx);
   }
-  for (const WIndex &idx : lower_) {
+  for (const Index &idx : lower_) {
     vec.push_back(idx);
   }
   // Remove repeated indices
@@ -48,12 +48,12 @@ std::vector<WIndex> WTensor::indices() const {
 }
 
 void WTensor::reindex(index_map_t &idx_map) {
-  for (WIndex &idx : upper_) {
+  for (Index &idx : upper_) {
     if (idx_map.count(idx) > 0) {
       idx = idx_map[idx];
     }
   }
-  for (WIndex &idx : lower_) {
+  for (Index &idx : lower_) {
     if (idx_map.count(idx) > 0) {
       idx = idx_map[idx];
     }
@@ -63,10 +63,10 @@ void WTensor::reindex(index_map_t &idx_map) {
 std::string WTensor::str() const {
   std::vector<std::string> str_vec_upper;
   std::vector<std::string> str_vec_lower;
-  for (const WIndex &index : upper_) {
+  for (const Index &index : upper_) {
     str_vec_upper.push_back(index.str());
   }
-  for (const WIndex &index : lower_) {
+  for (const Index &index : lower_) {
     str_vec_lower.push_back(index.str());
   }
   return (label_ + "^{" + to_string(str_vec_upper, ",") + "}_{" +
@@ -76,10 +76,10 @@ std::string WTensor::str() const {
 std::string WTensor::latex() const {
   std::vector<std::string> str_vec_upper;
   std::vector<std::string> str_vec_lower;
-  for (const WIndex &index : upper_) {
+  for (const Index &index : upper_) {
     str_vec_upper.push_back(index.latex());
   }
-  for (const WIndex &index : lower_) {
+  for (const Index &index : lower_) {
     str_vec_lower.push_back(index.latex());
   }
 
@@ -102,10 +102,10 @@ std::string WTensor::latex() const {
 
 std::string WTensor::ambit() const {
   std::vector<std::string> str_vec;
-  for (const WIndex &index : upper_) {
+  for (const Index &index : upper_) {
     str_vec.push_back(index.ambit());
   }
-  for (const WIndex &index : lower_) {
+  for (const Index &index : lower_) {
     str_vec.push_back(index.ambit());
   }
 
@@ -120,10 +120,10 @@ std::ostream &operator<<(std::ostream &os, const WTensor &tensor) {
 
 // std::string WTensor::ambit() {
 //  std::vector<std::string> str_vec;
-//  for (WIndex &index : upper_) {
+//  for (Index &index : upper_) {
 //    str_vec.push_back(index.str());
 //  }
-//  for (WIndex &index : lower_) {
+//  for (Index &index : lower_) {
 //    str_vec.push_back(index.str());
 //  }
 //  std::string ambit_label = label_;

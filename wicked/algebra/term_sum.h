@@ -1,20 +1,20 @@
-#ifndef _wicked_wsum_h_
-#define _wicked_wsum_h_
+#ifndef _wicked_term_sum_h_
+#define _wicked_term_sum_h_
 
 #include <map>
 #include <vector>
 
 #include "wicked-def.h"
-#include "windex.h"
+#include "index.h"
 
 class WAlgebraicTerm;
 class WEquationTerm;
 
 /// A class to represent a sum of SQ terms.
-class WSum {
+class TermSum {
 public:
   // ==> Constructor <==
-  WSum();
+  TermSum();
 
   // ==> Class public interface <==
 
@@ -29,27 +29,27 @@ public:
            scalar_t scale = 1);
 
   /// Add a term that can optionally be scaled
-  void add_sum(const WSum &terms, scalar_t scale = 1);
+  void add_sum(const TermSum &terms, scalar_t scale = 1);
 
   /// Canonicalize this sum
-  WSum &canonicalize();
+  TermSum &canonicalize();
 
   /// Reindex this sum
-  WSum &reindex(index_map_t &idx_map);
+  TermSum &reindex(index_map_t &idx_map);
 
-  bool operator==(const WSum &terms);
+  bool operator==(const TermSum &terms);
 
   /// Add a sum
-  WSum &operator+=(const WSum &terms);
+  TermSum &operator+=(const TermSum &terms);
 
   /// Substract a sum
-  WSum &operator-=(const WSum &terms);
+  TermSum &operator-=(const TermSum &terms);
 
   /// Return a string representation
   std::string str() const;
 
   /// Return a LaTeX representation
-  std::string latex() const;
+  std::string latex(const std::string &sep = " \\\\ \n") const;
 
   /// Convert this sum to a vector of many-body equations
   std::vector<WEquationTerm> to_manybody_equation(const std::string &label);
@@ -63,18 +63,18 @@ private:
 };
 
 /// addition
-WSum operator+(WSum lhs, const WSum &rhs);
+TermSum operator+(TermSum lhs, const TermSum &rhs);
 /// subtraction
-WSum operator-(WSum lhs, const WSum &rhs);
+TermSum operator-(TermSum lhs, const TermSum &rhs);
 
 /// Print to an output stream
-std::ostream &operator<<(std::ostream &os, const WSum &sum);
+std::ostream &operator<<(std::ostream &os, const TermSum &sum);
 
 /// The syntax used to input a tensor expression
 enum class TensorSyntax { Wicked, TCE };
 
 ///// Create a sum from a string
-WSum string_to_sum(const std::string &s,
-                   TensorSyntax syntax = TensorSyntax::Wicked);
+TermSum string_to_sum(const std::string &s,
+                      TensorSyntax syntax = TensorSyntax::Wicked);
 
-#endif // _wicked_wsum_h_
+#endif // _wicked_term_sum_h_

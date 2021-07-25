@@ -1,18 +1,19 @@
-//#ifndef _wicked_wtheorem_h_
-//#define _wicked_wtheorem_h_
+//#ifndef _wicked_theorem_h_
+//#define _wicked_theorem_h_
 
 //#include <vector>
 
 //#include "wterm.h"
 
-//enum WTPrintLevel { No, Summary, Detailed, Full };
+// enum WTPrintLevel { No, Summary, Detailed, Full };
 
-//using skeleton_map_t = std::map<std::tuple<int, int, int>,
-//                                std::vector<std::vector<std::pair<int, int>>>>;
+// using skeleton_map_t = std::map<std::tuple<int, int, int>,
+//                                std::vector<std::vector<std::pair<int,
+//                                int>>>>;
 
 ///// A class to apply Wick's theorem to a product of terms
-//class WTheorem {
-//public:
+// class WTheorem {
+// public:
 //  // ==> Constructor <==
 
 //  WTheorem();
@@ -45,7 +46,7 @@
 
 //  void set_print_level(WTPrintLevel print) { print_ = print; }
 
-//private:
+// private:
 //  /// The largest allowed cumulant
 //  int maxcumulant_ = 2;
 //  /// The maximum number of legs in a pairwise contraction
@@ -64,4 +65,4 @@
 //                              const std::vector<int> &B_legs);
 //};
 
-//#endif // _wicked_wtheorem_h_
+//#endif // _wicked_theorem_h_

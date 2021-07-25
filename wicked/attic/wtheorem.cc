@@ -6,14 +6,14 @@
 //#include "wtheorem.h"
 //#include "stl_utils.hpp"
 
-//using namespace std;
+// using namespace std;
 
 //#define PRINT(detail, code)                                                    \
 //  if (print_ >= detail) {                                                      \
 //    code                                                                       \
 //  }
 
-//WTheorem::WTheorem() {
+// WTheorem::WTheorem() {
 //  for (int n = 0; n <= 20; ++n) {
 //    integer_partitions_.push_back(integer_partitions(n));
 //  }
@@ -24,9 +24,9 @@
 //  make_contraction_skeletons();
 //}
 
-//void WTheorem::theorem(const std::vector<WTerm> &terms) {}
+// void WTheorem::theorem(const std::vector<WTerm> &terms) {}
 
-//void WTheorem::theorem_pair(const WTerm &A, const WTerm &B, int minrank,
+// void WTheorem::theorem_pair(const WTerm &A, const WTerm &B, int minrank,
 //                            int maxrank) {
 //  PRINT(Summary, cout << "Contracting the following terms:" << endl;
 //        cout << A.str() << endl; cout << B.str() << endl;)
@@ -36,8 +36,8 @@
 //  int naop = A.noperators();
 //  int nbop = B.noperators();
 
-//  // max number of contractions is largest multiple of two less than naop + nbop
-//  int maxcontr = (naop + nbop) / 2;
+//  // max number of contractions is largest multiple of two less than naop +
+//  nbop int maxcontr = (naop + nbop) / 2;
 
 //  std::vector<int> naop_space = A.noperators_per_space();
 //  std::vector<int> nbop_space = B.noperators_per_space();
@@ -59,7 +59,8 @@
 
 //  PRINT(
 //      Detailed, cout << "Max contractions per space: "; for (const auto &i
-//                                                             : maxcontr_space) {
+//                                                             : maxcontr_space)
+//                                                             {
 //        cout << ' ' << i;
 //      } cout << endl;)
 
@@ -74,7 +75,7 @@
 //      });
 //}
 
-//void WTheorem::contract_pair(const WTerm &A, const std::vector<int> &naop,
+// void WTheorem::contract_pair(const WTerm &A, const std::vector<int> &naop,
 //                             const WTerm &B, const std::vector<int> &nbop,
 //                             const std::vector<int> &contr_per_space) {
 //  PRINT(Detailed, cout << "Contraction pattern:";
@@ -91,7 +92,8 @@
 //  for (int s = 0; s < osi->num_spaces(); s++) {
 //    std::vector<std::tuple<int, int, int>> splittings;
 //    PRINT(Detailed, cout << "Space: " << s << endl;)
-//    //    PRINT(Detailed, cout << contr_per_space[s] << "-contractions with max"
+//    //    PRINT(Detailed, cout << contr_per_space[s] << "-contractions with
+//    max"
 //    //    << : " << s << endl;)
 //    int lt = 2 * contr_per_space[s];
 //    for (int la = 1; la <= naop[s]; ++la) { // loop over the legs in A
@@ -123,14 +125,15 @@
 //          splitting_list.push_back(
 //              contraction_splittings[s][splitting_per_space[s]]);
 //          PRINT(Detailed, cout << " -> (" << std::get<0>(t) << ","
-//                               << std::get<1>(t) << "," << std::get<2>(t) << ")"
+//                               << std::get<1>(t) << "," << std::get<2>(t) <<
+//                               ")"
 //                               << endl;)
 //        }
 //        this->contract_pair_splitting(A, B, splitting_list);
 //      });
 //}
 
-//void WTheorem::contract_pair_splitting(
+// void WTheorem::contract_pair_splitting(
 //    const WTerm &A, const WTerm &B,
 //    const std::vector<std::tuple<int, int, int>> &splitting) {
 //  // look into the skeleton database to find all compatible splittings
@@ -170,8 +173,8 @@
 //      num_skeletons_per_space,
 //      [&](const std::vector<int> &skeletons_per_space) {
 //        std::vector<std::vector<std::pair<int, int>>> contractions;
-//        PRINT(Summary, cout << "  Picking the following contractions:" << endl;)
-//        for (int s = 0; s < osi->num_spaces(); s++) {
+//        PRINT(Summary, cout << "  Picking the following contractions:" <<
+//        endl;) for (int s = 0; s < osi->num_spaces(); s++) {
 //          int sk = skeletons_per_space[s];
 //          const auto &key = splitting[s];
 //          const auto &skeleton = skeletons_[key][skeletons_per_space[s]];
@@ -186,7 +189,7 @@
 //      });
 //}
 
-//void WTheorem::contract_pair_permute(
+// void WTheorem::contract_pair_permute(
 //    const WTerm &A, const WTerm &B,
 //    const std::vector<std::vector<std::pair<int, int>>> &contractions) {
 
@@ -308,16 +311,16 @@
 //  // execute the contraction
 //}
 
-//void WTheorem::contract_pair_execute(
-//    const WTerm &A, const WTerm &B, const std::vector<std::vector<int>> &A_legs,
-//    const std::vector<std::vector<int>> &B_legs) {
+// void WTheorem::contract_pair_execute(
+//    const WTerm &A, const WTerm &B, const std::vector<std::vector<int>>
+//    &A_legs, const std::vector<std::vector<int>> &B_legs) {
 
 //  // relabel indices to avoid redundant terms
 //  // find the indices that are summed
-//  std::map<WIndex, int> Aidx_count;
-//  std::vector<WIndex> Aidx = A.indices();
-//  std::vector<WIndex> Aidx_un, Aidx_sum;
-//  for (const WIndex idx : Aidx) {
+//  std::map<Index, int> Aidx_count;
+//  std::vector<Index> Aidx = A.indices();
+//  std::vector<Index> Aidx_un, Aidx_sum;
+//  for (const Index idx : Aidx) {
 //    Aidx_count[idx] += 1;
 //  }
 //  for (const auto &kv : Aidx_count) {
@@ -330,10 +333,10 @@
 //  std::sort(Aidx_un.begin(), Aidx_un.end());
 //  std::sort(Aidx_sum.begin(), Aidx_sum.end());
 
-//  std::map<WIndex, int> Bidx_count;
-//  std::vector<WIndex> Bidx = B.indices();
-//  std::vector<WIndex> Bidx_un, Bidx_sum;
-//  for (const WIndex idx : Bidx) {
+//  std::map<Index, int> Bidx_count;
+//  std::vector<Index> Bidx = B.indices();
+//  std::vector<Index> Bidx_un, Bidx_sum;
+//  for (const Index idx : Bidx) {
 //    Bidx_count[idx] += 1;
 //  }
 //  for (const auto &kv : Bidx_count) {
@@ -347,7 +350,7 @@
 //  std::sort(Bidx_sum.begin(), Bidx_sum.end());
 
 //  // find the common non-summed indices of A and B
-//  std::vector<WIndex> ABidx_un;
+//  std::vector<Index> ABidx_un;
 //  std::set_intersection(Aidx_un.begin(), Aidx_un.end(), Bidx_un.begin(),
 //                        Bidx_un.end(), std::back_inserter(ABidx_un));
 
@@ -372,9 +375,9 @@
 //  cout << "    " << Amod.str() << endl;
 //  cout << "    " << Bmod.str() << endl;
 
-//  std::vector<std::vector<WSQOperator>> Aops = Amod.operators();
-//  std::vector<std::vector<WSQOperator>> Bops = Bmod.operators();
-//  std::vector<std::vector<WSQOperator>> Aops_mod, Bops_mod;
+//  std::vector<std::vector<SQOperator>> Aops = Amod.operators();
+//  std::vector<std::vector<SQOperator>> Bops = Bmod.operators();
+//  std::vector<std::vector<SQOperator>> Aops_mod, Bops_mod;
 
 //  std::vector<WTensor> Atens = Amod.tensors();
 //  std::vector<WTensor> Btens = Bmod.tensors();
@@ -398,8 +401,8 @@
 //    // Create density matrices and cumulants
 //    for (const auto &c : legs) {
 //      int order = c.first.size() + c.second.size();
-//      std::vector<WIndex> upper_idx;
-//      std::vector<WIndex> lower_idx;
+//      std::vector<Index> upper_idx;
+//      std::vector<Index> lower_idx;
 //      // pair contractions
 //      if (order == 2) {
 //        // pairwise contraction with Kronecker delta
@@ -408,8 +411,8 @@
 //        }
 //        // pairwise contraction with density matrix
 //        else {
-//          const WSQOperator &left_op = Aops[s][c.first[0]];
-//          const WSQOperator &right_op = Bops[s][c.second[0]];
+//          const SQOperator &left_op = Aops[s][c.first[0]];
+//          const SQOperator &right_op = Bops[s][c.second[0]];
 //          if ((left_op.type() == Creation) and
 //              (right_op.type() == Annihilation)) {
 //            upper_idx.push_back(left_op.index());
@@ -448,16 +451,16 @@
 //        Belim[b] = true;
 //      }
 //    }
-//    std::vector<WSQOperator> Aops_mod_space;
+//    std::vector<SQOperator> Aops_mod_space;
 //    int a = 0;
-//    for (const WSQOperator op : Aops[s]) {
+//    for (const SQOperator op : Aops[s]) {
 //      if (not Aelim[a]) {
 //        Aops_mod_space.push_back(op);
 //      }
 //    }
-//    std::vector<WSQOperator> Bops_mod_space;
+//    std::vector<SQOperator> Bops_mod_space;
 //    int b = 0;
-//    for (const WSQOperator op : Bops[s]) {
+//    for (const SQOperator op : Bops[s]) {
 //      if (not Belim[a]) {
 //        Bops_mod_space.push_back(op);
 //      }
@@ -485,8 +488,8 @@
 //  }
 //}
 
-//std::vector<std::pair<std::vector<int>, std::vector<int>>>
-//WTheorem::contraction_layout_to_edges(const std::vector<int> &A_legs,
+// std::vector<std::pair<std::vector<int>, std::vector<int>>>
+// WTheorem::contraction_layout_to_edges(const std::vector<int> &A_legs,
 //                                      const std::vector<int> &B_legs) {
 //  std::vector<std::pair<std::vector<int>, std::vector<int>>> legs;
 //  if ((A_legs.size() == 0) or (B_legs.size() == 0))
@@ -519,7 +522,7 @@
 //  return legs;
 //}
 
-//void WTheorem::make_contraction_skeletons() {
+// void WTheorem::make_contraction_skeletons() {
 //  // the null contraction
 //  std::tuple<int, int, int> key(0, 0, 0);
 //  skeletons_[key].push_back({std::make_pair(0, 0)});
@@ -560,7 +563,8 @@
 //      }
 //      PRINT(Detailed, cout << to_string(s, " + "););
 
-//      PRINT(Detailed, cout << " (highest cumulant: " << highest_cumulant << ")"
+//      PRINT(Detailed, cout << " (highest cumulant: " << highest_cumulant <<
+//      ")"
 //                           << endl;);
 
 //      if (highest_cumulant > maxcumulant_)
