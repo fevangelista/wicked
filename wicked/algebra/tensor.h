@@ -9,15 +9,15 @@
 
 /// This class represents a tensor labeled with orbital indices.
 /// It holds information about the label and the indices of the tensor.
-class WTensor {
+class Tensor {
 
 public:
   // ==> Constructors <==
-  explicit WTensor() {}
+  explicit Tensor() {}
 
-  WTensor(std::string label, const std::vector<Index> &lower,
-          const std::vector<Index> &upper,
-          SymmetryType symmetry = Antisymmetric);
+  Tensor(const std::string &label, const std::vector<Index> &lower,
+         const std::vector<Index> &upper,
+         SymmetryType symmetry = SymmetryType::Antisymmetric);
 
   // ==> Class public interface <==
 
@@ -49,10 +49,10 @@ public:
   int symmetry_factor() const;
 
   /// Comparison operator used for sorting
-  bool operator<(WTensor const &other) const;
+  bool operator<(Tensor const &other) const;
 
   /// Comparison operator used for sorting
-  bool operator==(WTensor const &other) const;
+  bool operator==(Tensor const &other) const;
 
   /// Return a string representation
   std::string str() const;
@@ -72,7 +72,13 @@ private:
   SymmetryType symmetry_;
 };
 
+/// A function to construct a tensor
+Tensor make_tensor(const std::string &label,
+                   const std::vector<std::pair<std::string, int>> &lower,
+                   const std::vector<std::pair<std::string, int>> &upper,
+                   SymmetryType symmetry);
+
 /// Print to an output stream
-std::ostream &operator<<(std::ostream &os, const WTensor &tensor);
+std::ostream &operator<<(std::ostream &os, const Tensor &tensor);
 
 #endif // _wicked_tensor_h_

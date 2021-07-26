@@ -2,10 +2,10 @@
 #include <pybind11/stl.h>
 
 #include "../wicked/algebra/sqoperator.h"
+#include "../wicked/algebra/tensor.h"
+#include "../wicked/algebra/term.h"
 #include "../wicked/algebra/term_sum.h"
-#include "../wicked/algebra/walgebraicterm.h"
 #include "../wicked/algebra/wequationterm.h"
-#include "../wicked/algebra/wtensor.h"
 #include "../wicked/diagrams/wdiag_operator.h"
 #include "../wicked/diagrams/wdiag_operator_sum.h"
 #include "../wicked/diagrams/wick_theorem.h"
@@ -18,22 +18,43 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 void export_Index(py::module &m);
 void export_SQOperator(py::module &m);
+void export_Tensor(py::module &m);
 
 PYBIND11_MODULE(wicked, m) {
   m.doc() = "Wicked python interface";
 
   export_Index(m);
   export_SQOperator(m);
+  export_Tensor(m);
+
+  m.def(
+      "reset_space", []() { osi->reset(); }, "Reset the orbital space");
+
+  m.def(
+      "add_space",
+      [](const std::string &label, const std::string &type,
+         const std::vector<std::string> &indices) {
+        RDMType structure = string_to_rdmtype(type);
+        osi->add_space(label, structure, indices);
+      },
+      "label"_a, "type"_a, "indices"_a,
+      "Add an orbital space. `type` can be any of "
+      "(occupied,unoccupied,general)");
 
   py::class_<rational, std::shared_ptr<rational>>(m, "rational")
       .def(py::init<>())
       .def(py::init<int>())
       .def(py::init<int, int>());
 
-  py::enum_<RDMType>(m, "rdmtype")
+  py::enum_<RDMType>(m, "rdm")
       .value("occupied", RDMType::Occupied)
       .value("unoccupied", RDMType::Unoccupied)
       .value("general", RDMType::General);
+
+  py::enum_<SymmetryType>(m, "sym")
+      .value("symm", SymmetryType::Symmetric)
+      .value("anti", SymmetryType::Antisymmetric)
+      .value("none", SymmetryType::Nonsymmetric);
 
   py::enum_<WDiagPrint>(m, "WDiagPrint")
       .value("no", WDiagPrint::No)
@@ -47,19 +68,17 @@ PYBIND11_MODULE(wicked, m) {
       .def(py::init<>())
       .def("default_spaces", &OrbitalSpaceInfo::default_spaces)
       .def("reset", &OrbitalSpaceInfo::reset)
-      .def("add_space", &OrbitalSpaceInfo::add_space);
+      .def("add_space", &OrbitalSpaceInfo::add_space)
+      .def("__str__", &OrbitalSpaceInfo::str);
 
-  py::class_<WTensor, std::shared_ptr<WTensor>>(m, "WTensor");
-
-  py::class_<WAlgebraicTerm, std::shared_ptr<WAlgebraicTerm>>(m,
-                                                              "WAlgebraicTerm")
+  py::class_<Term, std::shared_ptr<Term>>(m, "Term")
       .def(py::init<>())
-      .def("str", &WAlgebraicTerm::str)
-      .def("latex", &WAlgebraicTerm::latex)
-      .def("ambit", &WAlgebraicTerm::ambit);
+      .def("str", &Term::str)
+      .def("latex", &Term::latex)
+      .def("ambit", &Term::ambit);
 
   py::class_<WEquationTerm, std::shared_ptr<WEquationTerm>>(m, "WEquationTerm")
-      .def(py::init<const WAlgebraicTerm &, const WAlgebraicTerm &, scalar_t>())
+      .def(py::init<const Term &, const Term &, scalar_t>())
       .def("lhs", &WEquationTerm::lhs)
       .def("rhs", &WEquationTerm::rhs)
       .def("str", &WEquationTerm::str)
@@ -128,23 +147,9 @@ PYBIND11_MODULE(wicked, m) {
   //      .def("num_indices", &WDiagOperator::num_indices)
   //      .def("str", &WDiagOperator::str);
 
-  //  m.def("get_osi", &get_osi, "Return the orbital space");
+  m.def("get_osi", &get_osi, "Return the orbital space");
 
   //  std::cout << "Initializing the pywicked module." << std::endl;
-
-  m.def(
-      "reset", []() { osi->reset(); }, "Reset the orbital space");
-
-  m.def("add_space", [](const std::string &label, const std::string &type,
-                        const std::vector<std::string> &indices) {
-    RDMType structure(RDMType::General);
-    if ((type == "occupied") or (type == "core")) {
-      structure = RDMType::Occupied;
-    } else if ((type == "unoccupied") or (type == "virtual")) {
-      structure = RDMType::Unoccupied;
-    }
-    osi->add_space(label, structure, indices);
-  });
 
   //  osi = std::make_shared<OrbitalSpaceInfo>();
   //  osi->default_spaces();

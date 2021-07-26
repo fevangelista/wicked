@@ -4,10 +4,10 @@
 #include <map>
 #include <vector>
 
-#include "wicked-def.h"
 #include "index.h"
+#include "wicked-def.h"
 
-class WAlgebraicTerm;
+class Term;
 class WEquationTerm;
 
 /// A class to represent a sum of SQ terms.
@@ -19,14 +19,13 @@ public:
   // ==> Class public interface <==
 
   /// Return a map term -> factor
-  const std::map<WAlgebraicTerm, scalar_t> &terms() const { return terms_; }
+  const std::map<Term, scalar_t> &terms() const { return terms_; }
 
   /// Add a term that can optionally be scaled
-  void add(const WAlgebraicTerm &term, scalar_t factor = 1);
+  void add(const Term &term, scalar_t factor = 1);
 
   /// Add a term that can optionally be scaled
-  void add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
-           scalar_t scale = 1);
+  void add(const std::pair<Term, scalar_t> &term_factor, scalar_t scale = 1);
 
   /// Add a term that can optionally be scaled
   void add_sum(const TermSum &terms, scalar_t scale = 1);
@@ -57,7 +56,7 @@ public:
 private:
   // ==> Class private data <==
 
-  std::map<WAlgebraicTerm, scalar_t> terms_;
+  std::map<Term, scalar_t> terms_;
 
   // ==> Class private functions <==
 };

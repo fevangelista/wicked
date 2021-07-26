@@ -1,5 +1,5 @@
-#ifndef _wicked_algebraic_term_h_
-#define _wicked_algebraic_term_h_
+#ifndef _wicked_term_h_
+#define _wicked_term_h_
 
 #include <map>
 #include <numeric>
@@ -9,18 +9,18 @@
 #include "index.h"
 #include "wicked-def.h"
 
-class SQOperator;
-class WTensor;
 class Index;
+class SQOperator;
+class Tensor;
 
 /// A class to represent a term in a SQ expression. A term includes:
 /// 1) a product of tensors
 /// 2) a product of operators normal ordered with respect to the vacuum
-class WAlgebraicTerm {
+class Term {
 public:
   // ==> Constructor <==
 
-  WAlgebraicTerm();
+  Term();
 
   // ==> Class public interface <==
 
@@ -28,7 +28,7 @@ public:
   void add(const SQOperator &op);
 
   /// Add a tensor
-  void add(const WTensor &tensor);
+  void add(const Tensor &tensor);
 
   /// Return the number of SQ operators
   int noperators() const;
@@ -40,7 +40,7 @@ public:
   const std::vector<SQOperator> &ops() const { return operators_; }
 
   /// Return the tensors
-  const std::vector<WTensor> &tensors() const { return tensors_; }
+  const std::vector<Tensor> &tensors() const { return tensors_; }
 
   /// Return a vector containing all indices used in this term
   std::vector<Index> indices() const;
@@ -55,10 +55,10 @@ public:
   scalar_t canonicalize_tensor_indices();
 
   /// Comparison operator used for sorting
-  bool operator<(const WAlgebraicTerm &term) const;
+  bool operator<(const Term &term) const;
 
   /// Comparison operator used for sorting
-  bool operator==(const WAlgebraicTerm &term) const;
+  bool operator==(const Term &term) const;
 
   /// Return a string representation
   std::string str() const;
@@ -73,7 +73,7 @@ private:
   // ==> Class private data <==
 
   std::vector<SQOperator> operators_;
-  std::vector<WTensor> tensors_;
+  std::vector<Tensor> tensors_;
 
   // ==> Class private functions <==
 
@@ -83,27 +83,19 @@ private:
   // Used in the canonicalization routine to find how the indices of a tensor
   // connect to all the other tensors
   std::vector<std::pair<std::string, std::vector<int>>>
-  tensor_connectivity(const WTensor &t, bool upper) const;
+  tensor_connectivity(const Tensor &t, bool upper) const;
 };
 
 // Helper functions
 
 /// Print to an output stream
-std::ostream &operator<<(std::ostream &os, const WAlgebraicTerm &term);
+std::ostream &operator<<(std::ostream &os, const Term &term);
 
 std::ostream &operator<<(std::ostream &os,
-                         const std::pair<WAlgebraicTerm, scalar_t> &term);
+                         const std::pair<Term, scalar_t> &term);
 
 ///// Create an operator
-WAlgebraicTerm make_algebraic_term(const std::string &label,
-                                   const std::vector<std::string> &cre,
-                                   const std::vector<std::string> &ann);
+Term make_term(const std::string &label, const std::vector<std::string> &cre,
+               const std::vector<std::string> &ann);
 
-///// A class to represent a term in a SQ expression. A term includes:
-///// 1) a product of tensors
-///// 2) a product of operators normal ordered with respect to the vacuum
-// class WScala {
-// public:
-//}
-
-#endif // _wicked_algebraic_term_h_
+#endif // _wicked_term_h_

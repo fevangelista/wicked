@@ -9,7 +9,7 @@
 #include "combinatorics.h"
 #include "index.h"
 #include "sqoperator.h"
-#include "wtensor.h"
+#include "tensor.h"
 
 /// A class to represent a term in a SQ expression. A term includes:
 /// 1) a product of tensors
@@ -26,7 +26,7 @@ public:
   void add(const SQOperator &op);
 
   /// Add a tensor
-  void add(const WTensor &tensor);
+  void add(const Tensor &tensor);
 
   /// Return the scalar factor
   scalar_t factor() const;
@@ -54,7 +54,7 @@ public:
   }
 
   /// Return the tensors
-  const std::vector<WTensor> &tensors() const { return tensors_; }
+  const std::vector<Tensor> &tensors() const { return tensors_; }
 
   /// Return a vector containing all indices used in this term
   std::vector<Index> indices() const;
@@ -82,7 +82,7 @@ private:
 
   scalar_t factor_ = 1;
   std::vector<std::vector<SQOperator>> operators_;
-  std::vector<WTensor> tensors_;
+  std::vector<Tensor> tensors_;
 
   // ==> Class private functions <==
 

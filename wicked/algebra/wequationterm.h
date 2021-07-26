@@ -3,22 +3,21 @@
 
 #include <vector>
 
-class WAlgebraicTerm;
+class Term;
 
 /// A class to represent a sum of SQ terms.
 class WEquationTerm {
 public:
   // ==> Constructor <==
-  WEquationTerm(const WAlgebraicTerm &lhs, const WAlgebraicTerm &rhs,
-                scalar_t factor);
+  WEquationTerm(const Term &lhs, const Term &rhs, scalar_t factor);
 
   // ==> Class public interface <==
 
   /// Return the left-hand side of the equation
-  const WAlgebraicTerm &lhs() const;
+  const Term &lhs() const;
 
   /// Return the right-hand side of the equation
-  const WAlgebraicTerm &rhs() const;
+  const Term &rhs() const;
 
   /// Return the factor for the left-hand side equation
   scalar_t rhs_factor() const;
@@ -36,9 +35,9 @@ private:
   // ==> Class private data <==
 
   /// The right-hand term
-  WAlgebraicTerm lhs_;
+  Term lhs_;
   /// The left-hand term
-  WAlgebraicTerm rhs_;
+  Term rhs_;
   /// The factor of the left-hand side
   scalar_t factor_;
 

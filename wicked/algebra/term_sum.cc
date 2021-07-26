@@ -3,14 +3,14 @@
 
 #include "helpers.h"
 #include "sqoperator.h"
+#include "tensor.h"
+#include "term.h"
 #include "term_sum.h"
-#include "walgebraicterm.h"
 #include "wequationterm.h"
-#include "wtensor.h"
 
 TermSum::TermSum() {}
 
-void TermSum::add(const WAlgebraicTerm &term, scalar_t factor) {
+void TermSum::add(const Term &term, scalar_t factor) {
   auto search = terms_.find(term);
 
   if (search != terms_.end()) {
@@ -24,10 +24,10 @@ void TermSum::add(const WAlgebraicTerm &term, scalar_t factor) {
   }
 }
 
-void TermSum::add(const std::pair<WAlgebraicTerm, scalar_t> &term_factor,
+void TermSum::add(const std::pair<Term, scalar_t> &term_factor,
                   scalar_t scale) {
 
-  const WAlgebraicTerm &term = term_factor.first;
+  const Term &term = term_factor.first;
   scalar_t factor = term_factor.second;
 
   auto search = terms_.find(term);
@@ -50,9 +50,9 @@ void TermSum::add_sum(const TermSum &sum, scalar_t scale) {
 }
 
 TermSum &TermSum::canonicalize() {
-  std::map<WAlgebraicTerm, scalar_t> canonical_terms;
+  std::map<Term, scalar_t> canonical_terms;
   for (auto &kv : terms_) {
-    WAlgebraicTerm term = kv.first;
+    Term term = kv.first;
     scalar_t factor = term.canonicalize();
     factor *= kv.second;
 
@@ -63,9 +63,9 @@ TermSum &TermSum::canonicalize() {
 }
 
 TermSum &TermSum::reindex(index_map_t &idx_map) {
-  std::map<WAlgebraicTerm, scalar_t> reindexed_terms;
+  std::map<Term, scalar_t> reindexed_terms;
   for (auto &kv : terms_) {
-    WAlgebraicTerm term = kv.first;
+    Term term = kv.first;
     term.reindex(idx_map);
     add_to_map(reindexed_terms, term, kv.second);
   }
@@ -125,7 +125,7 @@ TermSum::to_manybody_equation(const std::string &label) {
   for (const auto &term_factor : terms_) {
     std::vector<Index> lower;
     std::vector<Index> upper;
-    const WAlgebraicTerm &term = term_factor.first;
+    const Term &term = term_factor.first;
     scalar_t factor = term_factor.second;
     for (const auto &op : term.ops()) {
       if (op.type() == SQOperatorType::Creation) {
@@ -134,8 +134,8 @@ TermSum::to_manybody_equation(const std::string &label) {
         upper.push_back(op.index());
       }
     }
-    WAlgebraicTerm rhs, lhs;
-    WTensor lhs_tensor(label, lower, upper);
+    Term rhs, lhs;
+    Tensor lhs_tensor(label, lower, upper);
     lhs.add(lhs_tensor);
     factor *= lhs_tensor.symmetry_factor();
 
@@ -182,7 +182,7 @@ TermSum string_to_sum(const std::string &s, TensorSyntax syntax) {
   auto tensors = findall(s, tensor_re);
   auto operators = findall(s, operator_re);
 
-  WAlgebraicTerm term;
+  Term term;
   for (size_t n = 0; n < tensors.size(); n += 3) {
     std::string label = tensors[n];
 
@@ -199,7 +199,7 @@ TermSum string_to_sum(const std::string &s, TensorSyntax syntax) {
     for (const auto &idx : lower_idx) {
       lower.push_back(string_to_index(idx));
     }
-    term.add(WTensor(label, lower, upper));
+    term.add(Tensor(label, lower, upper));
   }
 
   //  for (auto s : operators) {

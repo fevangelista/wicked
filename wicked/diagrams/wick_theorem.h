@@ -5,8 +5,8 @@
 #include <vector>
 
 class SQOperator;
-class WTensor;
-class WAlgebraicTerm;
+class Tensor;
+class Term;
 class WDiagOperator;
 class OperatorSum;
 class WDiagVertex;
@@ -86,13 +86,13 @@ private:
                            std::vector<WDiagVertex> &free_vertex_vec);
 
   /// Apply the contraction to this set of operators and produce a term
-  std::pair<WAlgebraicTerm, scalar_t> evaluate_contraction(
+  std::pair<Term, scalar_t> evaluate_contraction(
       const std::vector<WDiagOperator> &ops,
       const std::vector<std::vector<WDiagVertex>> &contractions,
       scalar_t factor);
 
   /// Return the tensors and operators correspoding to a product of operators
-  std::tuple<std::vector<WTensor>, std::vector<SQOperator>,
+  std::tuple<std::vector<Tensor>, std::vector<SQOperator>,
              std::map<std::tuple<int, int, bool, int>, int>>
   contration_tensors_sqops(const std::vector<WDiagOperator> &ops);
 

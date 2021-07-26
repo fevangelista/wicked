@@ -2,19 +2,19 @@
 #include <iostream>
 #include <regex>
 
-#include "wicked-def.h"
 #include "helpers.h"
-#include "wtensor.h"
+#include "tensor.h"
+#include "wicked-def.h"
 
-WTensor::WTensor(std::string label, const std::vector<Index> &lower,
-                 const std::vector<Index> &upper, SymmetryType symmetry)
+Tensor::Tensor(const std::string &label, const std::vector<Index> &lower,
+               const std::vector<Index> &upper, SymmetryType symmetry)
     : label_(label), lower_(lower), upper_(upper), symmetry_(symmetry) {}
 
-int WTensor::symmetry_factor() const {
+int Tensor::symmetry_factor() const {
   return ::symmetry_factor(upper_) * ::symmetry_factor(lower_);
 }
 
-bool WTensor::operator<(WTensor const &other) const {
+bool Tensor::operator<(Tensor const &other) const {
   // Compare the labels
   if (label_ < other.label_)
     return true;
@@ -28,12 +28,12 @@ bool WTensor::operator<(WTensor const &other) const {
   return upper_ < other.upper_;
 }
 
-bool WTensor::operator==(WTensor const &other) const {
+bool Tensor::operator==(Tensor const &other) const {
   return (label_ == other.label_) and (lower_ == other.lower_) and
          (upper_ == other.upper_);
 }
 
-std::vector<Index> WTensor::indices() const {
+std::vector<Index> Tensor::indices() const {
   std::vector<Index> vec;
   for (const Index &idx : upper_) {
     vec.push_back(idx);
@@ -47,7 +47,7 @@ std::vector<Index> WTensor::indices() const {
   return vec;
 }
 
-void WTensor::reindex(index_map_t &idx_map) {
+void Tensor::reindex(index_map_t &idx_map) {
   for (Index &idx : upper_) {
     if (idx_map.count(idx) > 0) {
       idx = idx_map[idx];
@@ -60,7 +60,7 @@ void WTensor::reindex(index_map_t &idx_map) {
   }
 }
 
-std::string WTensor::str() const {
+std::string Tensor::str() const {
   std::vector<std::string> str_vec_upper;
   std::vector<std::string> str_vec_lower;
   for (const Index &index : upper_) {
@@ -73,7 +73,7 @@ std::string WTensor::str() const {
           to_string(str_vec_lower, ",") + "}");
 }
 
-std::string WTensor::latex() const {
+std::string Tensor::latex() const {
   std::vector<std::string> str_vec_upper;
   std::vector<std::string> str_vec_lower;
   for (const Index &index : upper_) {
@@ -100,7 +100,7 @@ std::string WTensor::latex() const {
           to_string(str_vec_lower, " ") + "}");
 }
 
-std::string WTensor::ambit() const {
+std::string Tensor::ambit() const {
   std::vector<std::string> str_vec;
   for (const Index &index : upper_) {
     str_vec.push_back(index.ambit());
@@ -113,12 +113,27 @@ std::string WTensor::ambit() const {
                              : label_);
 }
 
-std::ostream &operator<<(std::ostream &os, const WTensor &tensor) {
+std::ostream &operator<<(std::ostream &os, const Tensor &tensor) {
   os << tensor.str();
   return os;
 }
 
-// std::string WTensor::ambit() {
+Tensor make_tensor(const std::string &label,
+                   const std::vector<std::pair<std::string, int>> &lower,
+                   const std::vector<std::pair<std::string, int>> &upper,
+                   SymmetryType symmetry) {
+  std::vector<Index> lower_indices;
+  for (const auto &[space, p] : lower) {
+    lower_indices.emplace_back(make_index(space, p));
+  }
+  std::vector<Index> upper_indices;
+  for (const auto &[space, p] : upper) {
+    upper_indices.emplace_back(make_index(space, p));
+  }
+  return Tensor(label, lower_indices, upper_indices, symmetry);
+}
+
+// std::string Tensor::ambit() {
 //  std::vector<std::string> str_vec;
 //  for (Index &index : upper_) {
 //    str_vec.push_back(index.str());

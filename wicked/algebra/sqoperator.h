@@ -62,9 +62,8 @@ private:
 // Helper functions
 
 /// Helper function to make an Index object from a space label and position
-SQOperator make_sqoperator(
-    const std::string &space, int p, SQOperatorType type,
-    SQOperatorStatistics statistics = SQOperatorStatistics::Fermion);
+SQOperator make_sqoperator(const std::string &space, int p, SQOperatorType type,
+                           SQOperatorStatistics statistics);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const SQOperator &op);

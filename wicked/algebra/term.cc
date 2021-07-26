@@ -7,21 +7,21 @@
 #include "index.h"
 #include "orbital_space.h"
 #include "sqoperator.h"
-#include "walgebraicterm.h"
+#include "tensor.h"
+#include "term.h"
 #include "wicked-def.h"
-#include "wtensor.h"
 
 using namespace std;
 
-WAlgebraicTerm::WAlgebraicTerm() {}
+Term::Term() {}
 
-void WAlgebraicTerm::add(const SQOperator &op) { operators_.push_back(op); }
+void Term::add(const SQOperator &op) { operators_.push_back(op); }
 
-void WAlgebraicTerm::add(const WTensor &tensor) { tensors_.push_back(tensor); }
+void Term::add(const Tensor &tensor) { tensors_.push_back(tensor); }
 
-int WAlgebraicTerm::nops() const { return operators_.size(); }
+int Term::nops() const { return operators_.size(); }
 
-std::vector<Index> WAlgebraicTerm::indices() const {
+std::vector<Index> Term::indices() const {
   std::vector<Index> result;
   for (const auto &t : tensors_) {
     const auto t_idx = t.indices();
@@ -33,7 +33,7 @@ std::vector<Index> WAlgebraicTerm::indices() const {
   return result;
 }
 
-void WAlgebraicTerm::reindex(index_map_t &idx_map) {
+void Term::reindex(index_map_t &idx_map) {
   for (auto &t : tensors_) {
     t.reindex(idx_map);
   }
@@ -43,7 +43,7 @@ void WAlgebraicTerm::reindex(index_map_t &idx_map) {
 }
 
 std::vector<std::pair<std::string, std::vector<int>>>
-WAlgebraicTerm::tensor_connectivity(const WTensor &t, bool upper) const {
+Term::tensor_connectivity(const Tensor &t, bool upper) const {
   std::vector<std::pair<std::string, std::vector<int>>> result;
   auto indices = upper ? t.upper() : t.lower();
   sort(indices.begin(), indices.end());
@@ -76,7 +76,7 @@ WAlgebraicTerm::tensor_connectivity(const WTensor &t, bool upper) const {
 }
 
 #define NEW_CANONICALIZATION 1
-scalar_t WAlgebraicTerm::canonicalize() {
+scalar_t Term::canonicalize() {
   scalar_t factor(1);
 
 // 1. Sort the tensors according to a score function
@@ -84,11 +84,10 @@ scalar_t WAlgebraicTerm::canonicalize() {
   using score_t =
       std::tuple<std::string, int, std::vector<int>, std::vector<int>,
                  std::vector<std::pair<std::string, std::vector<int>>>,
-                 std::vector<std::pair<std::string, std::vector<int>>>,
-                 WTensor>;
+                 std::vector<std::pair<std::string, std::vector<int>>>, Tensor>;
 #else
   using score_t =
-      std::tuple<std::string, int, std::vector<int>, std::vector<int>, WTensor>;
+      std::tuple<std::string, int, std::vector<int>, std::vector<int>, Tensor>;
 #endif
 
   std::vector<score_t> scores;
@@ -279,7 +278,7 @@ scalar_t WAlgebraicTerm::canonicalize() {
   return factor;
 }
 
-scalar_t WAlgebraicTerm::canonicalize_tensor_indices() {
+scalar_t Term::canonicalize_tensor_indices() {
   scalar_t sign(1);
   // Sort tensor indices according to canonical form
   for (auto &tensor : tensors_) {
@@ -326,7 +325,7 @@ scalar_t WAlgebraicTerm::canonicalize_tensor_indices() {
   return sign;
 }
 
-bool WAlgebraicTerm::operator<(const WAlgebraicTerm &other) const {
+bool Term::operator<(const Term &other) const {
   if (tensors_ > other.tensors_) {
     return false;
   }
@@ -336,13 +335,13 @@ bool WAlgebraicTerm::operator<(const WAlgebraicTerm &other) const {
   return operators_ < other.operators_;
 }
 
-bool WAlgebraicTerm::operator==(const WAlgebraicTerm &other) const {
+bool Term::operator==(const Term &other) const {
   return (tensors_ == other.tensors_) and (operators_ == other.operators_);
 }
 
-std::string WAlgebraicTerm::str() const {
+std::string Term::str() const {
   std::vector<std::string> str_vec;
-  for (const WTensor &tensor : tensors_) {
+  for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }
   if (operators_.size()) {
@@ -356,15 +355,15 @@ std::string WAlgebraicTerm::str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string WAlgebraicTerm::tensor_str() const {
+std::string Term::tensor_str() const {
   std::vector<std::string> str_vec;
-  for (const WTensor &tensor : tensors_) {
+  for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }
   return (to_string(str_vec, " "));
 }
 
-std::string WAlgebraicTerm::operator_str() const {
+std::string Term::operator_str() const {
   std::vector<std::string> str_vec;
   str_vec.push_back("{");
   for (const auto &op : operators_) {
@@ -374,9 +373,9 @@ std::string WAlgebraicTerm::operator_str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string WAlgebraicTerm::latex() const {
+std::string Term::latex() const {
   std::vector<std::string> str_vec;
-  for (const WTensor &tensor : tensors_) {
+  for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.latex());
   }
   if (operators_.size()) {
@@ -389,41 +388,40 @@ std::string WAlgebraicTerm::latex() const {
   return (to_string(str_vec, " "));
 }
 
-std::string WAlgebraicTerm::ambit() const {
+std::string Term::ambit() const {
   std::vector<std::string> str_vec;
-  for (const WTensor &tensor : tensors_) {
+  for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.ambit());
   }
   if (operators_.size()) {
-    throw "Trying to convert an WAlgebraicTerm object with operator terms to "
+    throw "Trying to convert an Term object with operator terms to "
           "ambit.";
   }
   return (to_string(str_vec, " * "));
 }
 
-std::ostream &operator<<(std::ostream &os, const WAlgebraicTerm &term) {
+std::ostream &operator<<(std::ostream &os, const Term &term) {
   os << term.str();
   return os;
 }
 
-std::ostream &
-operator<<(std::ostream &os,
-           const std::pair<WAlgebraicTerm, scalar_t> &term_factor) {
+std::ostream &operator<<(std::ostream &os,
+                         const std::pair<Term, scalar_t> &term_factor) {
   os << term_factor.second << ' ' << term_factor.second;
   return os;
 }
 
-WAlgebraicTerm make_algebraic_term(const std::string &label,
-                                   const std::vector<std::string> &cre,
-                                   const std::vector<std::string> &ann) {
-  WAlgebraicTerm term;
+Term make_algebraic_term(const std::string &label,
+                         const std::vector<std::string> &cre,
+                         const std::vector<std::string> &ann) {
+  Term term;
 
   auto indices = make_indices_from_space_labels({cre, ann});
   std::vector<Index> &cre_ind = indices[0];
   std::vector<Index> &ann_ind = indices[1];
 
   // Add the tensor
-  WTensor tensor(label, cre_ind, ann_ind);
+  Tensor tensor(label, cre_ind, ann_ind);
   term.add(tensor);
 
   // Add the creation operators
@@ -441,7 +439,7 @@ WAlgebraicTerm make_algebraic_term(const std::string &label,
   return term;
 }
 
-// scalar_t WAlgebraicTerm::canonicalize_best() {
+// scalar_t Term::canonicalize_best() {
 //  scalar_t factor(1);
 
 //  // find classes of equivalent indices

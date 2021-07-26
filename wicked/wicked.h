@@ -7,10 +7,10 @@
 
 #include "index.h"
 #include "sqoperator.h"
+#include "tensor.h"
+#include "term.h"
 #include "term_sum.h"
-#include "walgebraicterm.h"
 #include "wequationterm.h"
-#include "wtensor.h"
 
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"

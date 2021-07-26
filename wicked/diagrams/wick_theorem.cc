@@ -7,14 +7,12 @@
 #include "orbital_space.h"
 #include "sqoperator.h"
 #include "stl_utils.hpp"
+#include "tensor.h"
+#include "term.h"
 #include "term_sum.h"
-#include "walgebraicterm.h"
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"
 #include "wick_theorem.h"
-#include "wtensor.h"
-
-#include "log.h"
 
 #define PRINT(detail, code)                                                    \
   if (print_ >= detail) {                                                      \
@@ -23,7 +21,7 @@
 
 void print_key(std::tuple<int, int, bool, int> key, int n);
 void print_contraction(const std::vector<WDiagOperator> &ops,
-                       const std::vector<WTensor> &tensors,
+                       const std::vector<Tensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<SQOperator> &sqops,
                        const std::vector<int> sign_order);
@@ -67,11 +65,11 @@ TermSum WickTheorem::contract(scalar_t factor,
       auto ops_contractions = canonicalize_contraction(ops, contraction_vec);
       const auto &contractions = ops_contractions.second;
 
-      std::pair<WAlgebraicTerm, scalar_t> term_factor =
+      std::pair<Term, scalar_t> term_factor =
           evaluate_contraction(ops, contractions, factor);
       PRINT(WDiagPrint::Summary, cout << term_factor << endl;)
 
-      WAlgebraicTerm &term = term_factor.first;
+      Term &term = term_factor.first;
       PRINT(WDiagPrint::Basic, cout << term << endl;)
       scalar_t canonicalize_factor = term.canonicalize();
       result.add(
@@ -640,7 +638,7 @@ WickTheorem::generate_elementary_contractions(
   return contr_vec;
 }
 
-std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
+std::pair<Term, scalar_t> WickTheorem::evaluate_contraction(
     const std::vector<WDiagOperator> &ops,
     const std::vector<std::vector<WDiagVertex>> &contractions,
     scalar_t factor) {
@@ -651,7 +649,7 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
   // 1. Create tensors, lay out the second quantized operators on a vector,
   // and create mappings
   auto tensors_sqops_op_map = contration_tensors_sqops(ops);
-  std::vector<WTensor> &tensors = std::get<0>(tensors_sqops_op_map);
+  std::vector<Tensor> &tensors = std::get<0>(tensors_sqops_op_map);
   std::vector<SQOperator> &sqops = std::get<1>(tensors_sqops_op_map);
   // this map takes the operator index (op), orbital space (s), the sqop type,
   // and an index and maps it to the operators as they are stored in a vector
@@ -776,7 +774,7 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
         label = "lambda" + std::to_string(rank / 2);
       }
       // add the cumulant to the list of tensors
-      tensors.push_back(WTensor(label, lower, upper));
+      tensors.push_back(Tensor(label, lower, upper));
     }
     bit_map_vec.push_back(bit_map);
   }
@@ -819,7 +817,7 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
   // find the combinatorial factor associated with this contraction
   scalar_t comb_factor = combinatorial_factor(ops, contractions);
 
-  WAlgebraicTerm term;
+  Term term;
 
   for (const auto &tensor : tensors) {
     term.add(tensor);
@@ -840,12 +838,12 @@ std::pair<WAlgebraicTerm, scalar_t> WickTheorem::evaluate_contraction(
   return std::make_pair(term, sign * factor * comb_factor);
 }
 
-std::tuple<std::vector<WTensor>, std::vector<SQOperator>,
+std::tuple<std::vector<Tensor>, std::vector<SQOperator>,
            std::map<std::tuple<int, int, bool, int>, int>>
 WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
 
   std::vector<SQOperator> sqops;
-  std::vector<WTensor> tensors;
+  std::vector<Tensor> tensors;
   std::map<std::tuple<int, int, bool, int>, int> op_map;
 
   index_counter ic(osi->num_spaces());
@@ -887,7 +885,7 @@ WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
 
     // reverse the order of the upper indices
     std::reverse(upper.begin(), upper.end());
-    tensors.push_back(WTensor(op.label(), lower, upper));
+    tensors.push_back(Tensor(op.label(), lower, upper));
   }
   return make_tuple(tensors, sqops, op_map);
 }
@@ -987,7 +985,7 @@ void print_key(std::tuple<int, int, bool, int> key, int n) {
 }
 
 void print_contraction(const std::vector<WDiagOperator> &ops,
-                       const std::vector<WTensor> &tensors,
+                       const std::vector<Tensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<SQOperator> &sqops,
                        const std::vector<int> sign_order) {

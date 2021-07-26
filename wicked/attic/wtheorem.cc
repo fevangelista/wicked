@@ -379,10 +379,10 @@
 //  std::vector<std::vector<SQOperator>> Bops = Bmod.operators();
 //  std::vector<std::vector<SQOperator>> Aops_mod, Bops_mod;
 
-//  std::vector<WTensor> Atens = Amod.tensors();
-//  std::vector<WTensor> Btens = Bmod.tensors();
+//  std::vector<Tensor> Atens = Amod.tensors();
+//  std::vector<Tensor> Btens = Bmod.tensors();
 
-//  std::vector<WTensor> ABtens;
+//  std::vector<Tensor> ABtens;
 //  // insert the tensors
 //  ABtens.insert(ABtens.end(), Atens.begin(), Atens.end());
 //  ABtens.insert(ABtens.end(), Btens.begin(), Btens.end());
@@ -418,14 +418,14 @@
 //            upper_idx.push_back(left_op.index());
 //            lower_idx.push_back(right_op.index());
 //            // add particle density matrix
-//            WTensor gamma("Gamma", upper_idx, lower_idx);
+//            Tensor gamma("Gamma", upper_idx, lower_idx);
 //            ABtens.push_back(gamma);
 //          } else if ((left_op.type() == Annihilation) and
 //                     (right_op.type() == Creation)) {
 //            upper_idx.push_back(left_op.index());
 //            lower_idx.push_back(right_op.index());
 //            // add hole density matrix
-//            WTensor eta("Eta", upper_idx, lower_idx);
+//            Tensor eta("Eta", upper_idx, lower_idx);
 //            ABtens.push_back(eta);
 //          } else {
 //            valid = false;

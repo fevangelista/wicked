@@ -11,7 +11,7 @@ void WTerm::add(const SQOperator &op) {
   operators_[op.index().space()].push_back(op);
 }
 
-void WTerm::add(const WTensor &tensor) { tensors_.push_back(tensor); }
+void WTerm::add(const Tensor &tensor) { tensors_.push_back(tensor); }
 
 scalar_t WTerm::factor() const { return factor_; }
 
@@ -61,7 +61,7 @@ void WTerm::reindex(index_map_t &idx_map) {
 void WTerm::canonicalize() {
   // 1. Sort the tensors according to a score function
   using score_t =
-      std::tuple<std::string, int, std::vector<int>, std::vector<int>, WTensor>;
+      std::tuple<std::string, int, std::vector<int>, std::vector<int>, Tensor>;
   std::vector<score_t> scores;
 
   int n = 0;
@@ -111,7 +111,7 @@ std::string WTerm::str() const {
   str_vec.push_back("hello");
 
   str_vec.push_back(to_string(factor_));
-  for (const WTensor &tensor : tensors_) {
+  for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }
 
@@ -130,7 +130,7 @@ std::string WTerm::str() const {
 
 std::string WTerm::tensor_str() const {
   std::vector<std::string> str_vec;
-  for (const WTensor &tensor : tensors_) {
+  for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }
   return (to_string(str_vec, " "));
@@ -153,7 +153,7 @@ std::string WTerm::operator_str() const {
 
 std::string WTerm::latex() const {
   std::vector<std::string> str_vec;
-  for (const WTensor &tensor : tensors_) {
+  for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.latex());
   }
 
@@ -185,7 +185,7 @@ WTerm make_operator(const std::string &label,
   std::vector<Index> &ann_ind = indices[1];
 
   // Add the tensor
-  WTensor tensor(label, cre_ind, ann_ind);
+  Tensor tensor(label, cre_ind, ann_ind);
   term.add(tensor);
 
   // Add the creation operators

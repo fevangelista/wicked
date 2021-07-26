@@ -57,6 +57,9 @@ public:
   /// Maps a label into an orbital space
   int label_to_space(const std::string &label) const;
 
+  /// return a string representation
+  std::string str() const;
+
 private:
   /// Vector of spaces
   std::vector<t_space_info> space_info_;
@@ -71,5 +74,8 @@ private:
 extern std::shared_ptr<OrbitalSpaceInfo> osi;
 
 std::shared_ptr<OrbitalSpaceInfo> get_osi();
+
+/// Used to convert a string (e.g., "unoccupied") to a RDMType
+RDMType string_to_rdmtype(const std::string &str);
 
 #endif // _wicked_orbital_space_h_

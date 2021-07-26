@@ -6,13 +6,13 @@
 //#include "wicked-def.h"
 //#include "helpers.h"
 //#include "orbital_space.h"
-//#include "walgebraicterm.h"
+//#include "term.h"
 //#include "wequationterm.h"
 //#include "wdiag_operator.h"
 //#include "wdiag_operator_sum.h"
 //#include "wick_theorem.h"
 //#include "sqoperator.h"
-//#include "wtensor.h"
+//#include "tensor.h"
 //#include "wsum.h"
 
 // using namespace std;

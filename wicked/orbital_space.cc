@@ -1,8 +1,32 @@
 #include <iostream>
 
+#include "helpers.h"
 #include "orbital_space.h"
 
-std::shared_ptr<OrbitalSpaceInfo> osi = std::make_shared<OrbitalSpaceInfo>();
+std::map<RDMType, std::string> RDMType_to_str{
+    {RDMType::Occupied, "occupied"},
+    {RDMType::Unoccupied, "unoccupied"},
+    {RDMType::General, "general"}};
+
+RDMType string_to_rdmtype(const std::string &str) {
+  for (const auto &[rdm, s] : RDMType_to_str) {
+    if (str == s) {
+      return rdm;
+    }
+  }
+  throw std::runtime_error(
+      "\nstring_to_rdmtype() - called with an invalid rdmtype (" + str + ")" +
+      "\nValid options are: [occupied,unoccupied,general]");
+  return RDMType::General;
+}
+
+auto osi_lambda = []() -> std::shared_ptr<OrbitalSpaceInfo> {
+  auto val = std::make_shared<OrbitalSpaceInfo>();
+  val->default_spaces();
+  return val;
+};
+
+std::shared_ptr<OrbitalSpaceInfo> osi = osi_lambda();
 
 std::shared_ptr<OrbitalSpaceInfo> get_osi() { return osi; }
 
@@ -21,6 +45,16 @@ void OrbitalSpaceInfo::add_space(const std::string &label, RDMType structure,
     }
   }
   space_info_.push_back(make_tuple(label, structure, indices));
+}
+
+std::string OrbitalSpaceInfo::str() const {
+  std::vector<std::string> s;
+  for (const auto &info : space_info_) {
+    auto &[l, rdm, indices] = info;
+    s.push_back("space label: " + l + "\nrdm: " + RDMType_to_str[rdm] +
+                "\nindices: [" + join(indices, ",") + "]");
+  }
+  return join(s, "\n\n");
 }
 
 const std::string &OrbitalSpaceInfo::label(int pos) const {

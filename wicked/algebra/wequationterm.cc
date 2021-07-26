@@ -3,18 +3,17 @@
 
 #include "helpers.h"
 #include "sqoperator.h"
-#include "walgebraicterm.h"
+#include "tensor.h"
+#include "term.h"
 #include "wequationterm.h"
 #include "wicked-def.h"
-#include "wtensor.h"
 
-WEquationTerm::WEquationTerm(const WAlgebraicTerm &lhs,
-                             const WAlgebraicTerm &rhs, scalar_t factor)
+WEquationTerm::WEquationTerm(const Term &lhs, const Term &rhs, scalar_t factor)
     : lhs_(lhs), rhs_(rhs), factor_(factor) {}
 
-const WAlgebraicTerm &WEquationTerm::lhs() const { return lhs_; }
+const Term &WEquationTerm::lhs() const { return lhs_; }
 
-const WAlgebraicTerm &WEquationTerm::rhs() const { return rhs_; }
+const Term &WEquationTerm::rhs() const { return rhs_; }
 
 scalar_t WEquationTerm::rhs_factor() const { return factor_; }
 
