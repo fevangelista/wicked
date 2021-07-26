@@ -71,12 +71,6 @@ PYBIND11_MODULE(wicked, m) {
       .def("add_space", &OrbitalSpaceInfo::add_space)
       .def("__str__", &OrbitalSpaceInfo::str);
 
-  py::class_<Term, std::shared_ptr<Term>>(m, "Term")
-      .def(py::init<>())
-      .def("str", &Term::str)
-      .def("latex", &Term::latex)
-      .def("ambit", &Term::ambit);
-
   py::class_<WEquationTerm, std::shared_ptr<WEquationTerm>>(m, "WEquationTerm")
       .def(py::init<const Term &, const Term &, scalar_t>())
       .def("lhs", &WEquationTerm::lhs)
