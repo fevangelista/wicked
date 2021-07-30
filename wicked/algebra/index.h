@@ -52,8 +52,11 @@ using index_map_t = std::map<Index, Index>;
 
 // Helper functions
 
+// /// Helper function to make an Index object from a space label and position
+// Index make_index(const std::string &space, int p);
+
 /// Helper function to make an Index object from a space label and position
-Index make_index(const std::string &space, int p);
+Index make_index(const std::string &index);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Index &idx);

@@ -24,9 +24,10 @@
 //  make_contraction_skeletons();
 //}
 
-// void WTheorem::theorem(const std::vector<WTerm> &terms) {}
+// void WTheorem::theorem(const std::vector<WSymbolicTerm> &terms) {}
 
-// void WTheorem::theorem_pair(const WTerm &A, const WTerm &B, int minrank,
+// void WTheorem::theorem_pair(const WSymbolicTerm &A, const WSymbolicTerm &B,
+// int minrank,
 //                            int maxrank) {
 //  PRINT(Summary, cout << "Contracting the following terms:" << endl;
 //        cout << A.str() << endl; cout << B.str() << endl;)
@@ -75,9 +76,10 @@
 //      });
 //}
 
-// void WTheorem::contract_pair(const WTerm &A, const std::vector<int> &naop,
-//                             const WTerm &B, const std::vector<int> &nbop,
-//                             const std::vector<int> &contr_per_space) {
+// void WTheorem::contract_pair(const WSymbolicTerm &A, const std::vector<int>
+// &naop,
+//                             const WSymbolicTerm &B, const std::vector<int>
+//                             &nbop, const std::vector<int> &contr_per_space) {
 //  PRINT(Detailed, cout << "Contraction pattern:";
 //        for (int i
 //             : contr_per_space) { cout << ' ' << i; };
@@ -134,7 +136,7 @@
 //}
 
 // void WTheorem::contract_pair_splitting(
-//    const WTerm &A, const WTerm &B,
+//    const WSymbolicTerm &A, const WSymbolicTerm &B,
 //    const std::vector<std::tuple<int, int, int>> &splitting) {
 //  // look into the skeleton database to find all compatible splittings
 //  PRINT(
@@ -190,7 +192,7 @@
 //}
 
 // void WTheorem::contract_pair_permute(
-//    const WTerm &A, const WTerm &B,
+//    const WSymbolicTerm &A, const WSymbolicTerm &B,
 //    const std::vector<std::vector<std::pair<int, int>>> &contractions) {
 
 //  // lay out the legs and perform all permutations for each separate space
@@ -312,8 +314,9 @@
 //}
 
 // void WTheorem::contract_pair_execute(
-//    const WTerm &A, const WTerm &B, const std::vector<std::vector<int>>
-//    &A_legs, const std::vector<std::vector<int>> &B_legs) {
+//    const WSymbolicTerm &A, const WSymbolicTerm &B, const
+//    std::vector<std::vector<int>> &A_legs, const std::vector<std::vector<int>>
+//    &B_legs) {
 
 //  // relabel indices to avoid redundant terms
 //  // find the indices that are summed
@@ -366,8 +369,8 @@
 //  cout << "\n    Contractions:" << endl;
 
 //  // merge the two tensors
-//  WTerm Amod = A;
-//  WTerm Bmod = B;
+//  WSymbolicTerm Amod = A;
+//  WSymbolicTerm Bmod = B;
 
 //  // reindex B
 //  Bmod.reindex(B_idx_map);
@@ -470,7 +473,7 @@
 //  }
 
 //  if (valid) {
-//    WTerm AB;
+//    WSymbolicTerm AB;
 //    for (auto const &t : ABtens) {
 //      AB.add(t);
 //    }

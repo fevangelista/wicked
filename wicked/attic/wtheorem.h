@@ -21,26 +21,27 @@
 //  // ==> Class public interface <==
 
 //  /// Apply Wick's theorem to a product of terms
-//  void theorem(const std::vector<WTerm> &terms);
+//  void theorem(const std::vector<WSymbolicTerm> &terms);
 
 //  /// Wick's theorem for a pair of terms with resulting rank ranging from
 //  /// minrank to maxrank
-//  void theorem_pair(const WTerm &A, const WTerm &B, int minrank = -1,
+//  void theorem_pair(const WSymbolicTerm &A, const WSymbolicTerm &B, int
+//  minrank = -1,
 //                    int maxrank = -1);
 
-//  void contract_pair(const WTerm &A, const std::vector<int> &naop,
-//                     const WTerm &B, const std::vector<int> &nbop,
+//  void contract_pair(const WSymbolicTerm &A, const std::vector<int> &naop,
+//                     const WSymbolicTerm &B, const std::vector<int> &nbop,
 //                     const std::vector<int> &contr_per_space);
 
 //  void contract_pair_splitting(
-//      const WTerm &A, const WTerm &B,
+//      const WSymbolicTerm &A, const WSymbolicTerm &B,
 //      const std::vector<std::tuple<int, int, int>> &splitting);
 
 //  void contract_pair_permute(
-//      const WTerm &A, const WTerm &B,
+//      const WSymbolicTerm &A, const WSymbolicTerm &B,
 //      const std::vector<std::vector<std::pair<int, int>>> &contractions);
 
-//  void contract_pair_execute(const WTerm &A, const WTerm &B,
+//  void contract_pair_execute(const WSymbolicTerm &A, const WSymbolicTerm &B,
 //                             const std::vector<std::vector<int>> &A_legs,
 //                             const std::vector<std::vector<int>> &B_legs);
 

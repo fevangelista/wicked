@@ -119,16 +119,16 @@ std::ostream &operator<<(std::ostream &os, const Tensor &tensor) {
 }
 
 Tensor make_tensor(const std::string &label,
-                   const std::vector<std::pair<std::string, int>> &lower,
-                   const std::vector<std::pair<std::string, int>> &upper,
+                   const std::vector<std::string> &lower,
+                   const std::vector<std::string> &upper,
                    SymmetryType symmetry) {
   std::vector<Index> lower_indices;
-  for (const auto &[space, p] : lower) {
-    lower_indices.emplace_back(make_index(space, p));
+  for (const auto &l : lower) {
+    lower_indices.emplace_back(make_index(l));
   }
   std::vector<Index> upper_indices;
-  for (const auto &[space, p] : upper) {
-    upper_indices.emplace_back(make_index(space, p));
+  for (const auto &u : upper) {
+    upper_indices.emplace_back(make_index(u));
   }
   return Tensor(label, lower_indices, upper_indices, symmetry);
 }

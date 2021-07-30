@@ -13,15 +13,27 @@
 
 using namespace std;
 
-Term::Term() {}
+SymbolicTerm::SymbolicTerm() {}
 
-void Term::add(const SQOperator &op) { operators_.push_back(op); }
+SymbolicTerm::SymbolicTerm(const std::vector<SQOperator> &operators,
+                           const std::vector<Tensor> &tensors)
+    : operators_(operators), tensors_(tensors) {}
 
-void Term::add(const Tensor &tensor) { tensors_.push_back(tensor); }
+void SymbolicTerm::set(const std::vector<SQOperator> &op) { operators_ = op; }
 
-int Term::nops() const { return operators_.size(); }
+void SymbolicTerm::add(const SQOperator &op) { operators_.push_back(op); }
 
-std::vector<Index> Term::indices() const {
+void SymbolicTerm::add(const std::vector<SQOperator> &ops) {
+  for (const auto &op : ops) {
+    add(op);
+  }
+}
+
+void SymbolicTerm::add(const Tensor &tensor) { tensors_.push_back(tensor); }
+
+int SymbolicTerm::nops() const { return operators_.size(); }
+
+std::vector<Index> SymbolicTerm::indices() const {
   std::vector<Index> result;
   for (const auto &t : tensors_) {
     const auto t_idx = t.indices();
@@ -33,7 +45,7 @@ std::vector<Index> Term::indices() const {
   return result;
 }
 
-void Term::reindex(index_map_t &idx_map) {
+void SymbolicTerm::reindex(index_map_t &idx_map) {
   for (auto &t : tensors_) {
     t.reindex(idx_map);
   }
@@ -43,7 +55,7 @@ void Term::reindex(index_map_t &idx_map) {
 }
 
 std::vector<std::pair<std::string, std::vector<int>>>
-Term::tensor_connectivity(const Tensor &t, bool upper) const {
+SymbolicTerm::tensor_connectivity(const Tensor &t, bool upper) const {
   std::vector<std::pair<std::string, std::vector<int>>> result;
   auto indices = upper ? t.upper() : t.lower();
   sort(indices.begin(), indices.end());
@@ -76,7 +88,7 @@ Term::tensor_connectivity(const Tensor &t, bool upper) const {
 }
 
 #define NEW_CANONICALIZATION 1
-scalar_t Term::canonicalize() {
+scalar_t SymbolicTerm::canonicalize() {
   scalar_t factor(1);
 
 // 1. Sort the tensors according to a score function
@@ -246,7 +258,7 @@ scalar_t Term::canonicalize() {
   }
 
   // 4. Sort operators according to canonical form
-  std::vector<int> sqops_pos(operators_.size(), -1);
+  std::vector<int> sqops_pos(nops(), -1);
   std::vector<std::tuple<int, int, int, int>> sorting_vec;
   int pos = 0;
   for (const auto &sqop : operators_) {
@@ -278,7 +290,7 @@ scalar_t Term::canonicalize() {
   return factor;
 }
 
-scalar_t Term::canonicalize_tensor_indices() {
+scalar_t SymbolicTerm::canonicalize_tensor_indices() {
   scalar_t sign(1);
   // Sort tensor indices according to canonical form
   for (auto &tensor : tensors_) {
@@ -325,7 +337,7 @@ scalar_t Term::canonicalize_tensor_indices() {
   return sign;
 }
 
-bool Term::operator<(const Term &other) const {
+bool SymbolicTerm::operator<(const SymbolicTerm &other) const {
   if (tensors_ > other.tensors_) {
     return false;
   }
@@ -335,16 +347,16 @@ bool Term::operator<(const Term &other) const {
   return operators_ < other.operators_;
 }
 
-bool Term::operator==(const Term &other) const {
+bool SymbolicTerm::operator==(const SymbolicTerm &other) const {
   return (tensors_ == other.tensors_) and (operators_ == other.operators_);
 }
 
-std::string Term::str() const {
+std::string SymbolicTerm::str() const {
   std::vector<std::string> str_vec;
   for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
   }
-  if (operators_.size()) {
+  if (nops()) {
     str_vec.push_back("{");
     for (const auto &op : operators_) {
       str_vec.push_back(op.str());
@@ -355,7 +367,7 @@ std::string Term::str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string Term::tensor_str() const {
+std::string SymbolicTerm::tensor_str() const {
   std::vector<std::string> str_vec;
   for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
@@ -363,7 +375,7 @@ std::string Term::tensor_str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string Term::operator_str() const {
+std::string SymbolicTerm::operator_str() const {
   std::vector<std::string> str_vec;
   str_vec.push_back("{");
   for (const auto &op : operators_) {
@@ -373,12 +385,12 @@ std::string Term::operator_str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string Term::latex() const {
+std::string SymbolicTerm::latex() const {
   std::vector<std::string> str_vec;
   for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.latex());
   }
-  if (operators_.size()) {
+  if (nops()) {
     str_vec.push_back("\\{");
     for (const auto &op : operators_) {
       str_vec.push_back(op.latex());
@@ -388,33 +400,74 @@ std::string Term::latex() const {
   return (to_string(str_vec, " "));
 }
 
-std::string Term::ambit() const {
+std::string SymbolicTerm::ambit() const {
   std::vector<std::string> str_vec;
   for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.ambit());
   }
-  if (operators_.size()) {
-    throw "Trying to convert an Term object with operator terms to "
+  if (nops()) {
+    throw "Trying to convert an SymbolicTerm object with operator terms to "
           "ambit.";
   }
   return (to_string(str_vec, " * "));
 }
 
-std::ostream &operator<<(std::ostream &os, const Term &term) {
+Term::Term() {}
+
+Term::Term(scalar_t c, const std::vector<SQOperator> &operators,
+           const std::vector<Tensor> &tensors)
+    : coefficient_(c), SymbolicTerm(operators, tensors) {}
+
+Term::Term(const SymbolicTerm &term) : SymbolicTerm(term) {}
+
+Term::Term(scalar_t c, const SymbolicTerm &term)
+    : coefficient_(c), SymbolicTerm(term) {
+  ;
+}
+
+/// Return the coefficient
+scalar_t Term::coefficient() const { return coefficient_; }
+
+void Term::set(scalar_t c) { coefficient_ = c; }
+
+SymbolicTerm Term::symterm() const { return SymbolicTerm(ops(), tensors()); }
+
+std::string Term::str() const {
+  std::string term_str = SymbolicTerm::str();
+  std::string coeff_str = coefficient_.str();
+  if ((term_str == "") and (coeff_str == "")) {
+    return "1";
+  } else if ((term_str == "") and (coeff_str != "")) {
+    return coeff_str;
+  } else if ((term_str != "") and (coeff_str == "")) {
+    return term_str;
+  }
+  return coeff_str + " " + term_str;
+}
+
+std::string Term::latex() const {
+  return coefficient_.latex() + " " + SymbolicTerm::latex();
+}
+
+//   str_vec.push_back(coefficient_.ambit());
+// str_vec.push_back(coefficient_.latex());
+// str_vec.push_back(coefficient_.str());
+
+std::ostream &operator<<(std::ostream &os, const SymbolicTerm &term) {
   os << term.str();
   return os;
 }
 
 std::ostream &operator<<(std::ostream &os,
-                         const std::pair<Term, scalar_t> &term_factor) {
+                         const std::pair<SymbolicTerm, scalar_t> &term_factor) {
   os << term_factor.second << ' ' << term_factor.second;
   return os;
 }
 
-Term make_algebraic_term(const std::string &label,
-                         const std::vector<std::string> &cre,
-                         const std::vector<std::string> &ann) {
-  Term term;
+SymbolicTerm make_algebraic_term(const std::string &label,
+                                 const std::vector<std::string> &cre,
+                                 const std::vector<std::string> &ann) {
+  SymbolicTerm term;
 
   auto indices = make_indices_from_space_labels({cre, ann});
   std::vector<Index> &cre_ind = indices[0];
@@ -439,7 +492,7 @@ Term make_algebraic_term(const std::string &label,
   return term;
 }
 
-// scalar_t Term::canonicalize_best() {
+// scalar_t SymbolicTerm::canonicalize_best() {
 //  scalar_t factor(1);
 
 //  // find classes of equivalent indices

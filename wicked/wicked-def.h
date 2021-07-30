@@ -4,11 +4,15 @@
 #include <vector>
 
 #include "rational.h"
+#include <bitset>
 
 /// Enums
 enum class SymmetryType { Symmetric, Antisymmetric, Nonsymmetric };
 
 /// Rational numbers
 using scalar_t = rational;
+
+/// Bit array
+using bitarray = std::bitset<64>;
 
 #endif // #ifndef _wicked_icked_def_h_

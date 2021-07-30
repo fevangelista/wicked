@@ -6,26 +6,32 @@
 #include <string>
 #include <vector>
 
+#include "../wicked-def.h"
 #include "index.h"
-#include "wicked-def.h"
-
-class Index;
-class SQOperator;
-class Tensor;
+#include "sqoperator.h"
+#include "tensor.h"
 
 /// A class to represent a term in a SQ expression. A term includes:
 /// 1) a product of tensors
 /// 2) a product of operators normal ordered with respect to the vacuum
-class Term {
+class SymbolicTerm {
 public:
   // ==> Constructor <==
 
-  Term();
+  SymbolicTerm();
+
+  SymbolicTerm(const std::vector<SQOperator> &op,
+               const std::vector<Tensor> &tensors);
 
   // ==> Class public interface <==
 
   /// Add one or more SQOperator
+  void set(const std::vector<Tensor> &tensors);
+  void set(const std::vector<SQOperator> &op);
+
+  /// Add one or more SQOperators to the left
   void add(const SQOperator &op);
+  void add(const std::vector<SQOperator> &ops);
 
   /// Add a tensor
   void add(const Tensor &tensor);
@@ -55,10 +61,10 @@ public:
   scalar_t canonicalize_tensor_indices();
 
   /// Comparison operator used for sorting
-  bool operator<(const Term &term) const;
+  bool operator<(const SymbolicTerm &term) const;
 
   /// Comparison operator used for sorting
-  bool operator==(const Term &term) const;
+  bool operator==(const SymbolicTerm &term) const;
 
   /// Return a string representation
   std::string str() const;
@@ -69,9 +75,8 @@ public:
   /// Return an ambit (C++ code) representation
   std::string ambit() const;
 
-private:
+protected:
   // ==> Class private data <==
-
   std::vector<SQOperator> operators_;
   std::vector<Tensor> tensors_;
 
@@ -86,16 +91,49 @@ private:
   tensor_connectivity(const Tensor &t, bool upper) const;
 };
 
+class Term : public SymbolicTerm {
+public:
+  Term();
+
+  Term(scalar_t c, const std::vector<SQOperator> &op,
+       const std::vector<Tensor> &tensors);
+
+  Term(const SymbolicTerm &term);
+
+  Term(scalar_t c, const SymbolicTerm &term);
+
+  /// Set the coefficient
+  void set(scalar_t c);
+
+  /// Return the coefficient
+  scalar_t coefficient() const;
+
+  SymbolicTerm symterm() const;
+
+  /// Return a string representation
+  std::string str() const;
+
+  /// Return a LaTeX representation
+  std::string latex() const;
+
+  // /// Return an ambit (C++ code) representation
+  // std::string ambit() const;
+
+private:
+  scalar_t coefficient_ = 1;
+};
+
 // Helper functions
 
 /// Print to an output stream
-std::ostream &operator<<(std::ostream &os, const Term &term);
+std::ostream &operator<<(std::ostream &os, const SymbolicTerm &term);
 
 std::ostream &operator<<(std::ostream &os,
-                         const std::pair<Term, scalar_t> &term);
+                         const std::pair<SymbolicTerm, scalar_t> &term);
 
 ///// Create an operator
-Term make_term(const std::string &label, const std::vector<std::string> &cre,
-               const std::vector<std::string> &ann);
+SymbolicTerm make_term(const std::string &label,
+                       const std::vector<std::string> &cre,
+                       const std::vector<std::string> &ann);
 
 #endif // _wicked_term_h_

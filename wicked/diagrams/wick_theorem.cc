@@ -3,13 +3,13 @@
 #include <iostream>
 
 #include "combinatorics.h"
+#include "expression.h"
 #include "helpers.h"
 #include "orbital_space.h"
 #include "sqoperator.h"
 #include "stl_utils.hpp"
 #include "tensor.h"
 #include "term.h"
-#include "term_sum.h"
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"
 #include "wick_theorem.h"
@@ -30,11 +30,11 @@ using namespace std;
 
 WickTheorem::WickTheorem() {}
 
-TermSum WickTheorem::contract(scalar_t factor,
-                              const std::vector<WDiagOperator> &ops,
-                              int minrank, int maxrank) {
+Expression WickTheorem::contract(scalar_t factor,
+                                 const std::vector<WDiagOperator> &ops,
+                                 int minrank, int maxrank) {
 
-  TermSum result;
+  Expression result;
   ncontractions_ = 0;
   contractions_.clear();
   elementary_contractions_.clear();
@@ -65,11 +65,11 @@ TermSum WickTheorem::contract(scalar_t factor,
       auto ops_contractions = canonicalize_contraction(ops, contraction_vec);
       const auto &contractions = ops_contractions.second;
 
-      std::pair<Term, scalar_t> term_factor =
+      std::pair<SymbolicTerm, scalar_t> term_factor =
           evaluate_contraction(ops, contractions, factor);
       PRINT(WDiagPrint::Summary, cout << term_factor << endl;)
 
-      Term &term = term_factor.first;
+      SymbolicTerm &term = term_factor.first;
       PRINT(WDiagPrint::Basic, cout << term << endl;)
       scalar_t canonicalize_factor = term.canonicalize();
       result.add(
@@ -79,9 +79,9 @@ TermSum WickTheorem::contract(scalar_t factor,
   return result;
 }
 
-TermSum WickTheorem::contract(scalar_t factor, const OperatorSum &dop_sum,
-                              int minrank, int maxrank) {
-  TermSum result;
+Expression WickTheorem::contract(scalar_t factor, const OperatorSum &dop_sum,
+                                 int minrank, int maxrank) {
+  Expression result;
 
   for (const auto &dop_factor : dop_sum.sum()) {
     scalar_t this_factor = dop_factor.second;
@@ -638,7 +638,7 @@ WickTheorem::generate_elementary_contractions(
   return contr_vec;
 }
 
-std::pair<Term, scalar_t> WickTheorem::evaluate_contraction(
+std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
     const std::vector<WDiagOperator> &ops,
     const std::vector<std::vector<WDiagVertex>> &contractions,
     scalar_t factor) {
@@ -817,7 +817,7 @@ std::pair<Term, scalar_t> WickTheorem::evaluate_contraction(
   // find the combinatorial factor associated with this contraction
   scalar_t comb_factor = combinatorial_factor(ops, contractions);
 
-  Term term;
+  SymbolicTerm term;
 
   for (const auto &tensor : tensors) {
     term.add(tensor);

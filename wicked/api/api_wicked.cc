@@ -4,7 +4,7 @@
 #include "../wicked/algebra/sqoperator.h"
 #include "../wicked/algebra/tensor.h"
 #include "../wicked/algebra/term.h"
-#include "../wicked/algebra/term_sum.h"
+// #include "../wicked/algebra/term_sum.h"
 #include "../wicked/algebra/wequationterm.h"
 #include "../wicked/diagrams/wdiag_operator.h"
 #include "../wicked/diagrams/wdiag_operator_sum.h"
@@ -16,16 +16,27 @@ PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;
+void export_Expression(py::module &m);
 void export_Index(py::module &m);
 void export_SQOperator(py::module &m);
+void export_SQOpProd(py::module &m);
 void export_Tensor(py::module &m);
+void export_SymbolicTerm(py::module &m);
 
 PYBIND11_MODULE(wicked, m) {
   m.doc() = "Wicked python interface";
 
+  py::class_<rational, std::shared_ptr<rational>>(m, "rational")
+      .def(py::init<>())
+      .def(py::init<int>())
+      .def(py::init<int, int>());
+
   export_Index(m);
   export_SQOperator(m);
+  export_SQOpProd(m);
   export_Tensor(m);
+  export_SymbolicTerm(m);
+  export_Expression(m);
 
   m.def(
       "reset_space", []() { osi->reset(); }, "Reset the orbital space");
@@ -41,11 +52,6 @@ PYBIND11_MODULE(wicked, m) {
       "Add an orbital space. `type` can be any of "
       "(occupied,unoccupied,general)");
 
-  py::class_<rational, std::shared_ptr<rational>>(m, "rational")
-      .def(py::init<>())
-      .def(py::init<int>())
-      .def(py::init<int, int>());
-
   py::enum_<RDMType>(m, "rdm")
       .value("occupied", RDMType::Occupied)
       .value("unoccupied", RDMType::Unoccupied)
@@ -56,12 +62,12 @@ PYBIND11_MODULE(wicked, m) {
       .value("anti", SymmetryType::Antisymmetric)
       .value("none", SymmetryType::Nonsymmetric);
 
-  py::enum_<WDiagPrint>(m, "WDiagPrint")
-      .value("no", WDiagPrint::No)
-      .value("basic", WDiagPrint::Basic)
-      .value("summary", WDiagPrint::Summary)
-      .value("detailed", WDiagPrint::Detailed)
-      .value("all", WDiagPrint::All);
+  //   py::enum_<WDiagPrint>(m, "WDiagPrint")
+  //       .value("no", WDiagPrint::No)
+  //       .value("basic", WDiagPrint::Basic)
+  //       .value("summary", WDiagPrint::Summary)
+  //       .value("detailed", WDiagPrint::Detailed)
+  //       .value("all", WDiagPrint::All);
 
   py::class_<OrbitalSpaceInfo, std::shared_ptr<OrbitalSpaceInfo>>(
       m, "OrbitalSpaceInfo")
@@ -71,20 +77,13 @@ PYBIND11_MODULE(wicked, m) {
       .def("add_space", &OrbitalSpaceInfo::add_space)
       .def("__str__", &OrbitalSpaceInfo::str);
 
-  py::class_<WEquationTerm, std::shared_ptr<WEquationTerm>>(m, "WEquationTerm")
-      .def(py::init<const Term &, const Term &, scalar_t>())
-      .def("lhs", &WEquationTerm::lhs)
-      .def("rhs", &WEquationTerm::rhs)
-      .def("str", &WEquationTerm::str)
-      .def("latex", &WEquationTerm::latex)
-      .def("ambit", &WEquationTerm::ambit);
-
-  py::class_<TermSum, std::shared_ptr<TermSum>>(m, "TermSum")
-      .def(py::init<>())
-      .def("canonicalize", &TermSum::canonicalize)
-      .def("to_manybody_equation", &TermSum::to_manybody_equation)
-      .def("str", &TermSum::str)
-      .def("latex", &TermSum::latex, "sep"_a = " \\\\ \n");
+  //   py::class_<WEquationSymbolicTerm,
+  //   std::shared_ptr<WEquationSymbolicTerm>>(m, "WEquationSymbolicTerm")
+  //       .def(py::init<const SymbolicTerm &, const SymbolicTerm &,
+  //       scalar_t>()) .def("lhs", &WEquationSymbolicTerm::lhs) .def("rhs",
+  //       &WEquationSymbolicTerm::rhs) .def("str", &WEquationSymbolicTerm::str)
+  //       .def("latex", &WEquationSymbolicTerm::latex)
+  //       .def("ambit", &WEquationSymbolicTerm::ambit);
 
   py::class_<WDiagOperator, std::shared_ptr<WDiagOperator>>(m, "WDiagOperator")
       .def(py::init<const std::string &, const std::vector<int> &,
@@ -111,15 +110,16 @@ PYBIND11_MODULE(wicked, m) {
 
   m.def("operator", &make_operator, "Create a OperatorSum object");
 
-  py::class_<WickTheorem, std::shared_ptr<WickTheorem>>(m, "WickTheorem")
-      .def(py::init<>())
-      .def("contract",
-           py::overload_cast<scalar_t, const std::vector<WDiagOperator> &, int,
-                             int>(&WickTheorem::contract))
-      .def("contract",
-           py::overload_cast<scalar_t, const OperatorSum &, int, int>(
-               &WickTheorem::contract))
-      .def("set_print", &WickTheorem::set_print);
+  //   py::class_<WickTheorem, std::shared_ptr<WickTheorem>>(m, "WickTheorem")
+  //       .def(py::init<>())
+  //       .def("contract",
+  //            py::overload_cast<scalar_t, const std::vector<WDiagOperator> &,
+  //            int,
+  //                              int>(&WickTheorem::contract))
+  //       .def("contract",
+  //            py::overload_cast<scalar_t, const OperatorSum &, int, int>(
+  //                &WickTheorem::contract))
+  //       .def("set_print", &WickTheorem::set_print);
 
   //  py::class_make_diag_operator(const std::string &label,
   //                                   const std::vector<std::string>

@@ -72,10 +72,9 @@ std::string SQOperator::ambit() const {
   return "";
 }
 
-SQOperator make_sqoperator(const std::string &space, int p, SQOperatorType type,
+SQOperator make_sqoperator(const std::string &index, SQOperatorType type,
                            SQOperatorStatistics statistics) {
-  auto index = make_index(space, p);
-  return SQOperator(type, index, statistics);
+  return SQOperator(type, make_index(index), statistics);
 }
 
 std::ostream &operator<<(std::ostream &os, const SQOperator &op) {

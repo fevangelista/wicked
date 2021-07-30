@@ -4,20 +4,20 @@
 #include "wicked-def.h"
 #include "wterm.h"
 
-WTerm::WTerm()
+WSymbolicTerm::WSymbolicTerm()
     : operators_(std::vector<std::vector<SQOperator>>(osi->num_spaces())) {}
 
-void WTerm::add(const SQOperator &op) {
+void WSymbolicTerm::add(const SQOperator &op) {
   operators_[op.index().space()].push_back(op);
 }
 
-void WTerm::add(const Tensor &tensor) { tensors_.push_back(tensor); }
+void WSymbolicTerm::add(const Tensor &tensor) { tensors_.push_back(tensor); }
 
-scalar_t WTerm::factor() const { return factor_; }
+scalar_t WSymbolicTerm::factor() const { return factor_; }
 
-void WTerm::set_factor(scalar_t value) { factor_ = value; }
+void WSymbolicTerm::set_factor(scalar_t value) { factor_ = value; }
 
-int WTerm::noperators() const {
+int WSymbolicTerm::noperators() const {
   int result = 0;
   for (const auto &op_space : operators_) {
     result += op_space.size();
@@ -25,7 +25,7 @@ int WTerm::noperators() const {
   return result;
 }
 
-std::vector<int> WTerm::noperators_per_space() const {
+std::vector<int> WSymbolicTerm::noperators_per_space() const {
   std::vector<int> counter;
   for (const auto &op : operators_) {
     counter.push_back(op.size());
@@ -33,7 +33,7 @@ std::vector<int> WTerm::noperators_per_space() const {
   return counter;
 }
 
-std::vector<Index> WTerm::indices() const {
+std::vector<Index> WSymbolicTerm::indices() const {
   std::vector<Index> result;
   for (const auto &t : tensors_) {
     const auto t_idx = t.indices();
@@ -47,7 +47,7 @@ std::vector<Index> WTerm::indices() const {
   return result;
 }
 
-void WTerm::reindex(index_map_t &idx_map) {
+void WSymbolicTerm::reindex(index_map_t &idx_map) {
   for (auto &t : tensors_) {
     t.reindex(idx_map);
   }
@@ -58,7 +58,7 @@ void WTerm::reindex(index_map_t &idx_map) {
   }
 }
 
-void WTerm::canonicalize() {
+void WSymbolicTerm::canonicalize() {
   // 1. Sort the tensors according to a score function
   using score_t =
       std::tuple<std::string, int, std::vector<int>, std::vector<int>, Tensor>;
@@ -91,7 +91,7 @@ void WTerm::canonicalize() {
   // 3. Sort operators according to canonical form
 }
 
-bool WTerm::operator<(const WTerm &other) const {
+bool WSymbolicTerm::operator<(const WSymbolicTerm &other) const {
   if (tensors_ > other.tensors_) {
     return false;
   }
@@ -101,11 +101,11 @@ bool WTerm::operator<(const WTerm &other) const {
   return operators_ < other.operators_;
 }
 
-bool WTerm::operator==(const WTerm &other) const {
+bool WSymbolicTerm::operator==(const WSymbolicTerm &other) const {
   return (tensors_ == other.tensors_) and (operators_ == other.operators_);
 }
 
-std::string WTerm::str() const {
+std::string WSymbolicTerm::str() const {
   std::vector<std::string> str_vec;
 
   str_vec.push_back("hello");
@@ -128,7 +128,7 @@ std::string WTerm::str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string WTerm::tensor_str() const {
+std::string WSymbolicTerm::tensor_str() const {
   std::vector<std::string> str_vec;
   for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.str());
@@ -136,7 +136,7 @@ std::string WTerm::tensor_str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string WTerm::operator_str() const {
+std::string WSymbolicTerm::operator_str() const {
   std::vector<std::string> str_vec;
 
   if (noperators() > 0) {
@@ -151,7 +151,7 @@ std::string WTerm::operator_str() const {
   return (to_string(str_vec, " "));
 }
 
-std::string WTerm::latex() const {
+std::string WSymbolicTerm::latex() const {
   std::vector<std::string> str_vec;
   for (const Tensor &tensor : tensors_) {
     str_vec.push_back(tensor.latex());
@@ -170,15 +170,15 @@ std::string WTerm::latex() const {
   return (to_string(str_vec, " "));
 }
 
-std::ostream &operator<<(std::ostream &os, const WTerm &term) {
+std::ostream &operator<<(std::ostream &os, const WSymbolicTerm &term) {
   os << term.str();
   return os;
 }
 
-WTerm make_operator(const std::string &label,
-                    const std::vector<std::string> &cre,
-                    const std::vector<std::string> &ann) {
-  WTerm term;
+WSymbolicTerm make_operator(const std::string &label,
+                            const std::vector<std::string> &cre,
+                            const std::vector<std::string> &ann) {
+  WSymbolicTerm term;
 
   auto indices = make_indices_from_space_labels({cre, ann});
   std::vector<Index> &cre_ind = indices[0];

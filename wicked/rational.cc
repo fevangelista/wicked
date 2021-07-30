@@ -78,6 +78,19 @@ std::string rational::str(bool sign) const {
   return s;
 }
 
+std::string rational::repr() const {
+  if (numerator_ == 0) {
+    return "0";
+  }
+  std::string s = (numerator_ > 0) ? "+" : "-";
+  if (denominator_ == 1) {
+    s += std::to_string(numerator_);
+  } else {
+    s += std::to_string(numerator_) + "/" + std::to_string(denominator_);
+  }
+  return s;
+}
+
 std::string rational::latex() const {
   std::string s;
   if (numerator_ == 0) {

@@ -6,11 +6,11 @@
 
 class SQOperator;
 class Tensor;
-class Term;
+class SymbolicTerm;
 class WDiagOperator;
 class OperatorSum;
 class WDiagVertex;
-class TermSum;
+class Expression;
 
 enum class WDiagPrint { No, Basic, Summary, Detailed, All };
 
@@ -22,12 +22,12 @@ public:
   WickTheorem();
 
   /// Contract a product of operators
-  TermSum contract(scalar_t factor, const std::vector<WDiagOperator> &ops,
-                   int minrank, int maxrank);
+  Expression contract(scalar_t factor, const std::vector<WDiagOperator> &ops,
+                      int minrank, int maxrank);
 
   /// Contract a product of sums of operators
-  TermSum contract(scalar_t factor, const OperatorSum &dop_sum, int minrank,
-                   int maxrank);
+  Expression contract(scalar_t factor, const OperatorSum &dop_sum, int minrank,
+                      int maxrank);
 
   void set_print(WDiagPrint print);
 
@@ -86,7 +86,7 @@ private:
                            std::vector<WDiagVertex> &free_vertex_vec);
 
   /// Apply the contraction to this set of operators and produce a term
-  std::pair<Term, scalar_t> evaluate_contraction(
+  std::pair<SymbolicTerm, scalar_t> evaluate_contraction(
       const std::vector<WDiagOperator> &ops,
       const std::vector<std::vector<WDiagVertex>> &contractions,
       scalar_t factor);

@@ -1,33 +1,48 @@
 #include <algorithm>
 #include <iostream>
 
+#include "expression.h"
 #include "helpers.h"
 #include "sqoperator.h"
 #include "tensor.h"
 #include "term.h"
-#include "term_sum.h"
 #include "wequationterm.h"
 
-TermSum::TermSum() {}
+Expression::Expression() {}
 
-void TermSum::add(const Term &term, scalar_t factor) {
-  auto search = terms_.find(term);
+void Expression::add(const Term &sterm) {
+  SymbolicTerm symterm = sterm.symterm();
+  auto search = terms_.find(symterm);
 
   if (search != terms_.end()) {
     /// Found, then just add the factor to the existing term
-    search->second += factor;
+    search->second += sterm.coefficient();
     if (search->second == 0) {
       terms_.erase(search);
     }
   } else {
-    terms_[term] = factor;
+    terms_[symterm] = sterm.coefficient();
   }
 }
 
-void TermSum::add(const std::pair<Term, scalar_t> &term_factor,
-                  scalar_t scale) {
+void Expression::add(const SymbolicTerm &symterm, scalar_t coefficient) {
+  auto search = terms_.find(symterm);
 
-  const Term &term = term_factor.first;
+  if (search != terms_.end()) {
+    /// Found, then just add the factor to the existing term
+    search->second += coefficient;
+    if (search->second == 0) {
+      terms_.erase(search);
+    }
+  } else {
+    terms_[symterm] = coefficient;
+  }
+}
+
+void Expression::add(const std::pair<SymbolicTerm, scalar_t> &term_factor,
+                     scalar_t scale) {
+
+  const SymbolicTerm &term = term_factor.first;
   scalar_t factor = term_factor.second;
 
   auto search = terms_.find(term);
@@ -43,16 +58,16 @@ void TermSum::add(const std::pair<Term, scalar_t> &term_factor,
   }
 }
 
-void TermSum::add_sum(const TermSum &sum, scalar_t scale) {
-  for (const auto &kv : sum.terms()) {
+void Expression::add(const Expression &expr, scalar_t scale) {
+  for (const auto &kv : expr.terms()) {
     add(kv, scale);
   }
 }
 
-TermSum &TermSum::canonicalize() {
-  std::map<Term, scalar_t> canonical_terms;
+Expression &Expression::canonicalize() {
+  std::map<SymbolicTerm, scalar_t> canonical_terms;
   for (auto &kv : terms_) {
-    Term term = kv.first;
+    SymbolicTerm term = kv.first;
     scalar_t factor = term.canonicalize();
     factor *= kv.second;
 
@@ -62,36 +77,36 @@ TermSum &TermSum::canonicalize() {
   return *this;
 }
 
-TermSum &TermSum::reindex(index_map_t &idx_map) {
-  std::map<Term, scalar_t> reindexed_terms;
+Expression &Expression::reindex(index_map_t &idx_map) {
+  std::map<SymbolicTerm, scalar_t> reindexed_terms;
   for (auto &kv : terms_) {
-    Term term = kv.first;
+    SymbolicTerm term = kv.first;
     term.reindex(idx_map);
     add_to_map(reindexed_terms, term, kv.second);
   }
   return *this;
 }
 
-bool TermSum::operator==(const TermSum &sum) {
+bool Expression::operator==(const Expression &sum) {
   return terms_.size() == sum.terms_.size() &&
          std::equal(terms_.begin(), terms_.end(), sum.terms_.begin());
 }
 
-TermSum &TermSum::operator+=(const TermSum &sum) {
+Expression &Expression::operator+=(const Expression &sum) {
   for (const auto &kv : sum.terms()) {
     add(kv);
   }
   return *this;
 }
 
-TermSum &TermSum::operator-=(const TermSum &sum) {
+Expression &Expression::operator-=(const Expression &sum) {
   for (const auto &kv : sum.terms()) {
     add(kv, -1);
   }
   return *this;
 }
 
-std::string TermSum::str() const {
+std::string Expression::str() const {
   std::vector<std::string> str_vec;
   int n = 0;
   for (auto &kv : terms_) {
@@ -110,7 +125,7 @@ std::string TermSum::str() const {
   return (to_string(str_vec, "\n"));
 }
 
-std::string TermSum::latex(const std::string &sep) const {
+std::string Expression::latex(const std::string &sep) const {
   std::vector<std::string> str_vec;
   for (auto &kv : terms_) {
     str_vec.push_back(kv.second.latex() + ' ' + kv.first.latex());
@@ -118,53 +133,53 @@ std::string TermSum::latex(const std::string &sep) const {
   return (to_string(str_vec, sep));
 }
 
-std::vector<WEquationTerm>
-TermSum::to_manybody_equation(const std::string &label) {
-  std::vector<WEquationTerm> result;
+// std::vector<WEquationSymbolicTerm>
+// Expression::to_manybody_equation(const std::string &label) {
+//   std::vector<WEquationSymbolicTerm> result;
 
-  for (const auto &term_factor : terms_) {
-    std::vector<Index> lower;
-    std::vector<Index> upper;
-    const Term &term = term_factor.first;
-    scalar_t factor = term_factor.second;
-    for (const auto &op : term.ops()) {
-      if (op.type() == SQOperatorType::Creation) {
-        lower.push_back(op.index());
-      } else {
-        upper.push_back(op.index());
-      }
-    }
-    Term rhs, lhs;
-    Tensor lhs_tensor(label, lower, upper);
-    lhs.add(lhs_tensor);
-    factor *= lhs_tensor.symmetry_factor();
+//   for (const auto &term_factor : terms_) {
+//     std::vector<Index> lower;
+//     std::vector<Index> upper;
+//     const SymbolicTerm &term = term_factor.first;
+//     scalar_t factor = term_factor.second;
+//     for (const auto &op : term.ops()) {
+//       if (op.type() == SQOperatorType::Creation) {
+//         lower.push_back(op.index());
+//       } else {
+//         upper.push_back(op.index());
+//       }
+//     }
+//     SymbolicTerm rhs, lhs;
+//     Tensor lhs_tensor(label, lower, upper);
+//     lhs.add(lhs_tensor);
+//     factor *= lhs_tensor.symmetry_factor();
 
-    for (const auto &tensor : term.tensors()) {
-      rhs.add(tensor);
-    }
-    result.push_back(WEquationTerm(lhs, rhs, factor));
-  }
+//     for (const auto &tensor : term.tensors()) {
+//       rhs.add(tensor);
+//     }
+//     result.push_back(WEquationSymbolicTerm(lhs, rhs, factor));
+//   }
 
-  return result;
-}
+//   return result;
+// }
 
-TermSum operator+(TermSum lhs, const TermSum &rhs) {
+Expression operator+(Expression lhs, const Expression &rhs) {
   lhs += rhs;
   return lhs;
 }
 
-TermSum operator-(TermSum lhs, const TermSum &rhs) {
+Expression operator-(Expression lhs, const Expression &rhs) {
   lhs -= rhs;
   return lhs;
 }
 
-std::ostream &operator<<(std::ostream &os, const TermSum &sum) {
+std::ostream &operator<<(std::ostream &os, const Expression &sum) {
   os << sum.str();
   return os;
 }
 
-TermSum string_to_sum(const std::string &s, TensorSyntax syntax) {
-  TermSum sum;
+Expression string_to_sum(const std::string &s, TensorSyntax syntax) {
+  Expression sum;
 
   //  std::cout << "\n  Parsing: \"" << s << "\"" << std::endl;
 
@@ -182,7 +197,7 @@ TermSum string_to_sum(const std::string &s, TensorSyntax syntax) {
   auto tensors = findall(s, tensor_re);
   auto operators = findall(s, operator_re);
 
-  Term term;
+  SymbolicTerm term;
   for (size_t n = 0; n < tensors.size(); n += 3) {
     std::string label = tensors[n];
 

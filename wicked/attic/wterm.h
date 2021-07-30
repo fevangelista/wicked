@@ -14,11 +14,11 @@
 /// A class to represent a term in a SQ expression. A term includes:
 /// 1) a product of tensors
 /// 2) a product of operators normal ordered with respect to the vacuum
-class WTerm {
+class WSymbolicTerm {
 public:
   // ==> Constructor <==
 
-  WTerm();
+  WSymbolicTerm();
 
   // ==> Class public interface <==
 
@@ -66,10 +66,10 @@ public:
   void canonicalize();
 
   /// Comparison operator used for sorting
-  bool operator<(const WTerm &term) const;
+  bool operator<(const WSymbolicTerm &term) const;
 
   /// Comparison operator used for sorting
-  bool operator==(const WTerm &term) const;
+  bool operator==(const WSymbolicTerm &term) const;
 
   /// Return a string representation
   std::string str() const;
@@ -92,11 +92,11 @@ private:
 
 // Helper functions
 /// Create an operator
-WTerm make_operator(const std::string &label,
-                    const std::vector<std::string> &cre,
-                    const std::vector<std::string> &ann);
+WSymbolicTerm make_operator(const std::string &label,
+                            const std::vector<std::string> &cre,
+                            const std::vector<std::string> &ann);
 
 /// Print to an output stream
-std::ostream &operator<<(std::ostream &os, const WTerm &term);
+std::ostream &operator<<(std::ostream &os, const WSymbolicTerm &term);
 
 #endif // _wicked_term_h_

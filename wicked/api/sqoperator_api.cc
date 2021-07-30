@@ -25,34 +25,33 @@ void export_SQOperator(py::module &m) {
       .def("__str__", &SQOperator::str)
       .def("latex", &SQOperator::latex);
 
-  m.def("sqoperator", &make_sqoperator, "space"_a, "p"_a, "type"_a,
-        "statistics"_a);
+  m.def("sqoperator", &make_sqoperator, "index"_a, "type"_a, "statistics"_a);
   m.def(
       "Fcre",
-      [](const std::string &space, int p) {
-        return make_sqoperator(space, p, SQOperatorType::Creation,
+      [](const std::string &str) {
+        return make_sqoperator(str, SQOperatorType::Creation,
                                SQOperatorStatistics::Fermion);
       },
-      "space"_a, "p"_a);
+      "index"_a);
   m.def(
       "Fann",
-      [](const std::string &space, int p) {
-        return make_sqoperator(space, p, SQOperatorType::Annihilation,
+      [](const std::string &str) {
+        return make_sqoperator(str, SQOperatorType::Annihilation,
                                SQOperatorStatistics::Fermion);
       },
-      "space"_a, "p"_a);
+      "index"_a);
   m.def(
       "Bcre",
-      [](const std::string &space, int p) {
-        return make_sqoperator(space, p, SQOperatorType::Creation,
+      [](const std::string &str) {
+        return make_sqoperator(str, SQOperatorType::Creation,
                                SQOperatorStatistics::Boson);
       },
-      "space"_a, "p"_a);
+      "index"_a);
   m.def(
       "Bann",
-      [](const std::string &space, int p) {
-        return make_sqoperator(space, p, SQOperatorType::Annihilation,
+      [](const std::string &str) {
+        return make_sqoperator(str, SQOperatorType::Annihilation,
                                SQOperatorStatistics::Boson);
       },
-      "space"_a, "p"_a);
+      "index"_a);
 }

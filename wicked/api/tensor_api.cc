@@ -16,10 +16,5 @@ void export_Tensor(py::module &m) {
       .def("latex", &Tensor::latex)
       .def("ambit", &Tensor::ambit);
 
-  m.def("tensor", [](const std::string &label,
-                     const std::vector<std::pair<std::string, int>> &lower,
-                     const std::vector<std::pair<std::string, int>> &upper,
-                     SymmetryType symmetry) {
-    return make_tensor(label, lower, upper, symmetry);
-  });
+  m.def("tensor", &make_tensor, "label"_a, "lower"_a, "upper"_a, "symmetry"_a);
 }

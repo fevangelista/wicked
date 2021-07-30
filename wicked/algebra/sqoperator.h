@@ -62,7 +62,7 @@ private:
 // Helper functions
 
 /// Helper function to make an Index object from a space label and position
-SQOperator make_sqoperator(const std::string &space, int p, SQOperatorType type,
+SQOperator make_sqoperator(const std::string &index, SQOperatorType type,
                            SQOperatorStatistics statistics);
 
 /// Print to an output stream

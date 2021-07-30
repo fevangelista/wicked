@@ -64,8 +64,17 @@ std::vector<std::vector<Index>> make_indices_from_space_labels(
   return indices;
 }
 
-Index make_index(const std::string &space, int p) {
-  return Index(osi->label_to_space(space), p);
+Index make_index(const std::string &index) {
+  auto split_index = split(index, std::regex("[\\s,_]+"));
+  size_t p;
+  try {
+    p = stoi(split_index[1]);
+  } catch (const std::exception &e) {
+    throw std::runtime_error("\nCould not convert the index " + index +
+                             " to an Index object.\n\nException: " + e.what());
+  }
+  auto space = osi->label_to_space(split_index[0]);
+  return Index(space, p);
 }
 
 Index string_to_index(const std::string &s) {

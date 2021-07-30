@@ -74,8 +74,8 @@ private:
 
 /// A function to construct a tensor
 Tensor make_tensor(const std::string &label,
-                   const std::vector<std::pair<std::string, int>> &lower,
-                   const std::vector<std::pair<std::string, int>> &upper,
+                   const std::vector<std::string> &lower,
+                   const std::vector<std::string> &upper,
                    SymmetryType symmetry);
 
 /// Print to an output stream

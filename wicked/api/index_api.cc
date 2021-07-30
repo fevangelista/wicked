@@ -4,6 +4,7 @@
 #include "../wicked/algebra/index.h"
 
 namespace py = pybind11;
+using namespace pybind11::literals;
 
 /// Export the Indexclass
 void export_Index(py::module &m) {
@@ -16,5 +17,5 @@ void export_Index(py::module &m) {
       .def("latex", &Index::latex)
       .def("ambit", &Index::ambit);
 
-  m.def("index", &make_index);
+  m.def("index", &make_index, "index"_a);
 }
