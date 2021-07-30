@@ -1,6 +1,6 @@
+#include "wdiag_operator_sum.h"
 #include "helpers.h"
 #include "orbital_space.h"
-#include "wdiag_operator_sum.h"
 
 OperatorSum::OperatorSum() {}
 
@@ -18,7 +18,7 @@ OperatorSum::OperatorSum(
 }
 
 void OperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
-                           scalar_t factor) {
+                      scalar_t factor) {
   auto search = sum_.find(vec_dop);
 
   if (search != sum_.end()) {
@@ -88,13 +88,12 @@ std::string OperatorSum::str() const {
     }
     str_vec.push_back(s);
   }
-  return to_string(str_vec, "\n");
+  return join(str_vec, "\n");
 }
 
-OperatorSum operator*(OperatorSum lhs, const OperatorSum &rhs)
-{
-    lhs *= rhs;
-    return lhs;
+OperatorSum operator*(OperatorSum lhs, const OperatorSum &rhs) {
+  lhs *= rhs;
+  return lhs;
 }
 
 std::ostream &operator<<(std::ostream &os, const OperatorSum &opsum) {
@@ -103,7 +102,7 @@ std::ostream &operator<<(std::ostream &os, const OperatorSum &opsum) {
 }
 
 OperatorSum make_operator(const std::string &label,
-                               const std::vector<std::string> &components) {
+                          const std::vector<std::string> &components) {
   OperatorSum result;
   for (const std::string &s : components) {
     auto s_vec = split(s, std::regex("[->]+"));
@@ -132,8 +131,7 @@ OperatorSum make_operator(const std::string &label,
   return result;
 }
 
-OperatorSum commutator(const OperatorSum &A,
-                            const OperatorSum &B) {
+OperatorSum commutator(const OperatorSum &A, const OperatorSum &B) {
   OperatorSum result;
   for (const auto &vec_factor_A : A.sum()) {
     for (const auto &vec_factor_B : B.sum()) {
@@ -170,8 +168,7 @@ OperatorSum exp(const OperatorSum &A, int order) {
   return result;
 }
 
-OperatorSum bch_series(const OperatorSum &A,
-                            const OperatorSum &B, int n) {
+OperatorSum bch_series(const OperatorSum &A, const OperatorSum &B, int n) {
   OperatorSum result;
   result += A;
   OperatorSum temp(A);

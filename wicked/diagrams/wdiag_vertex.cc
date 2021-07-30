@@ -1,8 +1,8 @@
 #include <cassert>
 
-#include "wdiag_vertex.h"
 #include "helpers.h"
 #include "orbital_space.h"
+#include "wdiag_vertex.h"
 
 using namespace std;
 
@@ -57,7 +57,7 @@ std::string WDiagVertex::str() const {
   for (int s = 0; s < osi->num_spaces(); ++s) {
     av.push_back(to_string(ann(s)));
   }
-  return "[" + to_string(cv, " ") + "|" + to_string(av, " ") + "]";
+  return "[" + join(cv, " ") + "|" + join(av, " ") + "]";
 }
 
 std::ostream &operator<<(std::ostream &os, const WDiagVertex &v) {
@@ -104,7 +104,7 @@ std::string to_string(const std::vector<WDiagVertex> &vertex_vec) {
     }
     ann_line.push_back(" ");
   }
-  return to_string(cre_line, " ") + "\n" + to_string(ann_line, " ");
+  return join(cre_line, " ") + "\n" + join(ann_line, " ");
 }
 
 std::string signature(const WDiagVertex &vertex) {

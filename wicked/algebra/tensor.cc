@@ -69,8 +69,8 @@ std::string Tensor::str() const {
   for (const Index &index : lower_) {
     str_vec_lower.push_back(index.str());
   }
-  return (label_ + "^{" + to_string(str_vec_upper, ",") + "}_{" +
-          to_string(str_vec_lower, ",") + "}");
+  return (label_ + "^{" + join(str_vec_upper, ",") + "}_{" +
+          join(str_vec_lower, ",") + "}");
 }
 
 std::string Tensor::latex() const {
@@ -93,11 +93,11 @@ std::string Tensor::latex() const {
       "tau",   "upsilon", "phi",     "chi",   "psi",     "omega"};
   if (std::find(greek_letters.begin(), greek_letters.end(), label_wo_num) !=
       greek_letters.end()) {
-    return ("\\" + label_wo_num + "^{" + to_string(str_vec_upper, " ") + "}_{" +
-            to_string(str_vec_lower, " ") + "}");
+    return ("\\" + label_wo_num + "^{" + join(str_vec_upper, " ") + "}_{" +
+            join(str_vec_lower, " ") + "}");
   }
-  return (label_wo_num + "^{" + to_string(str_vec_upper, " ") + "}_{" +
-          to_string(str_vec_lower, " ") + "}");
+  return (label_wo_num + "^{" + join(str_vec_upper, " ") + "}_{" +
+          join(str_vec_lower, " ") + "}");
 }
 
 std::string Tensor::ambit() const {
@@ -109,7 +109,7 @@ std::string Tensor::ambit() const {
     str_vec.push_back(index.ambit());
   }
 
-  return (str_vec.size() > 0 ? (label_ + "[" + to_string(str_vec, ",") + "]")
+  return (str_vec.size() > 0 ? (label_ + "[" + join(str_vec, ",") + "]")
                              : label_);
 }
 

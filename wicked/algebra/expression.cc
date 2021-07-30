@@ -122,7 +122,7 @@ std::string Expression::str() const {
     str_vec.push_back(term_str + kv.first.str());
     n++;
   }
-  return (to_string(str_vec, "\n"));
+  return (join(str_vec, "\n"));
 }
 
 std::string Expression::latex(const std::string &sep) const {
@@ -130,7 +130,7 @@ std::string Expression::latex(const std::string &sep) const {
   for (auto &kv : terms_) {
     str_vec.push_back(kv.second.latex() + ' ' + kv.first.latex());
   }
-  return (to_string(str_vec, sep));
+  return (join(str_vec, sep));
 }
 
 // std::vector<WEquationSymbolicTerm>

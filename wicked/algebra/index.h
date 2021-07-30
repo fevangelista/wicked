@@ -4,9 +4,20 @@
 #include <map>
 #include <string>
 
-/// This class represents an orbital index that appears in a second quantized
-/// expression.  It holds information about the space type (via
-/// OrbitalSpaceType) and the index numerical label.
+/**
+ * @brief A class to represent orbital indices.
+ *
+ * This class represents an orbital index that appears in a second quantized
+ * expression.  It holds the space type (via an index to the corresponding
+ * space defined in the OrbitalSpaceInfo object) and the numerical label of
+ * index.
+ *
+ * For example, if OrbitalSpaceInfo defines an occupied space ("o"),
+ * the index o_1 corresponds to:
+ *
+ *     "o_1" -> Index(0,1)
+ *
+ */
 class Index {
 public:
   // ==> Constructors <==
@@ -16,16 +27,18 @@ public:
 
   // ==> Class public interface <==
 
-  /// Return the orbital space type
+  /// @return the orbital space type
   int space() const { return index_.first; }
 
-  /// Return the position within a space
+  /// @return the position within a space
   int pos() const { return index_.second; }
 
   /// Comparison operator
+  /// @return true if other index is equal to this
   bool operator==(Index const &other) const;
 
-  /// Comparison operator (used for sorting)
+  /// Less than operator (used for sorting)
+  /// @return true if other index is greater to this
   bool operator<(Index const &other) const;
 
   /// @return a string representation
@@ -37,7 +50,7 @@ public:
   /// or a generic index (e.g., 'o1')
   std::string latex() const;
 
-  /// Return an ambit (C++ code) representation (e.g., 'o1')
+  /// @return an ambit (C++ code) representation (e.g., 'o1')
   std::string ambit() const;
 
 private:
@@ -52,14 +65,13 @@ using index_map_t = std::map<Index, Index>;
 
 // Helper functions
 
-// /// Helper function to make an Index object from a space label and position
-// Index make_index(const std::string &space, int p);
-
 /// Helper function to make an Index object from a space label and position
 Index make_index(const std::string &index);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Index &idx);
+
+// Special functions
 
 /// Canonicalize a set of indices
 int canonicalize_indices(std::vector<Index> &indices);
