@@ -1,12 +1,14 @@
 #include <algorithm>
 #include <iostream>
 
+#include "../orbital_space.h"
 #include "expression.h"
 #include "helpers.h"
 #include "sqoperator.h"
+#include "stl_utils.hpp"
 #include "tensor.h"
 #include "term.h"
-#include "wequationterm.h"
+// #include "wequationterm.h"
 
 Expression::Expression() {}
 
@@ -178,35 +180,51 @@ std::ostream &operator<<(std::ostream &os, const Expression &sum) {
   return os;
 }
 
-// Expression make_operator_expr(const std::string &label,
-//                               const std::vector<std::string> &components) {
-//   Expression result;
-//   for (const std::string &s : components) {
-//     auto s_vec = split(s, std::regex("[->]+"));
+Expression make_operator_expr(const std::string &label,
+                              const std::vector<std::string> &components,
+                              scalar_t coefficient) {
+  Expression result;
+  for (const std::string &s : components) {
+    auto s_vec = split(s);
 
-//     std::vector<std::string> ann_labels;
-//     for (char c : s_vec[0]) {
-//       ann_labels.push_back(std::string(1, c));
-//     }
-//     std::vector<std::string> cre_labels;
-//     for (char c : s_vec[1]) {
-//       cre_labels.push_back(std::string(1, c));
-//     }
-//     std::vector<int> cre(osi->num_spaces());
-//     std::vector<int> ann(osi->num_spaces());
-//     for (const auto &label : cre_labels) {
-//       int space = osi->label_to_space(label);
-//       cre[space] += 1;
-//     }
-//     for (const auto &label : ann_labels) {
-//       int space = osi->label_to_space(label);
-//       ann[space] += 1;
-//     }
+    std::vector<int> cre_count(osi->num_spaces(), 0);
+    std::vector<int> ann_count(osi->num_spaces(), 0);
+    for (const auto &s : s_vec) {
+      int space = osi->label_to_space(s[0]);
+      ann_count[space] += 1;
+    }
 
-//     result.add({WDiagOperator(label, cre, ann)});
-//   }
-//   return result;
-// }
+    std::vector<Index> cre;
+    std::vector<Index> ann;
+
+    // parse "v+ o"
+    for (const auto &s : s_vec) {
+      int space = osi->label_to_space(s[0]);
+      if (s.size() == 2) {
+        auto idx = Index(space, cre_count[space]);
+        cre.push_back(idx);
+        cre_count[space] += 1;
+      } else {
+        ann_count[space] -= 1;
+        auto idx = Index(space, ann_count[space]);
+        ann.push_back(idx);
+      }
+    }
+    Term term;
+    term.set(coefficient);
+    for (const auto &c : cre) {
+      term.add(SQOperator(SQOperatorType::Creation, c));
+    }
+    for (const auto &a : ann) {
+      term.add(SQOperator(SQOperatorType::Annihilation, a));
+    }
+    std::reverse(std::begin(ann), std::end(ann));
+    Tensor tensor(label, cre, ann);
+    term.add(tensor);
+    result.add(term);
+  }
+  return result;
+}
 
 Expression string_to_sum(const std::string &s, TensorSyntax syntax) {
   Expression sum;

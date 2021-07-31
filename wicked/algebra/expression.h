@@ -79,4 +79,8 @@ enum class TensorSyntax { Wicked, TCE };
 Expression string_to_sum(const std::string &s,
                          TensorSyntax syntax = TensorSyntax::Wicked);
 
+Expression make_operator_expr(const std::string &label,
+                              const std::vector<std::string> &components,
+                              scalar_t coefficient = scalar_t(1));
+
 #endif // _wicked_term_sum_h_
