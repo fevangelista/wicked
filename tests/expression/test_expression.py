@@ -12,11 +12,13 @@ def test_expression():
 
     term = w.Term()
     term.add([w.Fcre("v_0"), w.Fann("o_0")])
+    term.set_normal_ordered(True)
     expr.add(term)
 
     assert str(expr) == "{ a+(v0) a-(o0) }"
 
     term = w.SymbolicTerm()
+    term.set_normal_ordered(True)
     term.add([w.Fcre("a_0")])
     expr.add(term, w.rational(1, 2))
     expr_str = """{ a+(v0) a-(o0) }
@@ -26,6 +28,7 @@ def test_expression():
     expr2 = w.Expression()
 
     term = w.SymbolicTerm()
+    term.set_normal_ordered(True)
     term.add([w.Fcre("a_0")])
     expr2.add(term)
 
@@ -43,13 +46,13 @@ def test_expression2():
     w.add_space("o", "occupied", ["i", "j"])
     w.add_space("a", "general", ["u", "v"])
     w.add_space("v", "unoccupied", ["a", "b", "c"])
-    expr = w.operator("T", ["v+ v+ o o"])
+    expr = w.operator("T", ["v+ v+ o o"], True)
     assert str(expr) == "T^{o0,o1}_{v0,v1} { a+(v0) a+(v1) a-(o1) a-(o0) }"
-    expr = w.operator("T", ["v+ v+ v v"])
+    expr = w.operator("T", ["v+ v+ v v"], True)
     assert str(expr) == "T^{v2,v3}_{v0,v1} { a+(v0) a+(v1) a-(v3) a-(v2) }"
-    expr = w.operator("T", ["v+ a+ a o"])
+    expr = w.operator("T", ["v+ a+ a o"], True)
     assert str(expr) == "T^{o0,a1}_{v0,a0} { a+(v0) a+(a0) a-(a1) a-(o0) }"
-    expr = w.operator("T", ["v+ a+ o a"])
+    expr = w.operator("T", ["v+ a+ o a"], True)
     assert str(expr) == "T^{a1,o0}_{v0,a0} { a+(v0) a+(a0) a-(o0) a-(a1) }"
 
 

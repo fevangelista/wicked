@@ -19,10 +19,13 @@ void export_Expression(py::module &m) {
            "expr"_a, "scale"_a = scalar_t(1))
       .def("__repr__", &Expression::str)
       .def("__str__", &Expression::str)
+      .def("__eq__", &Expression::operator==)
+      .def("__add__", [](const Expression &lhs,
+                         const Expression &rhs) { return lhs + rhs; })
       .def("latex", &Expression::latex, "sep"_a = " \\\\ \n")
+      .def("to_manybody_equation", &Expression::to_manybody_equation)
       .def("canonicalize", &Expression::canonicalize);
 
   m.def("operator", &make_operator_expr, "label"_a, "components"_a,
-        "coefficient"_a = scalar_t(1));
-  //       .def("to_manybody_equation", &Expression::to_manybody_equation)
+        "normal_ordered"_a, "coefficient"_a = scalar_t(1));
 }

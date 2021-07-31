@@ -9,9 +9,13 @@ using namespace std;
 
 SymbolicTerm::SymbolicTerm() {}
 
-SymbolicTerm::SymbolicTerm(const std::vector<SQOperator> &operators,
+SymbolicTerm::SymbolicTerm(bool normal_ordered,
+                           const std::vector<SQOperator> &operators,
                            const std::vector<Tensor> &tensors)
-    : operators_(operators), tensors_(tensors) {}
+    : normal_ordered_(normal_ordered), operators_(operators),
+      tensors_(tensors) {}
+
+void SymbolicTerm::set_normal_ordered(bool val) { normal_ordered_ = val; }
 
 void SymbolicTerm::set(const std::vector<SQOperator> &op) { operators_ = op; }
 
@@ -48,38 +52,7 @@ void SymbolicTerm::reindex(index_map_t &idx_map) {
   }
 }
 
-std::vector<std::pair<std::string, std::vector<int>>>
-SymbolicTerm::tensor_connectivity(const Tensor &t, bool upper) const {
-  std::vector<std::pair<std::string, std::vector<int>>> result;
-  auto indices = upper ? t.upper() : t.lower();
-  sort(indices.begin(), indices.end());
-  for (const auto &tensor : tensors_) {
-    if (not(t == tensor)) {
-
-      std::vector<Index> indices2 = upper ? tensor.lower() : tensor.upper();
-      sort(indices2.begin(), indices2.end());
-
-      std::vector<Index> indices3 = tensor.upper();
-      sort(indices3.begin(), indices3.end());
-
-      std::vector<Index> common_lower_indices;
-      set_intersection(indices.begin(), indices.end(), indices2.begin(),
-                       indices2.end(), back_inserter(common_lower_indices));
-
-      std::vector<Index> common_upper_indices;
-      set_intersection(indices.begin(), indices.end(), indices3.begin(),
-                       indices3.end(), back_inserter(common_upper_indices));
-
-      result.push_back(std::make_pair(
-          tensor.label(), num_indices_per_space(common_lower_indices)));
-      //      result.push_back(std::make_pair(
-      //          "u" + tensor.label(),
-      //          num_indices_per_space(common_upper_indices)));
-    }
-  }
-  std::sort(result.begin(), result.end());
-  return result;
-}
+//
 
 #define NEW_CANONICALIZATION 1
 scalar_t SymbolicTerm::canonicalize() {
@@ -351,11 +324,13 @@ std::string SymbolicTerm::str() const {
     str_vec.push_back(tensor.str());
   }
   if (nops()) {
-    str_vec.push_back("{");
+    if (normal_ordered())
+      str_vec.push_back("{");
     for (const auto &op : operators_) {
       str_vec.push_back(op.str());
     }
-    str_vec.push_back("}");
+    if (normal_ordered())
+      str_vec.push_back("}");
   }
 
   return (join(str_vec, " "));
@@ -385,11 +360,13 @@ std::string SymbolicTerm::latex() const {
     str_vec.push_back(tensor.latex());
   }
   if (nops()) {
-    str_vec.push_back("\\{");
+    if (normal_ordered())
+      str_vec.push_back("\\{");
     for (const auto &op : operators_) {
       str_vec.push_back(op.latex());
     }
-    str_vec.push_back("\\}");
+    if (normal_ordered())
+      str_vec.push_back("\\}");
   }
   return (join(str_vec, " "));
 }
@@ -415,6 +392,39 @@ std::ostream &operator<<(std::ostream &os,
                          const std::pair<SymbolicTerm, scalar_t> &term_factor) {
   os << term_factor.second << ' ' << term_factor.second;
   return os;
+}
+
+std::vector<std::pair<std::string, std::vector<int>>>
+SymbolicTerm::tensor_connectivity(const Tensor &t, bool upper) const {
+  std::vector<std::pair<std::string, std::vector<int>>> result;
+  auto indices = upper ? t.upper() : t.lower();
+  sort(indices.begin(), indices.end());
+  for (const auto &tensor : tensors_) {
+    if (not(t == tensor)) {
+
+      std::vector<Index> indices2 = upper ? tensor.lower() : tensor.upper();
+      sort(indices2.begin(), indices2.end());
+
+      std::vector<Index> indices3 = tensor.upper();
+      sort(indices3.begin(), indices3.end());
+
+      std::vector<Index> common_lower_indices;
+      set_intersection(indices.begin(), indices.end(), indices2.begin(),
+                       indices2.end(), back_inserter(common_lower_indices));
+
+      std::vector<Index> common_upper_indices;
+      set_intersection(indices.begin(), indices.end(), indices3.begin(),
+                       indices3.end(), back_inserter(common_upper_indices));
+
+      result.push_back(std::make_pair(
+          tensor.label(), num_indices_per_space(common_lower_indices)));
+      //      result.push_back(std::make_pair(
+      //          "u" + tensor.label(),
+      //          num_indices_per_space(common_upper_indices)));
+    }
+  }
+  std::sort(result.begin(), result.end());
+  return result;
 }
 
 // SymbolicTerm make_algebraic_term(const std::string &label,

@@ -20,12 +20,13 @@ public:
 
   SymbolicTerm();
 
-  SymbolicTerm(const std::vector<SQOperator> &op,
+  SymbolicTerm(bool normal_ordered, const std::vector<SQOperator> &op,
                const std::vector<Tensor> &tensors);
 
   // ==> Class public interface <==
 
   /// Add one or more SQOperator
+  void set_normal_ordered(bool val);
   void set(const std::vector<Tensor> &tensors);
   void set(const std::vector<SQOperator> &op);
 
@@ -42,6 +43,9 @@ public:
   /// Return the number of SQ operators
   int nops() const;
 
+  /// @return is the SQ operator product normal ordered?
+  bool normal_ordered() const { return normal_ordered_; }
+
   /// Return the SQ operators
   const std::vector<SQOperator> &ops() const { return operators_; }
 
@@ -51,7 +55,7 @@ public:
   /// Return a vector containing all indices used in this term
   std::vector<Index> indices() const;
 
-  /// Reindex this term
+  /// Apply a re-indexing map to this symbolic term
   void reindex(index_map_t &idx_map);
 
   /// Canonicalize this term and return the overall phase factor
@@ -77,6 +81,7 @@ public:
 
 protected:
   // ==> Class private data <==
+  bool normal_ordered_ = false;
   std::vector<SQOperator> operators_;
   std::vector<Tensor> tensors_;
 

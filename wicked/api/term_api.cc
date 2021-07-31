@@ -19,7 +19,9 @@ void export_SymbolicTerm(py::module &m) {
       .def("add", py::overload_cast<const SQOperator &>(&SymbolicTerm::add))
       .def("add", py::overload_cast<const Tensor &>(&SymbolicTerm::add))
       .def("set", py::overload_cast<const std::vector<SQOperator> &>(
-                      &SymbolicTerm::set));
+                      &SymbolicTerm::set))
+      .def("set_normal_ordered", &SymbolicTerm::set_normal_ordered);
+  ;
 
   py::class_<Term, std::shared_ptr<Term>>(m, "Term")
       .def(py::init<>())
@@ -31,5 +33,6 @@ void export_SymbolicTerm(py::module &m) {
            py::overload_cast<const std::vector<SQOperator> &>(&Term::add))
       .def("add", py::overload_cast<const SQOperator &>(&Term::add))
       .def("add", py::overload_cast<const Tensor &>(&Term::add))
-      .def("set", py::overload_cast<scalar_t>(&Term::set));
+      .def("set", py::overload_cast<scalar_t>(&Term::set))
+      .def("set_normal_ordered", &Term::set_normal_ordered);
 }

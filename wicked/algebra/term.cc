@@ -6,9 +6,10 @@ using namespace std;
 
 Term::Term() {}
 
-Term::Term(scalar_t c, const std::vector<SQOperator> &operators,
+Term::Term(scalar_t c, bool normal_ordered,
+           const std::vector<SQOperator> &operators,
            const std::vector<Tensor> &tensors)
-    : coefficient_(c), SymbolicTerm(operators, tensors) {}
+    : coefficient_(c), SymbolicTerm(normal_ordered, operators, tensors) {}
 
 Term::Term(const SymbolicTerm &term) : SymbolicTerm(term) {}
 
@@ -22,7 +23,9 @@ scalar_t Term::coefficient() const { return coefficient_; }
 
 void Term::set(scalar_t c) { coefficient_ = c; }
 
-SymbolicTerm Term::symterm() const { return SymbolicTerm(ops(), tensors()); }
+SymbolicTerm Term::symterm() const {
+  return SymbolicTerm(normal_ordered(), ops(), tensors());
+}
 
 std::string Term::str() const {
   std::string term_str = SymbolicTerm::str();
@@ -44,4 +47,13 @@ std::string Term::latex() const {
 std::ostream &operator<<(std::ostream &os, const Term &term) {
   os << term.str();
   return os;
+}
+
+std::vector<Term> wick_product(const Term &A, const Term &B) {
+  std::vector<Term> result;
+  scalar_t ab = A.coefficient() * B.coefficient();
+  return result;
+
+  
+
 }

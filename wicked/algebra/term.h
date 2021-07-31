@@ -10,7 +10,7 @@ class Term : public SymbolicTerm {
 public:
   Term();
 
-  Term(scalar_t c, const std::vector<SQOperator> &op,
+  Term(scalar_t c, bool normal_ordered, const std::vector<SQOperator> &op,
        const std::vector<Tensor> &tensors);
 
   Term(const SymbolicTerm &term);
@@ -31,9 +31,6 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
-  // /// Return an ambit (C++ code) representation
-  // std::string ambit() const;
-
 private:
   scalar_t coefficient_ = 1;
 };
@@ -47,5 +44,7 @@ std::ostream &operator<<(std::ostream &os, const Term &term);
 Term make_term(const std::string &label, const std::vector<std::string> &cre,
                const std::vector<std::string> &ann,
                scalar_t coefficient = scalar_t(1));
+
+std::vector<Term> wick_product(const Term &A, const Term &B);
 
 #endif // _wicked_term_h_

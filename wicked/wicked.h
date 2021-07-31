@@ -5,12 +5,12 @@
 
 #include "orbital_space.h"
 
+#include "equation.h"
 #include "index.h"
 #include "sqoperator.h"
 #include "tensor.h"
 #include "term.h"
 #include "term_sum.h"
-#include "wequationterm.h"
 
 #include "wdiag_operator.h"
 #include "wdiag_operator_sum.h"

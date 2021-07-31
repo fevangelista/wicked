@@ -14,12 +14,14 @@ def test_term():
 
     # Create a term from a symbolic term
     term = w.SymbolicTerm()
+    term.set_normal_ordered(True)
     term.add([w.Fcre("v_0"), w.Fann("o_0")])
     term = w.Term(term)
     assert str(term) == "{ a+(v0) a-(o0) }"
 
     # Create a term from scratch
     term = w.Term()
+    term.set_normal_ordered(True)
     term.set(w.rational(1, 2))
     term.add([w.Fcre("v_0"), w.Fann("o_0")])
     term.add(w.tensor("T", ["v_0"], ["o_0"], w.sym.anti))

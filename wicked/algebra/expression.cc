@@ -2,13 +2,13 @@
 #include <iostream>
 
 #include "../orbital_space.h"
+#include "equation.h"
 #include "expression.h"
 #include "helpers.h"
 #include "sqoperator.h"
 #include "stl_utils.hpp"
 #include "tensor.h"
 #include "term.h"
-// #include "wequationterm.h"
 
 Expression::Expression() {}
 
@@ -89,9 +89,9 @@ Expression &Expression::reindex(index_map_t &idx_map) {
   return *this;
 }
 
-bool Expression::operator==(const Expression &sum) {
-  return terms_.size() == sum.terms_.size() &&
-         std::equal(terms_.begin(), terms_.end(), sum.terms_.begin());
+bool Expression::operator==(const Expression &other) {
+  return (terms_.size() == other.terms_.size()) and
+         std::equal(terms_.begin(), terms_.end(), other.terms_.begin());
 }
 
 Expression &Expression::operator+=(const Expression &sum) {
@@ -135,35 +135,35 @@ std::string Expression::latex(const std::string &sep) const {
   return (join(str_vec, sep));
 }
 
-// std::vector<WEquationSymbolicTerm>
-// Expression::to_manybody_equation(const std::string &label) {
-//   std::vector<WEquationSymbolicTerm> result;
-
-//   for (const auto &term_factor : terms_) {
-//     std::vector<Index> lower;
-//     std::vector<Index> upper;
-//     const SymbolicTerm &term = term_factor.first;
-//     scalar_t factor = term_factor.second;
-//     for (const auto &op : term.ops()) {
-//       if (op.type() == SQOperatorType::Creation) {
-//         lower.push_back(op.index());
-//       } else {
-//         upper.push_back(op.index());
-//       }
-//     }
-//     SymbolicTerm rhs, lhs;
-//     Tensor lhs_tensor(label, lower, upper);
-//     lhs.add(lhs_tensor);
-//     factor *= lhs_tensor.symmetry_factor();
-
-//     for (const auto &tensor : term.tensors()) {
-//       rhs.add(tensor);
-//     }
-//     result.push_back(WEquationSymbolicTerm(lhs, rhs, factor));
-//   }
-
-//   return result;
-// }
+std::map<int, Expression>
+Expression::to_manybody_equation(const std::string &label) {
+  std::map<int, Expression> result;
+  for (const auto &term_factor : terms_) {
+    std::vector<Index> lower;
+    std::vector<Index> upper;
+    const SymbolicTerm &term = term_factor.first;
+    scalar_t factor = term_factor.second;
+    for (const auto &op : term.ops()) {
+      if (op.type() == SQOperatorType::Creation) {
+        lower.push_back(op.index());
+      } else {
+        upper.push_back(op.index());
+      }
+    }
+    SymbolicTerm lhs;
+    Tensor lhs_tensor(label, lower, upper);
+    auto rank = lhs_tensor.rank();
+    lhs.add(lhs_tensor);
+    factor *= lhs_tensor.symmetry_factor();
+    Term rhs;
+    rhs.set(factor);
+    for (const auto &tensor : term.tensors()) {
+      rhs.add(tensor);
+    }
+    result[rank].add(rhs);
+  }
+  return result;
+}
 
 Expression operator+(Expression lhs, const Expression &rhs) {
   lhs += rhs;
@@ -182,7 +182,7 @@ std::ostream &operator<<(std::ostream &os, const Expression &sum) {
 
 Expression make_operator_expr(const std::string &label,
                               const std::vector<std::string> &components,
-                              scalar_t coefficient) {
+                              bool normal_ordered, scalar_t coefficient) {
   Expression result;
   for (const std::string &s : components) {
     auto s_vec = split(s);
@@ -211,6 +211,7 @@ Expression make_operator_expr(const std::string &label,
       }
     }
     Term term;
+    term.set_normal_ordered(normal_ordered);
     term.set(coefficient);
     for (const auto &c : cre) {
       term.add(SQOperator(SQOperatorType::Creation, c));
@@ -226,7 +227,8 @@ Expression make_operator_expr(const std::string &label,
   return result;
 }
 
-Expression string_to_sum(const std::string &s, TensorSyntax syntax) {
+Expression string_to_sum(const std::string &s) {
+  TensorSyntax syntax = TensorSyntax::Wicked;
   Expression sum;
 
   //  std::cout << "\n  Parsing: \"" << s << "\"" << std::endl;
