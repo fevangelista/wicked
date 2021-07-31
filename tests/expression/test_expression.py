@@ -50,6 +50,7 @@ def test_expression2():
     expr = w.operator("T", ["v+ a+ a o"])
     assert str(expr) == "T^{o0,a1}_{v0,a0} { a+(v0) a+(a0) a-(a1) a-(o0) }"
     expr = w.operator("T", ["v+ a+ o a"])
+    assert str(expr) == "T^{a1,o0}_{v0,a0} { a+(v0) a+(a0) a-(o0) a-(a1) }"
 
 
 if __name__ == "__main__":
