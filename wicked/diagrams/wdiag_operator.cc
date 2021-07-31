@@ -1,7 +1,7 @@
-#include "helpers.h"
-#include "combinatorics.h"
-#include "orbital_space.h"
 #include "wdiag_operator.h"
+#include "combinatorics.h"
+#include "helpers.h"
+#include "orbital_space.h"
 
 using namespace std;
 
@@ -48,17 +48,17 @@ bool WDiagOperator::operator<(WDiagOperator const &other) const {
 std::string WDiagOperator::str() const {
   std::string s = label_ + "(";
 
-//  std::vector<std::string> cv, av;
-//  for (int s = 0; s < osi->num_spaces(); ++s) {
-//    cv.push_back(to_string(num_cre(s)));
-//  }
-//  for (int s = 0; s < osi->num_spaces(); ++s) {
-//    av.push_back(to_string(num_ann(s)));
-//  }
+  //  std::vector<std::string> cv, av;
+  //  for (int s = 0; s < osi->num_spaces(); ++s) {
+  //    cv.push_back(to_string(num_cre(s)));
+  //  }
+  //  for (int s = 0; s < osi->num_spaces(); ++s) {
+  //    av.push_back(to_string(num_ann(s)));
+  //  }
 
-//  s += " [" + to_string(cv, " ") + "|" + to_string(av, " ") + "] (";
+  //  s += " [" + to_string(cv, " ") + "|" + to_string(av, " ") + "] (";
 
-//  s += " -> ";
+  //  s += " -> ";
   for (int i = 0; i < osi->num_spaces(); ++i) {
     for (int j = 0; j < num_indices(i, false); j++)
       s += osi->label(i);
@@ -71,7 +71,6 @@ std::string WDiagOperator::str() const {
 
   s += ")";
 
-
   return s;
 }
 
@@ -81,8 +80,8 @@ std::ostream &operator<<(std::ostream &os, const WDiagOperator &op) {
 }
 
 WDiagOperator make_diag_operator(const std::string &label,
-                                 const std::vector<std::string> &cre_labels,
-                                 const std::vector<std::string> &ann_labels) {
+                                 const std::vector<char> &cre_labels,
+                                 const std::vector<char> &ann_labels) {
   // count the number of creation and annihilation operators in each space
   std::vector<int> cre(osi->num_spaces());
   std::vector<int> ann(osi->num_spaces());

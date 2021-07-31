@@ -32,7 +32,7 @@ std::shared_ptr<OrbitalSpaceInfo> get_osi() { return osi; }
 
 OrbitalSpaceInfo::OrbitalSpaceInfo() {}
 
-void OrbitalSpaceInfo::add_space(const std::string &label, RDMType structure,
+void OrbitalSpaceInfo::add_space(char label, RDMType structure,
                                  const std::vector<std::string> &indices) {
   size_t pos = space_info_.size();
   label_to_pos_[label] = pos;
@@ -51,13 +51,14 @@ std::string OrbitalSpaceInfo::str() const {
   std::vector<std::string> s;
   for (const auto &info : space_info_) {
     auto &[l, rdm, indices] = info;
-    s.push_back("space label: " + l + "\nrdm: " + RDMType_to_str[rdm] +
-                "\nindices: [" + join(indices, ",") + "]");
+    s.push_back("space label: " + std::string(1, l) +
+                "\nrdm: " + RDMType_to_str[rdm] + "\nindices: [" +
+                join(indices, ",") + "]");
   }
   return join(s, "\n\n");
 }
 
-const std::string &OrbitalSpaceInfo::label(int pos) const {
+char OrbitalSpaceInfo::label(int pos) const {
   return std::get<0>(space_info_[pos]);
 }
 
@@ -66,7 +67,8 @@ const std::string OrbitalSpaceInfo::index_label(int pos, int idx) const {
   if (idx < index_labels.size()) {
     return std::get<2>(space_info_[pos])[idx];
   }
-  return std::get<0>(space_info_[pos]) + "_{" + std::to_string(idx) + "}";
+  return std::string(1, std::get<0>(space_info_[pos])) + "_{" +
+         std::to_string(idx) + "}";
 }
 
 RDMType OrbitalSpaceInfo::dmstructure(int pos) const {
@@ -77,7 +79,7 @@ const std::vector<std::string> &OrbitalSpaceInfo::indices(int pos) const {
   return std::get<2>(space_info_[pos]);
 }
 
-int OrbitalSpaceInfo::label_to_space(const std::string &label) const {
+int OrbitalSpaceInfo::label_to_space(char label) const {
   auto search = label_to_pos_.find(label);
   if (search != label_to_pos_.end()) {
   } else {
@@ -95,7 +97,7 @@ void OrbitalSpaceInfo::reset() {
 }
 
 void OrbitalSpaceInfo::default_spaces() {
-  add_space("c", RDMType::Occupied, {"m", "n", "o", "p"});
-  add_space("a", RDMType::General, {"u", "v", "w", "x", "y", "z"});
-  add_space("v", RDMType::Unoccupied, {"e", "f", "g", "h"});
+  add_space('c', RDMType::Occupied, {"m", "n", "o", "p"});
+  add_space('a', RDMType::General, {"u", "v", "w", "x", "y", "z"});
+  add_space('v', RDMType::Unoccupied, {"e", "f", "g", "h"});
 }

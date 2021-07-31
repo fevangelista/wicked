@@ -80,10 +80,7 @@ int canonicalize_indices(std::vector<Index> &indices);
 /// (OrbitalSpaceType) to vectors of indices (Index) labeled staring with zero.
 /// Indices are assigned in an incremental way with no duplicates
 std::vector<std::vector<Index>> make_indices_from_space_labels(
-    const std::vector<std::vector<std::string>> &labels_space);
-
-/// Helper function to convert a string to a Index object
-Index string_to_index(const std::string &s);
+    const std::vector<std::vector<char>> &labels_space);
 
 /// A function that takes two lists of indices and creates a index map for the
 /// second list that voids duplicates

@@ -43,7 +43,7 @@ PYBIND11_MODULE(wicked, m) {
 
   m.def(
       "add_space",
-      [](const std::string &label, const std::string &type,
+      [](char label, const std::string &type,
          const std::vector<std::string> &indices) {
         RDMType structure = string_to_rdmtype(type);
         osi->add_space(label, structure, indices);

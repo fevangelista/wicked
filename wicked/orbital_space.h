@@ -23,8 +23,7 @@ class OrbitalSpaceInfo {
 private:
   /// This type holds infomation about a space in a tuple
   /// (<label>, type of RDM, labels)
-  using t_space_info =
-      std::tuple<std::string, RDMType, std::vector<std::string>>;
+  using t_space_info = std::tuple<char, RDMType, std::vector<std::string>>;
 
 public:
   OrbitalSpaceInfo();
@@ -36,14 +35,14 @@ public:
   void reset();
 
   /// Add an elementary space
-  void add_space(const std::string &label, RDMType structure,
+  void add_space(char label, RDMType structure,
                  const std::vector<std::string> &indices);
 
   /// Return the number of elementary spaces
   int num_spaces() { return static_cast<int>(space_info_.size()); }
 
   /// The label of an orbital space
-  const std::string &label(int pos) const;
+  char label(int pos) const;
 
   /// The label of an index that belongs to a given orbital space
   const std::string index_label(int pos, int idx) const;
@@ -55,7 +54,7 @@ public:
   const std::vector<std::string> &indices(int pos) const;
 
   /// Maps a label into an orbital space
-  int label_to_space(const std::string &label) const;
+  int label_to_space(char label) const;
 
   /// return a string representation
   std::string str() const;
@@ -65,7 +64,7 @@ private:
   std::vector<t_space_info> space_info_;
 
   /// Maps a space label to its index
-  std::map<std::string, int> label_to_pos_;
+  std::map<char, int> label_to_pos_;
 
   /// Maps orbital indices to a composite space
   std::map<std::string, int> indices_to_pos_;

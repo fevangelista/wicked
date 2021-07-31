@@ -107,13 +107,13 @@ OperatorSum make_operator(const std::string &label,
   for (const std::string &s : components) {
     auto s_vec = split(s, std::regex("[->]+"));
 
-    std::vector<std::string> ann_labels;
+    std::vector<char> ann_labels;
     for (char c : s_vec[0]) {
-      ann_labels.push_back(std::string(1, c));
+      ann_labels.push_back(c);
     }
-    std::vector<std::string> cre_labels;
+    std::vector<char> cre_labels;
     for (char c : s_vec[1]) {
-      cre_labels.push_back(std::string(1, c));
+      cre_labels.push_back(c);
     }
     std::vector<int> cre(osi->num_spaces());
     std::vector<int> ann(osi->num_spaces());

@@ -178,6 +178,36 @@ std::ostream &operator<<(std::ostream &os, const Expression &sum) {
   return os;
 }
 
+// Expression make_operator_expr(const std::string &label,
+//                               const std::vector<std::string> &components) {
+//   Expression result;
+//   for (const std::string &s : components) {
+//     auto s_vec = split(s, std::regex("[->]+"));
+
+//     std::vector<std::string> ann_labels;
+//     for (char c : s_vec[0]) {
+//       ann_labels.push_back(std::string(1, c));
+//     }
+//     std::vector<std::string> cre_labels;
+//     for (char c : s_vec[1]) {
+//       cre_labels.push_back(std::string(1, c));
+//     }
+//     std::vector<int> cre(osi->num_spaces());
+//     std::vector<int> ann(osi->num_spaces());
+//     for (const auto &label : cre_labels) {
+//       int space = osi->label_to_space(label);
+//       cre[space] += 1;
+//     }
+//     for (const auto &label : ann_labels) {
+//       int space = osi->label_to_space(label);
+//       ann[space] += 1;
+//     }
+
+//     result.add({WDiagOperator(label, cre, ann)});
+//   }
+//   return result;
+// }
+
 Expression string_to_sum(const std::string &s, TensorSyntax syntax) {
   Expression sum;
 
@@ -205,14 +235,14 @@ Expression string_to_sum(const std::string &s, TensorSyntax syntax) {
     auto upper_idx = split_indices(tensors[n + 1]);
     std::vector<Index> upper;
     for (const auto &idx : upper_idx) {
-      upper.push_back(string_to_index(idx));
+      upper.push_back(make_index(idx));
     }
 
     // Process the lower indices
     auto lower_idx = split_indices(tensors[n + 2]);
     std::vector<Index> lower;
     for (const auto &idx : lower_idx) {
-      lower.push_back(string_to_index(idx));
+      lower.push_back(make_index(idx));
     }
     term.add(Tensor(label, lower, upper));
   }
@@ -224,7 +254,7 @@ Expression string_to_sum(const std::string &s, TensorSyntax syntax) {
   for (size_t n = 0; n < operators.size(); n += 2) {
     SQOperatorType type = operators[n] == "+" ? SQOperatorType::Creation
                                               : SQOperatorType::Annihilation;
-    Index index = string_to_index(operators[n + 1]);
+    Index index = make_index(operators[n + 1]);
     term.add(SQOperator(type, index));
   }
 

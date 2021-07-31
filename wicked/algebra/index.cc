@@ -48,7 +48,7 @@ int canonicalize_indices(std::vector<Index> &indices) {
 }
 
 std::vector<std::vector<Index>> make_indices_from_space_labels(
-    const std::vector<std::vector<std::string>> &labels_space) {
+    const std::vector<std::vector<char>> &labels_space) {
   std::vector<std::vector<Index>> indices;
   std::vector<int> space_count(osi->num_spaces());
   for (const auto &labels : labels_space) {
@@ -73,21 +73,7 @@ Index make_index(const std::string &index) {
     throw std::runtime_error("\nCould not convert the index " + index +
                              " to an Index object.\n\nException: " + e.what());
   }
-  auto space = osi->label_to_space(split_index[0]);
-  return Index(space, p);
-}
-
-Index string_to_index(const std::string &s) {
-  int space = -1;
-  int p = -1;
-  for (int i : range(osi->num_spaces())) {
-    const std::string &label = osi->label(i);
-    size_t size = label.size();
-    if (s.compare(0, size, label) == 0) {
-      space = i;
-      p = std::stoi(s.substr(size));
-    }
-  }
+  auto space = osi->label_to_space(split_index[0][0]);
   return Index(space, p);
 }
 

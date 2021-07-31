@@ -1,11 +1,11 @@
 #ifndef _wicked_diag_operator_h_
 #define _wicked_diag_operator_h_
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "wicked-def.h"
 #include "wdiag_vertex.h"
+#include "wicked-def.h"
 
 /// A class to represent operators
 class WDiagOperator {
@@ -55,8 +55,8 @@ private:
 
 /// Create an operator
 WDiagOperator make_diag_operator(const std::string &label,
-                                 const std::vector<std::string> &cre_labels,
-                                 const std::vector<std::string> &ann_labels);
+                                 const std::vector<char> &cre_labels,
+                                 const std::vector<char> &ann_labels);
 
 /// Return the particle rank of a vector of operators
 int operators_rank(const std::vector<WDiagOperator> &ops);
