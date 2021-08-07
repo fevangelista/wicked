@@ -6,9 +6,6 @@
 #include "rational.h"
 #include <bitset>
 
-/// Enums
-enum class SymmetryType { Symmetric, Antisymmetric, Nonsymmetric };
-
 /// Rational numbers
 using scalar_t = rational;
 

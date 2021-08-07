@@ -1,24 +1,25 @@
-#include "wdiag_operator_sum.h"
+#include "diag_operator_expression.h"
 #include "helpers.h"
 #include "orbital_space.h"
 
-OperatorSum::OperatorSum() {}
+DiagOpExpression::DiagOpExpression() {}
 
-// OperatorSum::OperatorSum(const std::vector<WDiagOperator> &vec_dop,
+// DiagOpExpression::DiagOpExpression(const std::vector<DiagOperator>
+// &vec_dop,
 //                                   scalar_t factor) {
 //  add(vec_dop, factor);
 //}
 
-OperatorSum::OperatorSum(
-    const std::vector<std::vector<WDiagOperator>> &vec_vec_dop,
+DiagOpExpression::DiagOpExpression(
+    const std::vector<std::vector<DiagOperator>> &vec_vec_dop,
     scalar_t factor) {
   for (const auto &vec_dop : vec_vec_dop) {
     add(vec_dop, factor);
   }
 }
 
-void OperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
-                      scalar_t factor) {
+void DiagOpExpression::add(const std::vector<DiagOperator> &vec_dop,
+                           scalar_t factor) {
   auto search = sum_.find(vec_dop);
 
   if (search != sum_.end()) {
@@ -32,27 +33,27 @@ void OperatorSum::add(const std::vector<WDiagOperator> &vec_dop,
   }
 }
 
-const dop_sum_t &OperatorSum::sum() const { return sum_; }
+const dop_sum_t &DiagOpExpression::sum() const { return sum_; }
 
-OperatorSum &OperatorSum::operator+=(const OperatorSum &rhs) {
+DiagOpExpression &DiagOpExpression::operator+=(const DiagOpExpression &rhs) {
   for (const auto &vec_dop_factor : rhs.sum()) {
     add(vec_dop_factor.first, vec_dop_factor.second);
   }
   return *this;
 }
 
-OperatorSum &OperatorSum::operator-=(const OperatorSum &rhs) {
+DiagOpExpression &DiagOpExpression::operator-=(const DiagOpExpression &rhs) {
   for (const auto &vec_dop_factor : rhs.sum()) {
     add(vec_dop_factor.first, -vec_dop_factor.second);
   }
   return *this;
 }
 
-OperatorSum &OperatorSum::operator*=(const OperatorSum &rhs) {
-  OperatorSum result;
+DiagOpExpression &DiagOpExpression::operator*=(const DiagOpExpression &rhs) {
+  DiagOpExpression result;
   for (const auto &r_vec_dop_factor : sum()) {
     for (const auto &l_vec_dop_factor : rhs.sum()) {
-      std::vector<WDiagOperator> prod;
+      std::vector<DiagOperator> prod;
       prod.insert(prod.end(), r_vec_dop_factor.first.begin(),
                   r_vec_dop_factor.first.end());
       prod.insert(prod.end(), l_vec_dop_factor.first.begin(),
@@ -64,21 +65,21 @@ OperatorSum &OperatorSum::operator*=(const OperatorSum &rhs) {
   return *this;
 }
 
-OperatorSum &OperatorSum::operator*=(scalar_t factor) {
+DiagOpExpression &DiagOpExpression::operator*=(scalar_t factor) {
   for (auto &vec_dop_factor : sum_) {
     vec_dop_factor.second *= factor;
   }
   return *this;
 }
 
-OperatorSum &OperatorSum::operator/=(scalar_t factor) {
+DiagOpExpression &DiagOpExpression::operator/=(scalar_t factor) {
   for (auto &vec_dop_factor : sum_) {
     vec_dop_factor.second /= factor;
   }
   return *this;
 }
 
-std::string OperatorSum::str() const {
+std::string DiagOpExpression::str() const {
   std::vector<std::string> str_vec;
   for (auto &vec_dop_factor : sum_) {
     std::string s;
@@ -91,19 +92,20 @@ std::string OperatorSum::str() const {
   return join(str_vec, "\n");
 }
 
-OperatorSum operator*(OperatorSum lhs, const OperatorSum &rhs) {
+DiagOpExpression operator*(DiagOpExpression lhs, const DiagOpExpression &rhs) {
   lhs *= rhs;
   return lhs;
 }
 
-std::ostream &operator<<(std::ostream &os, const OperatorSum &opsum) {
+std::ostream &operator<<(std::ostream &os, const DiagOpExpression &opsum) {
   os << opsum.str();
   return os;
 }
 
-OperatorSum make_operator(const std::string &label,
-                          const std::vector<std::string> &components) {
-  OperatorSum result;
+DiagOpExpression
+make_diag_operator_expression(const std::string &label,
+                              const std::vector<std::string> &components) {
+  DiagOpExpression result;
   for (const std::string &s : components) {
     auto s_vec = split(s, std::regex("[->]+"));
 
@@ -126,23 +128,46 @@ OperatorSum make_operator(const std::string &label,
       ann[space] += 1;
     }
 
-    result.add({WDiagOperator(label, cre, ann)});
+    result.add({DiagOperator(label, cre, ann)});
   }
   return result;
 }
 
-OperatorSum commutator(const OperatorSum &A, const OperatorSum &B) {
-  OperatorSum result;
+DiagOpExpression
+make_diag_operator_expression2(const std::string &label,
+                               const std::vector<std::string> &components) {
+  DiagOpExpression result;
+  for (const std::string &s : components) {
+    auto s_vec = findall(s, "([a-zA-Z][+^]?)");
+    std::vector<int> cre(osi->num_spaces());
+    std::vector<int> ann(osi->num_spaces());
+
+    for (auto const &el : s_vec) {
+      int space = osi->label_to_space(el[0]);
+      if (el.size() > 1) {
+        cre[space] += 1;
+      } else {
+        ann[space] += 1;
+      }
+    }
+    result.add({DiagOperator(label, cre, ann)});
+  }
+  return result;
+}
+
+DiagOpExpression commutator(const DiagOpExpression &A,
+                            const DiagOpExpression &B) {
+  DiagOpExpression result;
   for (const auto &vec_factor_A : A.sum()) {
     for (const auto &vec_factor_B : B.sum()) {
       auto &vec_A = vec_factor_A.first;
       auto &vec_B = vec_factor_B.first;
 
-      std::vector<WDiagOperator> vec_AB;
+      std::vector<DiagOperator> vec_AB;
       vec_AB.insert(vec_AB.end(), vec_A.begin(), vec_A.end());
       vec_AB.insert(vec_AB.end(), vec_B.begin(), vec_B.end());
 
-      std::vector<WDiagOperator> vec_BA;
+      std::vector<DiagOperator> vec_BA;
       vec_BA.insert(vec_BA.end(), vec_B.begin(), vec_B.end());
       vec_BA.insert(vec_BA.end(), vec_A.begin(), vec_A.end());
 
@@ -156,10 +181,10 @@ OperatorSum commutator(const OperatorSum &A, const OperatorSum &B) {
   return result;
 }
 
-OperatorSum exp(const OperatorSum &A, int order) {
-  OperatorSum result;
+DiagOpExpression exp(const DiagOpExpression &A, int order) {
+  DiagOpExpression result;
   result.add({});
-  //  OperatorSum temp1;
+  //  DiagOpExpression temp1;
   //  temp1.add({});
   //  for (int k = 1; k <= order; k++){
   //      temp1 *= A;
@@ -168,13 +193,14 @@ OperatorSum exp(const OperatorSum &A, int order) {
   return result;
 }
 
-OperatorSum bch_series(const OperatorSum &A, const OperatorSum &B, int n) {
-  OperatorSum result;
+DiagOpExpression bch_series(const DiagOpExpression &A,
+                            const DiagOpExpression &B, int n) {
+  DiagOpExpression result;
   result += A;
-  OperatorSum temp(A);
+  DiagOpExpression temp(A);
 
   for (int k = 1; k <= n; k++) {
-    OperatorSum comm = commutator(temp, B);
+    DiagOpExpression comm = commutator(temp, B);
     comm *= scalar_t(1, k);
     result += comm;
     temp = comm;

@@ -4,22 +4,22 @@ import wicked as w
 def test_sqoperator():
     """Test the SQOperator class"""
     w.reset_space()
-    w.add_space("o", "occupied", ["i", "j"])
-    w.add_space("a", "general", ["u", "v"])
-    w.add_space("v", "unoccupied", ["a", "b", "c"])
+    w.add_space("o", "fermion", "occupied", ["i", "j"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
+    w.add_space("p", "boson", "unoccupied", ["u", "v"])
 
-    cop = w.sqoperator("o_0", w.type.cre, w.stat.fermion)
+    cop = w.sqoperator("o_0", w.type.cre)
     assert str(cop) == "a+(o0)"
-    cop = w.sqoperator("a_1", w.type.ann, w.stat.fermion)
-    assert str(cop) == "a-(a1)"
-    cop = w.sqoperator("o_0", w.type.cre, w.stat.boson)
-    assert str(cop) == "b+(o0)"
-    cop = w.sqoperator("a_1", w.type.ann, w.stat.boson)
-    assert str(cop) == "b-(a1)"
+    cop = w.sqoperator("v_1", w.type.ann)
+    assert str(cop) == "a-(v1)"
+    cop = w.sqoperator("p_0", w.type.cre)
+    assert str(cop) == "b+(p0)"
+    cop = w.sqoperator("p_1", w.type.ann)
+    assert str(cop) == "b-(p1)"
 
-    cop = w.Fcre("o_0")
+    cop = w.cre("o_0")
     assert str(cop) == "a+(o0)"
-    aop = w.Fann("v_1")
+    aop = w.ann("v_1")
     assert str(aop) == "a-(v1)"
 
 

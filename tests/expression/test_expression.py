@@ -4,14 +4,14 @@ import wicked as w
 def test_expression():
     """Test the Tensor class"""
     w.reset_space()
-    w.add_space("o", "occupied", ["i", "j"])
-    w.add_space("a", "general", ["u", "v"])
-    w.add_space("v", "unoccupied", ["a", "b", "c"])
+    w.add_space("o", "fermion", "occupied", ["i", "j"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
 
     expr = w.Expression()
 
     term = w.Term()
-    term.add([w.Fcre("v_0"), w.Fann("o_0")])
+    term.add([w.cre("v_0"), w.ann("o_0")])
     term.set_normal_ordered(True)
     expr.add(term)
 
@@ -19,7 +19,7 @@ def test_expression():
 
     term = w.SymbolicTerm()
     term.set_normal_ordered(True)
-    term.add([w.Fcre("a_0")])
+    term.add([w.cre("a_0")])
     expr.add(term, w.rational(1, 2))
     expr_str = """{ a+(v0) a-(o0) }
 +1/2 { a+(a0) }"""
@@ -29,7 +29,7 @@ def test_expression():
 
     term = w.SymbolicTerm()
     term.set_normal_ordered(True)
-    term.add([w.Fcre("a_0")])
+    term.add([w.cre("a_0")])
     expr2.add(term)
 
     expr_str = """{ a+(a0) }"""
@@ -43,16 +43,16 @@ def test_expression():
 
 def test_expression2():
     w.reset_space()
-    w.add_space("o", "occupied", ["i", "j"])
-    w.add_space("a", "general", ["u", "v"])
-    w.add_space("v", "unoccupied", ["a", "b", "c"])
-    expr = w.operator("T", ["v+ v+ o o"], True)
+    w.add_space("o", "fermion", "occupied", ["i", "j"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
+    expr = w.operator_expr("T", ["v+ v+ o o"], True)
     assert str(expr) == "T^{o0,o1}_{v0,v1} { a+(v0) a+(v1) a-(o1) a-(o0) }"
-    expr = w.operator("T", ["v+ v+ v v"], True)
+    expr = w.operator_expr("T", ["v+ v+ v v"], True)
     assert str(expr) == "T^{v2,v3}_{v0,v1} { a+(v0) a+(v1) a-(v3) a-(v2) }"
-    expr = w.operator("T", ["v+ a+ a o"], True)
+    expr = w.operator_expr("T", ["v+ a+ a o"], True)
     assert str(expr) == "T^{o0,a1}_{v0,a0} { a+(v0) a+(a0) a-(a1) a-(o0) }"
-    expr = w.operator("T", ["v+ a+ o a"], True)
+    expr = w.operator_expr("T", ["v+ a+ o a"], True)
     assert str(expr) == "T^{a1,o0}_{v0,a0} { a+(v0) a+(a0) a-(o0) a-(a1) }"
 
 

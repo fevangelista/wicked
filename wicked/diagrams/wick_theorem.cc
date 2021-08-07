@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include "combinatorics.h"
+#include "diag_operator.h"
+#include "diag_operator_expression.h"
 #include "expression.h"
 #include "helpers.h"
 #include "orbital_space.h"
@@ -10,8 +12,6 @@
 #include "stl_utils.hpp"
 #include "tensor.h"
 #include "term.h"
-#include "wdiag_operator.h"
-#include "wdiag_operator_sum.h"
 #include "wick_theorem.h"
 
 #define PRINT(detail, code)                                                    \
@@ -20,7 +20,7 @@
   }
 
 void print_key(std::tuple<int, int, bool, int> key, int n);
-void print_contraction(const std::vector<WDiagOperator> &ops,
+void print_contraction(const std::vector<DiagOperator> &ops,
                        const std::vector<Tensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<SQOperator> &sqops,
@@ -31,7 +31,7 @@ using namespace std;
 WickTheorem::WickTheorem() {}
 
 Expression WickTheorem::contract(scalar_t factor,
-                                 const std::vector<WDiagOperator> &ops,
+                                 const std::vector<DiagOperator> &ops,
                                  int minrank, int maxrank) {
 
   Expression result;
@@ -40,18 +40,22 @@ Expression WickTheorem::contract(scalar_t factor,
   elementary_contractions_.clear();
 
   PRINT(
-      WDiagPrint::Summary,
-      std::cout << "\nContracting the following operators:" << std::endl;
+      PrintLevel::Summary, std::cout << "\nContracting the operators: ";
       for (auto &op
-           : ops) { std::cout << " " << op; })
+           : ops) { std::cout << " " << op; } std::cout
+      << std::endl;)
 
   elementary_contractions_ = generate_elementary_contractions(ops);
 
   generate_composite_contractions(ops);
 
+  PRINT(PrintLevel::Summary,
+        std::cout << "\n- Step 3. Processing contractions" << std::endl;)
+
+  int nprocessed = 0;
   int ops_rank = operators_rank(ops);
   for (const auto &contraction_vec : contractions_) {
-    std::vector<std::vector<WDiagVertex>> vertices;
+    std::vector<std::vector<DiagVertex>> vertices;
     int contr_rank = 0;
     for (int c : contraction_vec) {
       contr_rank += vertices_rank(elementary_contractions_[c]);
@@ -59,47 +63,58 @@ Expression WickTheorem::contract(scalar_t factor,
     int term_rank = ops_rank - contr_rank;
 
     if ((term_rank >= minrank) and (term_rank <= maxrank)) {
-      PRINT(WDiagPrint::Basic,
-            cout << "\n  Operator rank " << ops_rank - contr_rank << endl;)
+      nprocessed++;
+      PRINT(PrintLevel::Basic,
+            cout << "\n\n  Contraction: " << nprocessed
+                 << "  Operator rank: " << ops_rank - contr_rank << endl;)
 
       auto ops_contractions = canonicalize_contraction(ops, contraction_vec);
       const auto &contractions = ops_contractions.second;
 
       std::pair<SymbolicTerm, scalar_t> term_factor =
           evaluate_contraction(ops, contractions, factor);
-      PRINT(WDiagPrint::Summary, cout << term_factor << endl;)
+
+      // PRINT(PrintLevel::Summary, cout << term_factor << endl;)
 
       SymbolicTerm &term = term_factor.first;
-      PRINT(WDiagPrint::Basic, cout << term << endl;)
       scalar_t canonicalize_factor = term.canonicalize();
       result.add(
           std::make_pair(term, term_factor.second * canonicalize_factor));
+
+      PRINT(PrintLevel::Summary,
+            Term t(term_factor.second * canonicalize_factor, term);
+            cout << "\n    term: " << t << endl;)
     }
+  }
+  if (nprocessed == 0) {
+    PRINT(PrintLevel::Summary, std::cout << "\n  No contractions generated\n"
+                                         << std::endl;)
   }
   return result;
 }
 
-Expression WickTheorem::contract(scalar_t factor, const OperatorSum &dop_sum,
-                                 int minrank, int maxrank) {
+Expression WickTheorem::contract(scalar_t factor,
+                                 const DiagOpExpression &dop_sum, int minrank,
+                                 int maxrank) {
   Expression result;
 
   for (const auto &dop_factor : dop_sum.sum()) {
     scalar_t this_factor = dop_factor.second;
-    const std::vector<WDiagOperator> &ops = dop_factor.first;
+    const std::vector<DiagOperator> &ops = dop_factor.first;
     result += contract(factor * this_factor, ops, minrank, maxrank);
   }
 
   return result;
 }
 
-void WickTheorem::set_print(WDiagPrint print) { print_ = print; }
+void WickTheorem::set_print(PrintLevel print) { print_ = print; }
 
-void print_contraction(
-    const std::vector<WDiagOperator> &ops,
-    const std::vector<std::vector<WDiagVertex>> &contractions,
-    const std::vector<int> ops_perm, const std::vector<int> contr_perm) {
+void print_contraction(const std::vector<DiagOperator> &ops,
+                       const std::vector<std::vector<DiagVertex>> &contractions,
+                       const std::vector<int> ops_perm,
+                       const std::vector<int> contr_perm) {
 
-  std::vector<WDiagVertex> op_vertex_vec;
+  std::vector<DiagVertex> op_vertex_vec;
   for (int o : ops_perm) {
     op_vertex_vec.push_back(ops[o].vertex());
   }
@@ -110,7 +125,7 @@ void print_contraction(
   cout << endl;
   cout << to_string(op_vertex_vec) << endl;
   for (int c : contr_perm) {
-    std::vector<WDiagVertex> permuted_contr;
+    std::vector<DiagVertex> permuted_contr;
     for (int o : ops_perm) {
       permuted_contr.push_back(contractions[c][o]);
     }
@@ -120,8 +135,8 @@ void print_contraction(
 }
 
 std::string
-contraction_signature(const std::vector<WDiagOperator> &ops,
-                      const std::vector<std::vector<WDiagVertex>> &contractions,
+contraction_signature(const std::vector<DiagOperator> &ops,
+                      const std::vector<std::vector<DiagVertex>> &contractions,
                       const std::vector<int> &ops_perm,
                       const std::vector<int> &contr_perm) {
 
@@ -142,10 +157,10 @@ contraction_signature(const std::vector<WDiagOperator> &ops,
   return s;
 }
 
-std::pair<std::vector<WDiagOperator>, std::vector<std::vector<WDiagVertex>>>
-WickTheorem::canonicalize_contraction(const std::vector<WDiagOperator> &ops,
+std::pair<std::vector<DiagOperator>, std::vector<std::vector<DiagVertex>>>
+WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
                                       const std::vector<int> &contraction_vec) {
-  std::vector<std::vector<WDiagVertex>> contractions;
+  std::vector<std::vector<DiagVertex>> contractions;
   for (int c : contraction_vec) {
     contractions.push_back(elementary_contractions_[c]);
   }
@@ -231,11 +246,11 @@ WickTheorem::canonicalize_contraction(const std::vector<WDiagOperator> &ops,
     if (allowed) {
       // find the "best" contraction permutation directly
 
-      std::vector<std::pair<std::vector<WDiagVertex>, int>> sorted_contractions;
+      std::vector<std::pair<std::vector<DiagVertex>, int>> sorted_contractions;
 
       int ncontr = contractions.size();
       for (int i = 0; i < ncontr; i++) {
-        std::vector<WDiagVertex> permuted_contr;
+        std::vector<DiagVertex> permuted_contr;
         for (int j = 0; j < nops; j++) {
           permuted_contr.push_back(contractions[i][ops_perm[j]]);
         }
@@ -266,12 +281,12 @@ WickTheorem::canonicalize_contraction(const std::vector<WDiagOperator> &ops,
   //  PRINT_ELEMENTS(best_contr_perm);
   //  cout << endl;
 
-  std::vector<WDiagOperator> best_ops;
+  std::vector<DiagOperator> best_ops;
   for (int o : best_ops_perm) {
     best_ops.push_back(ops[o]);
   }
 
-  std::vector<std::vector<WDiagVertex>> best_contractions;
+  std::vector<std::vector<DiagVertex>> best_contractions;
   for (int c : best_contr_perm) {
     best_contractions.push_back(contractions[c]);
   }
@@ -285,26 +300,37 @@ WickTheorem::canonicalize_contraction(const std::vector<WDiagOperator> &ops,
 }
 
 void WickTheorem::generate_composite_contractions(
-    const std::vector<WDiagOperator> &ops) {
+    const std::vector<DiagOperator> &ops) {
+  PRINT(PrintLevel::Summary,
+        std::cout << "\n- Step 2. Generating composite contractions"
+                  << std::endl;)
+
   std::vector<int> a(100, -1);
   // create a vector that keeps track of the free (uncontracted vertices)
-  std::vector<WDiagVertex> free_vertex_vec;
+  std::vector<DiagVertex> free_vertex_vec;
   for (const auto &op : ops) {
     free_vertex_vec.push_back(op.vertex());
   }
 
-  // generate all contractions
-  PRINT(WDiagPrint::Summary,
-        std::cout << "\nPossible contractions:" << std::endl;)
+  PRINT(PrintLevel::Summary,
+        std::cout << "\n    Contractions found by backtracking:";
+        std::cout
+        << "\n\n      N   Op. Rank  Elementary      Uncontracted operators";
+        std::cout << "\n                    Contractions ";
+        std::cout
+        << "\n    "
+           "----------------------------------------------------------";)
+
+  // generate all contractions by backtracking
   generate_contractions_backtrack(a, 0, elementary_contractions_,
                                   free_vertex_vec);
-  PRINT(WDiagPrint::Summary,
-        std::cout << "\nTotal:" << ncontractions_ << std::endl;)
+  PRINT(PrintLevel::Summary, std::cout << "\n\n    Total contractions: "
+                                       << ncontractions_ << std::endl;)
 }
 
 void WickTheorem::compare_contraction_perm(
-    const std::vector<WDiagOperator> &ops,
-    const std::vector<std::vector<WDiagVertex>> &contractions,
+    const std::vector<DiagOperator> &ops,
+    const std::vector<std::vector<DiagVertex>> &contractions,
     const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
     std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm) {
   //  // 1. Compare operators
@@ -360,8 +386,8 @@ void WickTheorem::compare_contraction_perm(
 
 void WickTheorem::generate_contractions_backtrack(
     std::vector<int> a, int k,
-    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-    std::vector<WDiagVertex> &free_vertex_vec) {
+    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+    std::vector<DiagVertex> &free_vertex_vec) {
 
   process_contraction(a, k, free_vertex_vec);
 
@@ -379,8 +405,8 @@ void WickTheorem::generate_contractions_backtrack(
 
 std::vector<int> WickTheorem::construct_candidates(
     std::vector<int> &a, int k,
-    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-    const std::vector<WDiagVertex> &free_vertex_vec) {
+    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+    const std::vector<DiagVertex> &free_vertex_vec) {
 
   std::vector<int> candidates;
   int nops = free_vertex_vec.size();
@@ -417,8 +443,8 @@ std::vector<int> WickTheorem::construct_candidates(
 
 void WickTheorem::make_move(
     const std::vector<int> &a, int k,
-    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-    std::vector<WDiagVertex> &free_vertex_vec) {
+    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+    std::vector<DiagVertex> &free_vertex_vec) {
   int nops = free_vertex_vec.size();
 
   // remove the current elementary contraction
@@ -426,19 +452,20 @@ void WickTheorem::make_move(
   const auto &el_contr = el_contr_vec[c];
 
   for (int A = 0; A < nops; A++) {
-    for (int s = 0; s < osi->num_spaces(); s++) {
-      int ncre = free_vertex_vec[A].cre(s) - el_contr[A].cre(s);
-      free_vertex_vec[A].cre(s, ncre);
-      int nann = free_vertex_vec[A].ann(s) - el_contr[A].ann(s);
-      free_vertex_vec[A].ann(s, nann);
-    }
+    free_vertex_vec[A] -= el_contr[A];
+    // for (int s = 0; s < osi->num_spaces(); s++) {
+    //   int ncre = free_vertex_vec[A].cre(s) - el_contr[A].cre(s);
+    //   free_vertex_vec[A].cre(s, ncre);
+    //   int nann = free_vertex_vec[A].ann(s) - el_contr[A].ann(s);
+    //   free_vertex_vec[A].ann(s, nann);
+    // }
   }
 }
 
 void WickTheorem::unmake_move(
     const std::vector<int> &a, int k,
-    const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-    std::vector<WDiagVertex> &free_vertex_vec) {
+    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+    std::vector<DiagVertex> &free_vertex_vec) {
   int nops = free_vertex_vec.size();
 
   // remove the current elementary contraction
@@ -446,84 +473,94 @@ void WickTheorem::unmake_move(
   const auto &el_contr = el_contr_vec[c];
 
   for (int A = 0; A < nops; A++) {
-    for (int s = 0; s < osi->num_spaces(); s++) {
-      int ncre = free_vertex_vec[A].cre(s) + el_contr[A].cre(s);
-      free_vertex_vec[A].cre(s, ncre);
-      int nann = free_vertex_vec[A].ann(s) + el_contr[A].ann(s);
-      free_vertex_vec[A].ann(s, nann);
-    }
+    // for (int s = 0; s < osi->num_spaces(); s++) {
+    //   int ncre = free_vertex_vec[A].cre(s) + el_contr[A].cre(s);
+    //   free_vertex_vec[A].cre(s, ncre);
+    //   int nann = free_vertex_vec[A].ann(s) + el_contr[A].ann(s);
+    //   free_vertex_vec[A].ann(s, nann);
+    // }
+    free_vertex_vec[A] += el_contr[A];
   }
 }
 
 void WickTheorem::process_contraction(
     const std::vector<int> &a, int k,
-    std::vector<WDiagVertex> &free_vertex_vec) {
+    std::vector<DiagVertex> &free_vertex_vec) {
   contractions_.push_back(std::vector<int>(a.begin(), a.begin() + k));
 
-  PRINT(
-      WDiagPrint::Summary, cout << " " << ncontractions_ << ":";
-      for (int i = 0; i < k; ++i) { cout << " " << a[i]; })
-
-  WDiagVertex free_ops;
+  DiagVertex free_ops;
   for (const auto &free_vertex : free_vertex_vec) {
     free_ops += free_vertex;
   }
 
-  PRINT(WDiagPrint::Summary,
-        cout << " " << free_ops << " rank = " << free_ops.rank() << endl;)
+  PRINT(
+      PrintLevel::Summary, cout << "\n      " << ncontractions_ << "      "
+                                << free_ops.rank() << "     ";
+      for (int i = 0; i < k; ++i) { cout << "  " << a[i]; } cout
+      << std::string(std::max(20 - 3 * k, 2), ' ') << free_ops;)
+
+  // PRINT(PrintLevel::Summary,
+  //       cout << " " << free_ops << " rank = " << free_ops.rank() << endl;)
 
   ncontractions_++;
 }
 
-std::vector<std::vector<WDiagVertex>>
+std::vector<std::vector<DiagVertex>>
 WickTheorem::generate_elementary_contractions(
-    const std::vector<WDiagOperator> &ops) {
+    const std::vector<DiagOperator> &ops) {
+
+  PRINT(PrintLevel::Summary,
+        std::cout << "\n- Step 1. Generating elementary contractions"
+                  << std::endl;)
 
   int nops = ops.size();
 
   // a vector that holds all the contractions
-  std::vector<std::vector<WDiagVertex>> contr_vec;
+  std::vector<std::vector<DiagVertex>> contr_vec;
 
-  for (int op = 0; op < nops; ++op) {
-    for (int s = 0; s < osi->num_spaces(); s++) {
-      cout << "\n op = " << op << " s = " << s
-           << " cre = " << ops[op].num_cre(s)
-           << " ann = " << ops[op].num_ann(s);
-    }
-  }
+  PRINT(
+      PrintLevel::Summary, cout << "\n  Operator   Space   Cre.   Ann.";
+      cout << "\n  ------------------------------"; for (int op = 0; op < nops;
+                                                         ++op) {
+        for (int s = 0; s < osi->num_spaces(); s++) {
+          cout << "\n      " << op << "        " << osi->label(s) << "      "
+               << ops[op].cre(s) << "      " << ops[op].ann(s);
+        }
+      } cout << "\n";)
 
   // loop over orbital spaces
   for (int s = 0; s < osi->num_spaces(); s++) {
-    PRINT(WDiagPrint::Summary, std::cout
-                                   << "\n  => Basic contractions for space "
-                                   << osi->label(s) << std::endl;)
+    PRINT(PrintLevel::Summary, std::cout
+                                   << "\n  Elementary contractions for space "
+                                   << osi->label(s) << ": ";)
 
     // differentiate between various types of spaces
-    RDMType dmstruc = osi->dmstructure(s);
+    SpaceType dmstruc = osi->space_type(s);
 
     // Pairwise contractions creation-annihilation:
     // _____
     // |   |
     // a^+ a
 
-    if (dmstruc == RDMType::Occupied) {
-      PRINT(WDiagPrint::Summary,
-            cout << "\n    * c/a pairwise contractions" << endl;)
+    if (dmstruc == SpaceType::Occupied) {
+      PRINT(PrintLevel::Summary,
+            cout << "Creation/Annihilation pairwise contractions" << endl;)
       // loop over the creation operators of each operator
       for (int c = 0; c < nops; c++) {
         // loop over the annihilation operators of each operator (right to the
         // creation operators)
         for (int a = c + 1; a < nops; a++) {
-          PRINT(WDiagPrint::Summary, cout << "\n " << c << " " << a << endl;)
+          PRINT(PrintLevel::Summary, cout << "\n      Contraction op(" << c
+                                          << ")---op(" << a << ")" << endl;)
 
           // check if contraction is viable
-          if ((ops[c].num_cre(s) > 0) and (ops[a].num_ann(s) > 0)) {
-            std::vector<WDiagVertex> new_contr(nops);
-            new_contr[c].cre(s, 1);
-            new_contr[a].ann(s, 1);
+          if ((ops[c].cre(s) > 0) and (ops[a].ann(s) > 0)) {
+            std::vector<DiagVertex> new_contr(nops);
+            new_contr[c].set_cre(s, 1);
+            new_contr[a].set_ann(s, 1);
             contr_vec.push_back(new_contr);
 
-            PRINT(WDiagPrint::Summary, PRINT_ELEMENTS(new_contr, "      ");
+            PRINT(PrintLevel::Summary, PRINT_ELEMENTS(new_contr, "      ");
                   cout << endl;)
           }
         }
@@ -535,24 +572,25 @@ WickTheorem::generate_elementary_contractions(
     // |   |
     // a   a^+
 
-    if (dmstruc == RDMType::Unoccupied) {
-      PRINT(WDiagPrint::Summary,
-            cout << "\n    * a/c pairwise contractions" << endl;)
+    if (dmstruc == SpaceType::Unoccupied) {
+      PRINT(PrintLevel::Summary,
+            cout << "Annihilation/Creation pairwise contractions" << endl;)
       // loop over the creation operators of each operator
       for (int a = 0; a < nops; a++) {
         // loop over the annihilation operators of each operator (right to the
         // creation operators)
         for (int c = a + 1; c < nops; c++) {
-          PRINT(WDiagPrint::Summary, cout << "\n " << c << " " << a << endl;)
+          PRINT(PrintLevel::Summary, cout << "\n      Contraction op(" << a
+                                          << ")---op(" << c << ")" << endl;)
 
           // check if contraction is viable
-          if ((ops[c].num_cre(s) > 0) and (ops[a].num_ann(s) > 0)) {
-            std::vector<WDiagVertex> new_contr(nops);
-            new_contr[c].cre(s, 1);
-            new_contr[a].ann(s, 1);
+          if ((ops[c].cre(s) > 0) and (ops[a].ann(s) > 0)) {
+            std::vector<DiagVertex> new_contr(nops);
+            new_contr[c].set_cre(s, 1);
+            new_contr[a].set_ann(s, 1);
             contr_vec.push_back(new_contr);
 
-            PRINT(WDiagPrint::Summary, PRINT_ELEMENTS(new_contr, "      ");
+            PRINT(PrintLevel::Summary, PRINT_ELEMENTS(new_contr, "      ");
                   cout << endl;)
           }
         }
@@ -565,22 +603,22 @@ WickTheorem::generate_elementary_contractions(
     // |   |   |   |
     // a^+ a   a   a^+
 
-    if (dmstruc == RDMType::General) {
+    if (dmstruc == SpaceType::General) {
 
       // compute the largest possible cumulant
       int sumcre = 0;
       int sumann = 0;
       for (int A = 0; A < nops; A++) {
-        sumcre += ops[A].num_cre(s);
-        sumann += ops[A].num_ann(s);
+        sumcre += ops[A].cre(s);
+        sumann += ops[A].ann(s);
       }
       int max_half_legs = std::min(std::min(sumcre, sumann), maxcumulant_);
       //      int max_legs = 2 * max_half_legs;
 
       // loop over all possible contractions from 2 to max_legs
       for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
-        PRINT(WDiagPrint::Summary, cout << "\n    * " << 2 * half_legs
-                                        << "-legs contractions" << endl;)
+        PRINT(PrintLevel::Summary,
+              cout << 2 * half_legs << "-legs contractions" << endl;)
         auto half_legs_part = integer_partitions(half_legs);
 
         // create lists of leg partitionings among all operators that are
@@ -596,10 +634,10 @@ WickTheorem::generate_elementary_contractions(
               bool cre_compatible = true;
               bool ann_compatible = true;
               for (int A = 0; A < nops; A++) {
-                if (ops[A].num_cre(s) < perm[A]) {
+                if (ops[A].cre(s) < perm[A]) {
                   cre_compatible = false;
                 }
-                if (ops[A].num_ann(s) < perm[A]) {
+                if (ops[A].ann(s) < perm[A]) {
                   ann_compatible = false;
                 }
               }
@@ -616,11 +654,11 @@ WickTheorem::generate_elementary_contractions(
         // combine the creation and annihilation operators
         for (const auto cre_legs : cre_legs_vec) {
           for (const auto ann_legs : ann_legs_vec) {
-            std::vector<WDiagVertex> new_contr(nops);
+            std::vector<DiagVertex> new_contr(nops);
             int ncontracted = 0;
             for (int A = 0; A < nops; A++) {
-              new_contr[A].cre(s, cre_legs[A]);
-              new_contr[A].ann(s, ann_legs[A]);
+              new_contr[A].set_cre(s, cre_legs[A]);
+              new_contr[A].set_ann(s, ann_legs[A]);
               // count number of operators contracted
               if (cre_legs[A] + ann_legs[A] > 0) {
                 ncontracted += 1;
@@ -639,10 +677,9 @@ WickTheorem::generate_elementary_contractions(
 }
 
 std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
-    const std::vector<WDiagOperator> &ops,
-    const std::vector<std::vector<WDiagVertex>> &contractions,
-    scalar_t factor) {
-  PRINT(WDiagPrint::Basic, cout << "\n----------------------------" << endl;)
+    const std::vector<DiagOperator> &ops,
+    const std::vector<std::vector<DiagVertex>> &contractions, scalar_t factor) {
+  // PRINT(PrintLevel::Basic, cout << "\n----------------------------" << endl;)
 
   // build a map of equivalent operators
 
@@ -662,7 +699,7 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
   // tensors (density matrices, cumulants)
 
   // counter of how many second quantized operators are not contracted
-  std::vector<WDiagVertex> ops_offset(ops.size());
+  std::vector<DiagVertex> ops_offset(ops.size());
   // vector to store the order of operators
   std::vector<int> sign_order(sqops.size(), -1);
   std::vector<std::vector<bool>> bit_map_vec;
@@ -680,7 +717,7 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
   index_map_t pair_contraction_reindex_map;
   // Loop over elementary contractions
-  for (const std::vector<WDiagVertex> &contraction : contractions) {
+  for (const std::vector<DiagVertex> &contraction : contractions) {
     std::vector<bool> bit_map(sqops.size(), false);
 
     // Find the rank and space of this contraction
@@ -709,14 +746,14 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
       sorted_position += 1;
     }
 
-    RDMType dmstruc = osi->dmstructure(s);
+    SpaceType dmstruc = osi->space_type(s);
 
     // Pairwise contractions creation-annihilation:
     // ________
     // |      |
     // a^+(i) a(j) = delta(i,j)
 
-    if (dmstruc == RDMType::Occupied) {
+    if (dmstruc == SpaceType::Occupied) {
       // Reindex the annihilator (j) to the creator (i)
       Index cre_index = sqops[pos_cre_sqops[0]].index();
       Index ann_index = sqops[pos_ann_sqops[0]].index();
@@ -728,7 +765,7 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
     // |    |
     // a(i) a^+(j) = delta(i,j)
 
-    if (dmstruc == RDMType::Unoccupied) {
+    if (dmstruc == SpaceType::Unoccupied) {
       // Reindex the creator (j) to the annihilator (i)
       Index cre_index = sqops[pos_cre_sqops[0]].index();
       Index ann_index = sqops[pos_ann_sqops[0]].index();
@@ -745,7 +782,7 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
     // |   |   |   |
     // a^+ a   a   a^+
 
-    if (dmstruc == RDMType::General) {
+    if (dmstruc == SpaceType::General) {
       std::vector<Index> lower;
       std::vector<Index> upper;
       // collect indices of creation operators for the upper indices
@@ -794,12 +831,12 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
     }
   }
 
-  PRINT(WDiagPrint::Basic,
+  PRINT(PrintLevel::Basic,
         print_contraction(ops, tensors, bit_map_vec, sqops, sign_order);)
 
   int sign = unoccupied_sign * permutation_sign(sign_order);
 
-  PRINT(WDiagPrint::All, PRINT_ELEMENTS(sign_order, "\n  positions: "););
+  PRINT(PrintLevel::All, PRINT_ELEMENTS(sign_order, "\n  positions: "););
 
   std::vector<std::pair<int, SQOperator>> sorted_sqops;
   sorted_position = 0;
@@ -831,7 +868,7 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
   term.reindex(pair_contraction_reindex_map);
 
-  PRINT(WDiagPrint::All, cout << "  sign = " << sign << endl;
+  PRINT(PrintLevel::Summary, cout << "  sign = " << sign << endl;
         cout << "  factor = " << factor << endl;
         cout << "  combinatorial_factor = " << comb_factor << endl;)
 
@@ -840,7 +877,7 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
 std::tuple<std::vector<Tensor>, std::vector<SQOperator>,
            std::map<std::tuple<int, int, bool, int>, int>>
-WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
+WickTheorem::contration_tensors_sqops(const std::vector<DiagOperator> &ops) {
 
   std::vector<SQOperator> sqops;
   std::vector<Tensor> tensors;
@@ -856,13 +893,13 @@ WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
     // Loop over creation operators (lower indices)
     std::vector<Index> lower;
     for (int s = 0; s < osi->num_spaces(); s++) {
-      for (int c = 0; c < op.num_cre(s); c++) {
+      for (int c = 0; c < op.cre(s); c++) {
         Index idx(s, ic.next_index(s)); // get next available index
         sqops.push_back(SQOperator(SQOperatorType::Creation, idx));
         lower.push_back(idx);
         auto key = std::make_tuple(o, s, true, c);
         op_map[key] = n;
-        PRINT(WDiagPrint::All, print_key(key, n););
+        PRINT(PrintLevel::All, print_key(key, n););
         n += 1;
       }
     }
@@ -872,13 +909,13 @@ WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
     // need to reverse the upper indices of the tensor, see below)
     std::vector<Index> upper;
     for (int s = osi->num_spaces() - 1; s >= 0; s--) {
-      for (int a = op.num_ann(s) - 1; a >= 0; a--) {
+      for (int a = op.ann(s) - 1; a >= 0; a--) {
         Index idx(s, ic.next_index(s)); // get next available index
         sqops.push_back(SQOperator(SQOperatorType::Annihilation, idx));
         upper.push_back(idx);
         auto key = std::make_tuple(o, s, false, a);
         op_map[key] = n;
-        PRINT(WDiagPrint::All, print_key(key, n););
+        PRINT(PrintLevel::All, print_key(key, n););
         n += 1;
       }
     }
@@ -891,19 +928,19 @@ WickTheorem::contration_tensors_sqops(const std::vector<WDiagOperator> &ops) {
 }
 
 std::vector<int> WickTheorem::vertex_vec_to_pos(
-    const std::vector<WDiagVertex> &vertex_vec,
-    std::vector<WDiagVertex> &ops_offset,
+    const std::vector<DiagVertex> &vertex_vec,
+    std::vector<DiagVertex> &ops_offset,
     std::map<std::tuple<int, int, bool, int>, int> &op_map, bool creation) {
 
   std::vector<int> result;
 
   int s = vertices_space(vertex_vec);
 
-  PRINT(WDiagPrint::All, cout << "\n  Vertex to position:" << endl;);
+  PRINT(PrintLevel::All, cout << "\n  Vertex to position:" << endl;);
 
   // Loop over all vertices
   for (int v = 0; v < vertex_vec.size(); v++) {
-    const WDiagVertex &vertex = vertex_vec[v];
+    const DiagVertex &vertex = vertex_vec[v];
     int nops = creation ? vertex.cre(s) : vertex.ann(s);
     // assign the operator indices
     int ops_off = creation ? ops_offset[v].cre(s) : ops_offset[v].ann(s);
@@ -915,33 +952,33 @@ std::vector<int> WickTheorem::vertex_vec_to_pos(
                                 ops_off + i) // start from the leftmost operator
               : std::make_tuple(v, s, false, ops_off + i);
       if (op_map.count(key) == 0) {
-        PRINT(WDiagPrint::All, print_key(key, -1););
+        PRINT(PrintLevel::All, print_key(key, -1););
         cout << " NOT FOUND!!!" << endl;
         exit(1);
       } else {
         int sqop_pos = op_map[key];
         result.push_back(sqop_pos);
-        PRINT(WDiagPrint::All, print_key(key, sqop_pos););
+        PRINT(PrintLevel::All, print_key(key, sqop_pos););
       }
     }
     // update the creator's offset
     if (creation) {
-      ops_offset[v].cre(s, ops_off + nops);
+      ops_offset[v].set_cre(s, ops_off + nops);
     } else {
-      ops_offset[v].ann(s, ops_off + nops);
+      ops_offset[v].set_ann(s, ops_off + nops);
     }
   }
   return result;
 }
 
 scalar_t WickTheorem::combinatorial_factor(
-    const std::vector<WDiagOperator> &ops,
-    const std::vector<std::vector<WDiagVertex>> &contractions) {
+    const std::vector<DiagOperator> &ops,
+    const std::vector<std::vector<DiagVertex>> &contractions) {
 
   scalar_t factor = 1;
 
   // stores the offset for each uncontracted operator
-  std::vector<WDiagVertex> free_vertices;
+  std::vector<DiagVertex> free_vertices;
   for (const auto &op : ops) {
     free_vertices.push_back(op.vertex());
   }
@@ -949,21 +986,18 @@ scalar_t WickTheorem::combinatorial_factor(
   // for each contraction find the combinatorial factor
   for (const auto &contraction : contractions) {
     for (int v = 0; v < contraction.size(); v++) {
-      const WDiagVertex &vertex = contraction[v];
+      const DiagVertex &vertex = contraction[v];
       for (int s = 0; s < osi->num_spaces(); s++) {
-        int kcre = vertex.cre(s);
-        int kann = vertex.ann(s);
-        int ncre = free_vertices[v].cre(s);
-        int nann = free_vertices[v].ann(s);
+        auto &[kcre, kann] = vertex.vertex(s);
+        auto &[ncre, nann] = free_vertices[v].vertex(s);
         factor *= binomial(ncre, kcre);
         factor *= binomial(nann, kann);
-        free_vertices[v].cre(s, ncre - kcre);
-        free_vertices[v].ann(s, nann - kann);
       }
+      free_vertices[v] -= vertex;
     }
   }
 
-  std::map<std::vector<WDiagVertex>, int> contraction_count;
+  std::map<std::vector<DiagVertex>, int> contraction_count;
   for (const auto &contraction : contractions) {
     contraction_count[contraction] += 1;
   }
@@ -984,16 +1018,17 @@ void print_key(std::tuple<int, int, bool, int> key, int n) {
        << "] -> " << n << endl;
 }
 
-void print_contraction(const std::vector<WDiagOperator> &ops,
+void print_contraction(const std::vector<DiagOperator> &ops,
                        const std::vector<Tensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<SQOperator> &sqops,
                        const std::vector<int> sign_order) {
+  std::string pre("  ");
   for (const auto &bit_map : bit_map_vec) {
     int ntrue = std::count(bit_map.begin(), bit_map.end(), true);
     bool line = false;
     bool first = true;
-    cout << "";
+    cout << pre;
     for (bool b : bit_map) {
       if (b) {
         line = true;
@@ -1001,12 +1036,12 @@ void print_contraction(const std::vector<WDiagOperator> &ops,
       }
       if (line) {
         if (first) {
-          cout << " __";
+          cout << " ┌─";
           first = false;
         } else if (ntrue == 0) {
-          cout << "__ ";
+          cout << "─┐ ";
         } else {
-          cout << "___";
+          cout << "───";
         }
       } else {
         cout << "   ";
@@ -1015,19 +1050,23 @@ void print_contraction(const std::vector<WDiagOperator> &ops,
         line = false;
     }
     cout << endl;
-    for (bool b : bit_map) {
-      cout << (b ? " | " : "   ");
-    }
-    cout << endl;
+    // cout << pre;
+    // for (bool b : bit_map) {
+    //   cout << (b ? " │ " : "   ");
+    // }
+    // cout << endl;
   }
+  cout << pre;
   for (const auto &sqop : sqops) {
     cout << ((sqop.type() == SQOperatorType::Creation) ? " + " : " - ");
   }
   cout << endl;
+  cout << pre;
   for (const auto &sqop : sqops) {
     cout << " " << sqop.index();
   }
   cout << endl;
+  cout << pre;
   for (int order : sign_order) {
     cout << " " << order << " ";
   }
@@ -1037,11 +1076,12 @@ void print_contraction(const std::vector<WDiagOperator> &ops,
   int opoffset = 0;
   for (const auto &tensor : tensors) {
     int oprank = tensor.rank();
+    cout << pre;
     for (int i = 0; i < opoffset; i++) {
       cout << "   ";
     }
     for (int i = 0; i < oprank; i++) {
-      cout << "---";
+      cout << "───";
     }
     for (int i = 0; i < nsqops - oprank - opoffset; i++) {
       cout << "   ";

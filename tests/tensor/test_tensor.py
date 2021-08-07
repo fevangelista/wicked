@@ -4,9 +4,9 @@ import wicked as w
 def test_tensor():
     """Test the Tensor class"""
     w.reset_space()
-    w.add_space("o", "occupied", ["i", "j"])
-    w.add_space("a", "general", ["u", "v"])
-    w.add_space("v", "unoccupied", ["a", "b", "c"])
+    w.add_space("o", "fermion", "occupied", ["i", "j"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
 
     # Create a tensor with one lower index
     t = w.tensor("T", ["o_0"], [], w.sym.none)

@@ -3,7 +3,7 @@
 //#define PRINT_DEBUG 1
 
 #include "test.h"
-#include "wicked.h"
+         "wicked.h"
 
 using namespace std;
 
@@ -671,8 +671,8 @@ int main(int argc, const char *argv[]) {
 
   // Define the orbital space
   osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->add_space("o", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
-  osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
+  osi->add_space("o", SpaceType::Occupied, {"i", "j", "k", "l", "m", "n"});
+  osi->add_space("v", SpaceType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
   auto Fvv = make_operator("v", {"v->v"});
 
   // Assemble the tests

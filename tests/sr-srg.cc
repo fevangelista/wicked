@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "wicked.h"
 #include "test.h"
 
 using namespace std;
@@ -25,8 +24,8 @@ int main(int argc, const char *argv[]) {
 
   // Define the orbital space
   osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->add_space("o", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
-  osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
+  osi->add_space("o", SpaceType::Occupied, {"i", "j", "k", "l", "m", "n"});
+  osi->add_space("v", SpaceType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
 
   // Assemble the tests
   auto test_functions = {

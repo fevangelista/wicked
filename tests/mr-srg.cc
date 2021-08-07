@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "wicked.h"
 #include "test.h"
+         "wicked.h"
 
 using namespace std;
 
@@ -45,7 +45,7 @@ test_return_t test_Faa_Tca() {
 
 test_return_t test_Fvv_Tcv() {
   WickTheorem wdt;
-  //  wdt.set_print(WDiagPrint::Basic);
+  //  wdt.set_print(PrintLevel::Basic);
   auto Fvv = make_operator("f", {"v->v"});
   auto Tcv = make_operator("t", {"c->v"});
 
@@ -80,9 +80,9 @@ int main(int argc, const char *argv[]) {
 
   // Define the orbital space
   osi = std::make_shared<OrbitalSpaceInfo>();
-  osi->add_space("c", RDMType::Occupied, {"i", "j", "k", "l", "m", "n"});
-  osi->add_space("a", RDMType::General, {"u", "v", "w", "x", "y", "z"});
-  osi->add_space("v", RDMType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
+  osi->add_space("c", SpaceType::Occupied, {"i", "j", "k", "l", "m", "n"});
+  osi->add_space("a", SpaceType::General, {"u", "v", "w", "x", "y", "z"});
+  osi->add_space("v", SpaceType::Unoccupied, {"a", "b", "c", "d", "e", "f"});
 
   // Assemble the tests
   auto test_functions = {test_Fac_Tca, test_Faa_Tca, test_Fvv_Tcv,

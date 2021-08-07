@@ -251,7 +251,7 @@ Expression string_to_sum(const std::string &s) {
   for (size_t n = 0; n < tensors.size(); n += 3) {
     std::string label = tensors[n];
 
-    // Proecess the upper indices
+    // Process the upper indices
     auto upper_idx = split_indices(tensors[n + 1]);
     std::vector<Index> upper;
     for (const auto &idx : upper_idx) {
@@ -298,8 +298,8 @@ Expression string_to_sum(const std::string &s) {
     }
   }
   scalar_t factor(numerator, denominator);
-  //  std::cout << term << std::endl;
 
   sum.add(term, factor);
+
   return sum;
 }

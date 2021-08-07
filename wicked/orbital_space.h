@@ -7,7 +7,7 @@
 #include <vector>
 
 /// Type of orbital space
-enum class RDMType {
+enum class SpaceType {
   // Single creation/annihilation contractions that yields a Kronecker delta
   Occupied,
   // Single annihilation/creation contractions that yields a Kronecker delta
@@ -16,26 +16,37 @@ enum class RDMType {
   General
 };
 
+/// The type of field
+enum class FieldType { Fermion, Boson };
+
 /// Spin types
 enum class SpinType { SpinOrbital, SpinFree, Alpha, Beta };
 
-class OrbitalSpaceInfo {
+class OrbitalSpace {
 private:
-  /// This type holds infomation about a space in a tuple
-  /// (<label>, type of RDM, labels)
-  using t_space_info = std::tuple<char, RDMType, std::vector<std::string>>;
+  char label_;
+  SpaceType space_type_;
+  FieldType field_type_;
+  std::vector<std::string> indices_;
 
 public:
-  OrbitalSpaceInfo();
+  OrbitalSpace(char label, FieldType field_type, SpaceType space_type,
+               const std::vector<std::string> &indices);
+  char label() const;
+  FieldType field_type() const;
+  SpaceType space_type() const;
+  const std::vector<std::string> &indices() const;
+};
 
-  /// Set default spaces
-  void default_spaces();
+class OrbitalSpaceInfo {
+public:
+  OrbitalSpaceInfo();
 
   /// Set default spaces
   void reset();
 
   /// Add an elementary space
-  void add_space(char label, RDMType structure,
+  void add_space(char label, FieldType field_type, SpaceType space_type,
                  const std::vector<std::string> &indices);
 
   /// Return the number of elementary spaces
@@ -47,8 +58,15 @@ public:
   /// The label of an index that belongs to a given orbital space
   const std::string index_label(int pos, int idx) const;
 
-  /// The structure of the density matrices for an orbital space
-  RDMType dmstructure(int pos) const;
+  /// @return the space type, which carries information about
+  /// the structure of the density matrices
+  SpaceType space_type(int pos) const;
+
+  /// @return the field type
+  FieldType field_type(int pos) const;
+
+  /// @return the symbol of an operator corresponding to this space
+  const std::string &op_symbol(int pos) const;
 
   /// The indices of an orbital space
   const std::vector<std::string> &indices(int pos) const;
@@ -61,7 +79,7 @@ public:
 
 private:
   /// Vector of spaces
-  std::vector<t_space_info> space_info_;
+  std::vector<OrbitalSpace> space_info_;
 
   /// Maps a space label to its index
   std::map<char, int> label_to_pos_;
@@ -74,7 +92,10 @@ extern std::shared_ptr<OrbitalSpaceInfo> osi;
 
 std::shared_ptr<OrbitalSpaceInfo> get_osi();
 
-/// Used to convert a string (e.g., "unoccupied") to a RDMType
-RDMType string_to_rdmtype(const std::string &str);
+/// Used to convert a string (e.g., "unoccupied") to a SpaceType
+SpaceType string_to_space_type(const std::string &str);
+
+/// Used to convert a string (e.g., "fermion") to a FieldType
+FieldType string_to_field_type(const std::string &str);
 
 #endif // _wicked_orbital_space_h_

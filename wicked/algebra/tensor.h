@@ -7,6 +7,9 @@
 #include "index.h"
 #include "wicked-def.h"
 
+/// Enums
+enum class SymmetryType { Symmetric, Antisymmetric, Nonsymmetric };
+
 /// This class represents a tensor labeled with orbital indices.
 /// It holds information about the label and the indices of the tensor.
 class Tensor {

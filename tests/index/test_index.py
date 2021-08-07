@@ -5,9 +5,9 @@ from wicked import Index, index
 def test_index():
     """Test Index class"""
     w.reset_space()
-    w.add_space("o", "occupied", ["i", "j", "k"])
-    w.add_space("a", "general", ["u", "v"])
-    w.add_space("v", "occupied", ["a", "b", "c"])
+    w.add_space("o", "fermion", "occupied", ["i", "j", "k"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "occupied", ["a", "b", "c"])
 
     i = Index(0, 0)
     assert i.space() == 0

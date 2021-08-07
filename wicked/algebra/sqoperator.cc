@@ -2,28 +2,24 @@
 #include "index.h"
 #include "wicked-def.h"
 
-std::map<SQOperatorStatistics, std::string> SQOperatorStatistics_to_str{
-    {SQOperatorStatistics::Fermion, "a"}, {SQOperatorStatistics::Boson, "b"}};
-
-SQOperator::SQOperator(SQOperatorType type, Index index,
-                       SQOperatorStatistics statistics)
-    : operator_(std::make_pair(type, index)), statistics_(statistics) {}
+SQOperator::SQOperator(SQOperatorType type, Index index)
+    : operator_(std::make_pair(type, index)) {}
 
 SQOperator::~SQOperator() {}
 
 SQOperatorType SQOperator::type() const { return operator_.first; }
 
-SQOperatorStatistics SQOperator::statistics() const { return statistics_; }
+FieldType SQOperator::field_type() const { return osi->field_type(space()); }
 
 Index SQOperator::index() const { return operator_.second; }
+
+int SQOperator::space() const { return operator_.second.space(); }
 
 bool SQOperator::is_creation() const {
   return type() == SQOperatorType::Creation;
 }
 
-std::string SQOperator::op_symbol() const {
-  return SQOperatorStatistics_to_str[statistics_];
-}
+std::string SQOperator::op_symbol() const { return osi->op_symbol(space()); }
 
 void SQOperator::reindex(index_map_t &idx_map) {
   if (idx_map.count(operator_.second) > 0) {
@@ -72,9 +68,8 @@ std::string SQOperator::ambit() const {
   return "";
 }
 
-SQOperator make_sqoperator(const std::string &index, SQOperatorType type,
-                           SQOperatorStatistics statistics) {
-  return SQOperator(type, make_index(index), statistics);
+SQOperator make_sqoperator(const std::string &index, SQOperatorType type) {
+  return SQOperator(type, make_index(index));
 }
 
 std::ostream &operator<<(std::ostream &os, const SQOperator &op) {

@@ -5,9 +5,9 @@ from wicked import index
 def test_sqopprod():
     """Test the SQOpProd class"""
     w.reset_space()
-    w.add_space("o", "occupied", ["i", "j"])
-    w.add_space("a", "general", ["u", "v"])
-    w.add_space("v", "occupied", ["a", "b", "c"])
+    w.add_space("o", "fermion", "occupied", ["i", "j"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "occupied", ["a", "b", "c"])
 
     opprod = w.sqopprod([], [])
     assert str(opprod) == ""

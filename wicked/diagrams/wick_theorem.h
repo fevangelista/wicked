@@ -7,12 +7,13 @@
 class SQOperator;
 class Tensor;
 class SymbolicTerm;
-class WDiagOperator;
-class OperatorSum;
-class WDiagVertex;
-class Expression;
+class DiagOperator;
+class DiagOpExpression;
+class DiagVertex;
 
-enum class WDiagPrint { No, Basic, Summary, Detailed, All };
+#include "../algebra/expression.h"
+
+enum class PrintLevel { No, Basic, Summary, Detailed, All };
 
 /// A class to contract a product of operators
 class WickTheorem {
@@ -22,36 +23,36 @@ public:
   WickTheorem();
 
   /// Contract a product of operators
-  Expression contract(scalar_t factor, const std::vector<WDiagOperator> &ops,
+  Expression contract(scalar_t factor, const std::vector<DiagOperator> &ops,
                       int minrank, int maxrank);
 
   /// Contract a product of sums of operators
-  Expression contract(scalar_t factor, const OperatorSum &dop_sum, int minrank,
-                      int maxrank);
+  Expression contract(scalar_t factor, const DiagOpExpression &dop_sum,
+                      int minrank, int maxrank);
 
-  void set_print(WDiagPrint print);
+  void set_print(PrintLevel print);
 
 private:
   std::vector<std::vector<int>> contractions_;
-  std::vector<std::vector<WDiagVertex>> elementary_contractions_;
+  std::vector<std::vector<DiagVertex>> elementary_contractions_;
 
   // Create a canonical
-  std::pair<std::vector<WDiagOperator>, std::vector<std::vector<WDiagVertex>>>
-  canonicalize_contraction(const std::vector<WDiagOperator> &ops,
+  std::pair<std::vector<DiagOperator>, std::vector<std::vector<DiagVertex>>>
+  canonicalize_contraction(const std::vector<DiagOperator> &ops,
                            const std::vector<int> &contraction_vec);
 
   void compare_contraction_perm(
-      const std::vector<WDiagOperator> &ops,
-      const std::vector<std::vector<WDiagVertex>> &contractions,
+      const std::vector<DiagOperator> &ops,
+      const std::vector<std::vector<DiagVertex>> &contractions,
       const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
       std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm);
 
   /// Generates all elementary contractions
-  std::vector<std::vector<WDiagVertex>>
-  generate_elementary_contractions(const std::vector<WDiagOperator> &ops);
+  std::vector<std::vector<DiagVertex>>
+  generate_elementary_contractions(const std::vector<DiagOperator> &ops);
 
   /// Generates all composite contractions
-  void generate_composite_contractions(const std::vector<WDiagOperator> &ops);
+  void generate_composite_contractions(const std::vector<DiagOperator> &ops);
 
   // ==> Backtracking routines <==
 
@@ -59,60 +60,60 @@ private:
   /// elementary contractions
   void generate_contractions_backtrack(
       std::vector<int> a, int k,
-      const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-      std::vector<WDiagVertex> &free_vertex_vec);
+      const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+      std::vector<DiagVertex> &free_vertex_vec);
 
   /// Return a vector of indices of elementary contractions that can be added to
   /// the current solution. Used in backtracking algorithm
-  std::vector<int> construct_candidates(
-      std::vector<int> &a, int k,
-      const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-      const std::vector<WDiagVertex> &free_vertex_vec);
+  std::vector<int>
+  construct_candidates(std::vector<int> &a, int k,
+                       const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+                       const std::vector<DiagVertex> &free_vertex_vec);
 
   /// Applies a contraction to the list of free vertices. Used in backtracking
   /// algorithm
   void make_move(const std::vector<int> &a, int k,
-                 const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-                 std::vector<WDiagVertex> &free_vertex_vec);
+                 const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+                 std::vector<DiagVertex> &free_vertex_vec);
 
   /// Undoes the application of a contraction to the list of free vertices. Used
   /// in backtracking algorithm
   void unmake_move(const std::vector<int> &a, int k,
-                   const std::vector<std::vector<WDiagVertex>> &el_contr_vec,
-                   std::vector<WDiagVertex> &free_vertex_vec);
+                   const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+                   std::vector<DiagVertex> &free_vertex_vec);
 
   /// Process a contraction found by the backtracking algorithm
   void process_contraction(const std::vector<int> &a, int k,
-                           std::vector<WDiagVertex> &free_vertex_vec);
+                           std::vector<DiagVertex> &free_vertex_vec);
 
   /// Apply the contraction to this set of operators and produce a term
-  std::pair<SymbolicTerm, scalar_t> evaluate_contraction(
-      const std::vector<WDiagOperator> &ops,
-      const std::vector<std::vector<WDiagVertex>> &contractions,
-      scalar_t factor);
+  std::pair<SymbolicTerm, scalar_t>
+  evaluate_contraction(const std::vector<DiagOperator> &ops,
+                       const std::vector<std::vector<DiagVertex>> &contractions,
+                       scalar_t factor);
 
   /// Return the tensors and operators correspoding to a product of operators
   std::tuple<std::vector<Tensor>, std::vector<SQOperator>,
              std::map<std::tuple<int, int, bool, int>, int>>
-  contration_tensors_sqops(const std::vector<WDiagOperator> &ops);
+  contration_tensors_sqops(const std::vector<DiagOperator> &ops);
 
   std::vector<int>
-  vertex_vec_to_pos(const std::vector<WDiagVertex> &vertex_vec,
-                    std::vector<WDiagVertex> &ops_offset,
+  vertex_vec_to_pos(const std::vector<DiagVertex> &vertex_vec,
+                    std::vector<DiagVertex> &ops_offset,
                     std::map<std::tuple<int, int, bool, int>, int> &op_map,
                     bool creation);
 
   /// Return the combinatorial factor corresponding to a contraction pattern
   scalar_t combinatorial_factor(
-      const std::vector<WDiagOperator> &ops,
-      const std::vector<std::vector<WDiagVertex>> &contractions);
+      const std::vector<DiagOperator> &ops,
+      const std::vector<std::vector<DiagVertex>> &contractions);
 
   /// The number of contractions found
   int ncontractions_ = 0;
   /// The largest allowed cumulant
   int maxcumulant_ = 100;
 
-  WDiagPrint print_ = WDiagPrint::All;
+  PrintLevel print_ = PrintLevel::No;
 };
 
 #endif // _wicked_diag_theorem_h_

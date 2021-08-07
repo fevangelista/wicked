@@ -26,6 +26,8 @@ void export_Expression(py::module &m) {
       .def("to_manybody_equation", &Expression::to_manybody_equation)
       .def("canonicalize", &Expression::canonicalize);
 
-  m.def("operator", &make_operator_expr, "label"_a, "components"_a,
+  m.def("operator_expr", &make_operator_expr, "label"_a, "components"_a,
         "normal_ordered"_a, "coefficient"_a = scalar_t(1));
+
+  m.def("string_to_expr", &string_to_sum);
 }

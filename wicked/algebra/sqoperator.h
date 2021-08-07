@@ -4,15 +4,11 @@
 #include <string>
 
 #include "index.h"
+#include "orbital_space.h"
 
 enum class SQOperatorType {
   Creation,
   Annihilation,
-};
-
-enum class SQOperatorStatistics {
-  Fermion,
-  Boson,
 };
 
 class SQOperator {
@@ -20,8 +16,7 @@ class SQOperator {
   using index_map_t = std::map<Index, Index>;
 
 public:
-  SQOperator(SQOperatorType type, Index index,
-             SQOperatorStatistics statistics = SQOperatorStatistics::Fermion);
+  SQOperator(SQOperatorType type, Index index);
   ~SQOperator();
 
   bool operator<(SQOperator const &other) const;
@@ -37,10 +32,13 @@ public:
   bool is_creation() const;
 
   /// Return the type of this operator
-  SQOperatorStatistics statistics() const;
+  FieldType field_type() const;
 
   /// Return the index of this operator
   Index index() const;
+
+  /// Return the index of this operator
+  int space() const;
 
   /// Reindex this operator
   void reindex(index_map_t &idx_map);
@@ -56,14 +54,12 @@ public:
 
 private:
   std::pair<SQOperatorType, Index> operator_;
-  SQOperatorStatistics statistics_;
 };
 
 // Helper functions
 
-/// Helper function to make an Index object from a space label and position
-SQOperator make_sqoperator(const std::string &index, SQOperatorType type,
-                           SQOperatorStatistics statistics);
+/// Helper function to make an SQOperator object from an index and the type
+SQOperator make_sqoperator(const std::string &index, SQOperatorType type);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const SQOperator &op);

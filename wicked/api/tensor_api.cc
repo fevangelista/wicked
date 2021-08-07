@@ -8,6 +8,11 @@ using namespace pybind11::literals;
 
 /// Export the Indexclass
 void export_Tensor(py::module &m) {
+  py::enum_<SymmetryType>(m, "sym")
+      .value("symm", SymmetryType::Symmetric)
+      .value("anti", SymmetryType::Antisymmetric)
+      .value("none", SymmetryType::Nonsymmetric);
+
   py::class_<Tensor, std::shared_ptr<Tensor>>(m, "Tensor")
       .def(py::init<const std::string &, const std::vector<Index> &,
                     const std::vector<Index> &, SymmetryType>())

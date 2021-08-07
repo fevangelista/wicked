@@ -71,7 +71,8 @@ Index make_index(const std::string &index) {
     throw std::runtime_error("\nCould not convert the index " + index +
                              " to an Index object");
   }
-  auto space = osi->label_to_space(std::string(sm[1])[0]);
+  std::string s = sm[1];
+  auto space = osi->label_to_space(s[0]);
   size_t p = stoi(sm[2]);
   return Index(space, p);
 }
