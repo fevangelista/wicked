@@ -29,5 +29,5 @@ void export_Expression(py::module &m) {
   m.def("operator_expr", &make_operator_expr, "label"_a, "components"_a,
         "normal_ordered"_a, "coefficient"_a = scalar_t(1));
 
-  m.def("string_to_expr", &string_to_sum);
+  m.def("string_to_expr", &string_to_expr);
 }

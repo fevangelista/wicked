@@ -3,9 +3,9 @@
 //#define PRINT_DEBUG 1
 
 #include "test.h"
-         "wicked.h"
+"wicked.h"
 
-using namespace std;
+    using namespace std;
 
 WickTheorem wdt;
 
@@ -15,7 +15,7 @@ test_return_t test_energy1() {
 
   // <F T1>
   auto val = wdt.contract_sum(1, Fov * T1, 0, 0);
-  auto val_test = string_to_sum("f^{v0}_{o0} t^{o0}_{v0}");
+  auto val_test = string_to_expr("f^{v0}_{o0} t^{o0}_{v0}");
   bool pass = (val == val_test);
   return make_return_t(TestPass, pass, {"CCSD Energy <F T1> (1)"});
 }
@@ -26,7 +26,7 @@ test_return_t test_energy2() {
 
   // <V T2>
   auto val = wdt.contract_sum(1, Voovv * T2, 0, 0);
-  auto val_test = string_to_sum("1/4 t^{o0,o1}_{v0,v1} v^{v0,v1}_{o0,o1}");
+  auto val_test = string_to_expr("1/4 t^{o0,o1}_{v0,v1} v^{v0,v1}_{o0,o1}");
   bool pass = (val == val_test);
   return make_return_t(TestPass, pass, {"CCSD Energy <V T2> (2)"});
 }
@@ -38,7 +38,7 @@ test_return_t test_energy3() {
   // 1/2 <V T1 T1>
   auto val = wdt.contract_sum(scalar_t(1, 2), Voovv * T1 * T1, 0, 0);
   auto val_test =
-      string_to_sum("1/2 t^{o0}_{v0} t^{o1}_{v1} v^{v0,v1}_{o0,o1}");
+      string_to_expr("1/2 t^{o0}_{v0} t^{o1}_{v1} v^{v0,v1}_{o0,o1}");
   bool pass = (val == val_test);
   return make_return_t(TestPass, pass, {"CCSD Energy <F T1> (3)"});
 }
@@ -52,7 +52,7 @@ test_return_t test_r1_1() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("f^{o0}_{v0}").canonicalize();
+  auto val_test = string_to_expr("f^{o0}_{v0}").canonicalize();
 
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
@@ -70,7 +70,7 @@ test_return_t test_r1_2() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("f^{v1}_{v0} t^{o0}_{v1}");
+  auto val_test = string_to_expr("f^{v1}_{v0} t^{o0}_{v1}");
 
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
@@ -89,7 +89,7 @@ test_return_t test_r1_3() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-1 f^{o0}_{o1} t^{o1}_{v0}");
+  auto val_test = string_to_expr("-1 f^{o0}_{o1} t^{o1}_{v0}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -106,7 +106,7 @@ test_return_t test_r1_4() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-1 t^{o1}_{v1} v^{o0,v1}_{o1,v0}");
+  auto val_test = string_to_expr("-1 t^{o1}_{v1} v^{o0,v1}_{o1,v0}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -123,7 +123,7 @@ test_return_t test_r1_5() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("1 f^{v1}_{o1} t^{o0,o1}_{v0,v1}");
+  auto val_test = string_to_expr("1 f^{v1}_{o1} t^{o0,o1}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -140,7 +140,7 @@ test_return_t test_r1_6() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-1/2 t^{o0,o1}_{v1,v2} v^{v1,v2}_{o1,v0}");
+  auto val_test = string_to_expr("-1/2 t^{o0,o1}_{v1,v2} v^{v1,v2}_{o1,v0}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -157,7 +157,7 @@ test_return_t test_r1_7() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-1/2 t^{o1,o2}_{v0,v1} v^{o0,v1}_{o1,o2}");
+  auto val_test = string_to_expr("-1/2 t^{o1,o2}_{v0,v1} v^{o0,v1}_{o1,o2}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -176,7 +176,7 @@ test_return_t test_r1_8() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-1 f^{v1}_{o1} t^{o1}_{v0} t^{o0}_{v1}");
+  auto val_test = string_to_expr("-1 f^{v1}_{o1} t^{o1}_{v0} t^{o0}_{v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -196,7 +196,8 @@ test_return_t test_r1_9() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-1 t^{o1}_{v0} t^{o2}_{v1} v^{o0,v1}_{o1,o2}");
+  auto val_test =
+      string_to_expr("-1 t^{o1}_{v0} t^{o2}_{v1} v^{o0,v1}_{o1,o2}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -216,7 +217,8 @@ test_return_t test_r1_10() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-1 t^{o0}_{v1} t^{o1}_{v2} v^{v1,v2}_{o1,v0}");
+  auto val_test =
+      string_to_expr("-1 t^{o0}_{v1} t^{o1}_{v2} v^{v1,v2}_{o1,v0}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -237,8 +239,8 @@ test_return_t test_r1_11() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test =
-      string_to_sum("-1 t^{o1}_{v0} t^{o0}_{v1} t^{o2}_{v2} v^{v1,v2}_{o1,o2}");
+  auto val_test = string_to_expr(
+      "-1 t^{o1}_{v0} t^{o0}_{v1} t^{o2}_{v2} v^{v1,v2}_{o1,o2}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -259,9 +261,9 @@ test_return_t test_r1_12_14() {
     val.add(eq.rhs(), eq.rhs_factor());
   }
   auto val_test =
-      string_to_sum("1 t^{o1}_{v1} t^{o0,o2}_{v0,v2} v^{v1,v2}_{o1,o2}") +
-      string_to_sum("-1/2 t^{o0}_{v1} t^{o1,o2}_{v0,v2} v^{v1,v2}_{o1,o2}") +
-      string_to_sum("-1/2 t^{o1}_{v0} t^{o0,o2}_{v1,v2} v^{v1,v2}_{o1,o2}");
+      string_to_expr("1 t^{o1}_{v1} t^{o0,o2}_{v0,v2} v^{v1,v2}_{o1,o2}") +
+      string_to_expr("-1/2 t^{o0}_{v1} t^{o1,o2}_{v0,v2} v^{v1,v2}_{o1,o2}") +
+      string_to_expr("-1/2 t^{o1}_{v0} t^{o0,o2}_{v1,v2} v^{v1,v2}_{o1,o2}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -279,7 +281,7 @@ test_return_t test_r2_1() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("1 v^{o0,o1}_{v0,v1}");
+  auto val_test = string_to_expr("1 v^{o0,o1}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -297,7 +299,7 @@ test_return_t test_r2_2() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-2 f^{v2}_{v0} t^{o0,o1}_{v1,v2}");
+  auto val_test = string_to_expr("-2 f^{v2}_{v0} t^{o0,o1}_{v1,v2}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -315,7 +317,7 @@ test_return_t test_r2_3() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("2 f^{o0}_{o2} t^{o1,o2}_{v0,v1}");
+  auto val_test = string_to_expr("2 f^{o0}_{o2} t^{o1,o2}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -333,7 +335,7 @@ test_return_t test_r2_4() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("1/2 t^{o2,o3}_{v0,v1} v^{o0,o1}_{o2,o3}");
+  auto val_test = string_to_expr("1/2 t^{o2,o3}_{v0,v1} v^{o0,o1}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -351,7 +353,7 @@ test_return_t test_r2_5() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("1/2 t^{o0,o1}_{v2,v3} v^{v2,v3}_{v0,v1}");
+  auto val_test = string_to_expr("1/2 t^{o0,o1}_{v2,v3} v^{v2,v3}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -369,7 +371,7 @@ test_return_t test_r2_6() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-4 t^{o0,o2}_{v0,v2} v^{o1,v2}_{o2,v1}");
+  auto val_test = string_to_expr("-4 t^{o0,o2}_{v0,v2} v^{o1,v2}_{o2,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -387,7 +389,7 @@ test_return_t test_r2_7() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-2 t^{o0}_{v2} v^{o1,v2}_{v0,v1}");
+  auto val_test = string_to_expr("-2 t^{o0}_{v2} v^{o1,v2}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -405,7 +407,7 @@ test_return_t test_r2_8() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("-2 t^{o2}_{v0} v^{o0,o1}_{o2,v1}");
+  auto val_test = string_to_expr("-2 t^{o2}_{v0} v^{o0,o1}_{o2,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;);
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -425,12 +427,13 @@ test_return_t test_r2_9_12() {
     val.add(eq.rhs(), eq.rhs_factor());
   }
   auto val_test =
-      string_to_sum("2 t^{o0,o2}_{v0,v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}") +
-      string_to_sum(
+      string_to_expr(
+          "2 t^{o0,o2}_{v0,v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}") +
+      string_to_expr(
           "-1 t^{o0,o1}_{v0,v2} t^{o2,o3}_{v1,v3} v^{v2,v3}_{o2,o3}") +
-      string_to_sum(
+      string_to_expr(
           "-1 t^{o0,o2}_{v0,v1} t^{o1,o3}_{v2,v3} v^{v2,v3}_{o2,o3}") +
-      string_to_sum(
+      string_to_expr(
           "1/4 t^{o2,o3}_{v0,v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
@@ -451,7 +454,7 @@ test_return_t test_r2_13() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("1 t^{o2}_{v0} t^{o3}_{v1} v^{o0,o1}_{o2,o3}");
+  auto val_test = string_to_expr("1 t^{o2}_{v0} t^{o3}_{v1} v^{o0,o1}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -471,7 +474,7 @@ test_return_t test_r2_14() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{v0,v1}");
+  auto val_test = string_to_expr("t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{v0,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -491,7 +494,7 @@ test_return_t test_r2_15() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("4 t^{o2}_{v0} t^{o0}_{v2} v^{o1,v2}_{o2,v1}");
+  auto val_test = string_to_expr("4 t^{o2}_{v0} t^{o0}_{v2} v^{o1,v2}_{o2,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -512,8 +515,9 @@ test_return_t test_r2_16_17() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum("2 f^{v2}_{o2} t^{o0}_{v2} t^{o1,o2}_{v0,v1}") +
-                  string_to_sum("2 f^{v2}_{o2} t^{o2}_{v0} t^{o0,o1}_{v1,v2}");
+  auto val_test =
+      string_to_expr("2 f^{v2}_{o2} t^{o0}_{v2} t^{o1,o2}_{v0,v1}") +
+      string_to_expr("2 f^{v2}_{o2} t^{o2}_{v0} t^{o0,o1}_{v1,v2}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -534,9 +538,9 @@ test_return_t test_r2_18_21_22() {
     val.add(eq.rhs(), eq.rhs_factor());
   }
   auto val_test =
-      string_to_sum("2 t^{o2}_{v2} t^{o0,o3}_{v0,v1} v^{o1,v2}_{o2,o3}") +
-      string_to_sum("-1 t^{o0}_{v2} t^{o2,o3}_{v0,v1} v^{o1,v2}_{o2,o3}") +
-      string_to_sum("4 t^{o2}_{v0} t^{o0,o3}_{v1,v2} v^{o1,v2}_{o2,o3}");
+      string_to_expr("2 t^{o2}_{v2} t^{o0,o3}_{v0,v1} v^{o1,v2}_{o2,o3}") +
+      string_to_expr("-1 t^{o0}_{v2} t^{o2,o3}_{v0,v1} v^{o1,v2}_{o2,o3}") +
+      string_to_expr("4 t^{o2}_{v0} t^{o0,o3}_{v1,v2} v^{o1,v2}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -557,9 +561,9 @@ test_return_t test_r2_19_20_23() {
     val.add(eq.rhs(), eq.rhs_factor());
   }
   auto val_test =
-      string_to_sum("2 t^{o2}_{v2} t^{o0,o1}_{v0,v3} v^{v2,v3}_{o2,v1}") +
-      string_to_sum("4 t^{o0}_{v2} t^{o1,o2}_{v0,v3} v^{v2,v3}_{o2,v1}") +
-      string_to_sum("-1 t^{o2}_{v0} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,v1}");
+      string_to_expr("2 t^{o2}_{v2} t^{o0,o1}_{v0,v3} v^{v2,v3}_{o2,v1}") +
+      string_to_expr("4 t^{o0}_{v2} t^{o1,o2}_{v0,v3} v^{v2,v3}_{o2,v1}") +
+      string_to_expr("-1 t^{o2}_{v0} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
   bool pass = (val == val_test);
@@ -580,8 +584,8 @@ test_return_t test_r2_24() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test =
-      string_to_sum("-2 t^{o2}_{v0} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,v1}");
+  auto val_test = string_to_expr(
+      "-2 t^{o2}_{v0} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,v1}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -602,8 +606,8 @@ test_return_t test_r2_25() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test =
-      string_to_sum("-2 t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} v^{o1,v2}_{o2,o3}");
+  auto val_test = string_to_expr(
+      "-2 t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} v^{o1,v2}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);
   bool pass = (val == val_test);
@@ -626,15 +630,15 @@ test_return_t test_r2_26_30() {
     val.add(eq.rhs(), eq.rhs_factor());
   }
   auto val_test =
-      string_to_sum(
+      string_to_expr(
           "-2 t^{o0}_{v2} t^{o2}_{v3} t^{o1,o3}_{v0,v1} v^{v2,v3}_{o2,o3}") +
-      string_to_sum(
+      string_to_expr(
           "-2 t^{o2}_{v0} t^{o3}_{v2} t^{o0,o1}_{v1,v3} v^{v2,v3}_{o2,o3}") +
-      string_to_sum(
+      string_to_expr(
           "1/2 t^{o0}_{v2} t^{o1}_{v3} t^{o2,o3}_{v0,v1} v^{v2,v3}_{o2,o3}") +
-      string_to_sum(
+      string_to_expr(
           "1/2 t^{o2}_{v0} t^{o3}_{v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}") +
-      string_to_sum(
+      string_to_expr(
           "-4 t^{o2}_{v0} t^{o0}_{v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;)
@@ -657,7 +661,7 @@ test_return_t test_r2_31() {
   for (const auto &eq : sum.to_manybody_equation("r")) {
     val.add(eq.rhs(), eq.rhs_factor());
   }
-  auto val_test = string_to_sum(
+  auto val_test = string_to_expr(
       "t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,o3}");
   TEST_DEBUG_PRINT(cout << "Result: " << val << endl;)
   TEST_DEBUG_PRINT(cout << "Test:   " << val_test << endl;);

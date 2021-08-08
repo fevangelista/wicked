@@ -49,6 +49,10 @@ public:
   void add_space(char label, FieldType field_type, SpaceType space_type,
                  const std::vector<std::string> &indices);
 
+  // /// Add a composite space
+  // void add_composite_space(char label,
+  //                          const std::vector<char> &elementary_spaces);
+
   /// Return the number of elementary spaces
   int num_spaces() { return static_cast<int>(space_info_.size()); }
 

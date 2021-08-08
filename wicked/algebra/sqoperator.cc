@@ -69,7 +69,7 @@ std::string SQOperator::ambit() const {
 }
 
 SQOperator make_sqoperator(const std::string &index, SQOperatorType type) {
-  return SQOperator(type, make_index(index));
+  return SQOperator(type, make_index_from_str(index));
 }
 
 std::ostream &operator<<(std::ostream &os, const SQOperator &op) {

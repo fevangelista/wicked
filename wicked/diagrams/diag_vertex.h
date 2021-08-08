@@ -1,6 +1,7 @@
 #ifndef _wicked_diag_vertex_h_
 #define _wicked_diag_vertex_h_
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -9,6 +10,11 @@
 /// A class to represent a collection of creation and annilation
 /// operators, which we call a diagram vertex
 class DiagVertex {
+  // Here we use an optimized way to store the vertex
+  // We assume that we work at most with 8 different spaces, which
+  // should be enough for virtually any type of application
+  static constexpr int max_spaces_ = 8;
+  using vertex_t = std::array<std::pair<int, int>, max_spaces_>;
 
 public:
   /// Constructor
@@ -18,7 +24,7 @@ public:
   DiagVertex(const std::vector<int> &cre, const std::vector<int> &ann);
 
   /// Return a vector of pairs of creation/annihilation operators
-  const std::vector<std::pair<int, int>> &vertex() const;
+  const vertex_t &vertex() const;
 
   /// Return a pair of creation/annihilation operators in space
   const std::pair<int, int> &vertex(int space) const;
@@ -55,7 +61,7 @@ public:
 
 private:
   /// The number of creation/annihilation operators in each space
-  std::vector<std::pair<int, int>> vertex_;
+  vertex_t vertex_ = {};
 };
 
 // Helper functions

@@ -62,6 +62,8 @@ rational operator*(rational lhs, const rational &rhs);
 /// division
 rational operator/(rational lhs, const rational &rhs);
 
+rational make_rational_from_str(const std::string &s);
+
 std::ostream &operator<<(std::ostream &os, const rational &rhs);
 
 #endif // _wicked_rational_h_

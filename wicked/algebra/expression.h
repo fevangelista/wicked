@@ -83,7 +83,7 @@ std::ostream &operator<<(std::ostream &os, const Expression &sum);
 enum class TensorSyntax { Wicked, TCE };
 
 ///// Create a sum from a string
-Expression string_to_sum(const std::string &s);
+Expression string_to_expr(const std::string &s);
 
 Expression make_operator_expr(const std::string &label,
                               const std::vector<std::string> &components,

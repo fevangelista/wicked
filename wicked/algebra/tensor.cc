@@ -124,13 +124,28 @@ Tensor make_tensor(const std::string &label,
                    SymmetryType symmetry) {
   std::vector<Index> lower_indices;
   for (const auto &l : lower) {
-    lower_indices.emplace_back(make_index(l));
+    lower_indices.emplace_back(make_index_from_str(l));
   }
   std::vector<Index> upper_indices;
   for (const auto &u : upper) {
-    upper_indices.emplace_back(make_index(u));
+    upper_indices.emplace_back(make_index_from_str(u));
   }
   return Tensor(label, lower_indices, upper_indices, symmetry);
+}
+
+Tensor make_tensor_from_str(const std::string &s) {
+  std::smatch sm;
+  auto tensor_re =
+      std::regex("([a-zA-Z0-9]+)\\^\\{([\\w,\\s]*)\\}_\\{([\\w,\\s]*)\\}");
+  auto m = std::regex_match(s, sm, tensor_re);
+  if (not m) {
+    throw std::runtime_error("\nCould not convert the string " + s +
+                             " to a Tensor object");
+  }
+  std::string label = sm[1];
+  auto upper = make_indices_from_str(sm[2]);
+  auto lower = make_indices_from_str(sm[3]);
+  return Tensor(label, lower, upper);
 }
 
 // std::string Tensor::ambit() {

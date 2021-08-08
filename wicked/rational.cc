@@ -1,3 +1,5 @@
+#include <regex>
+
 #include "rational.h"
 
 rational::rational() : numerator_(0), denominator_(1) {}
@@ -84,9 +86,10 @@ std::string rational::repr() const {
   }
   std::string s = (numerator_ > 0) ? "+" : "-";
   if (denominator_ == 1) {
-    s += std::to_string(numerator_);
+    s += std::to_string(std::abs(numerator_));
   } else {
-    s += std::to_string(numerator_) + "/" + std::to_string(denominator_);
+    s += std::to_string(std::abs(numerator_)) + "/" +
+         std::to_string(denominator_);
   }
   return s;
 }
@@ -177,4 +180,30 @@ void rational::reduce() {
     numerator_ /= gcd;
     denominator_ /= gcd;
   }
+}
+
+#include <iostream>
+
+rational make_rational_from_str(const std::string &s) {
+  std::smatch sm;
+  auto factor_re = std::regex("^\\s*([+-])?(\\d*)?\\/?(\\d*)?\\s*");
+  auto m = std::regex_match(s, sm, factor_re);
+  if (not m) {
+    throw std::runtime_error("\nCould not convert the string " + s +
+                             " to a rational object");
+  }
+  std::string sign = sm[1];
+  std::string numerator_str = sm[2];
+  std::string denominator_str = sm[3];
+  int numerator = 1, denominator = 1;
+  if (sign == "-") {
+    numerator *= -1;
+  }
+  if (numerator_str.size() > 0) {
+    numerator *= std::stoi(numerator_str);
+  }
+  if (denominator_str.size() > 0) {
+    denominator *= std::stoi(denominator_str);
+  }
+  return rational(numerator, denominator);
 }

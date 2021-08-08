@@ -81,6 +81,10 @@ Tensor make_tensor(const std::string &label,
                    const std::vector<std::string> &upper,
                    SymmetryType symmetry);
 
+/// Helper function to make a Tensor object from a string
+/// Accepts inputs of the form "t_{o0}^{v_0}"
+Tensor make_tensor_from_str(const std::string &index);
+
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Tensor &tensor);
 

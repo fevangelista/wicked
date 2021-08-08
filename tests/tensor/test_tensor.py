@@ -8,6 +8,14 @@ def test_tensor():
     w.add_space("a", "fermion", "general", ["u", "v"])
     w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
 
+    # Create a tensor from a string
+    t = w.tensor("T^{v0}_{a0}")
+    assert str(t) == "T^{v0}_{a0}"
+
+    # Create a tensor from a string
+    t = w.tensor("T^{o_0,o_1}_{v_0,v_1}")
+    assert str(t) == "T^{o0,o1}_{v0,v1}"
+
     # Create a tensor with one lower index
     t = w.tensor("T", ["o_0"], [], w.sym.none)
     assert str(t) == "T^{}_{o0}"

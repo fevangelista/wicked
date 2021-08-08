@@ -6,24 +6,23 @@
 
 using namespace std;
 
-DiagVertex::DiagVertex()
-    : vertex_(std::vector<std::pair<int, int>>(osi->num_spaces(),
-                                               std::make_pair(0, 0))) {
+DiagVertex::DiagVertex() {
+  // : vertex_(std::vector<std::pair<int, int>>(osi->num_spaces(),
+  //                                            std::make_pair(0, 0))) {
   // for (int i = 0; i < osi->num_spaces(); i++) {
   //   vertex_[i] = std::make_pair(0, 0);
   // }
 }
 
 DiagVertex::DiagVertex(const std::vector<int> &cre, const std::vector<int> &ann)
-    : vertex_(std::vector<std::pair<int, int>>(osi->num_spaces())) {
+// : vertex_(std::vector<std::pair<int, int>>(osi->num_spaces()))
+{
   for (int i = 0; i < osi->num_spaces(); i++) {
     vertex_[i] = std::make_pair(cre[i], ann[i]);
   }
 }
 
-const std::vector<std::pair<int, int>> &DiagVertex::vertex() const {
-  return vertex_;
-}
+const DiagVertex::vertex_t &DiagVertex::vertex() const { return vertex_; }
 
 const std::pair<int, int> &DiagVertex::vertex(int space) const {
   return vertex_[space];

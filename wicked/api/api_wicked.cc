@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "../wicked/combinatorics.h"
 #include "../wicked/rational.h"
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
@@ -27,7 +28,14 @@ PYBIND11_MODULE(wicked, m) {
   py::class_<rational, std::shared_ptr<rational>>(m, "rational")
       .def(py::init<>())
       .def(py::init<int>())
-      .def(py::init<int, int>());
+      .def(py::init<int, int>())
+      .def("__eq__",
+           [](const rational &lhs, const rational &rhs) { return lhs == rhs; })
+      .def("__repr__", &rational::repr);
+
+  m.def("make_rational", &make_rational_from_str);
+
+  m.def("int_part", &integer_partitions);
 
   export_OrbitalSpaceInfo(m);
   export_Index(m);

@@ -20,20 +20,21 @@ DiagOpExpression::DiagOpExpression(
 
 void DiagOpExpression::add(const std::vector<DiagOperator> &vec_dop,
                            scalar_t factor) {
-  auto search = sum_.find(vec_dop);
+  auto search = terms_.find(vec_dop);
 
-  if (search != sum_.end()) {
+  if (search != terms_.end()) {
     /// Found, then just add the factor to the existing term
     search->second += factor;
     if (search->second == 0) {
-      sum_.erase(search);
+      terms_.erase(search);
     }
   } else {
-    sum_[vec_dop] = factor;
+    terms_[vec_dop] = factor;
   }
 }
 
-const dop_sum_t &DiagOpExpression::sum() const { return sum_; }
+const dop_expr_t &DiagOpExpression::sum() const { return terms_; }
+const dop_expr_t &DiagOpExpression::terms() const { return terms_; }
 
 DiagOpExpression &DiagOpExpression::operator+=(const DiagOpExpression &rhs) {
   for (const auto &vec_dop_factor : rhs.sum()) {
@@ -61,19 +62,19 @@ DiagOpExpression &DiagOpExpression::operator*=(const DiagOpExpression &rhs) {
       result.add(prod, r_vec_dop_factor.second * l_vec_dop_factor.second);
     }
   }
-  sum_ = result.sum_;
+  terms_ = result.terms_;
   return *this;
 }
 
 DiagOpExpression &DiagOpExpression::operator*=(scalar_t factor) {
-  for (auto &vec_dop_factor : sum_) {
+  for (auto &vec_dop_factor : terms_) {
     vec_dop_factor.second *= factor;
   }
   return *this;
 }
 
 DiagOpExpression &DiagOpExpression::operator/=(scalar_t factor) {
-  for (auto &vec_dop_factor : sum_) {
+  for (auto &vec_dop_factor : terms_) {
     vec_dop_factor.second /= factor;
   }
   return *this;
@@ -81,7 +82,7 @@ DiagOpExpression &DiagOpExpression::operator/=(scalar_t factor) {
 
 std::string DiagOpExpression::str() const {
   std::vector<std::string> str_vec;
-  for (auto &vec_dop_factor : sum_) {
+  for (auto &vec_dop_factor : terms_) {
     std::string s;
     s += vec_dop_factor.second.str(true);
     for (auto &dop : vec_dop_factor.first) {

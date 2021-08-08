@@ -53,7 +53,4 @@ std::vector<Term> wick_product(const Term &A, const Term &B) {
   std::vector<Term> result;
   scalar_t ab = A.coefficient() * B.coefficient();
   return result;
-
-  
-
 }

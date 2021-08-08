@@ -27,10 +27,13 @@ public:
                       int minrank, int maxrank);
 
   /// Contract a product of sums of operators
-  Expression contract(scalar_t factor, const DiagOpExpression &dop_sum,
+  Expression contract(scalar_t factor, const DiagOpExpression &expr,
                       int minrank, int maxrank);
 
+  /// Set the amount of printing
   void set_print(PrintLevel print);
+
+  void set_max_cumulant(int val);
 
 private:
   std::vector<std::vector<int>> contractions_;
@@ -53,6 +56,11 @@ private:
 
   /// Generates all composite contractions
   void generate_composite_contractions(const std::vector<DiagOperator> &ops);
+
+  /// Process the contractions
+  Expression process_contractions(scalar_t factor,
+                                  const std::vector<DiagOperator> &ops,
+                                  int minrank, int maxrank);
 
   // ==> Backtracking routines <==
 
@@ -110,6 +118,7 @@ private:
 
   /// The number of contractions found
   int ncontractions_ = 0;
+
   /// The largest allowed cumulant
   int maxcumulant_ = 100;
 

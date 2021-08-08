@@ -2,7 +2,7 @@ import wicked as w
 
 
 def test_expression():
-    """Test the Tensor class"""
+    """Test the Expression class"""
     w.reset_space()
     w.add_space("o", "fermion", "occupied", ["i", "j"])
     w.add_space("a", "fermion", "general", ["u", "v"])
@@ -56,6 +56,21 @@ def test_expression2():
     assert str(expr) == "T^{a1,o0}_{v0,a0} { a+(v0) a+(a0) a-(o0) a-(a1) }"
 
 
+def test_expression3():
+    w.reset_space()
+    w.add_space("o", "fermion", "occupied", ["i", "j"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
+    # empty string corresponds to no operator
+    expr = w.string_to_expr("")
+    assert str(expr) == ""
+
+    # identity
+    expr = w.string_to_expr("1")
+    assert str(expr) == "1"
+
+
 if __name__ == "__main__":
     test_expression()
     test_expression2()
+    test_expression3()

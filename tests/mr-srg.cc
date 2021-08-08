@@ -1,9 +1,9 @@
 #include <iostream>
 
 #include "test.h"
-         "wicked.h"
+"wicked.h"
 
-using namespace std;
+    using namespace std;
 
 test_return_t test_Fac_Tca() {
   WickTheorem wdt;
@@ -14,11 +14,11 @@ test_return_t test_Fac_Tca() {
   auto sum = wdt.contract_sum(1, commutator(Fac, Tca), 0, 2);
 
   auto sum_test =
-      string_to_sum("eta1^{a1}_{a0} f^{a0}_{c0} t^{c0}_{a1}") +
-      string_to_sum(
+      string_to_expr("eta1^{a1}_{a0} f^{a0}_{c0} t^{c0}_{a1}") +
+      string_to_expr(
           "eta1^{a1}_{a0} f^{a0}_{c0} t^{c1}_{a1} { a+(c0) a-(c1) }") +
-      string_to_sum("-f^{a0}_{c0} t^{c0}_{a1} { a+(a1) a-(a0) }") +
-      string_to_sum(
+      string_to_expr("-f^{a0}_{c0} t^{c0}_{a1} { a+(a1) a-(a0) }") +
+      string_to_expr(
           "f^{a0}_{c0} gamma1^{a1}_{a0} t^{c1}_{a1} { a+(c0) a-(c1) }");
 
   bool pass = (sum == sum_test);
@@ -34,9 +34,9 @@ test_return_t test_Faa_Tca() {
   auto sum = wdt.contract_sum(1, commutator(Faa, Tca), 0, 2);
 
   auto sum_test =
-      string_to_sum(
+      string_to_expr(
           "eta1^{a2}_{a1} f^{a1}_{a0} t^{c0}_{a2} { a+(a0) a-(c0) }") +
-      string_to_sum(
+      string_to_expr(
           "f^{a1}_{a0} gamma1^{a2}_{a1} t^{c0}_{a2} { a+(a0) a-(c0) }");
 
   bool pass = (sum == sum_test);
@@ -52,7 +52,7 @@ test_return_t test_Fvv_Tcv() {
   // [Fvv,Tcv]
   auto sum = wdt.contract_sum(1, commutator(Fvv, Tcv), 0, 2);
 
-  auto sum_test = string_to_sum("f^{v1}_{v0} t^{c0}_{v1} { a+(v0) a-(c0) }");
+  auto sum_test = string_to_expr("f^{v1}_{v0} t^{c0}_{v1} { a+(v0) a-(c0) }");
 
   bool pass = (sum == sum_test);
   return make_return_t(TestPass, pass, {"[Fvv,Tcv]"});
@@ -67,9 +67,9 @@ test_return_t test_Faa_Tav() {
   auto sum = wdt.contract_sum(1, commutator(Faa, Tav), 0, 2);
 
   auto sum_test =
-      string_to_sum(
+      string_to_expr(
           "-eta1^{a2}_{a1} f^{a0}_{a2} t^{a1}_{v0} { a+(v0) a-(a0) }") +
-      string_to_sum(
+      string_to_expr(
           "-f^{a0}_{a1} gamma1^{a1}_{a2} t^{a2}_{v0} { a+(v0) a-(a0) }");
 
   bool pass = (sum == sum_test);

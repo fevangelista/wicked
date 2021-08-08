@@ -7,7 +7,7 @@
 #include "diag_operator.h"
 #include "wicked-def.h"
 
-using dop_sum_t = std::map<std::vector<DiagOperator>, scalar_t>;
+using dop_expr_t = std::map<std::vector<DiagOperator>, scalar_t>;
 
 /// A class to represent operators
 class DiagOpExpression {
@@ -23,7 +23,8 @@ public:
   void add(const std::vector<DiagOperator> &vec_dop, scalar_t factor = 1);
 
   /// Return the sum object
-  const dop_sum_t &sum() const;
+  const dop_expr_t &sum() const;
+  const dop_expr_t &terms() const;
 
   /// addition assignment
   DiagOpExpression &operator+=(const DiagOpExpression &rhs);
@@ -41,7 +42,7 @@ public:
 
 private:
   /// A vector containing pairs ((op1, op2, ...), factor)
-  dop_sum_t sum_;
+  dop_expr_t terms_;
 };
 
 /// multiplication

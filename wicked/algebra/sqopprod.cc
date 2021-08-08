@@ -131,10 +131,10 @@ SQOpProd make_sqopprod(const std::vector<std::string> &cre_str,
                        const std::vector<std::string> &ann_str) {
   std::vector<Index> cre, ann;
   for (const auto &c : cre_str) {
-    cre.push_back(make_index(c));
+    cre.push_back(make_index_from_str(c));
   }
   for (const auto &c : ann_str) {
-    ann.push_back(make_index(c));
+    ann.push_back(make_index_from_str(c));
   }
   return SQOpProd(cre, ann);
 }

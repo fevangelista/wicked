@@ -29,7 +29,7 @@ void export_DiagOpExpression(py::module &m) {
       .def("__str__", &DiagOpExpression::str)
       .def("__matmul__", [](const DiagOpExpression &lhs,
                             const DiagOpExpression &rhs) { return lhs * rhs; });
-  m.def("op", &make_diag_operator_expression,
+  m.def("op", &make_diag_operator_expression2,
         "Create a DiagOpExpression object");
   m.def("commutator", &commutator,
         "Create the commutator of two DiagOpExpression objects");

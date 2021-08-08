@@ -112,16 +112,22 @@ std::string Expression::str() const {
   std::vector<std::string> str_vec;
   int n = 0;
   for (auto &kv : terms_) {
-    std::string term_str;
-    if (n == 0) {
-      term_str += kv.second.str(false);
+    std::string symterm_str = kv.first.str();
+    std::string factor_str;
+    if (n == 0) { // don't show the first element sign unless it's negative
+      factor_str += kv.second.str(false);
     } else {
-      term_str += kv.second.str(true);
+      factor_str += kv.second.str(true);
     }
-    if ((term_str.size() > 1) and (term_str != "-")) {
-      term_str += " ";
+    // rational(1,1).str() returns "", so we need to handle the case of
+    // a pure scalar term with no operator
+    if ((factor_str.size() > 1) and (factor_str != "-")) {
+      factor_str += " ";
     }
-    str_vec.push_back(term_str + kv.first.str());
+    if (factor_str.size() + symterm_str.size() == 0) {
+      factor_str = (n == 0) ? "1" : "+1";
+    }
+    str_vec.push_back(factor_str + symterm_str);
     n++;
   }
   return (join(str_vec, "\n"));
@@ -227,77 +233,44 @@ Expression make_operator_expr(const std::string &label,
   return result;
 }
 
-Expression string_to_sum(const std::string &s) {
+Expression string_to_expr(const std::string &s) {
+
   TensorSyntax syntax = TensorSyntax::Wicked;
   Expression sum;
 
-  //  std::cout << "\n  Parsing: \"" << s << "\"" << std::endl;
+  // if we have an empty string, do not parse it (the code below would interpret
+  // it as the term 1)
+  if (s.size() == 0)
+    return sum;
 
   //"f^{v0}_{o0} t^{o0}_{v0}"
   std::string factor_re;
   std::string tensor_re;
   std::string operator_re;
   if (syntax == TensorSyntax::Wicked) {
-    tensor_re = "([a-zA-Z0-9]+)\\^\\{([\\w,\\s]*)\\}_\\{([\\w,\\s]*)\\}";
+    tensor_re = "([a-zA-Z0-9]+\\^\\{[\\w,\\s]*\\}_\\{[\\w,\\s]*\\})";
     operator_re = "a([+-]{1,1})\\(([\\w,\\d]*)\\)";
-    factor_re = "^\\s*([+-]?\\d*)?/?(\\d*)?\\s*";
+    factor_re = "^\\s*([+-]?\\d*\\/?\\d*)\\s*";
   }
 
-  //  std::cout << "Parsing tensors: " << std::endl;
   auto tensors = findall(s, tensor_re);
-  auto operators = findall(s, operator_re);
 
   SymbolicTerm term;
-  for (size_t n = 0; n < tensors.size(); n += 3) {
-    std::string label = tensors[n];
-
-    // Process the upper indices
-    auto upper_idx = split_indices(tensors[n + 1]);
-    std::vector<Index> upper;
-    for (const auto &idx : upper_idx) {
-      upper.push_back(make_index(idx));
-    }
-
-    // Process the lower indices
-    auto lower_idx = split_indices(tensors[n + 2]);
-    std::vector<Index> lower;
-    for (const auto &idx : lower_idx) {
-      lower.push_back(make_index(idx));
-    }
-    term.add(Tensor(label, lower, upper));
+  for (auto s : tensors) {
+    term.add(make_tensor_from_str(s));
   }
 
-  //  for (auto s : operators) {
-  //    std::cout << s << std::endl;
-  //  }
+  auto operators = findall(s, operator_re);
 
   for (size_t n = 0; n < operators.size(); n += 2) {
     SQOperatorType type = operators[n] == "+" ? SQOperatorType::Creation
                                               : SQOperatorType::Annihilation;
-    Index index = make_index(operators[n + 1]);
+    Index index = make_index_from_str(operators[n + 1]);
     term.add(SQOperator(type, index));
   }
 
-  //  std::cout << "Parsing factor: " << std::endl;
-
   auto factor_vec = findall(s, factor_re);
-  //  for (auto f : factor_vec) {
-  //    std::cout << "Factor: " << f << std::endl;
-  //  }
-  int numerator = 1;
-  int denominator = 1;
-  if (factor_vec.size() == 2) {
-    if (factor_vec[0] == "") {
-    } else if (factor_vec[0] == "-") {
-      numerator = -1;
-    } else {
-      numerator = std::stoi(factor_vec[0]);
-    }
-    if (factor_vec[1] != "") {
-      denominator = std::stoi(factor_vec[1]);
-    }
-  }
-  scalar_t factor(numerator, denominator);
+  scalar_t factor = make_rational_from_str(factor_vec[0]);
 
   sum.add(term, factor);
 

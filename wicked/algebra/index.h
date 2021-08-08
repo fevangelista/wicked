@@ -67,7 +67,8 @@ using index_map_t = std::map<Index, Index>;
 
 /// Helper function to make an Index object from a space label and position
 /// Accepts inputs of the form "o0", "o_0"
-Index make_index(const std::string &index);
+Index make_index_from_str(const std::string &index);
+std::vector<Index> make_indices_from_str(const std::string &index);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Index &idx);

@@ -16,7 +16,7 @@ bool test_Acc_Bcc() {
   auto c2 = wdt.contract(1, {opBoo, opAoo}, 0, 2);
   c1 -= c2;
   //  cout << "\n" << c1 << endl;
-  auto e1_test = string_to_sum("f^{v0}_{o0} t^{o0}_{v0}");
+  auto e1_test = string_to_expr("f^{v0}_{o0} t^{o0}_{v0}");
   return true; //(c1 == e1_test);
 }
 

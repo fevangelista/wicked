@@ -1,12 +1,11 @@
 #ifndef _wicked_combinatorics_h_
 #define _wicked_combinatorics_h_
 
-#include <vector>
 #include <functional>
+#include <vector>
 
 typedef std::vector<std::vector<int>> vecvecint;
 typedef std::vector<int> vecint;
-
 
 int factorial(int n);
 
@@ -15,7 +14,9 @@ int binomial(int n, int k);
 // ==> Integer partitions <==
 
 /// Generate all the partitions of the integer n
-std::vector<std::vector<int>> integer_partitions(int n);
+/// For example, for n = 4 this code generates
+/// [[1, 1, 1, 1], [2, 1, 1], [2, 2], [3, 1], [4]]
+std::vector<std::vector<int>> integer_partitions(int n, int maxlen = 1024);
 
 /// Generate all the even partitions of the even integer n
 std::vector<std::vector<int>> even_integer_partitions(int n);

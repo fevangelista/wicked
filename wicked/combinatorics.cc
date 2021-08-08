@@ -1,5 +1,5 @@
-#include <assert.h>
 #include <algorithm>
+#include <assert.h>
 #include <iostream>
 #include <numeric>
 
@@ -50,18 +50,22 @@ int permutation_sign(const std::vector<int> &vec) {
   return (sign % 2 == 0) ? 1 : -1;
 }
 
-std::vector<std::vector<int>> integer_partitions(int n) {
+std::vector<std::vector<int>> integer_partitions(int n, int maxlen) {
   std::vector<std::vector<int>> partitions;
   if (n > 1) {
     // Implements the ZS2 algorithm by A. Zoghbiu and I. Stojmenovic'
     // see Intern. J. Computer Math., Vol. 70. pp. 319
     std::vector<int> x(n + 1, 1);
-    partitions.push_back(std::vector<int>(x.begin() + 1, x.begin() + n + 1));
+    if (n <= maxlen) {
+      partitions.push_back(std::vector<int>(x.begin() + 1, x.begin() + n + 1));
+    }
     x[0] = 1;
     x[1] = 2;
     int h = 1;
     int m = n - 1;
-    partitions.push_back(std::vector<int>(x.begin() + 1, x.begin() + m + 1));
+    if (m <= maxlen) {
+      partitions.push_back(std::vector<int>(x.begin() + 1, x.begin() + m + 1));
+    }
     while (x[1] != n) {
       if (m - h > 1) {
         h++;
@@ -82,7 +86,10 @@ std::vector<std::vector<int>> integer_partitions(int n) {
         }
         m = h + r - 1;
       }
-      partitions.push_back(std::vector<int>(x.begin() + 1, x.begin() + m + 1));
+      if (m <= maxlen) {
+        partitions.push_back(
+            std::vector<int>(x.begin() + 1, x.begin() + m + 1));
+      }
     }
   } else if (n == 0) {
     // Special case not handled by ZS2
