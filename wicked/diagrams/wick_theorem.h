@@ -24,11 +24,11 @@ public:
 
   /// Contract a product of operators
   Expression contract(scalar_t factor, const std::vector<DiagOperator> &ops,
-                      int minrank, int maxrank);
+                      const int minrank, const int maxrank);
 
   /// Contract a product of sums of operators
   Expression contract(scalar_t factor, const DiagOpExpression &expr,
-                      int minrank, int maxrank);
+                      const int minrank, const int maxrank);
 
   /// Set the amount of printing
   void set_print(PrintLevel print);
@@ -55,12 +55,13 @@ private:
   generate_elementary_contractions(const std::vector<DiagOperator> &ops);
 
   /// Generates all composite contractions
-  void generate_composite_contractions(const std::vector<DiagOperator> &ops);
+  void generate_composite_contractions(const std::vector<DiagOperator> &ops,
+                                       const int minrank, const int maxrank);
 
   /// Process the contractions
   Expression process_contractions(scalar_t factor,
                                   const std::vector<DiagOperator> &ops,
-                                  int minrank, int maxrank);
+                                  const int minrank, const int maxrank);
 
   // ==> Backtracking routines <==
 
@@ -69,7 +70,8 @@ private:
   void generate_contractions_backtrack(
       std::vector<int> a, int k,
       const std::vector<std::vector<DiagVertex>> &el_contr_vec,
-      std::vector<DiagVertex> &free_vertex_vec);
+      std::vector<DiagVertex> &free_vertex_vec, const int minrank,
+      const int maxrank);
 
   /// Return a vector of indices of elementary contractions that can be added to
   /// the current solution. Used in backtracking algorithm
@@ -92,7 +94,8 @@ private:
 
   /// Process a contraction found by the backtracking algorithm
   void process_contraction(const std::vector<int> &a, int k,
-                           std::vector<DiagVertex> &free_vertex_vec);
+                           const std::vector<DiagVertex> &free_vertex_vec,
+                           const int minrank, const int maxrank);
 
   /// Apply the contraction to this set of operators and produce a term
   std::pair<SymbolicTerm, scalar_t>

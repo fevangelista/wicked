@@ -39,7 +39,7 @@ void WickTheorem::set_max_cumulant(int n) { maxcumulant_ = n; }
 
 Expression WickTheorem::contract(scalar_t factor,
                                  const std::vector<DiagOperator> &ops,
-                                 int minrank, int maxrank) {
+                                 const int minrank, const int maxrank) {
 
   ncontractions_ = 0;
   contractions_.clear();
@@ -55,7 +55,7 @@ Expression WickTheorem::contract(scalar_t factor,
   elementary_contractions_ = generate_elementary_contractions(ops);
 
   // Step 2. Generate allowed composite contractions
-  generate_composite_contractions(ops);
+  generate_composite_contractions(ops, minrank, maxrank);
 
   // Step 3. Process contractions
   Expression result = process_contractions(factor, ops, minrank, maxrank);
@@ -63,7 +63,7 @@ Expression WickTheorem::contract(scalar_t factor,
 }
 
 Expression WickTheorem::contract(scalar_t factor, const DiagOpExpression &expr,
-                                 int minrank, int maxrank) {
+                                 const int minrank, const int maxrank) {
   Expression result;
   for (const auto &[ops, f] : expr.terms()) {
     result += contract(factor * f, ops, minrank, maxrank);
@@ -428,7 +428,8 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
 }
 
 void WickTheorem::generate_composite_contractions(
-    const std::vector<DiagOperator> &ops) {
+    const std::vector<DiagOperator> &ops, const int minrank,
+    const int maxrank) {
   PRINT(PrintLevel::Summary,
         std::cout << "\n- Step 2. Generating composite contractions"
                   << std::endl;)
@@ -451,7 +452,7 @@ void WickTheorem::generate_composite_contractions(
 
   // generate all contractions by backtracking
   generate_contractions_backtrack(a, 0, elementary_contractions_,
-                                  free_vertex_vec);
+                                  free_vertex_vec, minrank, maxrank);
   PRINT(PrintLevel::Summary, std::cout << "\n\n    Total contractions: "
                                        << ncontractions_ << std::endl;)
 }
@@ -459,7 +460,7 @@ void WickTheorem::generate_composite_contractions(
 Expression
 WickTheorem::process_contractions(scalar_t factor,
                                   const std::vector<DiagOperator> &ops,
-                                  int minrank, int maxrank) {
+                                  const int minrank, const int maxrank) {
   PRINT(PrintLevel::Summary,
         std::cout << "\n- Step 3. Processing contractions" << std::endl;)
 
@@ -565,9 +566,10 @@ void WickTheorem::compare_contraction_perm(
 void WickTheorem::generate_contractions_backtrack(
     std::vector<int> a, int k,
     const std::vector<std::vector<DiagVertex>> &el_contr_vec,
-    std::vector<DiagVertex> &free_vertex_vec) {
+    std::vector<DiagVertex> &free_vertex_vec, const int minrank,
+    const int maxrank) {
 
-  process_contraction(a, k, free_vertex_vec);
+  process_contraction(a, k, free_vertex_vec, minrank, maxrank);
 
   k = k + 1;
   std::vector<int> candidates =
@@ -576,7 +578,8 @@ void WickTheorem::generate_contractions_backtrack(
   for (const auto &c : candidates) {
     a[k - 1] = c;
     make_move(a, k, el_contr_vec, free_vertex_vec);
-    generate_contractions_backtrack(a, k, el_contr_vec, free_vertex_vec);
+    generate_contractions_backtrack(a, k, el_contr_vec, free_vertex_vec,
+                                    minrank, maxrank);
     unmake_move(a, k, el_contr_vec, free_vertex_vec);
   }
 }
@@ -663,21 +666,24 @@ void WickTheorem::unmake_move(
 
 void WickTheorem::process_contraction(
     const std::vector<int> &a, int k,
-    std::vector<DiagVertex> &free_vertex_vec) {
-  contractions_.push_back(std::vector<int>(a.begin(), a.begin() + k));
-
-  DiagVertex free_ops;
+    const std::vector<DiagVertex> &free_vertex_vec, const int minrank,
+    const int maxrank) {
+  int rank = 0;
   for (const auto &free_vertex : free_vertex_vec) {
-    free_ops += free_vertex;
+    rank += free_vertex.rank();
   }
-
-  PRINT(
-      PrintLevel::Summary,
-      cout << fmt::format("\n  {:5d}    {:3d}    ", ncontractions_ + 1,
-                          free_ops.rank());
-      for (int i = 0; i < k; ++i) { cout << fmt::format(" {:3d}", a[i]); };
-      cout << std::string(std::max(24 - 4 * k, 2), ' ') << free_ops;)
-  ncontractions_++;
+  if ((rank >= minrank) and (rank <= maxrank)) {
+    contractions_.push_back(std::vector<int>(a.begin(), a.begin() + k));
+    PRINT(
+        PrintLevel::Summary, DiagVertex free_ops;
+        for (const auto &free_vertex
+             : free_vertex_vec) { free_ops += free_vertex; };
+        cout << fmt::format("\n  {:5d}    {:3d}    ", ncontractions_ + 1,
+                            free_ops.rank());
+        for (int i = 0; i < k; ++i) { cout << fmt::format(" {:3d}", a[i]); };
+        cout << std::string(std::max(24 - 4 * k, 2), ' ') << free_ops;)
+    ncontractions_++;
+  }
 }
 
 std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
