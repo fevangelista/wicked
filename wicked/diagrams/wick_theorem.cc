@@ -2,16 +2,20 @@
 #include <iomanip>
 #include <iostream>
 
+#include "fmt/format.h"
+
 #include "combinatorics.h"
 #include "diag_operator.h"
 #include "diag_operator_expression.h"
-#include "expression.h"
 #include "helpers.h"
 #include "orbital_space.h"
-#include "sqoperator.h"
 #include "stl_utils.hpp"
-#include "tensor.h"
-#include "term.h"
+
+#include "../algebra/expression.h"
+#include "../algebra/sqoperator.h"
+#include "../algebra/tensor.h"
+#include "../algebra/term.h"
+
 #include "wick_theorem.h"
 
 #define PRINT(detail, code)                                                    \
@@ -103,9 +107,6 @@ WickTheorem::generate_elementary_contractions(
     // ┌───┐
     // a^+ a
     if (space_type == SpaceType::Occupied) {
-      PRINT(PrintLevel::Summary,
-            std::cout << "Creation/Annihilation pairwise contractions"
-                      << std::endl;)
       for (int c = 0; c < nops; c++) {       // loop over creation (left)
         for (int a = c + 1; a < nops; a++) { // loop over annihilation (right)
           if (ops[c].cre(s) * ops[a].ann(s) > 0) { // is contraction viable?
@@ -113,9 +114,9 @@ WickTheorem::generate_elementary_contractions(
             new_contr[c].set_cre(s, 1);
             new_contr[a].set_ann(s, 1);
             contr_vec.push_back(new_contr);
-            PRINT(PrintLevel::Summary, cout << "\n      Contraction op(" << c
-                                            << ")---op(" << a << ")" << endl;
-                  PRINT_ELEMENTS(new_contr, "      "); cout << endl;)
+            PRINT(PrintLevel::Summary,
+                  cout << fmt::format("\n    {:5d}:", contr_vec.size());
+                  PRINT_ELEMENTS(new_contr, " "););
           }
         }
       }
@@ -125,9 +126,6 @@ WickTheorem::generate_elementary_contractions(
     // ┌───┐
     // a   a^+
     if (space_type == SpaceType::Unoccupied) {
-      PRINT(PrintLevel::Summary,
-            std::cout << "Annihilation/Creation pairwise contractions"
-                      << std::endl;)
       for (int a = 0; a < nops; a++) {       // loop over annihilation (left)
         for (int c = a + 1; c < nops; c++) { // loop over creation (right)
           if (ops[c].cre(s) * ops[a].ann(s) > 0) { // is contraction viable?
@@ -135,9 +133,9 @@ WickTheorem::generate_elementary_contractions(
             new_contr[c].set_cre(s, 1);
             new_contr[a].set_ann(s, 1);
             contr_vec.push_back(new_contr);
-            PRINT(PrintLevel::Summary, cout << "\n      Contraction op(" << a
-                                            << ")---op(" << c << ")" << endl;
-                  PRINT_ELEMENTS(new_contr, "      "); cout << endl;)
+            PRINT(PrintLevel::Summary,
+                  cout << fmt::format("\n    {:5d}:", contr_vec.size());
+                  PRINT_ELEMENTS(new_contr, " "););
           }
         }
       }
@@ -161,7 +159,7 @@ WickTheorem::generate_elementary_contractions(
       // loop over all possible contractions from 2 to max_legs
       for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
         PRINT(PrintLevel::Summary,
-              cout << 2 * half_legs << "-legs contractions" << endl;)
+              cout << "\n    " << 2 * half_legs << "-legs contractions";)
         auto half_legs_part =
             integer_partitions(half_legs, nops); // Experimental
         // create lists of leg partitionings among all operators that are
@@ -213,12 +211,12 @@ WickTheorem::generate_elementary_contractions(
             //   contr_vec.push_back(new_contr);
             // }
             // count number of operators contracted
-            int ncontracted = 0;
+            int nops_contracted = 0;
             for (int A = 0; A < nops; A++) {
-              ncontracted += (cre_legs[A] + ann_legs[A] > 0);
+              nops_contracted += (cre_legs[A] + ann_legs[A] > 0);
             }
             // exclude operators that have legs only on one operator
-            if (ncontracted < 2)
+            if (nops_contracted < 2)
               continue;
 
             std::vector<DiagVertex> new_contr(nops);
@@ -227,6 +225,10 @@ WickTheorem::generate_elementary_contractions(
               new_contr[A].set_ann(s, ann_legs[A]);
             }
             contr_vec.push_back(new_contr);
+
+            PRINT(PrintLevel::Summary,
+                  cout << fmt::format("\n    {:5d}:", contr_vec.size());
+                  PRINT_ELEMENTS(new_contr, " "););
           }
         }
       }
@@ -670,14 +672,11 @@ void WickTheorem::process_contraction(
   }
 
   PRINT(
-      PrintLevel::Summary, cout << "\n      " << ncontractions_ << "      "
-                                << free_ops.rank() << "     ";
-      for (int i = 0; i < k; ++i) { cout << "  " << a[i]; } cout
-      << std::string(std::max(20 - 3 * k, 2), ' ') << free_ops;)
-
-  // PRINT(PrintLevel::Summary,
-  //       cout << " " << free_ops << " rank = " << free_ops.rank() << endl;)
-
+      PrintLevel::Summary,
+      cout << fmt::format("\n  {:5d}    {:3d}    ", ncontractions_ + 1,
+                          free_ops.rank());
+      for (int i = 0; i < k; ++i) { cout << fmt::format(" {:3d}", a[i]); };
+      cout << std::string(std::max(24 - 4 * k, 2), ' ') << free_ops;)
   ncontractions_++;
 }
 
@@ -873,9 +872,12 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
   term.reindex(pair_contraction_reindex_map);
 
-  PRINT(PrintLevel::Summary, cout << "  sign = " << sign << endl;
-        cout << "  factor = " << factor << endl;
-        cout << "  combinatorial_factor = " << comb_factor << endl;)
+  PRINT(PrintLevel::Summary,
+        cout << fmt::format("  sign =                 {:d}", sign) << endl;
+        cout << fmt::format("  factor =               {:s}", factor.repr())
+             << endl;
+        cout << fmt::format("  combinatorial factor = {:s}", comb_factor.repr())
+             << endl;);
 
   return std::make_pair(term, sign * factor * comb_factor);
 }
@@ -1028,86 +1030,70 @@ void print_contraction(const std::vector<DiagOperator> &ops,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<SQOperator> &sqops,
                        const std::vector<int> sign_order) {
-  std::string pre("  ");
+  std::string pre("          ");
+  // 1. Draw the contraction legs
   for (const auto &bit_map : bit_map_vec) {
-    int ntrue = std::count(bit_map.begin(), bit_map.end(), true);
-    bool line = false;
-    bool first = true;
-    cout << pre;
-    for (bool b : bit_map) {
-      if (b) {
-        line = true;
-        ntrue -= 1;
-      }
-      if (line) {
-        if (first) {
-          cout << " ┌─";
-          first = false;
-        } else if (ntrue == 0) {
-          cout << "─┐ ";
-        } else {
-          cout << "───";
-        }
-      } else {
-        cout << "   ";
-      }
-      if (ntrue == 0)
-        line = false;
+    int first = std::distance(bit_map.begin(),
+                              std::find(bit_map.begin(), bit_map.end(), true));
+    int last = std::distance(std::find(bit_map.rbegin(), bit_map.rend(), true),
+                             bit_map.rend());
+    std::cout << pre;
+    for (int k = 0; k < first; k++) {
+      cout << "   ";
     }
-    cout << endl;
-    // cout << pre;
-    // for (bool b : bit_map) {
-    //   cout << (b ? " │ " : "   ");
-    // }
-    // cout << endl;
+    std::cout << " ┌─";
+    for (int k = first + 1; k < last - 1; k++) {
+      std::cout << (bit_map[k] ? "─┬─" : "───");
+    }
+    std::cout << "─┐ " << std::endl;
   }
-  cout << pre;
-  for (const auto &sqop : sqops) {
-    cout << ((sqop.type() == SQOperatorType::Creation) ? " + " : " - ");
-  }
-  cout << endl;
-  cout << pre;
-  for (const auto &sqop : sqops) {
-    cout << " " << sqop.index();
-  }
-  cout << endl;
-  cout << pre;
-  for (int order : sign_order) {
-    cout << " " << order << " ";
-  }
-  cout << "\n" << endl;
 
-  int nsqops = sqops.size();
-  int opoffset = 0;
-  for (const auto &tensor : tensors) {
-    int oprank = tensor.rank();
-    cout << pre;
-    for (int i = 0; i < opoffset; i++) {
-      cout << "   ";
-    }
-    for (int i = 0; i < oprank; i++) {
-      cout << "───";
-    }
-    for (int i = 0; i < nsqops - oprank - opoffset; i++) {
-      cout << "   ";
-    }
-    cout << " " << tensor.str();
-    opoffset += oprank;
-    cout << endl;
+  // 2. Show the type of operator (+ = creation, - = annihilation)
+  std::cout << "  type    ";
+  for (const auto &sqop : sqops) {
+    std::cout << ((sqop.type() == SQOperatorType::Creation) ? " + " : " - ");
   }
-  //  for (const auto &op : ops) {
-  //    int oprank = op.rank();
-  //    for (int i = 0; i < opoffset; i++) {
-  //      cout << "   ";
-  //    }
-  //    for (int i = 0; i < oprank; i++) {
-  //      cout << "---";
-  //    }
-  //    for (int i = 0; i < nsqops - oprank - opoffset; i++) {
-  //      cout << "   ";
-  //    }
-  //    cout << " " << op.label();
-  //    opoffset += oprank;
-  //    cout << endl;
-  //  }
+  std::cout << endl;
+
+  // 3. Show the operator index
+  std::cout << "  indices ";
+  for (const auto &sqop : sqops) {
+    std::cout << fmt::format("{:3s}", sqop.index().str());
+  }
+  std::cout << endl;
+
+  // 3. Show the permutation of the operators
+  std::cout << "  order  ";
+  for (int order : sign_order) {
+    std::cout << fmt::format("{:3d}", order);
+  }
+  std::cout << "\n" << endl;
+
+  // 5. Show the indices of the tensors involved
+  std::map<Index, int> index_map;
+  int k = 0;
+  for (int k = 0; k < sqops.size(); k++) {
+    index_map[sqops[k].index()] = k;
+  }
+  for (const auto &tensor : tensors) {
+    std::vector<int> indices(index_map.size(), 0);
+    for (const auto &idx : tensor.upper()) {
+      indices[index_map[idx]] = 1;
+    }
+    for (const auto &idx : tensor.lower()) {
+      indices[index_map[idx]] = -1;
+    }
+    std::cout << "          ";
+    for (int i : indices) {
+      if (i == 1) {
+        std::cout << "─┸─";
+      } else if (i == -1) {
+        std::cout << "─┰─";
+      } else {
+        std::cout << "───";
+      }
+    }
+    std::cout << "── " << tensor.str() << std::endl;
+  }
+  std::cout << std::endl;
 }
