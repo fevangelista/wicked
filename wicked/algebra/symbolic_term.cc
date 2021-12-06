@@ -371,16 +371,19 @@ std::string SymbolicTerm::latex() const {
   return (join(str_vec, " "));
 }
 
-std::string SymbolicTerm::ambit() const {
-  std::vector<std::string> str_vec;
-  for (const Tensor &tensor : tensors_) {
-    str_vec.push_back(tensor.ambit());
+std::string SymbolicTerm::compile(const std::string &format) const {
+  if (format == "ambit") {
+    std::vector<std::string> str_vec;
+    for (const Tensor &tensor : tensors_) {
+      str_vec.push_back(tensor.compile(format));
+    }
+    if (nops()) {
+      throw "Trying to convert an SymbolicTerm object with operator terms to "
+            "ambit.";
+    }
+    return (join(str_vec, " * "));
   }
-  if (nops()) {
-    throw "Trying to convert an SymbolicTerm object with operator terms to "
-          "ambit.";
-  }
-  return (join(str_vec, " * "));
+  return "";
 }
 
 std::ostream &operator<<(std::ostream &os, const SymbolicTerm &term) {

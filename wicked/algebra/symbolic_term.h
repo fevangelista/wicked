@@ -76,8 +76,8 @@ public:
   /// Return a LaTeX representation
   std::string latex() const;
 
-  /// Return an ambit (C++ code) representation
-  std::string ambit() const;
+  /// Return a compilable representation
+  std::string compile(const std::string &format) const;
 
 protected:
   // ==> Class private data <==

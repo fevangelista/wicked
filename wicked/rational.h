@@ -16,18 +16,16 @@ public:
   int numerator() const;
   /// return the denominator
   int denominator() const;
-  /// set the numerator
-  void numerator(int value);
-  /// set the denominator
-  void denominator(int value);
+  /// return this converted to a double
+  double to_double() const;
   /// return a (nice) string representation, and optionally show the sign
   std::string str(bool sign = false) const;
   /// return a string representation
   std::string repr() const;
   /// return a LaTeX representation
   std::string latex() const;
-  /// return an ambit (C++ code) representation
-  std::string ambit() const;
+  /// return a compilable representation
+  std::string compile(const std::string &format) const;
 
   /// addition assignment
   rational &operator+=(const rational &rhs);

@@ -9,6 +9,7 @@ PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
 namespace py = pybind11;
 using namespace pybind11::literals;
 
+void export_combinatorics(py::module &m);
 void export_OrbitalSpaceInfo(py::module &m);
 void export_Index(py::module &m);
 void export_SQOperator(py::module &m);
@@ -37,6 +38,7 @@ PYBIND11_MODULE(wicked, m) {
 
   m.def("int_part", &integer_partitions);
 
+  export_combinatorics(m);
   export_OrbitalSpaceInfo(m);
   export_Index(m);
   export_SQOperator(m);

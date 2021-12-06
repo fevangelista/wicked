@@ -62,9 +62,9 @@ std::string SQOperator::latex() const {
   return s;
 }
 
-std::string SQOperator::ambit() const {
+std::string SQOperator::compile(const std::string &format) const {
   throw std::runtime_error(
-      "SQOperator::ambit() - Operation does not make sense");
+      "SQOperator::compile() - Operation does not make sense");
   return "";
 }
 

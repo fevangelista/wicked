@@ -16,13 +16,16 @@ std::map<FieldType, std::string> FieldType_to_op_symbol{
 std::map<SpaceType, std::string> SpaceType_to_str{
     {SpaceType::Occupied, "occupied"},
     {SpaceType::Unoccupied, "unoccupied"},
-    {SpaceType::General, "general"}};
+    {SpaceType::General, "general"},
+    {SpaceType::Composite, "composite"},
+};
 
 OrbitalSpace::OrbitalSpace(char label, FieldType field_type,
                            SpaceType space_type,
-                           const std::vector<std::string> &indices)
+                           const std::vector<std::string> &indices,
+                           const std::vector<int> &elementary_spaces)
     : label_(label), space_type_(space_type), field_type_(field_type),
-      indices_(indices) {}
+      indices_(indices), elementary_spaces_(elementary_spaces) {}
 
 char OrbitalSpace::label() const { return label_; }
 
@@ -34,15 +37,23 @@ const std::vector<std::string> &OrbitalSpace::indices() const {
   return indices_;
 }
 
+const std::vector<int> &OrbitalSpace::elementary_spaces() const {
+  return elementary_spaces_;
+}
+
 SpaceType string_to_space_type(const std::string &str) {
   for (const auto &[space_type, s] : SpaceType_to_str) {
     if (str == s) {
       return space_type;
     }
   }
+  std::vector<std::string> options;
+  for (const auto &[space_type, s] : SpaceType_to_str) {
+    options.push_back(s);
+  }
   throw std::runtime_error(
       "\nstring_to_space_type() - called with an invalid string (" + str + ")" +
-      "\nValid options are: [occupied,unoccupied,general]");
+      "\nValid options are: [" + join(options) + "]");
   return SpaceType::General;
 }
 
@@ -62,7 +73,8 @@ OrbitalSpaceInfo::OrbitalSpaceInfo() {}
 
 void OrbitalSpaceInfo::add_space(char label, FieldType field_type,
                                  SpaceType space_type,
-                                 const std::vector<std::string> &indices) {
+                                 const std::vector<std::string> &indices,
+                                 const std::vector<char> &elementary_spaces) {
   size_t pos = space_info_.size();
   label_to_pos_[label] = pos;
   for (auto &index : indices) {
@@ -73,7 +85,12 @@ void OrbitalSpaceInfo::add_space(char label, FieldType field_type,
       indices_to_pos_[index] = pos;
     }
   }
-  space_info_.push_back(OrbitalSpace(label, field_type, space_type, indices));
+  std::vector<int> elementary_spaces_int;
+  for (char e : elementary_spaces) {
+    elementary_spaces_int.push_back(label_to_space(e));
+  }
+  space_info_.push_back(OrbitalSpace(label, field_type, space_type, indices,
+                                     elementary_spaces_int));
 }
 
 std::string OrbitalSpaceInfo::str() const {

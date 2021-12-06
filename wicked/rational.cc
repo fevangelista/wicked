@@ -19,15 +19,14 @@ int rational::numerator() const { return numerator_; }
 
 int rational::denominator() const { return denominator_; }
 
-void rational::numerator(int value) { numerator_ = value; }
-
-void rational::denominator(int value) { denominator_ = value; }
+double rational::to_double() const {
+  return static_cast<double>(numerator()) / static_cast<double>(denominator());
+}
 
 rational operator+(rational rhs) { return rhs; }
 
 rational operator-(rational rhs) {
-  rhs.numerator(-rhs.numerator());
-  return rhs;
+  return rational(-rhs.numerator(), rhs.denominator());
 }
 
 rational &rational::operator+=(const rational &rhs) {
@@ -120,7 +119,7 @@ std::string rational::latex() const {
   return s;
 }
 
-std::string rational::ambit() const {
+std::string rational::compile(const std::string &format) const {
   return std::to_string(static_cast<double>(numerator_) /
                         static_cast<double>(denominator_));
 }

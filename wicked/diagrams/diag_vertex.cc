@@ -38,7 +38,7 @@ void DiagVertex::set_ann(int space, int value) {
   vertex_[space].second = value;
 }
 
-int DiagVertex::rank() const {
+int DiagVertex::num_ops() const {
   int r = 0;
   for (const auto &pair : vertex_) {
     r += pair.first + pair.second;
@@ -97,27 +97,24 @@ std::ostream &operator<<(std::ostream &os, const DiagVertex &v) {
   return os;
 }
 
-int vertices_rank(const std::vector<DiagVertex> &vertices) {
-  int r = 0;
+int sum_num_ops(const std::vector<DiagVertex> &vertices) {
+  int n = 0;
   for (const auto &vertex : vertices) {
-    r += vertex.rank();
+    n += vertex.num_ops();
   }
-  return r;
+  return n;
 }
 
-int vertices_space(const std::vector<DiagVertex> &vertices) {
-  std::vector<int> count(osi->num_spaces());
+std::vector<int> spaces_in_vertices(const std::vector<DiagVertex> &vertices) {
+  std::vector<int> vec;
   for (const auto &vertex : vertices) {
     for (int s = 0; s < osi->num_spaces(); ++s) {
-      count[s] += vertex.ann(s) + vertex.cre(s);
+      if (vertex.ann(s) + vertex.cre(s) > 0) {
+        vec.push_back(s);
+      }
     }
   }
-  for (int s = 0; s < osi->num_spaces(); ++s) {
-    if (count[s] > 0) {
-      return s;
-    }
-  }
-  return -1;
+  return vec;
 }
 
 std::string to_string(const std::vector<DiagVertex> &vertex_vec) {

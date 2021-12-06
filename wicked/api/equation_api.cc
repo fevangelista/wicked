@@ -15,5 +15,5 @@ void export_Equation(py::module &m) {
       .def("__repr__", &Equation::str)
       .def("__str__", &Equation::str)
       .def("latex", &Equation::latex)
-      .def("ambit", &Equation::ambit);
+      .def("compile", &Equation::compile);
 }

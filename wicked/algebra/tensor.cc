@@ -100,13 +100,13 @@ std::string Tensor::latex() const {
           join(str_vec_lower, " ") + "}");
 }
 
-std::string Tensor::ambit() const {
+std::string Tensor::compile(const std::string &format) const {
   std::vector<std::string> str_vec;
   for (const Index &index : upper_) {
-    str_vec.push_back(index.ambit());
+    str_vec.push_back(index.compile(format));
   }
   for (const Index &index : lower_) {
-    str_vec.push_back(index.ambit());
+    str_vec.push_back(index.compile(format));
   }
 
   return (str_vec.size() > 0 ? (label_ + "[" + join(str_vec, ",") + "]")
@@ -148,7 +148,7 @@ Tensor make_tensor_from_str(const std::string &s) {
   return Tensor(label, lower, upper);
 }
 
-// std::string Tensor::ambit() {
+// std::string Tensor::compile() {
 //  std::vector<std::string> str_vec;
 //  for (Index &index : upper_) {
 //    str_vec.push_back(index.str());
@@ -156,9 +156,9 @@ Tensor make_tensor_from_str(const std::string &s) {
 //  for (Index &index : lower_) {
 //    str_vec.push_back(index.str());
 //  }
-//  std::string ambit_label = label_;
-//  ambit_label[0] = std::toupper(ambit_label[0]);
+//  std::string compile_label = label_;
+//  compile_label[0] = std::toupper(compile_label[0]);
 //  if (str_vec.size() == 0)
-//    return (ambit_label);
-//  return (ambit_label + "[\"" + join(str_vec, ",") + "\"]");
+//    return (compile_label);
+//  return (compile_label + "[\"" + join(str_vec, ",") + "\"]");
 //}

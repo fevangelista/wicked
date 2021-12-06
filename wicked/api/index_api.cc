@@ -15,7 +15,7 @@ void export_Index(py::module &m) {
       .def("__repr__", &Index::str)
       .def("__str__", &Index::str)
       .def("latex", &Index::latex)
-      .def("ambit", &Index::ambit);
+      .def("compile", &Index::compile);
 
   m.def("index", &make_index_from_str, "index"_a);
 }

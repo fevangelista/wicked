@@ -33,8 +33,9 @@ public:
   /// Return the number of annihilation operators in space
   int ann(int space) const;
 
-  /// Return the particle rank of this operator (sum creation + sum annilation)
-  int rank() const;
+  /// Return the number of creation + annilation operators represented by this
+  /// vertex
+  int num_ops() const;
 
   /// Comparison operator used for sorting
   bool operator<(DiagOperator const &other) const;
@@ -61,6 +62,6 @@ DiagOperator make_diag_operator(const std::string &label,
                                 const std::vector<char> &ann_labels);
 
 /// Return the particle rank of a vector of operators
-int operators_rank(const std::vector<DiagOperator> &ops);
+int sum_num_ops(const std::vector<DiagOperator> &ops);
 
 #endif // _wicked_diag_operator_h_

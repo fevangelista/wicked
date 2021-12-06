@@ -19,7 +19,7 @@ void export_Tensor(py::module &m) {
       .def("__repr__", &Tensor::str)
       .def("__str__", &Tensor::str)
       .def("latex", &Tensor::latex)
-      .def("ambit", &Tensor::ambit);
+      .def("compile", &Tensor::compile);
 
   m.def("tensor", &make_tensor, "label"_a, "lower"_a, "upper"_a, "symmetry"_a);
   m.def("tensor", &make_tensor_from_str, "s"_a);

@@ -41,8 +41,9 @@ public:
   /// Set the number of annihilation operators in space
   void set_ann(int space, int value);
 
-  /// Return the particle rank of this vertex (sum creation + sum annilation)
-  int rank() const;
+  /// Return the number of creation + annilation operators represented by this
+  /// vertex
+  int num_ops() const;
 
   /// Comparison operator used for sorting
   bool operator<(DiagVertex const &other) const;
@@ -60,18 +61,19 @@ public:
   friend std::ostream &operator<<(std::ostream &os, const DiagVertex &v);
 
 private:
-  /// The number of creation/annihilation operators in each space
+  /// This object stores the number of creation/annihilation
+  /// operators in each space. This initializes it to all zeros
   vertex_t vertex_ = {};
 };
 
 // Helper functions
 
-/// Return the particle rank of a vector of operators
-int vertices_rank(const std::vector<DiagVertex> &vertices);
+/// Return the sum of the number creation and annihilation operator for a vector
+/// of vertices
+int sum_num_ops(const std::vector<DiagVertex> &vertices);
 
-/// Return the space for which the number of creation/annihilation operators !=
-/// 0
-int vertices_space(const std::vector<DiagVertex> &vertices);
+/// Return a vector of spaces with number of cre/ann operators > 0
+std::vector<int> spaces_in_vertices(const std::vector<DiagVertex> &vertices);
 
 /// Return a nice string representation of a vector of vertices
 std::string to_string(const std::vector<DiagVertex> &vertex_vec);

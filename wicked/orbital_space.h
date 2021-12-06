@@ -13,14 +13,13 @@ enum class SpaceType {
   // Single annihilation/creation contractions that yields a Kronecker delta
   Unoccupied,
   // Multi-leg contractions
-  General
+  General,
+  // Composite
+  Composite
 };
 
 /// The type of field
 enum class FieldType { Fermion, Boson };
-
-/// Spin types
-enum class SpinType { SpinOrbital, SpinFree, Alpha, Beta };
 
 class OrbitalSpace {
 private:
@@ -28,14 +27,17 @@ private:
   SpaceType space_type_;
   FieldType field_type_;
   std::vector<std::string> indices_;
+  std::vector<int> elementary_spaces_;
 
 public:
   OrbitalSpace(char label, FieldType field_type, SpaceType space_type,
-               const std::vector<std::string> &indices);
+               const std::vector<std::string> &indices,
+               const std::vector<int> &elementary_spaces);
   char label() const;
   FieldType field_type() const;
   SpaceType space_type() const;
   const std::vector<std::string> &indices() const;
+  const std::vector<int> &elementary_spaces() const;
 };
 
 class OrbitalSpaceInfo {
@@ -47,7 +49,8 @@ public:
 
   /// Add an elementary space
   void add_space(char label, FieldType field_type, SpaceType space_type,
-                 const std::vector<std::string> &indices);
+                 const std::vector<std::string> &indices,
+                 const std::vector<char> &elementary_spaces = {});
 
   // /// Add a composite space
   // void add_composite_space(char label,

@@ -55,7 +55,8 @@ public:
   std::string latex(const std::string &sep = " \\\\ \n") const;
 
   /// Convert this sum to a vector of many-body equations
-  std::map<int, Expression> to_manybody_equation(const std::string &label);
+  std::map<int, std::vector<Equation>>
+  to_manybody_equation(const std::string &label);
 
   // /// Convert this sum to a vector of many-body expressions
   // Expression to_manybody_expression(const std::string &label);

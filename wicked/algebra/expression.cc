@@ -130,7 +130,7 @@ std::string Expression::str() const {
     str_vec.push_back(factor_str + symterm_str);
     n++;
   }
-  return (join(str_vec, "\n"));
+  return join(str_vec, "\n");
 }
 
 std::string Expression::latex(const std::string &sep) const {
@@ -138,12 +138,12 @@ std::string Expression::latex(const std::string &sep) const {
   for (auto &kv : terms_) {
     str_vec.push_back(kv.second.latex() + ' ' + kv.first.latex());
   }
-  return (join(str_vec, sep));
+  return join(str_vec, sep);
 }
 
-std::map<int, Expression>
+std::map<int, std::vector<Equation>>
 Expression::to_manybody_equation(const std::string &label) {
-  std::map<int, Expression> result;
+  std::map<int, std::vector<Equation>> result;
   for (const auto &term_factor : terms_) {
     std::vector<Index> lower;
     std::vector<Index> upper;
@@ -161,12 +161,12 @@ Expression::to_manybody_equation(const std::string &label) {
     auto rank = lhs_tensor.rank();
     lhs.add(lhs_tensor);
     factor *= lhs_tensor.symmetry_factor();
-    Term rhs;
-    rhs.set(factor);
+
+    SymbolicTerm rhs;
     for (const auto &tensor : term.tensors()) {
       rhs.add(tensor);
     }
-    result[rank].add(rhs);
+    result[rank].push_back(Equation(lhs, rhs, factor));
   }
   return result;
 }

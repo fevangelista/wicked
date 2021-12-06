@@ -54,6 +54,24 @@ private:
   std::vector<std::vector<DiagVertex>>
   generate_elementary_contractions(const std::vector<DiagOperator> &ops);
 
+  /// Generates elementary contractions of occupied spaces
+  void elementary_contractions_occupied(
+      const std::vector<DiagOperator> &ops, int s,
+      std::vector<std::vector<DiagVertex>> &contr_vec);
+
+  /// Generates elementary contractions of occupied spaces
+  void elementary_contractions_unoccupied(
+      const std::vector<DiagOperator> &ops, int s,
+      std::vector<std::vector<DiagVertex>> &contr_vec);
+
+  void elementary_contractions_general(
+      const std::vector<DiagOperator> &ops, int s,
+      std::vector<std::vector<DiagVertex>> &contr_vec);
+
+  void elementary_contractions_composite(
+      const std::vector<DiagOperator> &ops, int s,
+      std::vector<std::vector<DiagVertex>> &contr_vec);
+
   /// Generates all composite contractions
   void generate_composite_contractions(const std::vector<DiagOperator> &ops,
                                        const int minrank, const int maxrank);

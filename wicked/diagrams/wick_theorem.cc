@@ -80,7 +80,7 @@ WickTheorem::generate_elementary_contractions(
 
   int nops = ops.size();
 
-  // a vector that holds all the contractions
+  // a vector that will hold all the contractions
   std::vector<std::vector<DiagVertex>> contr_vec;
 
   PRINT(
@@ -103,139 +103,155 @@ WickTheorem::generate_elementary_contractions(
     // differentiate between various types of spaces
     SpaceType space_type = osi->space_type(s);
 
-    // 1. Pairwise contractions creation-annihilation:
+    // 1. Pairwise contractions 1 cre + 1 ann operator:
     // ┌───┐
     // a^+ a
     if (space_type == SpaceType::Occupied) {
-      for (int c = 0; c < nops; c++) {       // loop over creation (left)
-        for (int a = c + 1; a < nops; a++) { // loop over annihilation (right)
-          if (ops[c].cre(s) * ops[a].ann(s) > 0) { // is contraction viable?
-            std::vector<DiagVertex> new_contr(nops);
-            new_contr[c].set_cre(s, 1);
-            new_contr[a].set_ann(s, 1);
-            contr_vec.push_back(new_contr);
-            PRINT(PrintLevel::Summary,
-                  cout << fmt::format("\n    {:5d}:", contr_vec.size());
-                  PRINT_ELEMENTS(new_contr, " "););
-          }
-        }
-      }
+      elementary_contractions_occupied(ops, s, contr_vec);
     }
 
-    // 2. Pairwise contractions creation-annihilation:
+    // 2. Pairwise contractions 1 ann + 1 cre operator:
     // ┌───┐
     // a   a^+
     if (space_type == SpaceType::Unoccupied) {
-      for (int a = 0; a < nops; a++) {       // loop over annihilation (left)
-        for (int c = a + 1; c < nops; c++) { // loop over creation (right)
-          if (ops[c].cre(s) * ops[a].ann(s) > 0) { // is contraction viable?
-            std::vector<DiagVertex> new_contr(nops);
-            new_contr[c].set_cre(s, 1);
-            new_contr[a].set_ann(s, 1);
-            contr_vec.push_back(new_contr);
-            PRINT(PrintLevel::Summary,
-                  cout << fmt::format("\n    {:5d}:", contr_vec.size());
-                  PRINT_ELEMENTS(new_contr, " "););
-          }
-        }
-      }
+      elementary_contractions_unoccupied(ops, s, contr_vec);
     }
 
-    // 3. 2k-legged contractions (k >= 1) of k creation + k annihilation
-    // operators:
+    // 3. 2k-legged contractions (k >= 1) of k cre + k ann operators:
     // ┌───┬───┬───┐
     // a^+ a   a   a^+
     if (space_type == SpaceType::General) {
-      // compute the largest possible cumulant for this space
-      int sumcre = 0;
-      int sumann = 0;
-      for (int A = 0; A < nops; A++) {
-        sumcre += ops[A].cre(s);
-        sumann += ops[A].ann(s);
-      }
-      // the number of legs is limited by the smallest of number of cre/ann
-      // operators and the maximum cumulant level allowed
-      int max_half_legs = std::min(std::min(sumcre, sumann), maxcumulant_);
-      // loop over all possible contractions from 2 to max_legs
-      for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
-        PRINT(PrintLevel::Summary,
-              cout << "\n    " << 2 * half_legs << "-legs contractions";)
-        auto half_legs_part =
-            integer_partitions(half_legs, nops); // Experimental
-        // create lists of leg partitionings among all operators that are
-        // compatible with the number of creation and annihilation operators
-        std::vector<std::vector<int>> cre_legs_vec, ann_legs_vec;
-        // we copy the partition and permute it (with added zeros)
-        for (const auto part : half_legs_part) {
-          // if (part.size() <= nops) { // Experimental
-          std::vector<int> perm(nops, 0);
-          std::copy(part.begin(), part.end(), perm.begin());
-          std::sort(perm.begin(), perm.end());
-          do {
-            // check if compatible with creation/annihilation operators
-            bool cre_compatible = true;
-            bool ann_compatible = true;
-            for (int A = 0; A < nops; A++) {
-              if (ops[A].cre(s) < perm[A]) {
-                cre_compatible = false;
-              }
-              if (ops[A].ann(s) < perm[A]) {
-                ann_compatible = false;
-              }
-            }
-            if (cre_compatible) {
-              cre_legs_vec.push_back(perm);
-            }
-            if (ann_compatible) {
-              ann_legs_vec.push_back(perm);
-            }
-          } while (std::next_permutation(perm.begin(), perm.end()));
-          // } // Experimental
-        }
-
-        // combine the creation and annihilation operators
-        for (const auto cre_legs : cre_legs_vec) {
-          for (const auto ann_legs : ann_legs_vec) {
-            // std::vector<DiagVertex> new_contr(nops);
-            // int ncontracted = 0;
-            // for (int A = 0; A < nops; A++) {
-            //   new_contr[A].set_cre(s, cre_legs[A]);
-            //   new_contr[A].set_ann(s, ann_legs[A]);
-            //   // count number of operators contracted
-            //   if (cre_legs[A] + ann_legs[A] > 0) {
-            //     ncontracted += 1;
-            //   }
-            // }
-            // // exclude operators that have legs only on one operator
-            // if (ncontracted > 1) {
-            //   contr_vec.push_back(new_contr);
-            // }
-            // count number of operators contracted
-            int nops_contracted = 0;
-            for (int A = 0; A < nops; A++) {
-              nops_contracted += (cre_legs[A] + ann_legs[A] > 0);
-            }
-            // exclude operators that have legs only on one operator
-            if (nops_contracted < 2)
-              continue;
-
-            std::vector<DiagVertex> new_contr(nops);
-            for (int A = 0; A < nops; A++) {
-              new_contr[A].set_cre(s, cre_legs[A]);
-              new_contr[A].set_ann(s, ann_legs[A]);
-            }
-            contr_vec.push_back(new_contr);
-
-            PRINT(PrintLevel::Summary,
-                  cout << fmt::format("\n    {:5d}:", contr_vec.size());
-                  PRINT_ELEMENTS(new_contr, " "););
-          }
-        }
-      }
+      elementary_contractions_general(ops, s, contr_vec);
     }
   }
   return contr_vec;
 }
+
+void WickTheorem::elementary_contractions_occupied(
+    const std::vector<DiagOperator> &ops, int s,
+    std::vector<std::vector<DiagVertex>> &contr_vec) {
+  int nops = ops.size();
+  for (int c = 0; c < nops; c++) {             // loop over creation (left)
+    for (int a = c + 1; a < nops; a++) {       // loop over annihilation (right)
+      if (ops[c].cre(s) * ops[a].ann(s) > 0) { // is contraction viable?
+        std::vector<DiagVertex> new_contr(nops);
+        new_contr[c].set_cre(s, 1);
+        new_contr[a].set_ann(s, 1);
+        contr_vec.push_back(new_contr);
+        PRINT(PrintLevel::Summary,
+              cout << fmt::format("\n    {:5d}:", contr_vec.size());
+              PRINT_ELEMENTS(new_contr, " "););
+      }
+    }
+  }
+}
+
+void WickTheorem::elementary_contractions_unoccupied(
+    const std::vector<DiagOperator> &ops, int s,
+    std::vector<std::vector<DiagVertex>> &contr_vec) {
+  int nops = ops.size();
+  for (int a = 0; a < nops; a++) {             // loop over annihilation (left)
+    for (int c = a + 1; c < nops; c++) {       // loop over creation (right)
+      if (ops[c].cre(s) * ops[a].ann(s) > 0) { // is contraction viable?
+        std::vector<DiagVertex> new_contr(nops);
+        new_contr[c].set_cre(s, 1);
+        new_contr[a].set_ann(s, 1);
+        contr_vec.push_back(new_contr);
+        PRINT(PrintLevel::Summary,
+              cout << fmt::format("\n    {:5d}:", contr_vec.size());
+              PRINT_ELEMENTS(new_contr, " "););
+      }
+    }
+  }
+}
+
+void WickTheorem::elementary_contractions_general(
+    const std::vector<DiagOperator> &ops, int s,
+    std::vector<std::vector<DiagVertex>> &contr_vec) {
+  int nops = ops.size();
+  // compute the largest possible cumulant for this space
+  int sumcre = 0;
+  int sumann = 0;
+  for (int A = 0; A < nops; A++) {
+    sumcre += ops[A].cre(s);
+    sumann += ops[A].ann(s);
+  }
+  // the number of legs is limited by the smallest of number of cre/ann
+  // operators and the maximum cumulant level allowed
+  int max_half_legs = std::min(std::min(sumcre, sumann), maxcumulant_);
+
+  // in this algorithm we loop over all possible lengths of of half-leg
+  // contractions, partition this number into integers, permute these integers
+  // to generate elementary contractions, and test if these are valid
+  for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
+    PRINT(PrintLevel::Summary,
+          cout << "\n    " << 2 * half_legs << "-legs contractions";)
+    // create partitions of the number of half legs into at most nops numbers.
+    // For 4 half_legs =2 and nops = 2, half_legs_part = [[2],[1,1]]
+    auto half_legs_part = integer_partitions(half_legs, nops);
+    // create lists of leg partitionings among all operators that are
+    // compatible with the number of creation and annihilation operators
+    // these vectors store the number of cre/ann operators contracted per
+    // operator
+    std::vector<std::vector<int>> cre_legs_vec, ann_legs_vec;
+    for (const auto part : half_legs_part) {
+      // here we copy the partition and permute it (with added zeros, which
+      // signify no contraction)
+      std::vector<int> perm(nops, 0);
+      std::copy(part.begin(), part.end(), perm.begin());
+      std::sort(perm.begin(), perm.end());
+      do {
+        // check if compatible with creation/annihilation operators
+        bool cre_compatible = true;
+        bool ann_compatible = true;
+        for (int A = 0; A < nops; A++) {
+          if (ops[A].cre(s) < perm[A]) {
+            cre_compatible = false;
+          }
+          if (ops[A].ann(s) < perm[A]) {
+            ann_compatible = false;
+          }
+        }
+        if (cre_compatible) {
+          cre_legs_vec.push_back(perm);
+        }
+        if (ann_compatible) {
+          ann_legs_vec.push_back(perm);
+        }
+      } while (std::next_permutation(perm.begin(), perm.end()));
+    }
+
+    // combine the creation and annihilation operators
+    for (const auto cre_legs : cre_legs_vec) {
+      for (const auto ann_legs : ann_legs_vec) {
+        // count number of operators contracted
+        int nops_contracted = 0;
+        for (int A = 0; A < nops; A++) {
+          nops_contracted += (cre_legs[A] + ann_legs[A] > 0);
+        }
+        // exclude operators that have legs only on one operator
+        if (nops_contracted < 2)
+          continue;
+        // for a vector of DiagVertex objects that represent this
+        // contraction
+        std::vector<DiagVertex> new_contr(nops);
+        for (int A = 0; A < nops; A++) {
+          new_contr[A].set_cre(s, cre_legs[A]);
+          new_contr[A].set_ann(s, ann_legs[A]);
+        }
+        contr_vec.push_back(new_contr);
+
+        PRINT(PrintLevel::Summary,
+              cout << fmt::format("\n    {:5d}:", contr_vec.size());
+              PRINT_ELEMENTS(new_contr, " "););
+      }
+    }
+  }
+}
+
+void WickTheorem::elementary_contractions_composite(
+    const std::vector<DiagOperator> &ops, int s,
+    std::vector<std::vector<DiagVertex>> &contr_vec) {}
 
 void print_contraction(const std::vector<DiagOperator> &ops,
                        const std::vector<std::vector<DiagVertex>> &contractions,
@@ -294,7 +310,7 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
   }
 
   for (const auto &op : ops) {
-    if (op.rank() % 2 != 0) {
+    if (op.num_ops() % 2 != 0) {
       cout << "\n\n  WickTheorem::canonicalize_contraction cannot yet handle "
               "operators with an even number of sqops.\n";
       exit(1);
@@ -307,7 +323,7 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
   for (int c : contraction_vec) {
     std::vector<int> connections;
     for (int i = 0; i < nops; ++i) {
-      if (elementary_contractions_[c][i].rank() > 0) {
+      if (elementary_contractions_[c][i].num_ops() > 0) {
         connections.push_back(i);
       }
     }
@@ -434,6 +450,8 @@ void WickTheorem::generate_composite_contractions(
         std::cout << "\n- Step 2. Generating composite contractions"
                   << std::endl;)
 
+  // this vector is used in the backtracking algorithm to hold the list of
+  // elementary contractions
   std::vector<int> a(100, -1);
   // create a vector that keeps track of the free (uncontracted vertices)
   std::vector<DiagVertex> free_vertex_vec;
@@ -467,12 +485,12 @@ WickTheorem::process_contractions(scalar_t factor,
   Expression result;
 
   int nprocessed = 0;
-  int ops_rank = operators_rank(ops);
+  int ops_rank = sum_num_ops(ops);
   for (const auto &contraction_vec : contractions_) {
     std::vector<std::vector<DiagVertex>> vertices;
     int contr_rank = 0;
     for (int c : contraction_vec) {
-      contr_rank += vertices_rank(elementary_contractions_[c]);
+      contr_rank += sum_num_ops(elementary_contractions_[c]);
     }
     int term_rank = ops_rank - contr_rank;
 
@@ -668,18 +686,15 @@ void WickTheorem::process_contraction(
     const std::vector<int> &a, int k,
     const std::vector<DiagVertex> &free_vertex_vec, const int minrank,
     const int maxrank) {
-  int rank = 0;
-  for (const auto &free_vertex : free_vertex_vec) {
-    rank += free_vertex.rank();
-  }
-  if ((rank >= minrank) and (rank <= maxrank)) {
+  int num_ops = sum_num_ops(free_vertex_vec);
+  if ((num_ops >= minrank) and (num_ops <= maxrank)) {
     contractions_.push_back(std::vector<int>(a.begin(), a.begin() + k));
     PRINT(
         PrintLevel::Summary, DiagVertex free_ops;
         for (const auto &free_vertex
              : free_vertex_vec) { free_ops += free_vertex; };
         cout << fmt::format("\n  {:5d}    {:3d}    ", ncontractions_ + 1,
-                            free_ops.rank());
+                            free_ops.num_ops());
         for (int i = 0; i < k; ++i) { cout << fmt::format(" {:3d}", a[i]); };
         cout << std::string(std::max(24 - 4 * k, 2), ' ') << free_ops;)
     ncontractions_++;
@@ -689,26 +704,23 @@ void WickTheorem::process_contraction(
 std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
     const std::vector<DiagOperator> &ops,
     const std::vector<std::vector<DiagVertex>> &contractions, scalar_t factor) {
-  // PRINT(PrintLevel::Basic, cout << "\n----------------------------" << endl;)
-
-  // build a map of equivalent operators
-
-  // 1. Create tensors, lay out the second quantized operators on a vector,
-  // and create mappings
+  // 1. Get the Tensor objects and SQOperator vector corresponding to the
+  // uncontracted term
   auto tensors_sqops_op_map = contration_tensors_sqops(ops);
   std::vector<Tensor> &tensors = std::get<0>(tensors_sqops_op_map);
   std::vector<SQOperator> &sqops = std::get<1>(tensors_sqops_op_map);
-  // this map takes the operator index (op), orbital space (s), the sqop type,
-  // and an index and maps it to the operators as they are stored in a vector
+  // this map takes the operator index (op), orbital space (s), the sqop type
+  // (true = cre, false = ann), and an index and maps it to the operators as
+  // they are stored in a vector
   //  std::map<std::tuple<int, int, bool, int>, int> op_map;
-  //                   op space cre    n
+  //                       op space cre    n
   std::map<std::tuple<int, int, bool, int>, int> &op_map =
       std::get<2>(tensors_sqops_op_map);
 
   // 2. Apply the contractions to the second quantized operators and add new
   // tensors (density matrices, cumulants)
 
-  // counter of how many second quantized operators are not contracted
+  // counts of how many second quantized operators are not contracted
   std::vector<DiagVertex> ops_offset(ops.size());
   // vector to store the order of operators
   std::vector<int> sign_order(sqops.size(), -1);
@@ -721,19 +733,18 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
   int nsqops_contracted = 0;
 
   // a sign factor that keeps into account a negative sign introduced by
-  // sorting
-  // the operators in a unoccupied-unoccupied contraction
+  // sorting the operators in a unoccupied-unoccupied contraction
   int unoccupied_sign = 1;
 
   index_map_t pair_contraction_reindex_map;
   // Loop over elementary contractions
   for (const std::vector<DiagVertex> &contraction : contractions) {
+    // a bit array to keep track of which operators are contracted
     std::vector<bool> bit_map(sqops.size(), false);
 
     // Find the rank and space of this contraction
-    //    const auto &contraction = elementary_contractions_[c];
-    int rank = vertices_rank(contraction);
-    int s = vertices_space(contraction);
+    int rank = sum_num_ops(contraction);
+    int s = spaces_in_vertices(contraction)[0];
     nsqops_contracted += rank;
 
     // find the position of the creation operators
@@ -809,9 +820,9 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
       std::string label;
       if (rank == 2) {
         if (pos_cre_sqops[0] < pos_ann_sqops[0]) {
-          label = "gamma" + std::to_string(rank / 2);
+          label = "gamma1";
         } else {
-          label = "eta" + std::to_string(rank / 2);
+          label = "eta1";
           unoccupied_sign *= -1; // this factor is to compensate for the fact
                                  // that we order operator in a canonical form
                                  // in which annihilators are to the left of
@@ -900,9 +911,8 @@ WickTheorem::contration_tensors_sqops(const std::vector<DiagOperator> &ops) {
 
   // Loop over all operators
   int n = 0;
-  for (int o = 0; o < ops.size(); o++) {
+  for (int o = 0, maxo = ops.size(); o < maxo; o++) {
     const auto &op = ops[o];
-
     // Loop over creation operators (lower indices)
     std::vector<Index> lower;
     for (int s = 0; s < osi->num_spaces(); s++) {
@@ -947,7 +957,7 @@ std::vector<int> WickTheorem::vertex_vec_to_pos(
 
   std::vector<int> result;
 
-  int s = vertices_space(vertex_vec);
+  int s = spaces_in_vertices(vertex_vec)[0];
 
   PRINT(PrintLevel::All, cout << "\n  Vertex to position:" << endl;);
 

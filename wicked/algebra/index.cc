@@ -23,7 +23,7 @@ std::string Index::str() const {
 
 std::string Index::latex() const { return osi->index_label(space(), pos()); }
 
-std::string Index::ambit() const { return str(); }
+std::string Index::compile(const std::string &format) const { return str(); }
 
 std::ostream &operator<<(std::ostream &os, const Index &idx) {
   os << idx.str();

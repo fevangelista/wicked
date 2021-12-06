@@ -29,7 +29,7 @@ int DiagOperator::cre(int space) const { return vertex_.cre(space); }
 
 int DiagOperator::ann(int space) const { return vertex_.ann(space); }
 
-int DiagOperator::rank() const { return vertex_.rank(); }
+int DiagOperator::num_ops() const { return vertex_.num_ops(); }
 
 bool DiagOperator::operator<(DiagOperator const &other) const {
   // Compare the labels
@@ -85,10 +85,10 @@ DiagOperator make_diag_operator(const std::string &label,
   return DiagOperator(label, cre, ann);
 }
 
-int operators_rank(const std::vector<DiagOperator> &ops) {
+int sum_num_ops(const std::vector<DiagOperator> &ops) {
   int r = 0;
   for (const auto &op : ops) {
-    r += op.rank();
+    r += op.num_ops();
   }
   return r;
 }

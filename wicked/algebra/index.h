@@ -50,8 +50,8 @@ public:
   /// or a generic index (e.g., 'o1')
   std::string latex() const;
 
-  /// @return an ambit (C++ code) representation (e.g., 'o1')
-  std::string ambit() const;
+  /// @return a compilable representation (e.g., 'o1')
+  std::string compile(const std::string &format) const;
 
 private:
   // ==> Class private data <==

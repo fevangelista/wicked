@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "fmt/format.h"
+
 #include "equation.h"
 #include "helpers.h"
 #include "sqoperator.h"
@@ -34,11 +36,108 @@ std::string Equation::str() const {
 
 std::string Equation::latex() const { return str(); }
 
-std::string Equation::ambit() const {
-  std::vector<std::string> str_vec;
-  str_vec.push_back(lhs_.ambit() + " += " + factor_.ambit());
-  str_vec.push_back(rhs_.ambit());
-  return (join(str_vec, " * ") + ";");
+std::string get_unique_index(const std::string &s,
+                             std::map<std::string, std::string> &index_map,
+                             std::vector<char> &unused_indices);
+
+std::string
+get_unique_tensor_indices(const Tensor &t,
+                          std::map<std::string, std::string> &index_map,
+                          std::vector<char> &unused_indices);
+
+std::string get_unique_index(const std::string &s,
+                             std::map<std::string, std::string> &index_map,
+                             std::vector<std::string> &unused_indices) {
+  // is this index (something like "i" or "o2") in the map? If not, figure out
+  // what it corresponds to.
+  if (index_map.count(s) == 0) {
+    // a character
+    if (s.size() == 1) {
+      if (std::find(unused_indices.begin(), unused_indices.end(), s) !=
+          unused_indices.end()) {
+        // if this character is unused, use it
+        index_map[s] = s;
+      } else {
+        // if it is used, grab the first available index
+        index_map[s] = unused_indices.back();
+      }
+    } else {
+      index_map[s] = unused_indices.back();
+    }
+    // erase this character from the available characters to avoid reusing
+    unused_indices.erase(
+        std::remove(unused_indices.begin(), unused_indices.end(), index_map[s]),
+        unused_indices.end());
+  }
+  return index_map[s];
+}
+
+std::string
+get_unique_tensor_indices(const Tensor &t,
+                          std::map<std::string, std::string> &index_map,
+                          std::vector<std::string> &unused_indices) {
+  std::string indices;
+  for (const auto &l : t.upper()) {
+    indices += get_unique_index(l.latex(), index_map, unused_indices);
+  }
+  for (const auto &l : t.lower()) {
+    indices += get_unique_index(l.latex(), index_map, unused_indices);
+  }
+  return indices;
+}
+
+std::string Equation::compile(const std::string &format) const {
+  if (format == "ambit") {
+    std::vector<std::string> str_vec;
+    str_vec.push_back(lhs_.compile(format) + " += " + factor_.compile(format));
+    str_vec.push_back(rhs_.compile(format));
+    return (join(str_vec, " * ") + ";");
+  }
+
+  if (format == "einsum") {
+    std::vector<std::string> str_vec;
+    const auto &lhs_tensor = lhs().tensors()[0];
+
+    std::string lhs_tensor_label =
+        lhs_tensor.label() + std::to_string(lhs_tensor.rank());
+    for (const auto &l : lhs_tensor.upper()) {
+      lhs_tensor_label += osi->label(l.space());
+    }
+    for (const auto &l : lhs_tensor.lower()) {
+      lhs_tensor_label += osi->label(l.space());
+    }
+
+    str_vec.push_back(lhs_tensor_label +
+                      " += " + fmt::format("{:.9f}", rhs_factor().to_double()) +
+                      " * np.einsum(");
+
+    std::map<std::string, std::string> index_map;
+    std::vector<std::string> unused_indices = {
+        "Z", "Y", "X", "W", "V", "U", "T", "S", "R", "Q", "P", "O", "N",
+        "M", "L", "K", "J", "I", "H", "G", "F", "E", "D", "C", "B", "A",
+        "z", "y", "x", "w", "v", "u", "t", "s", "r", "q", "p", "o", "n",
+        "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b", "a"};
+
+    std::vector<std::string> indices_vec;
+    for (const auto &t : rhs().tensors()) {
+      std::string tensor_indices =
+          get_unique_tensor_indices(t, index_map, unused_indices);
+      indices_vec.push_back(tensor_indices);
+    }
+
+    std::vector<std::string> args_vec;
+    args_vec.push_back(
+        "\"" + join(indices_vec, ",") + "->" +
+        get_unique_tensor_indices(lhs_tensor, index_map, unused_indices) +
+        "\"");
+    for (const auto &t : rhs().tensors()) {
+      args_vec.push_back(t.label());
+    }
+    str_vec.push_back(join(args_vec, ","));
+    str_vec.push_back(")");
+    return join(str_vec, "");
+  }
+  return "";
 }
 
 std::ostream &operator<<(std::ostream &os, const Equation &eterm) {
