@@ -153,7 +153,8 @@ Expression::to_manybody_equation(const std::string &label) {
       if (op.type() == SQOperatorType::Creation) {
         lower.push_back(op.index());
       } else {
-        upper.push_back(op.index());
+        // upper indices are read in reverse order
+        upper.insert(upper.begin(), op.index());
       }
     }
     SymbolicTerm lhs;

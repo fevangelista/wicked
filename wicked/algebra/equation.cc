@@ -98,8 +98,7 @@ std::string Equation::compile(const std::string &format) const {
     std::vector<std::string> str_vec;
     const auto &lhs_tensor = lhs().tensors()[0];
 
-    std::string lhs_tensor_label =
-        lhs_tensor.label() + std::to_string(lhs_tensor.rank());
+    std::string lhs_tensor_label = lhs_tensor.label();
     for (const auto &l : lhs_tensor.upper()) {
       lhs_tensor_label += osi->label(l.space());
     }
@@ -131,7 +130,15 @@ std::string Equation::compile(const std::string &format) const {
         get_unique_tensor_indices(lhs_tensor, index_map, unused_indices) +
         "\"");
     for (const auto &t : rhs().tensors()) {
-      args_vec.push_back(t.label());
+      std::string t_label = t.label() + "[\"";
+      for (const auto &l : t.upper()) {
+        t_label += osi->label(l.space());
+      }
+      for (const auto &l : t.lower()) {
+        t_label += osi->label(l.space());
+      }
+      t_label += "\"]";
+      args_vec.push_back(t_label);
     }
     str_vec.push_back(join(args_vec, ","));
     str_vec.push_back(")");
