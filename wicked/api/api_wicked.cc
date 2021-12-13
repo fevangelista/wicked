@@ -23,7 +23,7 @@ void export_DiagOperator(py::module &m);
 void export_DiagOpExpression(py::module &m);
 void export_WickTheorem(py::module &m);
 
-PYBIND11_MODULE(wicked, m) {
+PYBIND11_MODULE(_wicked, m) {
   m.doc() = "Wicked python interface";
 
   py::class_<rational, std::shared_ptr<rational>>(m, "rational")

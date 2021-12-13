@@ -9,4 +9,4 @@ aux_source_directory(diagrams SRC_LIST)
 aux_source_directory(api SRC_LIST)
 aux_source_directory(fmt SRC_LIST)
 
-pybind11_add_module(wicked ${SRC_LIST} ${module_SOURCES})
+pybind11_add_module(_wicked ${SRC_LIST} ${module_SOURCES})
