@@ -11,12 +11,6 @@ pool:
   vmImage: ubuntu-latest
 strategy:
   matrix:
-    # Python27:
-    #   python.version: '2.7'
-    # Python35:
-    #   python.version: '3.5'
-    # Python36:
-    #   python.version: '3.6'
     Python37:
       python.version: '3.7'
 
@@ -27,6 +21,10 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
+    conda install -c conda-forge lcov
+  displayName: 'Compile wicked'
+
+- script: |
     python setup.py develop
   displayName: 'Compile wicked'
 
@@ -34,3 +32,10 @@ steps:
     pip install pytest pytest-azurepipelines
     pytest tests
   displayName: 'Run pytest'
+
+- script: |
+    lcov --directory . --capture --output-file coverage.info
+    lcov --remove coverage.info '/usr/*' '*fmt*' '*c++*' '*pybind11*' --output-file coverage.info # filter system-files
+    lcov --list coverage.info #debug info
+    bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+  displayName: 'Upload to codecov.io'
