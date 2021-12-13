@@ -61,11 +61,11 @@ class CMakeBuild(build_ext):
             self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        print(" ".join(['cmake', ext.sourcedir] + cmake_args))
-        print(" ".join(['cmake', '--build', '.'] + build_args))
+        print(" ".join(['cmake'] + cmake_args)
+        print(" ".join(['cmake', '--build', '.', '-j2'] + build_args))
 
         subprocess.check_call(['cmake'] + cmake_args)
-        subprocess.check_call(['cmake', '--build', '.'] + build_args)
+        subprocess.check_call(['cmake', '--build', '.', '-j2'] + build_args)
        
 #       subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
 #                             cwd=self.build_temp, env=env)
