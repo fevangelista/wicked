@@ -15,7 +15,6 @@ void export_DiagOperator(py::module &m) {
       .def("__repr__", &DiagOperator::str)
       .def("__str__", &DiagOperator::str);
   m.def("diag_operator", &make_diag_operator, "Create a DiagOperator object");
-  //   m.def("make_diag_operator", &make_diag_operator, "Make an operator");
 }
 
 void export_DiagOpExpression(py::module &m) {

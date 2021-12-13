@@ -77,8 +77,8 @@ make_diag_operator_expression2(const std::string &label,
 DiagOpExpression commutator(const DiagOpExpression &A,
                             const DiagOpExpression &B);
 
-/// Creates a new object with the exponential exp(A) truncated at a given order
-DiagOpExpression exp(const DiagOpExpression &A, int order);
+// /// Creates a new object with the exponential exp(A) truncated at a given
+// order DiagOpExpression exp(const DiagOpExpression &A, int order);
 
 /// Creates a new object with the Baker-Campbell-Hausdorff expansion of the
 /// quantity exp(-B) A exp(B) truncated at a given order n

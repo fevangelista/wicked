@@ -182,17 +182,17 @@ DiagOpExpression commutator(const DiagOpExpression &A,
   return result;
 }
 
-DiagOpExpression exp(const DiagOpExpression &A, int order) {
-  DiagOpExpression result;
-  result.add({});
-  //  DiagOpExpression temp1;
-  //  temp1.add({});
-  //  for (int k = 1; k <= order; k++){
-  //      temp1 *= A;
-  //      result.add(temp);
-  //  }
-  return result;
-}
+// DiagOpExpression exp(const DiagOpExpression &A, int order) {
+//   DiagOpExpression result;
+//   result.add({});
+//   //  DiagOpExpression temp1;
+//   //  temp1.add({});
+//   //  for (int k = 1; k <= order; k++){
+//   //      temp1 *= A;
+//   //      result.add(temp);
+//   //  }
+//   return result;
+// }
 
 DiagOpExpression bch_series(const DiagOpExpression &A,
                             const DiagOpExpression &B, int n) {
