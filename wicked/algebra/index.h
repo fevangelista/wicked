@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 /**
  * @brief A class to represent orbital indices.

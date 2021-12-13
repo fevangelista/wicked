@@ -1,3 +1,4 @@
+#include <cassert>
 
 #include "sqopprod.h"
 #include "../helpers.h"

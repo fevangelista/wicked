@@ -3,6 +3,7 @@
 
 #include <array>
 #include <string>
+#include <functional>
 
 #include "index.h"
 #include "wicked-def.h"
