@@ -2,6 +2,7 @@
 #include <pybind11/stl.h>
 
 #include "../wicked/algebra/equation.h"
+#include "../wicked/algebra/expression.h" // for rhs_expression
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -12,6 +13,7 @@ void export_Equation(py::module &m) {
       .def(py::init<const SymbolicTerm &, const SymbolicTerm &, scalar_t>())
       .def("lhs", &Equation::lhs)
       .def("rhs", &Equation::rhs)
+      .def("rhs_expression", &Equation::rhs_expression)
       .def("__repr__", &Equation::str)
       .def("__str__", &Equation::str)
       .def("latex", &Equation::latex)

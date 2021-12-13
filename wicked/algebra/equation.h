@@ -4,6 +4,8 @@
 #include "symbolic_term.h"
 #include <vector>
 
+class Expression;
+
 /// A class to represent a sum of SQ terms.
 class Equation {
 public:
@@ -12,14 +14,17 @@ public:
 
   // ==> Class public interface <==
 
-  /// Return the left-hand side of the equation
+  /// Return the symbolic term on the left-hand side of the equation
   const SymbolicTerm &lhs() const;
 
-  /// Return the right-hand side of the equation
+  /// Return the symbolic term on the right-hand side of the equation
   const SymbolicTerm &rhs() const;
 
   /// Return the factor for the left-hand side equation
   scalar_t rhs_factor() const;
+
+  /// Return the right-hand side of the equation
+  Expression rhs_expression() const;
 
   /// Comparison operator
   bool operator==(Equation const &other) const;

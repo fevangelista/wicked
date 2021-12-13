@@ -4,10 +4,10 @@
 #include "fmt/format.h"
 
 #include "equation.h"
+#include "expression.h"
 #include "helpers.h"
 #include "sqoperator.h"
 #include "tensor.h"
-#include "term.h"
 #include "wicked-def.h"
 
 Equation::Equation(const SymbolicTerm &lhs, const SymbolicTerm &rhs,
@@ -19,6 +19,12 @@ const SymbolicTerm &Equation::lhs() const { return lhs_; }
 const SymbolicTerm &Equation::rhs() const { return rhs_; }
 
 scalar_t Equation::rhs_factor() const { return factor_; }
+
+Expression Equation::rhs_expression() const {
+  Expression expr;
+  expr.add(rhs(), rhs_factor());
+  return expr;
+}
 
 bool Equation::operator==(Equation const &other) const {
   return ((lhs() == other.lhs()) and (rhs() == other.rhs()) and

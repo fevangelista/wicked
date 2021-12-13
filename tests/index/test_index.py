@@ -14,21 +14,18 @@ def test_index():
     assert i.pos() == 0
     assert str(i) == "o0"
     assert i.latex() == "i"
-    assert i.ambit() == "o0"
 
     j = index("o_1")
     assert j.space() == 0
     assert j.pos() == 1
     assert str(j) == "o1"
     assert j.latex() == "j"
-    assert j.ambit() == "o1"
 
     k = index("o_2")
     assert k.space() == 0
     assert k.pos() == 2
     assert str(k) == "o2"
     assert k.latex() == "k"
-    assert k.ambit() == "o2"
 
     u = Index(1, 1)
     assert u.space() == 1
