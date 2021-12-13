@@ -66,8 +66,8 @@ class CMakeBuild(build_ext):
         print(" ".join(["cmake"] + cmake_args))
         print(" ".join(["cmake", "--build", ".", "-j2"] + build_args))
 
-        subprocess.check_call(["cmake", "-build", "build"] + cmake_args)
-        subprocess.check_call(["cmake", "--build", "build", "-j2"] + build_args)
+        subprocess.check_call(["cmake", "-B", "build"] + cmake_args)
+        subprocess.check_call(["cmake", "-B", "build", "-j2"] + build_args)
 
         print()  # Add empty line for nicer output
 
