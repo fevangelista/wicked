@@ -10,7 +10,6 @@ import subprocess
 from distutils.version import LooseVersion
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
-from shutil import copyfile, copymode
 
 
 class CMakeExtension(Extension):
@@ -78,6 +77,7 @@ class CMakeBuild(build_ext):
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+
         subprocess.check_call(["cmake"] + cmake_args)
         subprocess.check_call(["cmake", "--build", ".", "-j2"] + build_args)
 
