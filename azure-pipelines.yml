@@ -5,7 +5,7 @@
 
 trigger:
 - master
-- azure
+- codecov
 
 pool:
   vmImage: ubuntu-latest
