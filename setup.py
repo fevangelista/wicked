@@ -63,10 +63,13 @@ class CMakeBuild(build_ext):
             os.makedirs(self.build_temp)
         print(" ".join(['cmake', ext.sourcedir] + cmake_args))
         print(" ".join(['cmake', '--build', '.'] + build_args))
+
+        subprocess.check_call(['cmake'] + cmake_args)
+        subprocess.check_call(['cmake', '--build', '.'] + build_args)
        
-        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
-                              cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake','--build','.'])
+#       subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
+#                             cwd=self.build_temp, env=env)
+#       subprocess.check_call(['cmake','--build','.'],cwd=self.build_temp)
 
         #subprocess.check_call(['cmake', '--build', '.'] + build_args)
 
