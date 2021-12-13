@@ -63,11 +63,8 @@ class CMakeBuild(build_ext):
         )
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        print(" ".join(["cmake"] + cmake_args))
-        print(" ".join(["cmake", "--build", ".", "-j2"] + build_args))
-
-        subprocess.check_call(["cmake", "-B", "build"] + cmake_args)
-        subprocess.check_call(["cmake", "-B", "build", "-j2"] + build_args)
+        subprocess.check_call(['cmake','-S', '.', '-B', 'build'] + cmake_args)
+        subprocess.check_call(['cmake', '--build', '.', '-j2'] + build_args)
 
         print()  # Add empty line for nicer output
 
