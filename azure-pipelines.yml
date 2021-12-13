@@ -31,7 +31,7 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    python setup.py
+    python setup.py develop
   displayName: 'Compile wicked'
 
 - script: |
