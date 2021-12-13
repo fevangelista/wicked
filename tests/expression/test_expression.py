@@ -62,11 +62,11 @@ def test_expression3():
     w.add_space("a", "fermion", "general", ["u", "v"])
     w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
     # empty string corresponds to no operator
-    expr = w.string_to_expr("")
+    expr = w.expression("")
     assert str(expr) == ""
 
     # identity
-    expr = w.string_to_expr("1")
+    expr = w.expression("1")
     assert str(expr) == "1"
 
 

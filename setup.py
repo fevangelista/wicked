@@ -106,9 +106,9 @@ setup(
     long_description='',
     # tell setuptools to look for any packages under 'wicked'
     packages=find_packages('wicked'),
-    # tell setuptools that all packages will be under the 'src' directory
+    # tell setuptools that all packages will be under the 'wicked' directory
     # and nowhere else
-    package_dir={'':'wicked'},
+    package_dir={'':'.'},
     # add an extension module named 'python_cpp_example' to the package
     # 'python_cpp_example'
     ext_modules=[CMakeExtension('wicked')],
