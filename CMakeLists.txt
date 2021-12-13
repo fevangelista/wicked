@@ -6,4 +6,4 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(pybind11 REQUIRED)
 
 add_subdirectory (wicked)
-
+add_subdirectory(external/pybind11)
