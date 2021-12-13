@@ -27,7 +27,8 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    pip install -r requirements.txt
+    conda install pybind11 -c conda-forge    
+    #pip install -r requirements.txt
   displayName: 'Install dependencies'
 
 - script: |
