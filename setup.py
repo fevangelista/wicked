@@ -20,6 +20,16 @@ class CMakeExtension(Extension):
 
 
 class CMakeBuild(build_ext):
+    build_ext.user_options = build_ext.user_options + [
+        # Notes: the first option is the option string
+        #        the second option is an abbreviated form of an option, which we avoid with None
+        ("code-coverage", None, "enable code coverage")
+    ]
+
+    def initialize_options(self):
+        self.code_coverage = "OFF"
+        return build_ext.initialize_options(self)
+
     def run(self):
         try:
             out = subprocess.check_output(["cmake", "--version"])
@@ -37,6 +47,8 @@ class CMakeBuild(build_ext):
             os.path.dirname(self.get_ext_fullpath(ext.name)), "wicked"
         )
         extdir = os.path.abspath(extdir)
+
+        print(f"    CODE_COVERAGE = {str(self.code_coverage).upper()}")
 
         cmake_args = [
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + extdir,
@@ -61,33 +73,15 @@ class CMakeBuild(build_ext):
         env["CXXFLAGS"] = "{} -DVERSION_INFO=\\'{}\\'".format(
             env.get("CXXFLAGS", ""), self.distribution.get_version()
         )
+
+        cmake_args += [f"-DCODE_COVERAGE={str(self.code_coverage).upper()}"]
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        subprocess.check_call(['cmake'] + cmake_args)
-        subprocess.check_call(['cmake', '--build', '.', '-j2'] + build_args)
+        subprocess.check_call(["cmake"] + cmake_args)
+        # subprocess.check_call(["cmake", "--build", ".", "-j2"] + build_args)
 
         print()  # Add empty line for nicer output
-
-    def copy_test_file(self, src_file):
-        """
-        Copy ``src_file`` to `tests/bin` directory, ensuring parent directory
-        exists. Messages like `creating directory /path/to/package` and
-        `copying directory /src/path/to/package -> path/to/package` are
-        displayed on standard output. Adapted from scikit-build.
-        """
-        # Create directory if needed
-        dest_dir = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "tests", "bin"
-        )
-        if dest_dir != "" and not os.path.exists(dest_dir):
-            print("creating directory {}".format(dest_dir))
-            os.makedirs(dest_dir)
-
-        # Copy file
-        dest_file = os.path.join(dest_dir, os.path.basename(src_file))
-        print("copying {} -> {}".format(src_file, dest_file))
-        copyfile(src_file, dest_file)
-        copymode(src_file, dest_file)
 
 
 setup(
