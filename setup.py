@@ -1,13 +1,10 @@
 from setuptools import find_packages
 
 import os
-import re
 import sys
-import sysconfig
 import platform
 import subprocess
 
-from distutils.version import LooseVersion
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 
@@ -32,6 +29,7 @@ class CMakeBuild(build_ext):
     def run(self):
         try:
             out = subprocess.check_output(["cmake", "--version"])
+            print(f"CMake version: {out}")
         except OSError:
             raise RuntimeError(
                 "CMake must be installed to build the following extensions: "
