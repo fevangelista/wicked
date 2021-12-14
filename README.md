@@ -6,4 +6,4 @@
 
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/fevangelista/wicked.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fevangelista/wicked/context:python)
 
-[![Language grade: C++](https://img.shields.io/lgtm/grade/python/g/fevangelista/wicked.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fevangelista/wicked/context:cpp)
+[![Language grade: C++](https://img.shields.io/lgtm/grade/cpp/g/fevangelista/wicked.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fevangelista/wicked/context:cpp)
