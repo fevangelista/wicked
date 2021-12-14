@@ -26,9 +26,10 @@ steps:
   displayName: 'Install lcov'
 
 - script: |
-    echo '[CMakeBuild]\ncode_coverage=ON\n' > setup.cfg
+    #echo '[CMakeBuild]\ncode_coverage=ON\n' > setup.cfg
+    echo '\nset(CODE_COVERAGE ON)' >> CMakeLists.txt
+    cat CMakeLists.txt
     python setup.py develop
-    rm -rf setup.cfg
   displayName: 'Compile wicked'
 
 - script: |
