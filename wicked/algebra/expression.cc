@@ -257,8 +257,8 @@ Expression string_to_expr(const std::string &s) {
   auto tensors = findall(s, tensor_re);
 
   SymbolicTerm term;
-  for (auto s : tensors) {
-    term.add(make_tensor_from_str(s));
+  for (const auto &t : tensors) {
+    term.add(make_tensor_from_str(t));
   }
 
   auto operators = findall(s, operator_re);

@@ -132,8 +132,7 @@ const std::vector<std::string> &OrbitalSpaceInfo::indices(int pos) const {
 
 int OrbitalSpaceInfo::label_to_space(char label) const {
   auto search = label_to_pos_.find(label);
-  if (search != label_to_pos_.end()) {
-  } else {
+  if (search == label_to_pos_.end()) {
     throw std::runtime_error("\n  Could not find label :'" +
                              std::string(1, label) +
                              "' in OrbitalSpaceInfo.\n  Use the add_space() "

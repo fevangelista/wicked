@@ -66,11 +66,12 @@ std::string rational::str(bool sign) const {
       s = '+';
     }
     if (denominator_ == 1) {
-      if (numerator_ == 1) {
-      } else if (numerator_ == -1) {
+      if (numerator_ == -1) {
         s += "-";
       } else {
-        s += std::to_string(numerator_);
+        if (numerator_ != 1) {
+          s += std::to_string(numerator_);
+        }
       }
     } else {
       s += std::to_string(numerator_) + "/" + std::to_string(denominator_);

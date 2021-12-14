@@ -73,12 +73,12 @@ DiagOperator make_diag_operator(const std::string &label,
   // count the number of creation and annihilation operators in each space
   std::vector<int> cre(osi->num_spaces());
   std::vector<int> ann(osi->num_spaces());
-  for (const auto &label : cre_labels) {
-    int space = osi->label_to_space(label);
+  for (const auto &l : cre_labels) {
+    int space = osi->label_to_space(l);
     cre[space] += 1;
   }
-  for (const auto &label : ann_labels) {
-    int space = osi->label_to_space(label);
+  for (const auto &l : ann_labels) {
+    int space = osi->label_to_space(l);
     ann[space] += 1;
   }
 
