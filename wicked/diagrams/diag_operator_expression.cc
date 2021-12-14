@@ -120,12 +120,12 @@ make_diag_operator_expression(const std::string &label,
     }
     std::vector<int> cre(osi->num_spaces());
     std::vector<int> ann(osi->num_spaces());
-    for (const auto &label : cre_labels) {
-      int space = osi->label_to_space(label);
+    for (const auto &l : cre_labels) {
+      int space = osi->label_to_space(l);
       cre[space] += 1;
     }
-    for (const auto &label : ann_labels) {
-      int space = osi->label_to_space(label);
+    for (const auto &l : ann_labels) {
+      int space = osi->label_to_space(l);
       ann[space] += 1;
     }
 
