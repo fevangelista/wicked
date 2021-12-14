@@ -28,6 +28,7 @@ steps:
 - script: |
     echo '[CMakeBuild]\ncode_coverage=ON\n' > setup.cfg
     python setup.py develop
+    rm -rf setup.cfg
   displayName: 'Compile wicked'
 
 - script: |
