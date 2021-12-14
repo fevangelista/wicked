@@ -30,9 +30,20 @@ PYBIND11_MODULE(_wicked, m) {
       .def(py::init<>())
       .def(py::init<int>())
       .def(py::init<int, int>())
+      .def("__float__", &rational::to_double)
       .def("__eq__",
            [](const rational &lhs, const rational &rhs) { return lhs == rhs; })
-      .def("__repr__", &rational::repr);
+      .def("__add__",
+           [](const rational &lhs, const rational &rhs) { return lhs + rhs; })
+      .def("__sub__",
+           [](const rational &lhs, const rational &rhs) { return lhs - rhs; })
+      .def("__mul__",
+           [](const rational &lhs, const rational &rhs) { return lhs * rhs; })
+      .def("__truediv__",
+           [](const rational &lhs, const rational &rhs) { return lhs / rhs; })
+      .def("__repr__", &rational::repr)
+      .def("str", &rational::str);
+  ;
 
   m.def("make_rational", &make_rational_from_str);
 
