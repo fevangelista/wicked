@@ -48,7 +48,10 @@ public:
   /// Return the rank of the tensor
   int rank() const { return lower_.size() + upper_.size(); }
 
-  /// Return the symmetry factor of this vector
+  /// return the signature (number of upper/lower indices in each space)
+  std::vector<std::pair<int,int>> signature() const;
+
+  /// Return the symmetry factor of this tensor
   int symmetry_factor() const;
 
   /// Comparison operator used for sorting

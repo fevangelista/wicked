@@ -150,6 +150,8 @@ std::string Equation::compile(const std::string &format) const {
     str_vec.push_back(")");
     return join(str_vec, "");
   }
+  std::string msg = "Equation::compile() - the argument '" + format + "' is not valid. Choices are 'ambit' or 'einsum'";
+  throw std::runtime_error(msg);
   return "";
 }
 

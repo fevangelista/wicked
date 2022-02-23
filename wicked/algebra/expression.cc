@@ -141,9 +141,9 @@ std::string Expression::latex(const std::string &sep) const {
   return join(str_vec, sep);
 }
 
-std::map<int, std::vector<Equation>>
-Expression::to_manybody_equation(const std::string &label) {
-  std::map<int, std::vector<Equation>> result;
+std::map<std::string, std::vector<Equation>>
+Expression::to_manybody_equation(const std::string &label) const {
+  std::map<std::string, std::vector<Equation>> result;
   for (const auto &term_factor : terms_) {
     std::vector<Index> lower;
     std::vector<Index> upper;
@@ -159,7 +159,18 @@ Expression::to_manybody_equation(const std::string &label) {
     }
     SymbolicTerm lhs;
     Tensor lhs_tensor(label, lower, upper);
-    auto rank = lhs_tensor.rank();
+    auto signature = lhs_tensor.signature();
+    // convert the signature to a string (to bypass limitations of pybind11)
+    std::string signature_str_upper;
+    std::string signature_str_lower;
+    int pos = 0;
+    for (const auto& [u,l] : signature){
+        signature_str_upper += std::string(u,osi->label(pos));
+        signature_str_lower += std::string(l,osi->label(pos));
+        pos += 1;
+    }
+    reverse(signature_str_lower.begin(), signature_str_lower.end());
+    auto signature_str = signature_str_upper + "|" + signature_str_lower;
     lhs.add(lhs_tensor);
     factor *= lhs_tensor.symmetry_factor();
 
@@ -167,7 +178,7 @@ Expression::to_manybody_equation(const std::string &label) {
     for (const auto &tensor : term.tensors()) {
       rhs.add(tensor);
     }
-    result[rank].push_back(Equation(lhs, rhs, factor));
+    result[signature_str].push_back(Equation(lhs, rhs, factor));
   }
   return result;
 }

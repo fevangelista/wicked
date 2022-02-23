@@ -5,10 +5,22 @@
 #include "helpers.h"
 #include "tensor.h"
 #include "wicked-def.h"
+#include "orbital_space.h"
 
 Tensor::Tensor(const std::string &label, const std::vector<Index> &lower,
                const std::vector<Index> &upper, SymmetryType symmetry)
     : label_(label), lower_(lower), upper_(upper), symmetry_(symmetry) {}
+
+std::vector<std::pair<int,int>> Tensor::signature() const{
+  std::vector<std::pair<int,int>> result(osi->num_spaces(),std::pair(0,0));
+  for (const Index &idx : upper_) {
+    result[idx.space()].first += 1;
+  }
+  for (const Index &idx : lower_) {
+    result[idx.space()].second += 1;
+  }
+  return result;
+}
 
 int Tensor::symmetry_factor() const {
   return ::symmetry_factor(upper_) * ::symmetry_factor(lower_);

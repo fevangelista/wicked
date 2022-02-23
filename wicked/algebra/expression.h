@@ -55,14 +55,10 @@ public:
   std::string latex(const std::string &sep = " \\\\ \n") const;
 
   /// Convert this sum to a vector of many-body equations
-  std::map<int, std::vector<Equation>>
-  to_manybody_equation(const std::string &label);
-
-  // /// Convert this sum to a vector of many-body expressions
-  // Expression to_manybody_expression(const std::string &label);
-  // #for (const auto &eq : sum.to_manybody_equation("r")) {
-  // #val.add(eq.rhs(), eq.rhs_factor());
-  // #}
+  /// The result is stored into a map. The key to this map
+  /// shows the number of upper/lower indices in each space
+  std::map<std::string, std::vector<Equation>>
+  to_manybody_equation(const std::string &label) const;
 
 private:
   // ==> Class private data <==
