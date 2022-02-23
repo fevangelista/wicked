@@ -75,12 +75,17 @@ void OrbitalSpaceInfo::add_space(char label, FieldType field_type,
                                  SpaceType space_type,
                                  const std::vector<std::string> &indices,
                                  const std::vector<char> &elementary_spaces) {
+  if (label_to_pos_.count(label) != 0){
+          throw std::runtime_error("Orbitals space label " + std::string(label, 1) +
+                                   " is already defined. Use another label.");
+  }
+                                   
   size_t pos = space_info_.size();
   label_to_pos_[label] = pos;
   for (auto &index : indices) {
     if (indices_to_pos_.count(index)) {
-      throw std::runtime_error("Index: " + std::string(index, 1) +
-                               " is already assigned!");
+      throw std::runtime_error("Index " + std::string(index, 1) +
+                               " is already assigned. Use another index.");
     } else {
       indices_to_pos_[index] = pos;
     }
