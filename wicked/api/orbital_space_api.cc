@@ -13,6 +13,8 @@ void export_OrbitalSpaceInfo(py::module &m) {
       .def(py::init<>())
       .def("reset_space", &OrbitalSpaceInfo::reset)
       .def("add_space", &OrbitalSpaceInfo::add_space)
+      .def("num_spaces", &OrbitalSpaceInfo::num_spaces)
+      .def("label", &OrbitalSpaceInfo::label)
       .def("__str__", &OrbitalSpaceInfo::str);
 
   m.def("osi", []() { return osi; });
