@@ -68,10 +68,6 @@ private:
       const std::vector<DiagOperator> &ops, int s,
       std::vector<std::vector<DiagVertex>> &contr_vec);
 
-  void elementary_contractions_composite(
-      const std::vector<DiagOperator> &ops, int s,
-      std::vector<std::vector<DiagVertex>> &contr_vec);
-
   /// Generates all composite contractions
   void generate_composite_contractions(const std::vector<DiagOperator> &ops,
                                        const int minrank, const int maxrank);
@@ -124,7 +120,7 @@ private:
   /// Return the tensors and operators correspoding to a product of operators
   std::tuple<std::vector<Tensor>, std::vector<SQOperator>,
              std::map<std::tuple<int, int, bool, int>, int>>
-  contration_tensors_sqops(const std::vector<DiagOperator> &ops);
+  contraction_tensors_sqops(const std::vector<DiagOperator> &ops);
 
   std::vector<int>
   vertex_vec_to_pos(const std::vector<DiagVertex> &vertex_vec,

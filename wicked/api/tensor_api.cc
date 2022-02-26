@@ -22,5 +22,5 @@ void export_Tensor(py::module &m) {
       .def("compile", &Tensor::compile);
 
   m.def("tensor", &make_tensor, "label"_a, "lower"_a, "upper"_a, "symmetry"_a);
-  m.def("tensor", &make_tensor_from_str, "s"_a);
+  m.def("tensor", &make_tensor_from_str, "s"_a, "symmetry"_a);
 }

@@ -20,7 +20,7 @@ public:
 
   Tensor(const std::string &label, const std::vector<Index> &lower,
          const std::vector<Index> &upper,
-         SymmetryType symmetry = SymmetryType::Antisymmetric);
+         SymmetryType symmetry);
 
   // ==> Class public interface <==
 
@@ -86,7 +86,7 @@ Tensor make_tensor(const std::string &label,
 
 /// Helper function to make a Tensor object from a string
 /// Accepts inputs of the form "t_{o0}^{v_0}"
-Tensor make_tensor_from_str(const std::string &index);
+Tensor make_tensor_from_str(const std::string &index, SymmetryType symmetry);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Tensor &tensor);

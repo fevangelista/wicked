@@ -38,33 +38,33 @@ def test_energy():
     expr = wt.contract(w.rational(1), F @ T1, 0, 2)
     mbeq = expr.to_manybody_equation("R")
 
-    assert len(mbeq[0]) == 1
-    comp = mbeq[0][0].compile("einsum")
+    assert len(mbeq["|"]) == 1
+    comp = mbeq["|"][0].compile("einsum")
     print(comp)
     assert comp == 'R += 1.000000000 * np.einsum("ia,ai->",T1["ov"],f["vo"])'
 
-    assert len(mbeq[2]) == 4
-    comp = mbeq[2][0].compile("einsum")
+    assert len(mbeq["o|v"]) == 2
+    comp = mbeq["o|v"][0].compile("einsum")
     print(comp)
     assert comp == 'Rov += 1.000000000 * np.einsum("ib,ba->ia",T1["ov"],f["vv"])'
 
-    comp = mbeq[2][1].compile("einsum")
+    comp = mbeq["o|v"][1].compile("einsum")
     print(comp)
     assert comp == 'Rov += -1.000000000 * np.einsum("ja,ij->ia",T1["ov"],f["oo"])'
 
-    comp = mbeq[2][2].compile("einsum")
+    comp = mbeq["o|o"][0].compile("einsum")
     print(comp)
     assert comp == 'Roo += 1.000000000 * np.einsum("ia,aj->ij",T1["ov"],f["vo"])'
 
-    comp = mbeq[2][3].compile("einsum")
+    comp = mbeq["v|v"][0].compile("einsum")
     print(comp)
     assert comp == 'Rvv += -1.000000000 * np.einsum("ia,bi->ba",T1["ov"],f["vo"])'
 
     expr = wt.contract(w.rational(1), V @ T2, 0, 2)
     mbeq = expr.to_manybody_equation("R")
 
-    assert len(mbeq[0]) == 1
-    comp = mbeq[0][0].compile("einsum")
+    assert len(mbeq["|"]) == 1
+    comp = mbeq["|"][0].compile("einsum")
     print(comp)
     assert comp == 'R += 0.250000000 * np.einsum("ijab,abij->",T2["oovv"],v["vvoo"])'
 

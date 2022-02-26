@@ -27,7 +27,9 @@ void export_Expression(py::module &m) {
       .def("canonicalize", &Expression::canonicalize);
 
   m.def("operator_expr", &make_operator_expr, "label"_a, "components"_a,
-        "normal_ordered"_a, "coefficient"_a = scalar_t(1));
+        "normal_ordered"_a, "symmetry"_a = SymmetryType::Antisymmetric,
+        "coefficient"_a = scalar_t(1));
 
-  m.def("expression", &string_to_expr);
+  m.def("expression", &string_to_expr, "s"_a,
+        "symmetry"_a = SymmetryType::Antisymmetric);
 }

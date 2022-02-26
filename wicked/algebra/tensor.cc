@@ -145,7 +145,7 @@ Tensor make_tensor(const std::string &label,
   return Tensor(label, lower_indices, upper_indices, symmetry);
 }
 
-Tensor make_tensor_from_str(const std::string &s) {
+Tensor make_tensor_from_str(const std::string &s, SymmetryType symmetry) {
   std::smatch sm;
   auto tensor_re =
       std::regex("([a-zA-Z0-9]+)\\^\\{([\\w,\\s]*)\\}_\\{([\\w,\\s]*)\\}");
@@ -157,7 +157,7 @@ Tensor make_tensor_from_str(const std::string &s) {
   std::string label = sm[1];
   auto upper = make_indices_from_str(sm[2]);
   auto lower = make_indices_from_str(sm[3]);
-  return Tensor(label, lower, upper);
+  return Tensor(label, lower, upper, symmetry);
 }
 
 // std::string Tensor::compile() {

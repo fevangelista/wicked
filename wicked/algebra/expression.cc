@@ -158,16 +158,16 @@ Expression::to_manybody_equation(const std::string &label) const {
       }
     }
     SymbolicTerm lhs;
-    Tensor lhs_tensor(label, lower, upper);
+    Tensor lhs_tensor(label, lower, upper, SymmetryType::Antisymmetric);
     auto signature = lhs_tensor.signature();
     // convert the signature to a string (to bypass limitations of pybind11)
     std::string signature_str_upper;
     std::string signature_str_lower;
     int pos = 0;
-    for (const auto& [u,l] : signature){
-        signature_str_upper += std::string(u,osi->label(pos));
-        signature_str_lower += std::string(l,osi->label(pos));
-        pos += 1;
+    for (const auto &[u, l] : signature) {
+      signature_str_upper += std::string(u, osi->label(pos));
+      signature_str_lower += std::string(l, osi->label(pos));
+      pos += 1;
     }
     reverse(signature_str_lower.begin(), signature_str_lower.end());
     auto signature_str = signature_str_upper + "|" + signature_str_lower;
@@ -200,7 +200,8 @@ std::ostream &operator<<(std::ostream &os, const Expression &sum) {
 
 Expression make_operator_expr(const std::string &label,
                               const std::vector<std::string> &components,
-                              bool normal_ordered, scalar_t coefficient) {
+                              bool normal_ordered, SymmetryType symmetry,
+                              scalar_t coefficient) {
   Expression result;
   for (const std::string &s : components) {
     auto s_vec = split(s);
@@ -238,14 +239,14 @@ Expression make_operator_expr(const std::string &label,
       term.add(SQOperator(SQOperatorType::Annihilation, a));
     }
     std::reverse(std::begin(ann), std::end(ann));
-    Tensor tensor(label, cre, ann);
+    Tensor tensor(label, cre, ann, symmetry);
     term.add(tensor);
     result.add(term);
   }
   return result;
 }
 
-Expression string_to_expr(const std::string &s) {
+Expression string_to_expr(const std::string &s, SymmetryType symmetry) {
 
   TensorSyntax syntax = TensorSyntax::Wicked;
   Expression sum;
@@ -269,7 +270,7 @@ Expression string_to_expr(const std::string &s) {
 
   SymbolicTerm term;
   for (const auto &t : tensors) {
-    term.add(make_tensor_from_str(t));
+    term.add(make_tensor_from_str(t, symmetry));
   }
 
   auto operators = findall(s, operator_re);

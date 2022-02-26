@@ -44,7 +44,7 @@ def test_energy():
         for eq in mbeq[rank]:
             print(eq)
 
-    for eq in mbeq[4]:
+    for eq in mbeq['oo|vv']:
         print(eq.compile("einsum"))
     # assert len(mbeq[0]) == 1
     # comp = mbeq[0][0].compile("einsum")
