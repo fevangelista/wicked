@@ -21,8 +21,8 @@ def test_expression():
     term.set_normal_ordered(True)
     term.add([w.cre("a_0")])
     expr.add(term, w.rational(1, 2))
-    expr_str = """{ a+(v0) a-(o0) }
-+1/2 { a+(a0) }"""
+    expr_str = """1/2 { a+(a0) }
++{ a+(v0) a-(o0) }"""
     assert str(expr) == expr_str
 
     expr2 = w.Expression()
@@ -36,8 +36,8 @@ def test_expression():
     assert str(expr2) == expr_str
 
     expr.add(expr2)
-    expr_str = """{ a+(v0) a-(o0) }
-+3/2 { a+(a0) }"""
+    expr_str = """3/2 { a+(a0) }
++{ a+(v0) a-(o0) }"""
     assert str(expr) == expr_str
 
 

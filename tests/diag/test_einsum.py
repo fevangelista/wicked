@@ -44,18 +44,20 @@ def test_energy():
     assert comp == 'R += 1.000000000 * np.einsum("ia,ai->",T1["ov"],f["vo"])'
 
     assert len(mbeq["o|v"]) == 2
-    comp = mbeq["o|v"][0].compile("einsum")
+    comp = mbeq["o|v"][1].compile("einsum")
     print(comp)
     assert comp == 'Rov += 1.000000000 * np.einsum("ib,ba->ia",T1["ov"],f["vv"])'
 
-    comp = mbeq["o|v"][1].compile("einsum")
+    comp = mbeq["o|v"][0].compile("einsum")
     print(comp)
     assert comp == 'Rov += -1.000000000 * np.einsum("ja,ij->ia",T1["ov"],f["oo"])'
 
+    assert len(mbeq["o|o"]) == 1
     comp = mbeq["o|o"][0].compile("einsum")
     print(comp)
     assert comp == 'Roo += 1.000000000 * np.einsum("ia,aj->ij",T1["ov"],f["vo"])'
 
+    assert len(mbeq["v|v"]) == 1
     comp = mbeq["v|v"][0].compile("einsum")
     print(comp)
     assert comp == 'Rvv += -1.000000000 * np.einsum("ia,bi->ba",T1["ov"],f["vo"])'

@@ -1,4 +1,6 @@
 #include "sqoperator.h"
+#include "combinatorics.h"
+#include "helpers.h"
 #include "index.h"
 #include "wicked-def.h"
 
@@ -28,7 +30,7 @@ void SQOperator::reindex(index_map_t &idx_map) {
 }
 
 bool SQOperator::operator<(SQOperator const &other) const {
-  // first compare the type
+  // first compare the type (annihilators come before creation operators)
   if (operator_.first < other.operator_.first) {
     return true;
   }
@@ -75,4 +77,25 @@ SQOperator make_sqoperator(const std::string &index, SQOperatorType type) {
 std::ostream &operator<<(std::ostream &os, const SQOperator &op) {
   os << op.str();
   return os;
+}
+
+scalar_t canonicalize_sqops(std::vector<SQOperator> &sqops, bool reversed) {
+  std::vector<std::pair<SQOperator, int>> sqop_pos;
+  for (const auto &[n, sqop] : enumerate(sqops)) {
+    sqop_pos.push_back(std::make_pair(sqop, n));
+  }
+  // when reversed == false, we sort in increasing order
+  // when reversed == true, we sort in decreasing order
+  if (reversed) {
+    std::sort(sqop_pos.rbegin(), sqop_pos.rend());
+  } else {
+    std::sort(sqop_pos.begin(), sqop_pos.end());
+  }
+  std::vector<int> perm;
+  sqops.clear();
+  for (const auto &[sqop, pos] : sqop_pos) {
+    sqops.push_back(sqop);
+    perm.push_back(pos);
+  }
+  return permutation_sign(perm);
 }

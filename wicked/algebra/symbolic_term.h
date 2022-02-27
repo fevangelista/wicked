@@ -61,8 +61,7 @@ public:
   /// Canonicalize this term and return the overall phase factor
   scalar_t canonicalize();
 
-  /// Canonicalize the indices of all tensors
-  scalar_t canonicalize_tensor_indices();
+  scalar_t simplify();
 
   /// Comparison operator used for sorting
   bool operator<(const SymbolicTerm &term) const;

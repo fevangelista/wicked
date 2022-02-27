@@ -23,6 +23,10 @@ void export_SQOperator(py::module &m) {
       .def("field_type", &SQOperator::field_type)
       .def("__repr__", &SQOperator::str)
       .def("__str__", &SQOperator::str)
+      .def("__lt__",
+           [](const SQOperator &l, const SQOperator &r) { return l < r; })
+      .def("__eq__",
+           [](const SQOperator &l, const SQOperator &r) { return l == r; })
       .def("latex", &SQOperator::latex);
 
   m.def("sqoperator", &make_sqoperator, "index"_a, "type"_a);

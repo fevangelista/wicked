@@ -3,16 +3,16 @@
 #include <regex>
 
 #include "helpers.h"
+#include "orbital_space.h"
 #include "tensor.h"
 #include "wicked-def.h"
-#include "orbital_space.h"
 
 Tensor::Tensor(const std::string &label, const std::vector<Index> &lower,
                const std::vector<Index> &upper, SymmetryType symmetry)
     : label_(label), lower_(lower), upper_(upper), symmetry_(symmetry) {}
 
-std::vector<std::pair<int,int>> Tensor::signature() const{
-  std::vector<std::pair<int,int>> result(osi->num_spaces(),std::pair(0,0));
+std::vector<std::pair<int, int>> Tensor::signature() const {
+  std::vector<std::pair<int, int>> result(osi->num_spaces(), std::pair(0, 0));
   for (const Index &idx : upper_) {
     result[idx.space()].first += 1;
   }
@@ -70,6 +70,17 @@ void Tensor::reindex(index_map_t &idx_map) {
       idx = idx_map[idx];
     }
   }
+}
+
+scalar_t Tensor::canonicalize() {
+  scalar_t sign = 1;
+  auto upper_indices = this->upper();
+  sign *= canonicalize_indices(upper_indices, false);
+  auto lower_indices = this->lower();
+  sign *= canonicalize_indices(lower_indices, false);
+  this->set_upper(upper_indices);
+  this->set_lower(lower_indices);
+  return sign;
 }
 
 std::string Tensor::str() const {

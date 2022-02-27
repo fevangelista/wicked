@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "wicked-def.h"
+
 /**
  * @brief A class to represent orbital indices.
  *
@@ -77,11 +79,11 @@ std::ostream &operator<<(std::ostream &os, const Index &idx);
 // Special functions
 
 /// Canonicalize a set of indices
-int canonicalize_indices(std::vector<Index> &indices);
+scalar_t canonicalize_indices(std::vector<Index> &indices, bool reversed);
 
 /// Helper function that converts multiple vectors of space types
-/// (OrbitalSpaceType) to vectors of indices (Index) labeled staring with zero.
-/// Indices are assigned in an incremental way with no duplicates
+/// (OrbitalSpaceType) to vectors of indices (Index) labeled staring with
+/// zero. Indices are assigned in an incremental way with no duplicates
 std::vector<std::vector<Index>> make_indices_from_space_labels(
     const std::vector<std::vector<char>> &labels_space);
 
@@ -94,8 +96,8 @@ index_map_t remap(const std::vector<Index> &idx_vec1,
 std::vector<int> num_indices_per_space(const std::vector<Index> &indices);
 
 /// Return the symmetry factor of a product of indices
-/// This is the product n1! x n2! x n3! x ... where ni is the number of indices
-/// that belong to orbital space i
+/// This is the product n1! x n2! x n3! x ... where ni is the number of
+/// indices that belong to orbital space i
 int symmetry_factor(const std::vector<Index> &indices);
 
 #endif // _wicked_index_h_

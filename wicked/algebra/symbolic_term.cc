@@ -3,6 +3,7 @@
 #include "../combinatorics.h"
 #include "../helpers.h"
 #include "../orbital_space.h"
+#include "stl_utils.hpp"
 #include "term.h"
 
 using namespace std;
@@ -56,7 +57,9 @@ void SymbolicTerm::reindex(index_map_t &idx_map) {
 scalar_t SymbolicTerm::canonicalize() {
   scalar_t factor(1);
 
+//
 // 1. Sort the tensors according to a score function
+//
 #if NEW_CANONICALIZATION
   using score_t =
       std::tuple<std::string, int, std::vector<int>, std::vector<int>,
@@ -69,9 +72,8 @@ scalar_t SymbolicTerm::canonicalize() {
 
   std::vector<score_t> scores;
 
-  //  std::cout << "\n Canonicalizing: " << str() << std::endl;
+  WPRINT(std::cout << "\n Canonicalizing: " << str() << std::endl;);
 
-  //  int n = 0;
   for (const auto &tensor : tensors_) {
     // a) label
     const std::string &label = tensor.label();
@@ -89,27 +91,25 @@ scalar_t SymbolicTerm::canonicalize() {
     // d) connectivity of upper indices
     auto upper_conn = tensor_connectivity(tensor, true);
 
-// e) store the score
+    // e) store the score
 #if NEW_CANONICALIZATION
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, lower_conn,
                                      upper_conn, tensor));
-    //    std::cout << "\nScore = " << label << " " << rank << " ";
-    //    PRINT_ELEMENTS(num_low);
-    //    std::cout << " ";
-    //    PRINT_ELEMENTS(num_upp);
-    //    std::cout << " ";
-    //    for (const auto &str_vec : lower_conn) {
-    //      std::cout << str_vec.first << " ";
-    //      PRINT_ELEMENTS(str_vec.second);
-    //    }
-    //    for (const auto &str_vec : upper_conn) {
-    //      std::cout << " " << str_vec.first << " ";
-    //      PRINT_ELEMENTS(str_vec.second);
-    //    }
+    WPRINT(
+        std::cout << "\nScore = " << label << " " << rank << " ";
+        PRINT_ELEMENTS(num_low); std::cout << " "; PRINT_ELEMENTS(num_upp);
+        std::cout << " "; for (const auto &str_vec
+                               : lower_conn) {
+          std::cout << str_vec.first << " ";
+          PRINT_ELEMENTS(str_vec.second);
+        } for (const auto &str_vec
+               : upper_conn) {
+          std::cout << " " << str_vec.first << " ";
+          PRINT_ELEMENTS(str_vec.second);
+        });
 
 #else
     scores.push_back(std::make_tuple(label, rank, num_low, num_upp, tensor));
-//    n += 1;
 #endif
   }
 
@@ -125,8 +125,9 @@ scalar_t SymbolicTerm::canonicalize() {
   }
 
   // 2. Relabel indices of tensors and operators
-
+  // vector to keep track of how many indices in each space
   std::vector<int> sqop_index_count(osi->num_spaces(), 0);
+  // vector to keep track of how many indices in each space
   std::vector<int> tens_index_count(osi->num_spaces(), 0);
   index_map_t index_map;
   std::map<Index, bool> is_operator_index;
@@ -174,130 +175,77 @@ scalar_t SymbolicTerm::canonicalize() {
       }
     }
   }
-
+  // reindex the tensor
   reindex(index_map);
 
   // 3. Sort tensor indices according to canonical form
   for (auto &tensor : tensors_) {
-    scalar_t sign = 1;
-    {
-      std::vector<std::tuple<int, int, int, Index>> upper_sort;
-      int upos = 0;
-      for (const auto &index : tensor.upper()) {
-        upper_sort.push_back(
-            std::make_tuple(index.space(), index.pos(), upos, index));
-        upos += 1;
-      }
-      std::sort(upper_sort.begin(), upper_sort.end());
-
-      std::vector<int> usign;
-      std::vector<Index> new_upper;
-      for (const auto &tpl : upper_sort) {
-        usign.push_back(std::get<2>(tpl));
-        new_upper.push_back(std::get<3>(tpl));
-      }
-      tensor.set_upper(new_upper);
-      sign *= permutation_sign(usign);
-    }
-
-    {
-      std::vector<std::tuple<int, int, int, Index>> lower_sort;
-      int lpos = 0;
-      for (const auto &index : tensor.lower()) {
-        lower_sort.push_back(
-            std::make_tuple(index.space(), index.pos(), lpos, index));
-        lpos += 1;
-      }
-      std::sort(lower_sort.begin(), lower_sort.end());
-
-      std::vector<int> lsign;
-      std::vector<Index> new_lower;
-      for (const auto &tpl : lower_sort) {
-        lsign.push_back(std::get<2>(tpl));
-        new_lower.push_back(std::get<3>(tpl));
-      }
-      tensor.set_lower(new_lower);
-      sign *= permutation_sign(lsign);
-    }
-    factor *= sign;
+    factor *= tensor.canonicalize();
   }
 
   // 4. Sort operators according to canonical form
-  std::vector<int> sqops_pos(nops(), -1);
-  std::vector<std::tuple<int, int, int, int>> sorting_vec;
-  int pos = 0;
-  for (const auto &sqop : operators_) {
-    int type = (sqop.type() == SQOperatorType::Creation) ? 0 : 1;
-    int s = sqop.index().space();
-    // Annihilation operators are written in reverse order
-    int index = (sqop.type() == SQOperatorType::Creation) ? sqop.index().pos()
-                                                          : -sqop.index().pos();
-    sorting_vec.push_back(std::make_tuple(type, s, index, pos));
-    pos += 1;
+  if (true /* true == experimental*/) {
+    factor *= canonicalize_sqops(operators_, false);
+  } else {
+    std::vector<int> sqops_pos(nops(), -1);
+    std::vector<std::tuple<int, int, int, int>> sorting_vec;
+    int pos = 0;
+    for (const auto &sqop : operators_) {
+      int type = (sqop.type() == SQOperatorType::Creation) ? 0 : 1;
+      int s = sqop.index().space();
+      // Annihilation operators are written in reverse order
+      int index = (sqop.type() == SQOperatorType::Creation)
+                      ? sqop.index().pos()
+                      : -sqop.index().pos();
+      sorting_vec.push_back(std::make_tuple(type, s, index, pos));
+      pos += 1;
+    }
+
+    std::sort(sorting_vec.begin(), sorting_vec.end());
+
+    std::vector<int> sign_order;
+    std::vector<SQOperator> new_sqops;
+    for (const auto &tpl : sorting_vec) {
+      int idx = std::get<3>(tpl);
+      sign_order.push_back(idx);
+      new_sqops.push_back(operators_[idx]);
+    }
+    factor *= permutation_sign(sign_order);
+    operators_ = new_sqops;
   }
 
-  std::sort(sorting_vec.begin(), sorting_vec.end());
+  simplify();
 
-  std::vector<int> sign_order;
-  std::vector<SQOperator> new_sqops;
-  for (const auto &tpl : sorting_vec) {
-    int idx = std::get<3>(tpl);
-    sign_order.push_back(idx);
-    new_sqops.push_back(operators_[idx]);
-  }
-  factor *= permutation_sign(sign_order);
-  operators_ = new_sqops;
-
-  //  std::cout << "\n  " << str();
+  WPRINT(std::cout << "\n  " << str();)
 
   return factor;
 }
 
-scalar_t SymbolicTerm::canonicalize_tensor_indices() {
-  scalar_t sign(1);
-  // Sort tensor indices according to canonical form
-  for (auto &tensor : tensors_) {
-    {
-      std::vector<std::tuple<int, int, int, Index>> upper_sort;
-      int upos = 0;
-      for (const auto &index : tensor.upper()) {
-        upper_sort.push_back(
-            std::make_tuple(index.space(), index.pos(), upos, index));
-        upos += 1;
-      }
-      std::sort(upper_sort.begin(), upper_sort.end());
-
-      std::vector<int> usign;
-      std::vector<Index> new_upper;
-      for (const auto &tpl : upper_sort) {
-        usign.push_back(std::get<2>(tpl));
-        new_upper.push_back(std::get<3>(tpl));
-      }
-      tensor.set_upper(new_upper);
-      sign *= permutation_sign(usign);
+scalar_t SymbolicTerm::simplify() {
+  scalar_t factor = 1;
+  for (const auto &tensor : tensors_) {
+    // lower indices
+    std::vector<std::vector<Index>> equivalent_upper(osi->num_spaces(),
+                                                     std::vector<Index>());
+    for (const auto &u : tensor.upper()) {
+      equivalent_upper[u.space()].push_back(u);
     }
-
-    {
-      std::vector<std::tuple<int, int, int, Index>> lower_sort;
-      int lpos = 0;
-      for (const auto &index : tensor.lower()) {
-        lower_sort.push_back(
-            std::make_tuple(index.space(), index.pos(), lpos, index));
-        lpos += 1;
-      }
-      std::sort(lower_sort.begin(), lower_sort.end());
-
-      std::vector<int> lsign;
-      std::vector<Index> new_lower;
-      for (const auto &tpl : lower_sort) {
-        lsign.push_back(std::get<2>(tpl));
-        new_lower.push_back(std::get<3>(tpl));
-      }
-      tensor.set_lower(new_lower);
-      sign *= permutation_sign(lsign);
+    std::vector<std::vector<Index>> equivalent_lower(osi->num_spaces(),
+                                                     std::vector<Index>());
+    for (const auto &l : tensor.lower()) {
+      equivalent_lower[l.space()].push_back(l);
+    }
+    cout << "\nEquivalence classes for " << tensor.label() << endl;
+    for (const auto &v : equivalent_upper) {
+      PRINT_ELEMENTS(v);
+      cout << endl;
+    }
+    for (const auto &v : equivalent_lower) {
+      PRINT_ELEMENTS(v);
+      cout << endl;
     }
   }
-  return sign;
+  return factor;
 }
 
 bool SymbolicTerm::operator<(const SymbolicTerm &other) const {
@@ -417,9 +365,6 @@ SymbolicTerm::tensor_connectivity(const Tensor &t, bool upper) const {
 
       result.push_back(std::make_pair(
           tensor.label(), num_indices_per_space(common_lower_indices)));
-      //      result.push_back(std::make_pair(
-      //          "u" + tensor.label(),
-      //          num_indices_per_space(common_upper_indices)));
     }
   }
   std::sort(result.begin(), result.end());
@@ -551,3 +496,30 @@ SymbolicTerm::tensor_connectivity(const Tensor &t, bool upper) const {
 
 //  return factor;
 //}
+
+// std::vector<int> sqops_pos(nops(), -1);
+// std::vector<std::tuple<int, int, int, int>> sorting_vec;
+// int pos = 0;
+// for (const auto &sqop : operators_) {
+//   int type = (sqop.type() == SQOperatorType::Creation) ? 0 : 1;
+//   int s = sqop.index().space();
+//   // Annihilation operators are written in reverse order
+//   int index = (sqop.type() == SQOperatorType::Creation) ?
+//   sqop.index().pos()
+//                                                         :
+//                                                         -sqop.index().pos();
+//   sorting_vec.push_back(std::make_tuple(type, s, index, pos));
+//   pos += 1;
+// }
+
+// std::sort(sorting_vec.begin(), sorting_vec.end());
+
+// std::vector<int> sign_order;
+// std::vector<SQOperator> new_sqops;
+// for (const auto &tpl : sorting_vec) {
+//   int idx = std::get<3>(tpl);
+//   sign_order.push_back(idx);
+//   new_sqops.push_back(operators_[idx]);
+// }
+// factor *= permutation_sign(sign_order);
+// operators_ = new_sqops;

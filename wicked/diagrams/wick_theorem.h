@@ -116,24 +116,19 @@ private:
                                   const std::vector<DiagOperator> &ops,
                                   const int minrank, const int maxrank);
 
-  // Create a canonical
-  std::pair<std::vector<DiagOperator>, std::vector<std::vector<DiagVertex>>>
-  canonicalize_contraction(const std::vector<DiagOperator> &ops,
-                           const std::vector<int> &contraction_vec);
-
-  void compare_contraction_perm(
-      const std::vector<DiagOperator> &ops,
-      const std::vector<std::vector<DiagVertex>> &contractions,
-      const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
-      std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm);
-
-  // ==> Backtracking routines <==
-
   /// Apply the contraction to this set of operators and produce a term
   std::pair<SymbolicTerm, scalar_t>
   evaluate_contraction(const std::vector<DiagOperator> &ops,
                        const std::vector<std::vector<DiagVertex>> &contractions,
                        scalar_t factor);
+
+  //   void compare_contraction_perm(
+  //       const std::vector<DiagOperator> &ops,
+  //       const std::vector<std::vector<DiagVertex>> &contractions,
+  //       const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
+  //       std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm);
+
+  // ==> Backtracking routines <==
 
   /// Return the tensors and operators correspoding to a product of operators
   std::tuple<std::vector<Tensor>, std::vector<SQOperator>,
@@ -150,6 +145,11 @@ private:
   scalar_t combinatorial_factor(
       const std::vector<DiagOperator> &ops,
       const std::vector<std::vector<DiagVertex>> &contractions);
+
+  // Create a canonical contraction (experimental)
+  std::pair<std::vector<DiagOperator>, std::vector<std::vector<DiagVertex>>>
+  canonicalize_contraction(const std::vector<DiagOperator> &ops,
+                           const std::vector<int> &contraction_vec);
 
   /// The number of contractions found
   int ncontractions_ = 0;

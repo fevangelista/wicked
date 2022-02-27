@@ -64,4 +64,7 @@ SQOperator make_sqoperator(const std::string &index, SQOperatorType type);
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const SQOperator &op);
 
+/// Canonicalize a product of operators
+scalar_t canonicalize_sqops(std::vector<SQOperator> &sqops, bool reversed);
+
 #endif // _wicked_sqoperator_h_

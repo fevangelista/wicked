@@ -52,5 +52,22 @@ def test_index():
     assert b.latex() == "a"
 
 
+def test_index2():
+    """Test Index class"""
+    w.reset_space()
+    w.add_space("o", "fermion", "occupied", ["i", "j", "k"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "occupied", ["a", "b", "c"])
+    assert index("o_0") < index("o_1")
+    assert index("o_0") < index("a_0")
+    assert index("o_0") == index("o_0")
+    indices = w.indices("v_0,v_1,a_2,a_0,a_1,o_1,o_0")
+    sign, indices = w.canonicalize_indices(indices, False)
+    test_indices = w.indices("o_0,o_1,a_0,a_1,a_2,v_0,v_1")
+    assert indices == test_indices
+    assert sign == w.rational(-1, 1)
+
+
 if __name__ == "__main__":
     test_index()
+    test_index2()

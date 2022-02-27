@@ -19,8 +19,7 @@ public:
   explicit Tensor() {}
 
   Tensor(const std::string &label, const std::vector<Index> &lower,
-         const std::vector<Index> &upper,
-         SymmetryType symmetry);
+         const std::vector<Index> &upper, SymmetryType symmetry);
 
   // ==> Class public interface <==
 
@@ -45,11 +44,14 @@ public:
   /// Reindex this tensor
   void reindex(index_map_t &idx_map);
 
+  /// Canonicalize this tensor and return the overall phase factor
+  scalar_t canonicalize();
+
   /// Return the rank of the tensor
   int rank() const { return lower_.size() + upper_.size(); }
 
   /// return the signature (number of upper/lower indices in each space)
-  std::vector<std::pair<int,int>> signature() const;
+  std::vector<std::pair<int, int>> signature() const;
 
   /// Return the symmetry factor of this tensor
   int symmetry_factor() const;

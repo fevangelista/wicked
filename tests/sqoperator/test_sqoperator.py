@@ -23,5 +23,21 @@ def test_sqoperator():
     assert str(aop) == "a-(v1)"
 
 
+def test_sqoperator2():
+    """Test the SQOperator class"""
+    w.reset_space()
+    w.add_space("c", "fermion", "occupied", ["i", "j"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
+    assert w.cre("c_0") < w.ann("c_0")
+    assert w.cre("a_0") < w.ann("c_0")
+    assert w.cre("v_0") < w.ann("c_0")
+    assert w.cre("v_0") < w.ann("a_0")
+    assert w.cre("c_0") < w.cre("c_1")
+    assert w.cre("c_0") < w.cre("a_1")
+    assert w.ann("c_1") < w.ann("c_0")
+
+
 if __name__ == "__main__":
     test_sqoperator()
+    test_sqoperator2()

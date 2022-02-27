@@ -14,7 +14,7 @@ bool Index::operator==(Index const &other) const {
 }
 
 bool Index::operator<(Index const &other) const {
-  return other.index_ < index_;
+  return index_ < other.index_;
 }
 
 std::string Index::str() const {
@@ -30,19 +30,23 @@ std::ostream &operator<<(std::ostream &os, const Index &idx) {
   return os;
 }
 
-int canonicalize_indices(std::vector<Index> &indices) {
-  std::vector<std::pair<Index, int>> vec_pairs;
-  for (const auto &n_index : enumerate(indices)) {
-    vec_pairs.push_back(std::make_pair(n_index.second, n_index.first));
+scalar_t canonicalize_indices(std::vector<Index> &indices, bool reversed) {
+  std::vector<std::pair<Index, int>> idx_pos;
+  for (const auto &[n, index] : enumerate(indices)) {
+    idx_pos.push_back(std::make_pair(index, n));
   }
-
-  std::sort(vec_pairs.begin(), vec_pairs.end());
-
+  // when reversed == false, we sort in increasing order
+  // when reversed == true, we sort in decreasing order
+  if (reversed) {
+    std::sort(idx_pos.rbegin(), idx_pos.rend());
+  } else {
+    std::sort(idx_pos.begin(), idx_pos.end());
+  }
   std::vector<int> perm;
   indices.clear();
-  for (const auto &pairs : vec_pairs) {
-    perm.push_back(pairs.second);
-    indices.push_back(pairs.first);
+  for (const auto &[idx, pos] : idx_pos) {
+    indices.push_back(idx);
+    perm.push_back(pos);
   }
   return permutation_sign(perm);
 }

@@ -69,9 +69,13 @@ WickTheorem::process_contractions(scalar_t factor,
             cout << "\n\n  Contraction: " << nprocessed
                  << "  Operator rank: " << ops_rank - contr_rank << endl;)
 
-      // canonicalize the contraction
-      auto ops_contractions = canonicalize_contraction(ops, contraction_vec);
-      const auto &contractions = ops_contractions.second;
+      std::vector<std::vector<DiagVertex>> contractions;
+      for (int c : contraction_vec) {
+        contractions.push_back(elementary_contractions_[c]);
+      }
+      // NOTE: This code is left here for an experimental feature
+      // auto ops_contractions = canonicalize_contraction(ops, contraction_vec);
+      // const auto &contractions = ops_contractions.second;
 
       std::pair<SymbolicTerm, scalar_t> term_factor =
           evaluate_contraction(ops, contractions, factor);
@@ -272,11 +276,14 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
   auto tensors_sqops_op_map = contraction_tensors_sqops(ops);
   std::vector<Tensor> &tensors = std::get<0>(tensors_sqops_op_map);
   std::vector<SQOperator> &sqops = std::get<1>(tensors_sqops_op_map);
+
   // this map takes the operator index (op), orbital space (s), the sqop type
   // (true = cre, false = ann), and an index and maps it to the operators as
-  // they are stored in a vector
+  // they are stored in a vector:
+  //
   //  std::map<std::tuple<int, int, bool, int>, int> op_map;
   //                       op space cre    n
+  //
   std::map<std::tuple<int, int, bool, int>, int> &op_map =
       std::get<2>(tensors_sqops_op_map);
 
@@ -285,9 +292,6 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
 
   // counts of how many second quantized operators are not contracted
   std::vector<DiagVertex> ops_offset(ops.size());
-  // vector to store the order of operators
-  std::vector<int> sign_order(sqops.size(), -1);
-  std::vector<std::vector<bool>> bit_map_vec;
 
   // a counter to keep track of the positions assigned to operators
   int sorted_position = 0;
@@ -300,6 +304,11 @@ std::pair<SymbolicTerm, scalar_t> WickTheorem::evaluate_contraction(
   int unoccupied_sign = 1;
 
   index_map_t pair_contraction_reindex_map;
+
+  // vector to store the order of operators
+  std::vector<int> sign_order(sqops.size(), -1);
+  std::vector<std::vector<bool>> bit_map_vec;
+
   // Loop over elementary contractions
   for (const std::vector<DiagVertex> &contraction : contractions) {
     // a bit array to keep track of which operators are contracted
@@ -600,59 +609,58 @@ scalar_t WickTheorem::combinatorial_factor(
 }
 
 /////
+// void WickTheorem::compare_contraction_perm(
+//     const std::vector<DiagOperator> &ops,
+//     const std::vector<std::vector<DiagVertex>> &contractions,
+//     const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
+//     std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm) {
+//   //  // 1. Compare operators
+//   //  int nops = ops.size();
+//   //  for (int i = 0; i < nops; i++) {
+//   //    if (ops[ops_perm[i]] < ops[best_ops_perm[i]]) {
+//   //      return;
+//   //    }
+//   //  }
 
-void WickTheorem::compare_contraction_perm(
-    const std::vector<DiagOperator> &ops,
-    const std::vector<std::vector<DiagVertex>> &contractions,
-    const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
-    std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm) {
-  //  // 1. Compare operators
-  //  int nops = ops.size();
-  //  for (int i = 0; i < nops; i++) {
-  //    if (ops[ops_perm[i]] < ops[best_ops_perm[i]]) {
-  //      return;
-  //    }
-  //  }
+//   //  // 2. Compare contractions
+//   //  int ncontr = contractions.size();
+//   //  for (int j = 0; j < nops; j++) {
+//   //    for (int i = 0; i < ncontr; i++) {
+//   //      if (contractions[contr_perm[i]][ops_perm[j]] <
+//   //          contractions[best_contr_perm[i]][best_ops_perm[j]]) {
+//   //        return;
+//   //      }
+//   //    }
+//   //  }
+//   //  best_ops_perm = ops_perm;
+//   //  best_contr_perm = contr_perm;
 
-  //  // 2. Compare contractions
-  //  int ncontr = contractions.size();
-  //  for (int j = 0; j < nops; j++) {
-  //    for (int i = 0; i < ncontr; i++) {
-  //      if (contractions[contr_perm[i]][ops_perm[j]] <
-  //          contractions[best_contr_perm[i]][best_ops_perm[j]]) {
-  //        return;
-  //      }
-  //    }
-  //  }
-  //  best_ops_perm = ops_perm;
-  //  best_contr_perm = contr_perm;
+//   // 1. Compare operators
+//   int nops = ops.size();
+//   bool ops_better = false;
+//   for (int i = 0; i < nops; i++) {
+//     if (ops[best_ops_perm[i]] < ops[ops_perm[i]]) {
+//       ops_better = true;
+//       break;
+//     }
+//   }
 
-  // 1. Compare operators
-  int nops = ops.size();
-  bool ops_better = false;
-  for (int i = 0; i < nops; i++) {
-    if (ops[best_ops_perm[i]] < ops[ops_perm[i]]) {
-      ops_better = true;
-      break;
-    }
-  }
-
-  // 2. Compare contractions
-  int ncontr = contractions.size();
-  bool contr_better = false;
-  for (int i = 0; i < ncontr; i++) {
-    for (int j = 0; j < nops; j++) {
-      if (contractions[best_contr_perm[i]][best_ops_perm[j]] <
-          contractions[contr_perm[i]][ops_perm[j]]) {
-        contr_better = true;
-        break;
-      }
-    }
-  }
-  if (ops_better and contr_better) {
-    cout << "\n Found better contraction" << endl;
-    best_ops_perm = ops_perm;
-    best_contr_perm = contr_perm;
-    print_contraction(ops, contractions, ops_perm, contr_perm);
-  }
-}
+//   // 2. Compare contractions
+//   int ncontr = contractions.size();
+//   bool contr_better = false;
+//   for (int i = 0; i < ncontr; i++) {
+//     for (int j = 0; j < nops; j++) {
+//       if (contractions[best_contr_perm[i]][best_ops_perm[j]] <
+//           contractions[contr_perm[i]][ops_perm[j]]) {
+//         contr_better = true;
+//         break;
+//       }
+//     }
+//   }
+//   if (ops_better and contr_better) {
+//     cout << "\n Found better contraction" << endl;
+//     best_ops_perm = ops_perm;
+//     best_contr_perm = contr_perm;
+//     print_contraction(ops, contractions, ops_perm, contr_perm);
+//   }
+// }
