@@ -184,35 +184,7 @@ scalar_t SymbolicTerm::canonicalize() {
   }
 
   // 4. Sort operators according to canonical form
-  if (true /* true == experimental*/) {
-    factor *= canonicalize_sqops(operators_, false);
-  } else {
-    std::vector<int> sqops_pos(nops(), -1);
-    std::vector<std::tuple<int, int, int, int>> sorting_vec;
-    int pos = 0;
-    for (const auto &sqop : operators_) {
-      int type = (sqop.type() == SQOperatorType::Creation) ? 0 : 1;
-      int s = sqop.index().space();
-      // Annihilation operators are written in reverse order
-      int index = (sqop.type() == SQOperatorType::Creation)
-                      ? sqop.index().pos()
-                      : -sqop.index().pos();
-      sorting_vec.push_back(std::make_tuple(type, s, index, pos));
-      pos += 1;
-    }
-
-    std::sort(sorting_vec.begin(), sorting_vec.end());
-
-    std::vector<int> sign_order;
-    std::vector<SQOperator> new_sqops;
-    for (const auto &tpl : sorting_vec) {
-      int idx = std::get<3>(tpl);
-      sign_order.push_back(idx);
-      new_sqops.push_back(operators_[idx]);
-    }
-    factor *= permutation_sign(sign_order);
-    operators_ = new_sqops;
-  }
+  factor *= canonicalize_sqops(operators_, false);
 
   simplify();
 
@@ -508,6 +480,33 @@ SymbolicTerm::tensor_connectivity(const Tensor &t, bool upper) const {
 //   sqop.index().pos()
 //                                                         :
 //                                                         -sqop.index().pos();
+//   sorting_vec.push_back(std::make_tuple(type, s, index, pos));
+//   pos += 1;
+// }
+
+// std::sort(sorting_vec.begin(), sorting_vec.end());
+
+// std::vector<int> sign_order;
+// std::vector<SQOperator> new_sqops;
+// for (const auto &tpl : sorting_vec) {
+//   int idx = std::get<3>(tpl);
+//   sign_order.push_back(idx);
+//   new_sqops.push_back(operators_[idx]);
+// }
+// factor *= permutation_sign(sign_order);
+// operators_ = new_sqops;
+
+// old code for SQOperator canonicalization
+// std::vector<int> sqops_pos(nops(), -1);
+// std::vector<std::tuple<int, int, int, int>> sorting_vec;
+// int pos = 0;
+// for (const auto &sqop : operators_) {
+//   int type = (sqop.type() == SQOperatorType::Creation) ? 0 : 1;
+//   int s = sqop.index().space();
+//   // Annihilation operators are written in reverse order
+//   int index = (sqop.type() == SQOperatorType::Creation)
+//                   ? sqop.index().pos()
+//                   : -sqop.index().pos();
 //   sorting_vec.push_back(std::make_tuple(type, s, index, pos));
 //   pos += 1;
 // }
