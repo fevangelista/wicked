@@ -230,11 +230,286 @@ def test_r1_12_14():
 
 
 def test_r2_1():
+    """CCSD T2 Residual Vvvoo (1)"""
     Vvvoo = w.op("v", ["v+ v+ o o"])
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), Vvvoo, 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
     val2 = w.expression("1 v^{o0,o1}_{v0,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_2():
+    """CCSD T2 Residual [Fvv,T2] (2)"""
+    T2 = w.op("t", ["v+ v+ o o"])
+    Fvv = w.op("f", ["v+ v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1), w.commutator(Fvv, T2), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("-2 f^{v2}_{v0} t^{o0,o1}_{v1,v2}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_3():
+    """CCSD T2 Residual [Foo,T2] (3)"""
+    T2 = w.op("t", ["v+ v+ o o"])
+    Foo = w.op("f", ["o+ o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1), w.commutator(Foo, T2), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("2 f^{o0}_{o2} t^{o1,o2}_{v0,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_4():
+    """CCSD T2 Residual [Voooo,T2] (4)"""
+    T2 = w.op("t", ["v+ v+ o o"])
+    Voooo = w.op("v", ["o+ o+ o o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1), w.commutator(Voooo, T2), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("1/2 t^{o2,o3}_{v0,v1} v^{o0,o1}_{o2,o3}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_5():
+    """CCSD T2 Residual [Vvvvv,T2] (5)"""
+    T2 = w.op("t", ["v+ v+ o o"])
+    Vvvvv = w.op("v", ["v+ v+ v v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1), w.commutator(Vvvvv, T2), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("1/2 t^{o0,o1}_{v2,v3} v^{v2,v3}_{v0,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_6():
+    """CCSD T2 Residual [Vovov,T2] (6)"""
+    T2 = w.op("t", ["v+ v+ o o"])
+    Vovov = w.op("v", ["o+ v+ v o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1), w.commutator(Vovov, T2), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("-4 t^{o0,o2}_{v0,v2} v^{o1,v2}_{o2,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_7():
+    """CCSD T2 Residual [Vvvov,T1] (7)"""
+    T1 = w.op("t", ["v+ o"])
+    Vvvov = w.op("v", ["v+ v+ v o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1), w.commutator(Vvvov, T1), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("-2 t^{o0}_{v2} v^{o1,v2}_{v0,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_8():
+    """CCSD T2 Residual [Vovoo,T1] (8)"""
+    T1 = w.op("t", ["v+ o"])
+    Vovoo = w.op("v", ["o+ v+ o o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1), w.commutator(Vovoo, T1), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("-2 t^{o2}_{v0} v^{o0,o1}_{o2,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_9_12():
+    """CCSD T2 Residual 1/2 [[Voovv,T2],T2] (9-12)"""
+    T2 = w.op("t", ["v+ v+ o o"])
+    Voovv = w.op("v", ["o+ o+ v v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1, 2), w.commutator(w.commutator(Voovv, T2), T2), 4, 4)
+    answers = [
+        "2 t^{o0,o2}_{v0,v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
+        "-1 t^{o0,o1}_{v0,v2} t^{o2,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
+        "1/4 t^{o2,o3}_{v0,v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}",
+        "-1 t^{o0,o2}_{v0,v1} t^{o1,o3}_{v2,v3} v^{v2,v3}_{o2,o3}",
+    ]
+    for i in range(4):
+        val = sum.to_manybody_equation("r")["oo|vv"][i].rhs_expression()
+        val2 = w.expression(answers[i])
+        print_comparison(val, val2)
+        assert val == val2
+
+
+def test_r2_13():
+    """CCSD T2 Residual 1/2 [[Voooo,T1],T1] (13)"""
+    T1 = w.op("t", ["v+ o"])
+    Voooo = w.op("v", ["o+ o+ o o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1, 2), w.commutator(w.commutator(Voooo, T1), T1), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("1 t^{o2}_{v0} t^{o3}_{v1} v^{o0,o1}_{o2,o3}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_14():
+    """CCSD T2 Residual 1/2 [[Vvvvv,T1],T1] (14)"""
+    T1 = w.op("t", ["v+ o"])
+    Vvvvv = w.op("v", ["v+ v+ v v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1, 2), w.commutator(w.commutator(Vvvvv, T1), T1), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{v0,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_15():
+    """CCSD T2 Residual 1/2 [[Vovov,T1],T1] (15)"""
+    T1 = w.op("t", ["v+ o"])
+    Vovov = w.op("v", ["o+ v+ v o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1, 2), w.commutator(w.commutator(Vovov, T1), T1), 4, 4)
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("4 t^{o2}_{v0} t^{o0}_{v2} v^{o1,v2}_{o2,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_16_17():
+    """CCSD T2 Residual [[Fov,T1],T2] (16-17)"""
+    T1 = w.op("t", ["v+ o"])
+    T2 = w.op("t", ["v+ v+ o o"])
+    Fov = w.op("f", ["o+ v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1, 1), w.commutator(w.commutator(Fov, T1), T2), 4, 4)
+    answers = [
+        "2 f^{v2}_{o2} t^{o0}_{v2} t^{o1,o2}_{v0,v1}",
+        "2 f^{v2}_{o2} t^{o2}_{v0} t^{o0,o1}_{v1,v2}",
+    ]
+    for i in range(2):
+        val = sum.to_manybody_equation("r")["oo|vv"][i].rhs_expression()
+        val2 = w.expression(answers[i])
+        print_comparison(val, val2)
+        assert val == val2
+
+
+def test_r2_18_21_22():
+    """CCSD T2 Residual [[Vooov,T1],T2] (18,21,22)"""
+    T1 = w.op("t", ["v+ o"])
+    T2 = w.op("t", ["v+ v+ o o"])
+    Vooov = w.op("v", ["o+ o+ v o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1, 1), w.commutator(w.commutator(Vooov, T1), T2), 4, 4)
+    answers = [
+        "2 t^{o2}_{v2} t^{o0,o3}_{v0,v1} v^{o1,v2}_{o2,o3}",
+        "-1 t^{o0}_{v2} t^{o2,o3}_{v0,v1} v^{o1,v2}_{o2,o3}",
+        "4 t^{o2}_{v0} t^{o0,o3}_{v1,v2} v^{o1,v2}_{o2,o3}",
+    ]
+    for i in range(3):
+        val = sum.to_manybody_equation("r")["oo|vv"][i].rhs_expression()
+        val2 = w.expression(answers[i])
+        print_comparison(val, val2)
+        assert val == val2
+
+
+def test_r2_19_20_23():
+    """CCSD T2 Residual [[Vovvv,T1],T2] (19,20,23)"""
+    T1 = w.op("t", ["v+ o"])
+    T2 = w.op("t", ["v+ v+ o o"])
+    Vovvv = w.op("v", ["o+ v+ v v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(w.rational(1, 1), w.commutator(w.commutator(Vovvv, T1), T2), 4, 4)
+    answers = [
+        "2 t^{o2}_{v2} t^{o0,o1}_{v0,v3} v^{v2,v3}_{o2,v1}",
+        "4 t^{o0}_{v2} t^{o1,o2}_{v0,v3} v^{v2,v3}_{o2,v1}",
+        "-1 t^{o2}_{v0} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,v1}",
+    ]
+    for i in range(3):
+        val = sum.to_manybody_equation("r")["oo|vv"][i].rhs_expression()
+        val2 = w.expression(answers[i])
+        print_comparison(val, val2)
+        assert val == val2
+
+
+def test_r2_24():
+    """CCSD T2 Residual 1/6 [[[Vovvv,T1],T1],T1] (24)"""
+    T1 = w.op("t", ["v+ o"])
+    Vovvv = w.op("v", ["o+ v+ v v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(
+        w.rational(1, 6),
+        w.commutator(w.commutator(w.commutator(Vovvv, T1), T1), T1),
+        4,
+        4,
+    )
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("-2 t^{o2}_{v0} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,v1}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_25():
+    """CCSD T2 Residual 1/6 [[[Vooov,T1],T1],T1] (25)"""
+    T1 = w.op("t", ["v+ o"])
+    Vooov = w.op("v", ["o+ o+ v o"])
+    wt = w.WickTheorem()
+    sum = wt.contract(
+        w.rational(1, 6),
+        w.commutator(w.commutator(w.commutator(Vooov, T1), T1), T1),
+        4,
+        4,
+    )
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression("-2 t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} v^{o1,v2}_{o2,o3}")
+    print_comparison(val, val2)
+    assert val == val2
+
+
+def test_r2_26_30():
+    """CCSD T2 Residual [[[Voovv,T1],T1],T2] (26-30)"""
+    T1 = w.op("t", ["v+ o"])
+    T2 = w.op("t", ["v+ v+ o o"])
+    Voovv = w.op("v", ["o+ o+ v v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(
+        w.rational(1, 2),
+        w.commutator(w.commutator(w.commutator(Voovv, T1), T1), T2),
+        4,
+        4,
+    )
+    answers = [
+        "-2 t^{o0}_{v2} t^{o2}_{v3} t^{o1,o3}_{v0,v1} v^{v2,v3}_{o2,o3}",
+        "1/2 t^{o0}_{v2} t^{o1}_{v3} t^{o2,o3}_{v0,v1} v^{v2,v3}_{o2,o3}",
+        "-2 t^{o2}_{v0} t^{o3}_{v2} t^{o0,o1}_{v1,v3} v^{v2,v3}_{o2,o3}",
+        "-4 t^{o2}_{v0} t^{o0}_{v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
+        "1/2 t^{o2}_{v0} t^{o3}_{v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}",
+    ]
+    for i in range(5):
+        val = sum.to_manybody_equation("r")["oo|vv"][i].rhs_expression()
+        val2 = w.expression(answers[i])
+        print_comparison(val, val2)
+        assert val == val2
+
+
+def test_r2_31():
+    """CCSD T2 Residual 1/24 [[[[Voovv,T1],T1],T1],T1] (31)"""
+    T1 = w.op("t", ["v+ o"])
+    Voovv = w.op("v", ["o+ o+ v v"])
+    wt = w.WickTheorem()
+    sum = wt.contract(
+        w.rational(1, 24),
+        w.commutator(w.commutator(w.commutator(w.commutator(Voovv, T1), T1), T1), T1),
+        4,
+        4,
+    )
+    val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
+    val2 = w.expression(
+        "t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,o3}"
+    )
     print_comparison(val, val2)
     assert val == val2
 
@@ -256,383 +531,21 @@ if __name__ == "__main__":
     test_r1_11()
     test_r1_12_14()
     test_r2_1()
-
-# test_return_t test_r2_2() {
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Fvv = make_operator("f", {"v+ v"})
-
-#   // [Fvv,T2]
-#   auto sum = wdt.contract_sum(1, Fvv @ T2, 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("-2 f^{v2}_{v0} t^{o0,o1}_{v1,v2}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Fvv,T2] (2)"})
-# }
-
-# test_return_t test_r2_3() {
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Foo = make_operator("f", {"o+ o"})
-
-#   // [Foo,T2]
-#   auto sum = wdt.contract_sum(1, Foo @ T2, 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("2 f^{o0}_{o2} t^{o1,o2}_{v0,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Foo,T2] (3)"})
-# }
-
-# test_return_t test_r2_4() {
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Voooo = make_operator("v", {"oo->oo"})
-
-#   // [Voooo,T2]
-#   auto sum = wdt.contract_sum(1, Voooo @ T2, 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("1/2 t^{o2,o3}_{v0,v1} v^{o0,o1}_{o2,o3}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Voooo,T2] (4)"})
-# }
-
-# test_return_t test_r2_5() {
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Vvvvv = make_operator("v", {"vv->vv"})
-
-#   // [Vvvvv,T2]
-#   auto sum = wdt.contract_sum(1, Vvvvv @ T2, 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("1/2 t^{o0,o1}_{v2,v3} v^{v2,v3}_{v0,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Vvvvv,T2] (5)"})
-# }
-
-# test_return_t test_r2_6() {
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Vovov = make_operator("v", {"o+ v+ v o"})
-
-#   // [Vovov,T2]
-#   auto sum = wdt.contract_sum(1, Vovov @ T2, 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("-4 t^{o0,o2}_{v0,v2} v^{o1,v2}_{o2,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Vovov,T2] (6)"})
-# }
-
-# test_return_t test_r2_7() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto Vvvov = make_operator("v", {"ov->vv"})
-
-#   // [Vvvov,T2]
-#   auto sum = wdt.contract_sum(1, Vvvov @ T1, 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("-2 t^{o0}_{v2} v^{o1,v2}_{v0,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Vvvov,T2] (7)"})
-# }
-
-# test_return_t test_r2_8() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto Vovoo = make_operator("v", {"oo->ov"})
-
-#   // [Vovoo,T2]
-#   auto sum = wdt.contract_sum(1, Vovoo @ T1, 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("-2 t^{o2}_{v0} v^{o0,o1}_{o2,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass, {"CCSD T2 Residual [Vovoo,T2] (8)"})
-# }
-
-# test_return_t test_r2_9_12() {
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Voovv = make_operator("v", {"o+ o+ v v"})
-
-#   // 1/2 [[Voovv,T2],T2]
-#   auto sum = wdt.contract_sum(scalar_t(1, 2),
-#                               commutator(commutator(Voovv, T2), T2), 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 =
-#       string_to_expr("2 t^{o0,o2}_{v0,v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}") +
-#       string_to_expr(
-#           "-1 t^{o0,o1}_{v0,v2} t^{o2,o3}_{v1,v3} v^{v2,v3}_{o2,o3}") +
-#       string_to_expr(
-#           "-1 t^{o0,o2}_{v0,v1} t^{o1,o3}_{v2,v3} v^{v2,v3}_{o2,o3}") +
-#       string_to_expr(
-#           "1/4 t^{o2,o3}_{v0,v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual 1/2 [[Voovv,T2],T2] (9-12)"})
-# }
-
-# test_return_t test_r2_13() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto Voooo = make_operator("v", {"oo->oo"})
-
-#   // 1/2 [[Voooo,T1],T1]
-#   auto sum = wdt.contract_sum(scalar_t(1, 2),
-#                               commutator(commutator(Voooo, T1), T1), 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("1 t^{o2}_{v0} t^{o3}_{v1} v^{o0,o1}_{o2,o3}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual 1/2 [[Voooo,T1],T1] (13)"})
-# }
-
-# test_return_t test_r2_14() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto Vvvvv = make_operator("v", {"vv->vv"})
-
-#   // 1/2 [[Vvvvv,T1],T1]
-#   auto sum = wdt.contract_sum(scalar_t(1, 2),
-#                               commutator(commutator(Vvvvv, T1), T1), 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{v0,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual 1/2 [[Vvvvv,T1],T1] (14)"})
-# }
-
-# test_return_t test_r2_15() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto Vovov = make_operator("v", {"o+ v+ v o"})
-
-#   // 1/2 [[Vovov,T1],T1]
-#   auto sum = wdt.contract_sum(scalar_t(1, 2),
-#                               commutator(commutator(Vovov, T1), T1), 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("4 t^{o2}_{v0} t^{o0}_{v2} v^{o1,v2}_{o2,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual 1/2 [[Vovov,T1],T1] (15)"})
-# }
-
-# test_return_t test_r2_16_17() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-
-#   auto Fov = make_operator("f", {"o+ v"})
-
-#   // [[Fov,T1],T2]
-#   auto sum = wdt.contract_sum(1, commutator(commutator(Fov, T1), T2), 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr("2 f^{v2}_{o2} t^{o0}_{v2} t^{o1,o2}_{v0,v1}") +
-#                   string_to_expr("2 f^{v2}_{o2} t^{o2}_{v0} t^{o0,o1}_{v1,v2}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual [[Fov,T1],T2] (16-17)"})
-# }
-
-# test_return_t test_r2_18_21_22() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Vooov = make_operator("v", {"v+ v+ v o"})
-
-#   // [[Vooov,T1],T2]
-#   auto sum = wdt.contract_sum(1, commutator(commutator(Vooov, T1), T2), 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 =
-#       string_to_expr("2 t^{o2}_{v2} t^{o0,o3}_{v0,v1} v^{o1,v2}_{o2,o3}") +
-#       string_to_expr("-1 t^{o0}_{v2} t^{o2,o3}_{v0,v1} v^{o1,v2}_{o2,o3}") +
-#       string_to_expr("4 t^{o2}_{v0} t^{o0,o3}_{v1,v2} v^{o1,v2}_{o2,o3}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual [[Vooov,T1],T2] (18,21,22)"})
-# }
-
-# test_return_t test_r2_19_20_23() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Vovvv = make_operator("v", {"o+ v+ v v"})
-
-#   // [[Vovvv,T1],T2]
-#   auto sum = wdt.contract_sum(1, commutator(commutator(Vovvv, T1), T2), 4, 4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 =
-#       string_to_expr("2 t^{o2}_{v2} t^{o0,o1}_{v0,v3} v^{v2,v3}_{o2,v1}") +
-#       string_to_expr("4 t^{o0}_{v2} t^{o1,o2}_{v0,v3} v^{v2,v3}_{o2,v1}") +
-#       string_to_expr("-1 t^{o2}_{v0} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual [[Vovvv,T1],T2] (19,20,23)"})
-# }
-
-# test_return_t test_r2_24() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto Vovvv = make_operator("v", {"o+ v+ v v"})
-
-#   // 1/6 [[[Vovvv,T1],T1],T1]
-#   auto sum = wdt.contract_sum(
-#       scalar_t(1, 6), commutator(commutator(commutator(Vovvv, T1), T1), T1), 4,
-#       4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 =
-#       string_to_expr("-2 t^{o2}_{v0} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,v1}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual 1/6 [[[Vovvv,T1],T1],T1] (24)"})
-# }
-
-# test_return_t test_r2_25() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto Vooov = make_operator("v", {"v+ v+ v o"})
-
-#   // 1/6 [[[Vooov,T1],T1],T1]
-#   auto sum = wdt.contract_sum(
-#       scalar_t(1, 6), commutator(commutator(commutator(Vooov, T1), T1), T1), 4,
-#       4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 =
-#       string_to_expr("-2 t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} v^{o1,v2}_{o2,o3}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual 1/6 [[[Vooov,T1],T1],T1] (25)"})
-# }
-
-# test_return_t test_r2_26_30() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto T2 = make_operator("t", {"v+ v+ o o"})
-#   auto Voovv = make_operator("v", {"o+ o+ v v"})
-
-#   // [[[Voovv,T1],T1],T2]
-#   auto sum = wdt.contract_sum(
-#       scalar_t(1, 2), commutator(commutator(commutator(Voovv, T1), T1), T2), 4,
-#       4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 =
-#       string_to_expr(
-#           "-2 t^{o0}_{v2} t^{o2}_{v3} t^{o1,o3}_{v0,v1} v^{v2,v3}_{o2,o3}") +
-#       string_to_expr(
-#           "-2 t^{o2}_{v0} t^{o3}_{v2} t^{o0,o1}_{v1,v3} v^{v2,v3}_{o2,o3}") +
-#       string_to_expr(
-#           "1/2 t^{o0}_{v2} t^{o1}_{v3} t^{o2,o3}_{v0,v1} v^{v2,v3}_{o2,o3}") +
-#       string_to_expr(
-#           "1/2 t^{o2}_{v0} t^{o3}_{v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}") +
-#       string_to_expr(
-#           "-4 t^{o2}_{v0} t^{o0}_{v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(TestPass, pass,
-#                        {"CCSD T2 Residual [[[Voovv,T1],T1],T2] (26)"})
-# }
-
-# test_return_t test_r2_31() {
-#   auto T1 = make_operator("t", {"v+ o"})
-#   auto Voovv = make_operator("v", {"o+ o+ v v"})
-
-#   // 1/24 [[[[Voovv,T1],T1],T1],T1]
-#   auto sum = wdt.contract_sum(
-#       scalar_t(1, 24),
-#       commutator(commutator(commutator(commutator(Voovv, T1), T1), T1), T1), 4,
-#       4)
-#   Expression val
-#   for (const auto &eq : sum.to_manybody_equation("r")) {
-#     val.add(eq.rhs(), eq.rhs_factor())
-#   }
-#   auto val2 = string_to_expr(
-#       "t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,o3}")
-#   TEST_DEBUG_PRINT(cout << "Result: " << val << endl)
-#   TEST_DEBUG_PRINT(cout << "Test:   " << val2 << endl)
-#   bool pass = (val == val2)
-
-#   return make_return_t(
-#       TestPass, pass, {"CCSD T2 Residual 1/24 [[[[Voovv,T1],T1],T1],T1] (31)"})
-# }
+    test_r2_2()
+    test_r2_3()
+    test_r2_4()
+    test_r2_5()
+    test_r2_6()
+    test_r2_7()
+    test_r2_8()
+    test_r2_9_12()
+    test_r2_13()
+    test_r2_14()
+    test_r2_15()
+    test_r2_16_17()
+    test_r2_18_21_22()
+    test_r2_19_20_23()
+    test_r2_24()
+    test_r2_25()
+    test_r2_26_30()
+    test_r2_31()

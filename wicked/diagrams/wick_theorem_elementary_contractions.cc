@@ -74,12 +74,12 @@ void WickTheorem::elementary_contractions_occupied(
     const std::vector<DiagOperator> &ops, int s,
     std::vector<std::vector<DiagVertex>> &contr_vec) {
   int nops = ops.size();
-  for (int c = 0; c < nops; c++) {             // loop over creation (left)
-    for (int a = c + 1; a < nops; a++) {       // loop over annihilation (right)
-      if (ops[c].cre(s) * ops[a].ann(s) > 0) { // is contraction viable?
+  for (int l = 0; l < nops; l++) {             // loop over creation (left)
+    for (int r = l + 1; r < nops; r++) {       // loop over annihilation (right)
+      if (ops[l].cre(s) * ops[r].ann(s) > 0) { // is contraction viable?
         std::vector<DiagVertex> new_contr(nops);
-        new_contr[c].set_cre(s, 1);
-        new_contr[a].set_ann(s, 1);
+        new_contr[l].set_cre(s, 1);
+        new_contr[r].set_ann(s, 1);
         contr_vec.push_back(new_contr);
         PRINT(PrintLevel::Summary,
               cout << fmt::format("\n    {:5d}:", contr_vec.size());
@@ -93,12 +93,12 @@ void WickTheorem::elementary_contractions_unoccupied(
     const std::vector<DiagOperator> &ops, int s,
     std::vector<std::vector<DiagVertex>> &contr_vec) {
   int nops = ops.size();
-  for (int a = 0; a < nops; a++) {             // loop over annihilation (left)
-    for (int c = a + 1; c < nops; c++) {       // loop over creation (right)
-      if (ops[c].cre(s) * ops[a].ann(s) > 0) { // is contraction viable?
+  for (int l = 0; l < nops; l++) {             // loop over annihilation (left)
+    for (int r = l + 1; r < nops; r++) {       // loop over creation (right)
+      if (ops[l].ann(s) * ops[r].cre(s) > 0) { // is contraction viable?
         std::vector<DiagVertex> new_contr(nops);
-        new_contr[c].set_cre(s, 1);
-        new_contr[a].set_ann(s, 1);
+        new_contr[l].set_ann(s, 1);
+        new_contr[r].set_cre(s, 1);
         contr_vec.push_back(new_contr);
         PRINT(PrintLevel::Summary,
               cout << fmt::format("\n    {:5d}:", contr_vec.size());
@@ -123,17 +123,18 @@ void WickTheorem::elementary_contractions_general(
   // operators and the maximum cumulant level allowed
   int max_half_legs = std::min(std::min(sumcre, sumann), maxcumulant_);
 
-  // in this algorithm we loop over all possible lengths of of half-leg
+  // in this algorithm we loop over all possible lengths of half-leg
   // contractions, partition this number into integers, permute these integers
   // to generate elementary contractions, and test if these are valid
   for (int half_legs = 1; half_legs <= max_half_legs; half_legs++) {
     PRINT(PrintLevel::Summary,
           cout << "\n    " << 2 * half_legs << "-legs contractions";)
     // create partitions of the number of half legs into at most nops numbers.
-    // For 4 half_legs =2 and nops = 2, half_legs_part = [[2],[1,1]]
+    // For half_legs = 2 and nops = 2, half_legs_part = [[2],[1,1]]
     auto half_legs_part = integer_partitions(half_legs, nops);
     // create lists of leg partitionings among all operators that are
     // compatible with the number of creation and annihilation operators
+    //
     // these vectors store the number of cre/ann operators contracted per
     // operator
     std::vector<std::vector<int>> cre_legs_vec, ann_legs_vec;

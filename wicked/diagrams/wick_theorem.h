@@ -39,16 +39,10 @@ private:
   std::vector<std::vector<int>> contractions_;
   std::vector<std::vector<DiagVertex>> elementary_contractions_;
 
-  // Create a canonical
-  std::pair<std::vector<DiagOperator>, std::vector<std::vector<DiagVertex>>>
-  canonicalize_contraction(const std::vector<DiagOperator> &ops,
-                           const std::vector<int> &contraction_vec);
-
-  void compare_contraction_perm(
-      const std::vector<DiagOperator> &ops,
-      const std::vector<std::vector<DiagVertex>> &contractions,
-      const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
-      std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm);
+  //
+  // Functions for step 1. of the Wick's theorem algorithm
+  // implemented in wich_theorem_elementary_contractions.cc
+  //
 
   /// Generates all elementary contractions
   std::vector<std::vector<DiagVertex>>
@@ -64,20 +58,20 @@ private:
       const std::vector<DiagOperator> &ops, int s,
       std::vector<std::vector<DiagVertex>> &contr_vec);
 
+  /// Generates elementary contractions of general spaces
   void elementary_contractions_general(
       const std::vector<DiagOperator> &ops, int s,
       std::vector<std::vector<DiagVertex>> &contr_vec);
 
-  /// Generates all composite contractions
+  //
+  // Functions for step 2. of the Wick's theorem algorithm
+  // implemented in wich_theorem_composite_contractions.cc
+  //
+
+  /// Generates all composite contractions for a given contraction
+  /// pattern stored in ops
   void generate_composite_contractions(const std::vector<DiagOperator> &ops,
                                        const int minrank, const int maxrank);
-
-  /// Process the contractions
-  Expression process_contractions(scalar_t factor,
-                                  const std::vector<DiagOperator> &ops,
-                                  const int minrank, const int maxrank);
-
-  // ==> Backtracking routines <==
 
   /// Backtracking algorithm used to generate all contractions product of
   /// elementary contractions
@@ -87,8 +81,14 @@ private:
       std::vector<DiagVertex> &free_vertex_vec, const int minrank,
       const int maxrank);
 
+  /// Process a contraction (store it) found by the backtracking algorithm
+  void process_contraction(const std::vector<int> &a, int k,
+                           const std::vector<DiagVertex> &free_vertex_vec,
+                           const int minrank, const int maxrank);
+
   /// Return a vector of indices of elementary contractions that can be added to
-  /// the current solution. Used in backtracking algorithm
+  /// the current backtracking solution. All candidates generated here lead to
+  /// valid contractions
   std::vector<int>
   construct_candidates(std::vector<int> &a, int k,
                        const std::vector<std::vector<DiagVertex>> &el_contr_vec,
@@ -96,20 +96,38 @@ private:
 
   /// Applies a contraction to the list of free vertices. Used in backtracking
   /// algorithm
-  void make_move(const std::vector<int> &a, int k,
+  void make_move(std::vector<int> &a, int k, int c,
                  const std::vector<std::vector<DiagVertex>> &el_contr_vec,
                  std::vector<DiagVertex> &free_vertex_vec);
 
   /// Undoes the application of a contraction to the list of free vertices. Used
   /// in backtracking algorithm
-  void unmake_move(const std::vector<int> &a, int k,
+  void unmake_move(std::vector<int> &a, int k, int c,
                    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
                    std::vector<DiagVertex> &free_vertex_vec);
 
-  /// Process a contraction found by the backtracking algorithm
-  void process_contraction(const std::vector<int> &a, int k,
-                           const std::vector<DiagVertex> &free_vertex_vec,
-                           const int minrank, const int maxrank);
+  //
+  // Functions for step 3. of the Wick's theorem algorithm
+  // implemented in wich_theorem_process_contractions.cc
+  //
+
+  /// Process the contractions generated in step 2.
+  Expression process_contractions(scalar_t factor,
+                                  const std::vector<DiagOperator> &ops,
+                                  const int minrank, const int maxrank);
+
+  // Create a canonical
+  std::pair<std::vector<DiagOperator>, std::vector<std::vector<DiagVertex>>>
+  canonicalize_contraction(const std::vector<DiagOperator> &ops,
+                           const std::vector<int> &contraction_vec);
+
+  void compare_contraction_perm(
+      const std::vector<DiagOperator> &ops,
+      const std::vector<std::vector<DiagVertex>> &contractions,
+      const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
+      std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm);
+
+  // ==> Backtracking routines <==
 
   /// Apply the contraction to this set of operators and produce a term
   std::pair<SymbolicTerm, scalar_t>
@@ -139,7 +157,7 @@ private:
   /// The largest allowed cumulant
   int maxcumulant_ = 100;
 
-  PrintLevel print_ = PrintLevel::No;
+  PrintLevel print_ = PrintLevel::Detailed;
 };
 
 #endif // _wicked_diag_theorem_h_

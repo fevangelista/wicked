@@ -30,7 +30,6 @@ void WickTheorem::generate_composite_contractions(
   for (const auto &op : ops) {
     free_vertex_vec.push_back(op.vertex());
   }
-
   PRINT(PrintLevel::Summary,
         std::cout << "\n    Contractions found by backtracking:";
         std::cout
@@ -53,18 +52,20 @@ void WickTheorem::generate_contractions_backtrack(
     std::vector<DiagVertex> &free_vertex_vec, const int minrank,
     const int maxrank) {
 
+  // process this contraction
   process_contraction(a, k, free_vertex_vec, minrank, maxrank);
 
+  // build a list of candidate contractions to add to this solution
   k = k + 1;
   std::vector<int> candidates =
       construct_candidates(a, k, el_contr_vec, free_vertex_vec);
 
+  // test each candidate contraction
   for (const auto &c : candidates) {
-    a[k - 1] = c;
-    make_move(a, k, el_contr_vec, free_vertex_vec);
+    make_move(a, k, c, el_contr_vec, free_vertex_vec);
     generate_contractions_backtrack(a, k, el_contr_vec, free_vertex_vec,
                                     minrank, maxrank);
-    unmake_move(a, k, el_contr_vec, free_vertex_vec);
+    unmake_move(a, k, c, el_contr_vec, free_vertex_vec);
   }
 }
 
@@ -75,6 +76,7 @@ void WickTheorem::process_contraction(
   int num_ops = sum_num_ops(free_vertex_vec);
   if ((num_ops >= minrank) and (num_ops <= maxrank)) {
     contractions_.push_back(std::vector<int>(a.begin(), a.begin() + k));
+    ncontractions_++;
     PRINT(
         PrintLevel::Summary, DiagVertex free_ops;
         for (const auto &free_vertex
@@ -83,7 +85,6 @@ void WickTheorem::process_contraction(
                             free_ops.num_ops());
         for (int i = 0; i < k; ++i) { cout << fmt::format(" {:3d}", a[i]); };
         cout << std::string(std::max(24 - 4 * k, 2), ' ') << free_ops;)
-    ncontractions_++;
   }
 }
 
@@ -96,6 +97,7 @@ std::vector<int> WickTheorem::construct_candidates(
   int nops = free_vertex_vec.size();
 
   // determine the last elementary contraction used
+  // the -2 is here because k is incremented just before calling this function
   int minc = (k > 1) ? a[k - 2] : 0;
   int maxc = el_contr_vec.size();
 
@@ -103,22 +105,21 @@ std::vector<int> WickTheorem::construct_candidates(
   for (int c = minc; c < maxc; c++) {
     const auto &el_contr = el_contr_vec[c];
 
-    // test if this contraction is compatible, that is if the number of
-    // operators we want to contract is less than or equal to the number of
-    // free
-    // (uncontracted) operators
-    bool compatible = true;
+    // test if this contraction is valid: check that the number of
+    // operators to contract is less than or equal to the number of
+    // free (uncontracted) operators
+    bool is_valid_contraction = true;
     for (int A = 0; A < nops; A++) {
       for (int s = 0; s < osi->num_spaces(); s++) {
         if (free_vertex_vec[A].cre(s) < el_contr[A].cre(s)) {
-          compatible = false;
+          is_valid_contraction = false;
         }
         if (free_vertex_vec[A].ann(s) < el_contr[A].ann(s)) {
-          compatible = false;
+          is_valid_contraction = false;
         }
       }
     }
-    if (compatible) {
+    if (is_valid_contraction) {
       candidates.push_back(c);
     }
   }
@@ -126,43 +127,32 @@ std::vector<int> WickTheorem::construct_candidates(
 }
 
 void WickTheorem::make_move(
-    const std::vector<int> &a, int k,
+    std::vector<int> &a, int k, int c,
     const std::vector<std::vector<DiagVertex>> &el_contr_vec,
     std::vector<DiagVertex> &free_vertex_vec) {
-  int nops = free_vertex_vec.size();
+  // add this contraction to the solution
+  a[k - 1] = c;
 
-  // remove the current elementary contraction
-  int c = a[k - 1];
+  // update the number of uncontracted operators
   const auto &el_contr = el_contr_vec[c];
-
+  int nops = free_vertex_vec.size();
   for (int A = 0; A < nops; A++) {
     free_vertex_vec[A] -= el_contr[A];
-    // for (int s = 0; s < osi->num_spaces(); s++) {
-    //   int ncre = free_vertex_vec[A].cre(s) - el_contr[A].cre(s);
-    //   free_vertex_vec[A].cre(s, ncre);
-    //   int nann = free_vertex_vec[A].ann(s) - el_contr[A].ann(s);
-    //   free_vertex_vec[A].ann(s, nann);
-    // }
   }
 }
 
 void WickTheorem::unmake_move(
-    const std::vector<int> &a, int k,
+    std::vector<int> &a, int k, int c,
     const std::vector<std::vector<DiagVertex>> &el_contr_vec,
     std::vector<DiagVertex> &free_vertex_vec) {
-  int nops = free_vertex_vec.size();
 
-  // remove the current elementary contraction
-  int c = a[k - 1];
+  // remove this contraction from the solution
+  a[k - 1] = -1;
+
+  // update the number of uncontracted operators
   const auto &el_contr = el_contr_vec[c];
-
+  int nops = free_vertex_vec.size();
   for (int A = 0; A < nops; A++) {
-    // for (int s = 0; s < osi->num_spaces(); s++) {
-    //   int ncre = free_vertex_vec[A].cre(s) + el_contr[A].cre(s);
-    //   free_vertex_vec[A].cre(s, ncre);
-    //   int nann = free_vertex_vec[A].ann(s) + el_contr[A].ann(s);
-    //   free_vertex_vec[A].ann(s, nann);
-    // }
     free_vertex_vec[A] += el_contr[A];
   }
 }

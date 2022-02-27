@@ -52,8 +52,6 @@ void SymbolicTerm::reindex(index_map_t &idx_map) {
   }
 }
 
-//
-
 #define NEW_CANONICALIZATION 1
 scalar_t SymbolicTerm::canonicalize() {
   scalar_t factor(1);
@@ -251,8 +249,6 @@ scalar_t SymbolicTerm::canonicalize() {
   operators_ = new_sqops;
 
   //  std::cout << "\n  " << str();
-
-  //  canonicalize_best();
 
   return factor;
 }

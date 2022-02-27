@@ -29,11 +29,16 @@ void print_contraction(const std::vector<DiagOperator> &ops,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<SQOperator> &sqops,
                        const std::vector<int> sign_order);
-
 void print_contraction(const std::vector<DiagOperator> &ops,
                        const std::vector<std::vector<DiagVertex>> &contractions,
                        const std::vector<int> ops_perm,
                        const std::vector<int> contr_perm);
+
+std::string
+contraction_signature(const std::vector<DiagOperator> &ops,
+                      const std::vector<std::vector<DiagVertex>> &contractions,
+                      const std::vector<int> &ops_perm,
+                      const std::vector<int> &contr_perm);
 
 using namespace std;
 
@@ -46,10 +51,12 @@ WickTheorem::process_contractions(scalar_t factor,
 
   Expression result;
 
+  // loop over all contractions and keep those with the correct rank
+  // contraction_vec stores a list of elementary contractions appearing
+  // in a term
   int nprocessed = 0;
   int ops_rank = sum_num_ops(ops);
   for (const auto &contraction_vec : contractions_) {
-    std::vector<std::vector<DiagVertex>> vertices;
     int contr_rank = 0;
     for (int c : contraction_vec) {
       contr_rank += sum_num_ops(elementary_contractions_[c]);
@@ -62,13 +69,12 @@ WickTheorem::process_contractions(scalar_t factor,
             cout << "\n\n  Contraction: " << nprocessed
                  << "  Operator rank: " << ops_rank - contr_rank << endl;)
 
+      // canonicalize the contraction
       auto ops_contractions = canonicalize_contraction(ops, contraction_vec);
       const auto &contractions = ops_contractions.second;
 
       std::pair<SymbolicTerm, scalar_t> term_factor =
           evaluate_contraction(ops, contractions, factor);
-
-      // PRINT(PrintLevel::Summary, cout << term_factor << endl;)
 
       SymbolicTerm &term = term_factor.first;
       scalar_t canonicalize_factor = term.canonicalize();
@@ -90,6 +96,7 @@ WickTheorem::process_contractions(scalar_t factor,
 std::pair<std::vector<DiagOperator>, std::vector<std::vector<DiagVertex>>>
 WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
                                       const std::vector<int> &contraction_vec) {
+  // create a vector of elementary contractions to apply
   std::vector<std::vector<DiagVertex>> contractions;
   for (int c : contraction_vec) {
     contractions.push_back(elementary_contractions_[c]);
@@ -97,13 +104,15 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
 
   for (const auto &op : ops) {
     if (op.num_ops() % 2 != 0) {
-      cout << "\n\n  WickTheorem::canonicalize_contraction cannot yet handle "
-              "operators with an even number of sqops.\n";
-      exit(1);
+      auto msg =
+          "\n\n  WickTheorem::canonicalize_contraction cannot yet handle "
+          "operators with an even number of sqops.\n";
+      throw std::runtime_error(msg);
     }
   }
 
-  // create a connectivity matrix
+  // create a connectivity matrix conn_mat[i][j] such that
+  // if operators i and j are contracted, then conn_mat[i][j] = 1
   int nops = ops.size();
   int_matrix conn_mat(nops, nops);
   for (int c : contraction_vec) {
@@ -122,7 +131,7 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
     }
   }
 
-  const int maxops = 16;
+  const int maxops = 64;
   std::vector<std::bitset<maxops>> left_masks(nops);
   // create a mask for each operator
   for (int i = 0; i < nops; i++) {
@@ -132,10 +141,11 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
       }
     }
   }
-  //  cout << "\nOperator masks:" << endl;
-  //  for (const auto &mask : left_masks) {
-  //    cout << mask << endl;
-  //  }
+  PRINT(
+      PrintLevel::Detailed, cout << "\n  Contraction canonicalization" << endl;
+      cout << "\n  Operator masks:" << endl;
+      for (const auto &mask
+           : left_masks) { cout << mask << endl; });
 
   // setup vectors that will store the best permutations
   std::vector<int> best_ops_perm(ops.size());
@@ -143,8 +153,8 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
   std::iota(best_ops_perm.begin(), best_ops_perm.end(), 0);
   std::iota(best_contr_perm.begin(), best_contr_perm.end(), 0);
 
-  //  cout << "Contraction to canonicalize:" << endl;
-  //  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
+  PRINT(PrintLevel::Detailed, cout << "Contraction to canonicalize:" << endl;
+        print_contraction(ops, contractions, best_ops_perm, best_contr_perm););
 
   std::vector<
       std::pair<std::string, std::pair<std::vector<int>, std::vector<int>>>>
@@ -153,8 +163,8 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
   std::vector<int> ops_perm(ops.size());
   std::iota(ops_perm.begin(), ops_perm.end(), 0);
   do {
-    //    cout << "Permutation: ";
-    //    PRINT_ELEMENTS(ops_perm);
+    PRINT(PrintLevel::Detailed, cout << "  Operator permutation: ";
+          PRINT_ELEMENTS(ops_perm););
 
     bool allowed = true;
     for (int i = 0; i < nops; i++) {
@@ -168,10 +178,9 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
         allowed = false;
       }
     }
-    //    if (not allowed) {
-    //      cout << " is not allowed!";
-    //    }
-    //    cout << endl;
+
+    PRINT(PrintLevel::Detailed,
+          cout << (allowed ? " is allowed" : " is not allowed!") << endl;);
 
     if (allowed) {
       // find the "best" contraction permutation directly
@@ -202,14 +211,17 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
 
   std::sort(scores.begin(), scores.end());
 
+  for (const auto &[score, op_contr] : scores) {
+    cout << score << endl;
+  }
+
   best_ops_perm = scores.begin()->second.first;
   best_contr_perm = scores.begin()->second.second;
 
-  //  cout << "\n Best permutation of operators:    ";
-  //  PRINT_ELEMENTS(best_ops_perm);
-  //  cout << "\n Best permutation of contractions: ";
-  //  PRINT_ELEMENTS(best_contr_perm);
-  //  cout << endl;
+  PRINT(PrintLevel::Detailed, cout << "\n Best permutation of operators:    ";
+        PRINT_ELEMENTS(best_ops_perm);
+        cout << "\n Best permutation of contractions: ";
+        PRINT_ELEMENTS(best_contr_perm); cout << endl;);
 
   std::vector<DiagOperator> best_ops;
   for (int o : best_ops_perm) {
@@ -223,8 +235,8 @@ WickTheorem::canonicalize_contraction(const std::vector<DiagOperator> &ops,
 
   // TODO: check if there is a sign change
 
-  //  cout << "Canonical contraction:" << endl;
-  //  print_contraction(ops, contractions, best_ops_perm, best_contr_perm);
+  PRINT(PrintLevel::Detailed, cout << "Canonical contraction:" << endl;
+        print_contraction(ops, contractions, best_ops_perm, best_contr_perm););
 
   return std::make_pair(best_ops, best_contractions);
 }
