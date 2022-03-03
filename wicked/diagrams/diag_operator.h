@@ -54,6 +54,20 @@ private:
   DiagVertex vertex_;
 };
 
+class DiagOperatorProduct {
+public:
+  /// Constructor
+  DiagOperatorProduct();
+
+public:
+  /// Constructor
+  DiagOperatorProduct(const std::vector<DiagOperator> &operators);
+
+private:
+  ///
+  std::vector<DiagOperator> operators_;
+};
+
 // Helper functions
 
 /// Create an operator
