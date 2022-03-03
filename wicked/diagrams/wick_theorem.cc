@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "contraction.h"
 #include "diag_operator.h"
 #include "diag_operator_expression.h"
 

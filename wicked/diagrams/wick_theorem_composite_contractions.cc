@@ -3,6 +3,7 @@
 
 #include "fmt/format.h"
 
+#include "contraction.h"
 #include "diag_operator.h"
 #include "diag_vertex.h"
 
@@ -48,7 +49,7 @@ void WickTheorem::generate_composite_contractions(
 
 void WickTheorem::generate_contractions_backtrack(
     std::vector<int> a, int k,
-    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+    const std::vector<ElementaryContraction> &el_contr_vec,
     std::vector<DiagVertex> &free_vertex_vec, const int minrank,
     const int maxrank) {
 
@@ -90,7 +91,7 @@ void WickTheorem::process_contraction(
 
 std::vector<int> WickTheorem::construct_candidates(
     std::vector<int> &a, int k,
-    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+    const std::vector<ElementaryContraction> &el_contr_vec,
     const std::vector<DiagVertex> &free_vertex_vec) {
 
   std::vector<int> candidates;
@@ -128,7 +129,7 @@ std::vector<int> WickTheorem::construct_candidates(
 
 void WickTheorem::make_move(
     std::vector<int> &a, int k, int c,
-    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+    const std::vector<ElementaryContraction> &el_contr_vec,
     std::vector<DiagVertex> &free_vertex_vec) {
   // add this contraction to the solution
   a[k - 1] = c;
@@ -143,7 +144,7 @@ void WickTheorem::make_move(
 
 void WickTheorem::unmake_move(
     std::vector<int> &a, int k, int c,
-    const std::vector<std::vector<DiagVertex>> &el_contr_vec,
+    const std::vector<ElementaryContraction> &el_contr_vec,
     std::vector<DiagVertex> &free_vertex_vec) {
 
   // remove this contraction from the solution

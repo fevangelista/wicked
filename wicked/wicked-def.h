@@ -6,7 +6,7 @@
 #include "rational.h"
 #include <bitset>
 
-#define DEBUG_PRINT 1
+#define DEBUG_PRINT 0
 
 #if DEBUG_PRINT == 1
 #define WPRINT(code)                                                           \

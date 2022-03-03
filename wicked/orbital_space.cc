@@ -17,7 +17,6 @@ std::map<SpaceType, std::string> SpaceType_to_str{
     {SpaceType::Occupied, "occupied"},
     {SpaceType::Unoccupied, "unoccupied"},
     {SpaceType::General, "general"},
-    {SpaceType::Composite, "composite"},
 };
 
 OrbitalSpace::OrbitalSpace(char label, FieldType field_type,
@@ -75,11 +74,11 @@ void OrbitalSpaceInfo::add_space(char label, FieldType field_type,
                                  SpaceType space_type,
                                  const std::vector<std::string> &indices,
                                  const std::vector<char> &elementary_spaces) {
-  if (label_to_pos_.count(label) != 0){
-          throw std::runtime_error("Orbitals space label " + std::string(label, 1) +
-                                   " is already defined. Use another label.");
+  if (label_to_pos_.count(label) != 0) {
+    throw std::runtime_error("Orbitals space label " + std::string(label, 1) +
+                             " is already defined. Use another label.");
   }
-                                   
+
   size_t pos = space_info_.size();
   label_to_pos_[label] = pos;
   for (auto &index : indices) {

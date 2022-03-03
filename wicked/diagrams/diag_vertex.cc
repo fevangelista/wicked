@@ -38,6 +38,8 @@ void DiagVertex::set_ann(int space, int value) {
   vertex_[space].second = value;
 }
 
+int DiagVertex::num_ops(int space) const { return cre(space) + ann(space); }
+
 int DiagVertex::num_ops() const {
   int r = 0;
   for (const auto &pair : vertex_) {
@@ -105,35 +107,18 @@ int sum_num_ops(const std::vector<DiagVertex> &vertices) {
   return n;
 }
 
-std::vector<int> spaces_in_vertices(const std::vector<DiagVertex> &vertices) {
-  std::vector<int> vec;
-  for (const auto &vertex : vertices) {
-    for (int s = 0; s < osi->num_spaces(); ++s) {
-      if (vertex.ann(s) + vertex.cre(s) > 0) {
-        vec.push_back(s);
-      }
-    }
-  }
-  return vec;
-}
-
 std::string to_string(const std::vector<DiagVertex> &vertex_vec) {
   // print the creation operator above
-  std::vector<std::string> cre_line, ann_line;
-  for (const auto &vertex : vertex_vec) {
-    for (int s = 0; s < osi->num_spaces(); ++s) {
-      cre_line.push_back(to_string(vertex.cre(s)));
+  std::vector<std::string> lines;
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    std::string line;
+    for (const auto &vertex : vertex_vec) {
+      line += std::to_string(vertex.cre(s)) + " " +
+              std::to_string(vertex.ann(s)) + "   ";
     }
-    cre_line.push_back(" ");
+    lines.push_back(line);
   }
-  // print the annihilation operator above
-  for (const auto &vertex : vertex_vec) {
-    for (int s = 0; s < osi->num_spaces(); ++s) {
-      ann_line.push_back(to_string(vertex.ann(s)));
-    }
-    ann_line.push_back(" ");
-  }
-  return join(cre_line, " ") + "\n" + join(ann_line, " ");
+  return join(lines, "\n");
 }
 
 std::string signature(const DiagVertex &vertex) {

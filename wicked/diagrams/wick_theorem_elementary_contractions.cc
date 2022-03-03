@@ -1,6 +1,7 @@
 #include "fmt/format.h"
 
 #include "combinatorics.h"
+#include "contraction.h"
 #include "diag_operator.h"
 #include "helpers.h"
 #include "stl_utils.hpp"
@@ -14,7 +15,7 @@
 
 using namespace std;
 
-std::vector<std::vector<DiagVertex>>
+std::vector<ElementaryContraction>
 WickTheorem::generate_elementary_contractions(
     const std::vector<DiagOperator> &ops) {
   PRINT(PrintLevel::Summary,
@@ -24,7 +25,7 @@ WickTheorem::generate_elementary_contractions(
   int nops = ops.size();
 
   // a vector that will hold all the contractions
-  std::vector<std::vector<DiagVertex>> contr_vec;
+  std::vector<ElementaryContraction> contr_vec;
 
   PRINT(
       PrintLevel::Summary, cout << "\n  Operator   Space   Cre.   Ann.";
@@ -72,7 +73,7 @@ WickTheorem::generate_elementary_contractions(
 
 void WickTheorem::elementary_contractions_occupied(
     const std::vector<DiagOperator> &ops, int s,
-    std::vector<std::vector<DiagVertex>> &contr_vec) {
+    std::vector<ElementaryContraction> &contr_vec) {
   int nops = ops.size();
   for (int l = 0; l < nops; l++) {             // loop over creation (left)
     for (int r = l + 1; r < nops; r++) {       // loop over annihilation (right)
@@ -91,7 +92,7 @@ void WickTheorem::elementary_contractions_occupied(
 
 void WickTheorem::elementary_contractions_unoccupied(
     const std::vector<DiagOperator> &ops, int s,
-    std::vector<std::vector<DiagVertex>> &contr_vec) {
+    std::vector<ElementaryContraction> &contr_vec) {
   int nops = ops.size();
   for (int l = 0; l < nops; l++) {             // loop over annihilation (left)
     for (int r = l + 1; r < nops; r++) {       // loop over creation (right)
@@ -110,7 +111,7 @@ void WickTheorem::elementary_contractions_unoccupied(
 
 void WickTheorem::elementary_contractions_general(
     const std::vector<DiagOperator> &ops, int s,
-    std::vector<std::vector<DiagVertex>> &contr_vec) {
+    std::vector<ElementaryContraction> &contr_vec) {
   int nops = ops.size();
   // compute the largest possible cumulant for this space
   int sumcre = 0;

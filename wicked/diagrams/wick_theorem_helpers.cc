@@ -5,6 +5,7 @@
 
 #include "fmt/format.h"
 
+#include "contraction.h"
 #include "diag_operator.h"
 
 #include "../algebra/sqoperator.h"
@@ -12,10 +13,10 @@
 
 using namespace std;
 
-void print_contraction(const std::vector<DiagOperator> &ops,
-                       const std::vector<std::vector<DiagVertex>> &contractions,
-                       const std::vector<int> ops_perm,
-                       const std::vector<int> contr_perm) {
+void print_contraction_graph(const std::vector<DiagOperator> &ops,
+                             const CompositeContraction &contractions,
+                             const std::vector<int> ops_perm,
+                             const std::vector<int> contr_perm) {
 
   std::vector<DiagVertex> op_vertex_vec;
   for (int o : ops_perm) {

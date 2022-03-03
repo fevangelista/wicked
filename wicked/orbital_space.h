@@ -14,8 +14,6 @@ enum class SpaceType {
   Unoccupied,
   // Multi-leg contractions
   General,
-  // Composite
-  Composite
 };
 
 /// The type of field

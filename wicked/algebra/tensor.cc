@@ -73,6 +73,10 @@ void Tensor::reindex(index_map_t &idx_map) {
 }
 
 scalar_t Tensor::canonicalize() {
+  if (symmetry_ == SymmetryType::Nonsymmetric) {
+    throw std::runtime_error(
+        "Tensor::canonicalize cannot canonicalize a nonsymmetric tensor");
+  }
   scalar_t sign = 1;
   auto upper_indices = this->upper();
   sign *= canonicalize_indices(upper_indices, false);
@@ -80,7 +84,7 @@ scalar_t Tensor::canonicalize() {
   sign *= canonicalize_indices(lower_indices, false);
   this->set_upper(upper_indices);
   this->set_lower(lower_indices);
-  return sign;
+  return (symmetry_ == SymmetryType::Antisymmetric) ? sign : scalar_t(1);
 }
 
 std::string Tensor::str() const {

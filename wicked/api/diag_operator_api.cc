@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "../wicked/diagrams/contraction.h"
 #include "../wicked/diagrams/diag_operator.h"
 #include "../wicked/diagrams/diag_operator_expression.h"
 #include "../wicked/diagrams/wick_theorem.h"

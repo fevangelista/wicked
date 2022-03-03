@@ -45,6 +45,10 @@ public:
   /// vertex
   int num_ops() const;
 
+  /// Return the number of creation + annilation operators represented by this
+  /// vertex in a given space
+  int num_ops(int space) const;
+
   /// Comparison operator used for sorting
   bool operator<(DiagVertex const &other) const;
 
@@ -71,9 +75,6 @@ private:
 /// Return the sum of the number creation and annihilation operator for a vector
 /// of vertices
 int sum_num_ops(const std::vector<DiagVertex> &vertices);
-
-/// Return a vector of spaces with number of cre/ann operators > 0
-std::vector<int> spaces_in_vertices(const std::vector<DiagVertex> &vertices);
 
 /// Return a nice string representation of a vector of vertices
 std::string to_string(const std::vector<DiagVertex> &vertex_vec);

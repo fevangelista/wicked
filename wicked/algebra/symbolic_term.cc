@@ -194,29 +194,52 @@ scalar_t SymbolicTerm::canonicalize() {
 }
 
 scalar_t SymbolicTerm::simplify() {
+  WPRINT(cout << "\nSymbolic term simplification " << endl;);
   scalar_t factor = 1;
-  for (const auto &tensor : tensors_) {
-    // lower indices
-    std::vector<std::vector<Index>> equivalent_upper(osi->num_spaces(),
-                                                     std::vector<Index>());
-    for (const auto &u : tensor.upper()) {
-      equivalent_upper[u.space()].push_back(u);
+  // Canonicalize each space separately
+  for (int s = 0; s < osi->num_spaces(); s++) {
+    WPRINT(cout << "\nSpace " << osi->label(s) << endl;);
+
+    std::vector<std::vector<Index>> equivalent_classes;
+    std::vector<std::pair<std::bitset<64>, std::bitset<64>>> ul_bit_masks;
+    for (const auto &tensor : tensors_) {
+      std::bitset<64> upper_bits, lower_bits;
+      {
+        std::vector<Index> equivalent;
+        for (const auto &u : tensor.upper()) {
+          if (u.space() == s) {
+            equivalent.push_back(u);
+            upper_bits[u.pos()] = true;
+          }
+        }
+        if (equivalent.size() > 0)
+          equivalent_classes.push_back(equivalent);
+      }
+      {
+        std::vector<Index> equivalent;
+        for (const auto &l : tensor.lower()) {
+          if (l.space() == s) {
+            equivalent.push_back(l);
+            lower_bits[l.pos()] = true;
+          }
+        }
+        if (equivalent.size() > 0)
+          equivalent_classes.push_back(equivalent);
+      }
+      ul_bit_masks.push_back(std::make_pair(upper_bits, lower_bits));
     }
-    std::vector<std::vector<Index>> equivalent_lower(osi->num_spaces(),
-                                                     std::vector<Index>());
-    for (const auto &l : tensor.lower()) {
-      equivalent_lower[l.space()].push_back(l);
-    }
-    cout << "\nEquivalence classes for " << tensor.label() << endl;
-    for (const auto &v : equivalent_upper) {
-      PRINT_ELEMENTS(v);
-      cout << endl;
-    }
-    for (const auto &v : equivalent_lower) {
-      PRINT_ELEMENTS(v);
-      cout << endl;
-    }
+    WPRINT(
+        for (const auto &v
+             : equivalent_classes) {
+          PRINT_ELEMENTS(v);
+          cout << endl;
+        } for (const auto &[ub, lb]
+               : ul_bit_masks) {
+          cout << ub << endl;
+          cout << lb << endl;
+        });
   }
+
   return factor;
 }
 
