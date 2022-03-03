@@ -14,7 +14,7 @@ class ElementaryContraction;
 
 #include "../algebra/expression.h"
 
-enum class PrintLevel { No, Basic, Summary, Detailed, All };
+enum class PrintLevel { None, Basic, Summary, Detailed, All };
 
 /// A class to contract a product of operators
 class WickTheorem {
@@ -34,6 +34,10 @@ public:
   /// Set the amount of printing
   void set_print(PrintLevel print);
 
+  /// Turn on/off graph canonicalization
+  void do_canonicalize_graph(bool val);
+
+  /// Set the maximum cumulant level
   void set_max_cumulant(int val);
 
 private:
@@ -50,8 +54,11 @@ private:
   /// The largest allowed cumulant
   int maxcumulant_ = 100;
 
+  /// Turn on/off graph canonicalization
+  bool do_canonicalize_graph_ = true;
+
   /// The default print level
-  PrintLevel print_ = PrintLevel::All;
+  PrintLevel print_ = PrintLevel::None;
 
   //
   // Functions for step 1. of the Wick's theorem algorithm
@@ -154,7 +161,7 @@ private:
   // Create a canonical contraction graph
   std::tuple<std::vector<DiagOperator>, CompositeContraction, scalar_t>
   canonicalize_contraction_graph(const std::vector<DiagOperator> &ops,
-                                 const std::vector<int> &contraction_vec);
+                                 const CompositeContraction &contractions);
 };
 
 #endif // _wicked_diag_theorem_h_

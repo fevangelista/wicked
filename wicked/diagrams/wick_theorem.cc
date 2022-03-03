@@ -19,6 +19,10 @@ void WickTheorem::set_print(PrintLevel print) { print_ = print; }
 
 void WickTheorem::set_max_cumulant(int n) { maxcumulant_ = n; }
 
+void WickTheorem::do_canonicalize_graph(bool val) {
+  do_canonicalize_graph_ = val;
+}
+
 Expression WickTheorem::contract(scalar_t factor,
                                  const std::vector<DiagOperator> &ops,
                                  const int minrank, const int maxrank) {

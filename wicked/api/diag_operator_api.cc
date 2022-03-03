@@ -42,7 +42,7 @@ void export_DiagOpExpression(py::module &m) {
 
 void export_WickTheorem(py::module &m) {
   py::enum_<PrintLevel>(m, "PrintLevel")
-      .value("no", PrintLevel::No)
+      .value("none", PrintLevel::None)
       .value("basic", PrintLevel::Basic)
       .value("summary", PrintLevel::Summary)
       .value("detailed", PrintLevel::Detailed)
@@ -56,5 +56,7 @@ void export_WickTheorem(py::module &m) {
       .def("contract",
            py::overload_cast<scalar_t, const DiagOpExpression &, int, int>(
                &WickTheorem::contract))
-      .def("set_print", &WickTheorem::set_print);
+      .def("set_print", &WickTheorem::set_print)
+      .def("set_max_cumulant", &WickTheorem::set_max_cumulant)
+      .def("do_canonicalize_graph", &WickTheorem::do_canonicalize_graph);
 }

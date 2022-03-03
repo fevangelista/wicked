@@ -70,17 +70,14 @@ WickTheorem::process_contractions(scalar_t factor,
             cout << "\n\n  Contraction: " << nprocessed
                  << "  Operator rank: " << ops_rank - contr_rank << endl;)
 
-      // CompositeContraction best_contractions;
-      // for (int c : contraction_vec) {
-      //   best_contractions.push_back(elementary_contractions_[c]);
-      // }
-      // const auto &best_ops = ops;
-      // const auto &best_contractions = ops_contractions.second;
-      // const auto &best_ops = ops_contractions.first;
-      // const int sign = 1;
-
+      CompositeContraction contraction;
+      for (int c : contraction_vec) {
+        contraction.push_back(elementary_contractions_[c]);
+      }
       const auto [best_ops, best_contractions, sign] =
-          canonicalize_contraction_graph(ops, contraction_vec);
+          do_canonicalize_graph_
+              ? canonicalize_contraction_graph(ops, contraction)
+              : std::make_tuple(ops, contraction, scalar_t(1));
 
       std::pair<SymbolicTerm, scalar_t> term_factor =
           evaluate_contraction(best_ops, best_contractions, factor);
@@ -105,14 +102,7 @@ WickTheorem::process_contractions(scalar_t factor,
 std::tuple<std::vector<DiagOperator>, CompositeContraction, scalar_t>
 WickTheorem::canonicalize_contraction_graph(
     const std::vector<DiagOperator> &ops,
-    const std::vector<int> &contraction_vec) {
-
-  // copy the elementary contractions that contribute to this term
-  CompositeContraction contractions;
-  for (int c : contraction_vec) {
-    contractions.push_back(elementary_contractions_[c]);
-  }
-
+    const CompositeContraction &contractions) {
   for (const auto &op : ops) {
     if (op.num_ops() % 2 != 0) {
       auto msg =
@@ -131,7 +121,8 @@ WickTheorem::canonicalize_contraction_graph(
   std::vector<std::vector<int>> constraints(nops, std::vector<int>(nops, 0));
   for (int i = 0; i < nops; i++) {
     for (int j = 0; j < nops; j++) {
-      cout << "\n Operator pair " << i << " " << j << endl;
+      PRINT(PrintLevel::All,
+            cout << "\n Operator pair " << i << " " << j << endl;);
       bool are_permutable = true;
       // check the type of contractions between operators i and j
       for (const auto &el_contr : contractions) {
@@ -150,12 +141,15 @@ WickTheorem::canonicalize_contraction_graph(
           }
         }
       }
-      for (const auto &el_contr : contractions) {
-        cout << el_contr[i] << endl;
-        cout << el_contr[j] << endl;
-      }
-      cout << "\n These operators are "
-           << (are_permutable ? "permutable" : "NOT permutable") << endl;
+      PRINT(
+          PrintLevel::All,
+          for (const auto &el_contr
+               : contractions) {
+            cout << el_contr[i] << endl;
+            cout << el_contr[j] << endl;
+          } cout
+              << "\n These operators are "
+              << (are_permutable ? "permutable" : "NOT permutable") << endl;);
       constraints[i][j] = (are_permutable ? 0 : 1);
     }
   }
@@ -260,9 +254,9 @@ WickTheorem::canonicalize_contraction_graph(
 
   std::sort(scores.begin(), scores.end());
 
-  for (const auto &[score, op_contr] : scores) {
-    cout << score << endl;
-  }
+  PRINT(
+      PrintLevel::All, for (const auto &[score, op_contr]
+                            : scores) { cout << score << endl; });
 
   best_ops_perm = scores.begin()->second.first;
   best_contr_perm = scores.begin()->second.second;
