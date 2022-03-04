@@ -7,17 +7,17 @@
 #include "../product.hpp"
 #include "../wicked-def.h"
 
-class DiagVertex;
+class Vertex;
 
 /// A class to represent an elementary contraction
-class ElementaryContraction : public Product<DiagVertex> {
+class ElementaryContraction : public Product<Vertex> {
 public:
   /// Constructor
-  ElementaryContraction() : Product<DiagVertex>() {}
+  ElementaryContraction() : Product<Vertex>() {}
 
   /// Constructor. Set number of creation and annihilation operators
-  ElementaryContraction(const std::vector<DiagVertex> &vertices)
-      : Product<DiagVertex>(vertices) {}
+  ElementaryContraction(const std::vector<Vertex> &vertices)
+      : Product<Vertex>(vertices) {}
 
   /// The number of second quantization operator contracted
   int num_ops() const;
@@ -32,7 +32,7 @@ public:
   CompositeContraction() : Product<ElementaryContraction>() {}
 
   // /// Constructor. Set number of creation and annihilation operators
-  // CompositeContraction(const std::vector<DiagVertex> &vertices);
+  // CompositeContraction(const std::vector<Vertex> &vertices);
 
   //   void push_back(const ElementaryContraction &c);
 
@@ -58,7 +58,7 @@ public:
   //   }
 
   // private:
-  //   /// This object stores a vector of DiagVertex objects
+  //   /// This object stores a vector of Vertex objects
   //   std::vector<ElementaryContraction> contractions_;
 };
 

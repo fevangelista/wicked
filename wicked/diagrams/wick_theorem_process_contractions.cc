@@ -6,9 +6,9 @@
 
 #include "combinatorics.h"
 #include "contraction.h"
-#include "diag_operator.h"
-#include "diag_operator_expression.h"
 #include "helpers.h"
+#include "operator.h"
+#include "operator_expression.h"
 #include "orbital_space.h"
 #include "stl_utils.hpp"
 
@@ -228,11 +228,11 @@ WickTheorem::canonicalize_contraction_graph(
 
     if (is_allowed) {
       // find the "best" contraction permutation directly
-      std::vector<std::pair<std::vector<DiagVertex>, int>> sorted_contractions;
+      std::vector<std::pair<std::vector<Vertex>, int>> sorted_contractions;
 
       const int ncontr = contractions.size();
       for (int i = 0; i < ncontr; i++) {
-        std::vector<DiagVertex> permuted_contr;
+        std::vector<Vertex> permuted_contr;
         for (int j = 0; j < nops; j++) {
           permuted_contr.push_back(contractions[i][ops_perm[j]]);
         }
@@ -273,7 +273,7 @@ WickTheorem::canonicalize_contraction_graph(
   // permute the order and operator upon a contraction acts
   CompositeContraction best_contractions;
   for (int c : best_contr_perm) {
-    std::vector<DiagVertex> permuted_contr;
+    std::vector<Vertex> permuted_contr;
     for (int j = 0; j < nops; j++) {
       permuted_contr.push_back(contractions[c][best_ops_perm[j]]);
     }
@@ -336,7 +336,7 @@ WickTheorem::evaluate_contraction(const OperatorProduct &ops,
   // tensors (density matrices, cumulants)
 
   // counts of how many second quantized operators are not contracted
-  std::vector<DiagVertex> ops_offset(ops.size());
+  std::vector<Vertex> ops_offset(ops.size());
 
   // a counter to keep track of the positions assigned to operators
   int sorted_position = 0;
@@ -570,8 +570,7 @@ WickTheorem::contraction_tensors_sqops(const OperatorProduct &ops) {
 }
 
 std::vector<int> WickTheorem::vertex_vec_to_pos(
-    const ElementaryContraction &vertex_vec,
-    std::vector<DiagVertex> &ops_offset,
+    const ElementaryContraction &vertex_vec, std::vector<Vertex> &ops_offset,
     std::map<std::tuple<int, int, bool, int>, int> &op_map, bool creation) {
 
   std::vector<int> result;
@@ -582,7 +581,7 @@ std::vector<int> WickTheorem::vertex_vec_to_pos(
 
   // Loop over all vertices
   for (int v = 0; v < vertex_vec.size(); v++) {
-    const DiagVertex &vertex = vertex_vec[v];
+    const Vertex &vertex = vertex_vec[v];
     int nops = creation ? vertex.cre(s) : vertex.ann(s);
     // assign the operator indices
     int ops_off = creation ? ops_offset[v].cre(s) : ops_offset[v].ann(s);
@@ -620,7 +619,7 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
   scalar_t factor = 1;
 
   // stores the offset for each uncontracted operator
-  std::vector<DiagVertex> free_vertices;
+  std::vector<Vertex> free_vertices;
   for (const auto &op : ops) {
     free_vertices.push_back(op.vertex());
   }
@@ -628,7 +627,7 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
   // for each contraction find the combinatorial factor
   for (const auto &contraction : contractions) {
     for (int v = 0; v < contraction.size(); v++) {
-      const DiagVertex &vertex = contraction[v];
+      const Vertex &vertex = contraction[v];
       for (int s = 0; s < osi->num_spaces(); s++) {
         auto &[kcre, kann] = vertex.vertex(s);
         auto &[ncre, nann] = free_vertices[v].vertex(s);
@@ -650,8 +649,8 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
 
 /////
 // void WickTheorem::compare_contraction_perm(
-//     const std::vector<DiagOperator> &ops,
-//     const std::vector<std::vector<DiagVertex>> &contractions,
+//     const std::vector<Operator> &ops,
+//     const std::vector<std::vector<Vertex>> &contractions,
 //     const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
 //     std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm) {
 //   //  // 1. Compare operators

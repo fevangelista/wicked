@@ -1,20 +1,19 @@
-#include "diag_operator.h"
+#include "operator.h"
 #include "combinatorics.h"
 #include "helpers.h"
 #include "orbital_space.h"
 
 using namespace std;
 
-DiagOperator::DiagOperator(const std::string &label,
-                           const std::vector<int> &cre,
-                           const std::vector<int> &ann)
+Operator::Operator(const std::string &label, const std::vector<int> &cre,
+                   const std::vector<int> &ann)
     : label_(label), vertex_(cre, ann) {}
 
-const std::string &DiagOperator::label() const { return label_; }
+const std::string &Operator::label() const { return label_; }
 
-DiagVertex DiagOperator::vertex() const { return vertex_; }
+Vertex Operator::vertex() const { return vertex_; }
 
-scalar_t DiagOperator::factor() const {
+scalar_t Operator::factor() const {
   scalar_t result = 1;
   for (int s = 0; s < osi->num_spaces(); ++s) {
     result /= static_cast<scalar_t>(factorial(cre(s)));
@@ -25,13 +24,13 @@ scalar_t DiagOperator::factor() const {
   return result;
 }
 
-int DiagOperator::cre(int space) const { return vertex_.cre(space); }
+int Operator::cre(int space) const { return vertex_.cre(space); }
 
-int DiagOperator::ann(int space) const { return vertex_.ann(space); }
+int Operator::ann(int space) const { return vertex_.ann(space); }
 
-int DiagOperator::num_ops() const { return vertex_.num_ops(); }
+int Operator::num_ops() const { return vertex_.num_ops(); }
 
-bool DiagOperator::operator<(DiagOperator const &other) const {
+bool Operator::operator<(Operator const &other) const {
   // Compare the labels
   if (label_ < other.label_)
     return true;
@@ -41,7 +40,7 @@ bool DiagOperator::operator<(DiagOperator const &other) const {
   return vertex_ < other.vertex_;
 }
 
-std::string DiagOperator::str() const {
+std::string Operator::str() const {
   std::vector<std::string> s;
   s.push_back(label_);
   s.push_back("{");
@@ -62,14 +61,30 @@ std::string DiagOperator::str() const {
   return join(s, " ");
 }
 
-std::ostream &operator<<(std::ostream &os, const DiagOperator &op) {
+std::ostream &operator<<(std::ostream &os, const Operator &op) {
   os << op.str();
   return os;
 }
 
-DiagOperator make_diag_operator(const std::string &label,
-                                const std::vector<char> &cre_labels,
-                                const std::vector<char> &ann_labels) {
+bool do_operators_commute(const Operator &a, const Operator &b) {
+  int noncommuting = 0;
+  for (int s = 0; s < osi->num_spaces(); s++) {
+    noncommuting += a.ann(s) * b.cre(s) + a.cre(s) * b.ann(s);
+  }
+  return noncommuting == 0;
+}
+
+bool operator_noncommuting_less(const Operator &a, const Operator &b) {
+  // if the operators commute return normal less
+  if (do_operators_commute(a, b)) {
+    return (a < b);
+  }
+  return false;
+}
+
+Operator make_diag_operator(const std::string &label,
+                            const std::vector<char> &cre_labels,
+                            const std::vector<char> &ann_labels) {
   // count the number of creation and annihilation operators in each space
   std::vector<int> cre(osi->num_spaces());
   std::vector<int> ann(osi->num_spaces());
@@ -82,20 +97,12 @@ DiagOperator make_diag_operator(const std::string &label,
     ann[space] += 1;
   }
 
-  return DiagOperator(label, cre, ann);
+  return Operator(label, cre, ann);
 }
 
-int sum_num_ops(const std::vector<DiagOperator> &ops) {
+int sum_num_ops(const std::vector<Operator> &ops) {
   int r = 0;
   for (const auto &op : ops) {
-    r += op.num_ops();
-  }
-  return r;
-}
-
-int OperatorProduct::num_ops() const {
-  int r = 0;
-  for (const auto &op : elements_) {
     r += op.num_ops();
   }
   return r;

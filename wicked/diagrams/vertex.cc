@@ -1,39 +1,36 @@
 #include <cassert>
 
-#include "diag_vertex.h"
 #include "helpers.h"
 #include "orbital_space.h"
+#include "vertex.h"
 
 using namespace std;
 
-DiagVertex::DiagVertex() {}
+Vertex::Vertex() {}
 
-DiagVertex::DiagVertex(const std::vector<int> &cre,
-                       const std::vector<int> &ann) {
+Vertex::Vertex(const std::vector<int> &cre, const std::vector<int> &ann) {
   for (int i = 0; i < osi->num_spaces(); i++) {
     vertex_[i] = std::make_pair(cre[i], ann[i]);
   }
 }
 
-const DiagVertex::vertex_t &DiagVertex::vertex() const { return vertex_; }
+const Vertex::vertex_t &Vertex::vertex() const { return vertex_; }
 
-const std::pair<int, int> &DiagVertex::vertex(int space) const {
+const std::pair<int, int> &Vertex::vertex(int space) const {
   return vertex_[space];
 }
 
-int DiagVertex::cre(int space) const { return vertex_[space].first; }
+int Vertex::cre(int space) const { return vertex_[space].first; }
 
-int DiagVertex::ann(int space) const { return vertex_[space].second; }
+int Vertex::ann(int space) const { return vertex_[space].second; }
 
-void DiagVertex::set_cre(int space, int value) { vertex_[space].first = value; }
+void Vertex::set_cre(int space, int value) { vertex_[space].first = value; }
 
-void DiagVertex::set_ann(int space, int value) {
-  vertex_[space].second = value;
-}
+void Vertex::set_ann(int space, int value) { vertex_[space].second = value; }
 
-int DiagVertex::num_ops(int space) const { return cre(space) + ann(space); }
+int Vertex::num_ops(int space) const { return cre(space) + ann(space); }
 
-int DiagVertex::num_ops() const {
+int Vertex::num_ops() const {
   int r = 0;
   for (const auto &pair : vertex_) {
     r += pair.first + pair.second;
@@ -41,11 +38,11 @@ int DiagVertex::num_ops() const {
   return r;
 }
 
-bool DiagVertex::operator<(DiagVertex const &other) const {
+bool Vertex::operator<(Vertex const &other) const {
   return vertex_ < other.vertex_;
 }
 
-DiagVertex &DiagVertex::operator+=(const DiagVertex &rhs) {
+Vertex &Vertex::operator+=(const Vertex &rhs) {
   for (int s = 0; s < osi->num_spaces(); ++s) {
     vertex_[s].first += rhs.vertex_[s].first;
     vertex_[s].second += rhs.vertex_[s].second;
@@ -53,7 +50,7 @@ DiagVertex &DiagVertex::operator+=(const DiagVertex &rhs) {
   return *this;
 }
 
-DiagVertex &DiagVertex::operator-=(const DiagVertex &rhs) {
+Vertex &Vertex::operator-=(const Vertex &rhs) {
   for (int s = 0; s < osi->num_spaces(); ++s) {
     vertex_[s].first -= rhs.vertex_[s].first;
     vertex_[s].second -= rhs.vertex_[s].second;
@@ -61,7 +58,7 @@ DiagVertex &DiagVertex::operator-=(const DiagVertex &rhs) {
   return *this;
 }
 
-std::string DiagVertex::str() const {
+std::string Vertex::str() const {
   // std::vector<std::string> cv, av;
   // for (int s = 0; s < osi->num_spaces(); ++s) {
   //   cv.push_back(to_string(cre(s)));
@@ -87,12 +84,12 @@ std::string DiagVertex::str() const {
   return join(cv, " ");
 }
 
-std::ostream &operator<<(std::ostream &os, const DiagVertex &v) {
+std::ostream &operator<<(std::ostream &os, const Vertex &v) {
   os << v.str();
   return os;
 }
 
-int sum_num_ops(const std::vector<DiagVertex> &vertices) {
+int sum_num_ops(const std::vector<Vertex> &vertices) {
   int n = 0;
   for (const auto &vertex : vertices) {
     n += vertex.num_ops();
@@ -100,7 +97,7 @@ int sum_num_ops(const std::vector<DiagVertex> &vertices) {
   return n;
 }
 
-std::string to_string(const std::vector<DiagVertex> &vertex_vec) {
+std::string to_string(const std::vector<Vertex> &vertex_vec) {
   // print the creation operator above
   std::vector<std::string> lines;
   for (int s = 0; s < osi->num_spaces(); ++s) {
@@ -114,7 +111,7 @@ std::string to_string(const std::vector<DiagVertex> &vertex_vec) {
   return join(lines, "\n");
 }
 
-std::string signature(const DiagVertex &vertex) {
+std::string signature(const Vertex &vertex) {
   std::string str;
   for (int s = 0; s < osi->num_spaces(); ++s) {
     str += std::to_string(vertex.cre(s));
@@ -125,7 +122,7 @@ std::string signature(const DiagVertex &vertex) {
   return str;
 }
 
-std::string signature(const std::vector<DiagVertex> &vertex_vec) {
+std::string signature(const std::vector<Vertex> &vertex_vec) {
   std::string s;
   for (const auto &vertex : vertex_vec) {
     s += signature(vertex);

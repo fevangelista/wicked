@@ -9,7 +9,7 @@
 
 /// A class to represent a collection of creation and annilation
 /// operators, which we call a diagram vertex
-class DiagVertex {
+class Vertex {
   // Here we use an optimized way to store the vertex
   // We assume that we work at most with 8 different spaces, which
   // should be enough for virtually any type of application
@@ -18,10 +18,10 @@ class DiagVertex {
 
 public:
   /// Constructor
-  DiagVertex();
+  Vertex();
 
   /// Constructor. Set number of creation and annihilation operators
-  DiagVertex(const std::vector<int> &cre, const std::vector<int> &ann);
+  Vertex(const std::vector<int> &cre, const std::vector<int> &ann);
 
   /// Return a vector of pairs of creation/annihilation operators
   const vertex_t &vertex() const;
@@ -50,19 +50,19 @@ public:
   int num_ops(int space) const;
 
   /// Comparison operator used for sorting
-  bool operator<(DiagVertex const &other) const;
+  bool operator<(Vertex const &other) const;
 
   // Adds the operator count of another object
-  DiagVertex &operator+=(const DiagVertex &rhs);
+  Vertex &operator+=(const Vertex &rhs);
 
   // Subtracts the operator count of another object
-  DiagVertex &operator-=(const DiagVertex &rhs);
+  Vertex &operator-=(const Vertex &rhs);
 
   /// Return a string representation of the operator
   std::string str() const;
 
   /// Write a string representation of the operator to a stream
-  friend std::ostream &operator<<(std::ostream &os, const DiagVertex &v);
+  friend std::ostream &operator<<(std::ostream &os, const Vertex &v);
 
 private:
   /// This object stores the number of creation/annihilation
@@ -74,13 +74,13 @@ private:
 
 /// Return the sum of the number creation and annihilation operator for a vector
 /// of vertices
-int sum_num_ops(const std::vector<DiagVertex> &vertices);
+int sum_num_ops(const std::vector<Vertex> &vertices);
 
 /// Return a nice string representation of a vector of vertices
-std::string to_string(const std::vector<DiagVertex> &vertex_vec);
+std::string to_string(const std::vector<Vertex> &vertex_vec);
 
-std::string signature(const DiagVertex &vertex);
+std::string signature(const Vertex &vertex);
 
-std::string signature(const std::vector<DiagVertex> &vertex_vec);
+std::string signature(const std::vector<Vertex> &vertex_vec);
 
 #endif // _wicked_diag_vertex_h_

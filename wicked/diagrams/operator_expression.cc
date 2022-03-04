@@ -1,14 +1,9 @@
-#include "diag_operator_expression.h"
+#include "operator_expression.h"
 #include "helpers.h"
+#include "operator.h"
 #include "orbital_space.h"
 
 DiagOpExpression::DiagOpExpression() {}
-
-// DiagOpExpression::DiagOpExpression(const std::vector<DiagOperator>
-// &vec_dop,
-//                                   scalar_t factor) {
-//  add(vec_dop, factor);
-//}
 
 DiagOpExpression::DiagOpExpression(
     const std::vector<OperatorProduct> &vec_vec_dop, scalar_t factor) {
@@ -31,8 +26,24 @@ void DiagOpExpression::add(const OperatorProduct &vec_dop, scalar_t factor) {
   }
 }
 
+void DiagOpExpression::add2(const DiagOpExpression &expr, scalar_t factor) {
+  for (const auto &vec_dop_factor : expr.terms()) {
+    add(vec_dop_factor.first, factor * vec_dop_factor.second);
+  }
+}
+
 const dop_expr_t &DiagOpExpression::sum() const { return terms_; }
 const dop_expr_t &DiagOpExpression::terms() const { return terms_; }
+
+void DiagOpExpression::canonicalize() {
+  dop_expr_t canonical;
+  for (auto [prod, scalar] : terms_) {
+    auto newprod = prod;
+    const auto sign = newprod.canonicalize();
+    canonical[newprod] += sign * scalar;
+  }
+  terms_ = canonical;
+}
 
 DiagOpExpression &DiagOpExpression::operator+=(const DiagOpExpression &rhs) {
   for (const auto &vec_dop_factor : rhs.sum()) {
@@ -52,7 +63,7 @@ DiagOpExpression &DiagOpExpression::operator*=(const DiagOpExpression &rhs) {
   DiagOpExpression result;
   for (const auto &r_vec_dop_factor : sum()) {
     for (const auto &l_vec_dop_factor : rhs.sum()) {
-      std::vector<DiagOperator> prod;
+      std::vector<Operator> prod;
       prod.insert(prod.end(), r_vec_dop_factor.first.begin(),
                   r_vec_dop_factor.first.end());
       prod.insert(prod.end(), l_vec_dop_factor.first.begin(),
@@ -127,7 +138,7 @@ make_diag_operator_expression(const std::string &label,
       ann[space] += 1;
     }
 
-    result.add({DiagOperator(label, cre, ann)});
+    result.add({Operator(label, cre, ann)});
   }
   return result;
 }
@@ -149,7 +160,7 @@ make_diag_operator_expression2(const std::string &label,
         ann[space] += 1;
       }
     }
-    result.add({DiagOperator(label, cre, ann)});
+    result.add({Operator(label, cre, ann)});
   }
   return result;
 }
@@ -162,11 +173,11 @@ DiagOpExpression commutator(const DiagOpExpression &A,
       auto &vec_A = vec_factor_A.first;
       auto &vec_B = vec_factor_B.first;
 
-      std::vector<DiagOperator> vec_AB;
+      std::vector<Operator> vec_AB;
       vec_AB.insert(vec_AB.end(), vec_A.begin(), vec_A.end());
       vec_AB.insert(vec_AB.end(), vec_B.begin(), vec_B.end());
 
-      std::vector<DiagOperator> vec_BA;
+      std::vector<Operator> vec_BA;
       vec_BA.insert(vec_BA.end(), vec_B.begin(), vec_B.end());
       vec_BA.insert(vec_BA.end(), vec_A.begin(), vec_A.end());
 

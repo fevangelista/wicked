@@ -19,7 +19,7 @@ void export_SymbolicTerm(py::module &m);
 void export_Expression(py::module &m);
 void export_Equation(py::module &m);
 
-void export_DiagOperator(py::module &m);
+void export_Operator(py::module &m);
 void export_DiagOpExpression(py::module &m);
 void export_WickTheorem(py::module &m);
 
@@ -58,7 +58,7 @@ PYBIND11_MODULE(_wicked, m) {
   export_SymbolicTerm(m);
   export_Expression(m);
   export_Equation(m);
-  export_DiagOperator(m);
+  export_Operator(m);
   export_DiagOpExpression(m);
   export_WickTheorem(m);
 }

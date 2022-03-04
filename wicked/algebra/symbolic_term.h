@@ -61,6 +61,9 @@ public:
   /// Canonicalize this term and return the overall phase factor
   scalar_t canonicalize();
 
+  /// Canonicalize this term and return the overall phase factor
+  // bool is_connected();
+
   scalar_t simplify();
 
   /// Comparison operator used for sorting

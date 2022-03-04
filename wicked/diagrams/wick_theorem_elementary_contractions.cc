@@ -2,8 +2,9 @@
 
 #include "combinatorics.h"
 #include "contraction.h"
-#include "diag_operator.h"
 #include "helpers.h"
+#include "operator.h"
+#include "operator_product.h"
 #include "stl_utils.hpp"
 
 #include "wick_theorem.h"
@@ -77,7 +78,7 @@ void WickTheorem::elementary_contractions_occupied(
   for (int l = 0; l < nops; l++) {             // loop over creation (left)
     for (int r = l + 1; r < nops; r++) {       // loop over annihilation (right)
       if (ops[l].cre(s) * ops[r].ann(s) > 0) { // is contraction viable?
-        std::vector<DiagVertex> new_contr(nops);
+        std::vector<Vertex> new_contr(nops);
         new_contr[l].set_cre(s, 1);
         new_contr[r].set_ann(s, 1);
         contr_vec.push_back(new_contr);
@@ -96,7 +97,7 @@ void WickTheorem::elementary_contractions_unoccupied(
   for (int l = 0; l < nops; l++) {             // loop over annihilation (left)
     for (int r = l + 1; r < nops; r++) {       // loop over creation (right)
       if (ops[l].ann(s) * ops[r].cre(s) > 0) { // is contraction viable?
-        std::vector<DiagVertex> new_contr(nops);
+        std::vector<Vertex> new_contr(nops);
         new_contr[l].set_ann(s, 1);
         new_contr[r].set_cre(s, 1);
         contr_vec.push_back(new_contr);
@@ -176,9 +177,9 @@ void WickTheorem::elementary_contractions_general(
         // exclude operators that have legs only on one operator
         if (nops_contracted < 2)
           continue;
-        // for a vector of DiagVertex objects that represent this
+        // for a vector of Vertex objects that represent this
         // contraction
-        std::vector<DiagVertex> new_contr(nops);
+        std::vector<Vertex> new_contr(nops);
         for (int A = 0; A < nops; A++) {
           new_contr[A].set_cre(s, cre_legs[A]);
           new_contr[A].set_ann(s, ann_legs[A]);

@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-#include "diag_operator.h"
+#include "operator_product.h"
 #include "wicked-def.h"
 
 using dop_expr_t = std::map<OperatorProduct, scalar_t>;
@@ -22,9 +22,13 @@ public:
   /// Add a vector of diagrams to this sum
   void add(const OperatorProduct &vec_dop, scalar_t factor = 1);
 
+  void add2(const DiagOpExpression &expr, scalar_t factor = 1);
+
   /// Return the sum object
   const dop_expr_t &sum() const;
   const dop_expr_t &terms() const;
+
+  void canonicalize();
 
   /// addition assignment
   DiagOpExpression &operator+=(const DiagOpExpression &rhs);

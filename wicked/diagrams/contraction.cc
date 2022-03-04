@@ -1,7 +1,7 @@
-#import "contraction.h"
+#include "contraction.h"
 
-#import "../orbital_space.h"
-#import "diag_vertex.h"
+#include "../orbital_space.h"
+#include "vertex.h"
 
 int ElementaryContraction::num_ops() const {
   int n = 0;

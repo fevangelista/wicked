@@ -6,7 +6,8 @@
 #include "fmt/format.h"
 
 #include "contraction.h"
-#include "diag_operator.h"
+#include "operator.h"
+#include "operator_product.h"
 
 #include "../algebra/sqoperator.h"
 #include "../algebra/tensor.h"
@@ -18,7 +19,7 @@ void print_contraction_graph(const OperatorProduct &ops,
                              const std::vector<int> ops_perm,
                              const std::vector<int> contr_perm) {
 
-  std::vector<DiagVertex> op_vertex_vec;
+  std::vector<Vertex> op_vertex_vec;
   for (int o : ops_perm) {
     op_vertex_vec.push_back(ops[o].vertex());
   }
@@ -29,7 +30,7 @@ void print_contraction_graph(const OperatorProduct &ops,
   cout << endl;
   cout << to_string(op_vertex_vec) << endl;
   for (int c : contr_perm) {
-    std::vector<DiagVertex> permuted_contr;
+    std::vector<Vertex> permuted_contr;
     for (int o : ops_perm) {
       permuted_contr.push_back(contractions[c][o]);
     }
