@@ -16,8 +16,7 @@
 using namespace std;
 
 std::vector<ElementaryContraction>
-WickTheorem::generate_elementary_contractions(
-    const std::vector<DiagOperator> &ops) {
+WickTheorem::generate_elementary_contractions(const OperatorProduct &ops) {
   PRINT(PrintLevel::Summary,
         std::cout << "\n- Step 1. Generating elementary contractions"
                   << std::endl;)
@@ -72,7 +71,7 @@ WickTheorem::generate_elementary_contractions(
 }
 
 void WickTheorem::elementary_contractions_occupied(
-    const std::vector<DiagOperator> &ops, int s,
+    const OperatorProduct &ops, int s,
     std::vector<ElementaryContraction> &contr_vec) {
   int nops = ops.size();
   for (int l = 0; l < nops; l++) {             // loop over creation (left)
@@ -91,7 +90,7 @@ void WickTheorem::elementary_contractions_occupied(
 }
 
 void WickTheorem::elementary_contractions_unoccupied(
-    const std::vector<DiagOperator> &ops, int s,
+    const OperatorProduct &ops, int s,
     std::vector<ElementaryContraction> &contr_vec) {
   int nops = ops.size();
   for (int l = 0; l < nops; l++) {             // loop over annihilation (left)
@@ -110,7 +109,7 @@ void WickTheorem::elementary_contractions_unoccupied(
 }
 
 void WickTheorem::elementary_contractions_general(
-    const std::vector<DiagOperator> &ops, int s,
+    const OperatorProduct &ops, int s,
     std::vector<ElementaryContraction> &contr_vec) {
   int nops = ops.size();
   // compute the largest possible cumulant for this space

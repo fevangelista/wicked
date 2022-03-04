@@ -16,9 +16,9 @@
 
 using namespace std;
 
-void WickTheorem::generate_composite_contractions(
-    const std::vector<DiagOperator> &ops, const int minrank,
-    const int maxrank) {
+void WickTheorem::generate_composite_contractions(const OperatorProduct &ops,
+                                                  const int minrank,
+                                                  const int maxrank) {
   PRINT(PrintLevel::Summary,
         std::cout << "\n- Step 2. Generating composite contractions"
                   << std::endl;)

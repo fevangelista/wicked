@@ -22,9 +22,14 @@ void export_DiagOpExpression(py::module &m) {
   py::class_<DiagOpExpression, std::shared_ptr<DiagOpExpression>>(
       m, "DiagOpExpression")
       .def(py::init<>())
-      .def(py::init<const std::vector<std::vector<DiagOperator>> &, scalar_t>(),
+      .def(py::init<const std::vector<OperatorProduct> &, scalar_t>(),
            py::arg("vec_vec_dop"), py::arg("factor") = rational(1))
       .def("add", &DiagOpExpression::add)
+      .def("__add__",
+           [](DiagOpExpression &rhs, const DiagOpExpression &lhs) {
+             rhs += lhs;
+             return rhs;
+           })
       .def("__repr__", &DiagOpExpression::str)
       .def("__str__", &DiagOpExpression::str)
       .def("__matmul__", [](const DiagOpExpression &lhs,
@@ -51,8 +56,8 @@ void export_WickTheorem(py::module &m) {
   py::class_<WickTheorem, std::shared_ptr<WickTheorem>>(m, "WickTheorem")
       .def(py::init<>())
       .def("contract",
-           py::overload_cast<scalar_t, const std::vector<DiagOperator> &, int,
-                             int>(&WickTheorem::contract))
+           py::overload_cast<scalar_t, const OperatorProduct &, int, int>(
+               &WickTheorem::contract))
       .def("contract",
            py::overload_cast<scalar_t, const DiagOpExpression &, int, int>(
                &WickTheorem::contract))

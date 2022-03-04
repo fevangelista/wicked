@@ -93,8 +93,10 @@ int sum_num_ops(const std::vector<DiagOperator> &ops) {
   return r;
 }
 
-DiagOperatorProduct::DiagOperatorProduct() {}
-
-DiagOperatorProduct::DiagOperatorProduct(
-    const std::vector<DiagOperator> &operators)
-    : operators_(operators) {}
+int OperatorProduct::num_ops() const {
+  int r = 0;
+  for (const auto &op : elements_) {
+    r += op.num_ops();
+  }
+  return r;
+}

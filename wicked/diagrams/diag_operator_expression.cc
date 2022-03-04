@@ -11,15 +11,13 @@ DiagOpExpression::DiagOpExpression() {}
 //}
 
 DiagOpExpression::DiagOpExpression(
-    const std::vector<std::vector<DiagOperator>> &vec_vec_dop,
-    scalar_t factor) {
+    const std::vector<OperatorProduct> &vec_vec_dop, scalar_t factor) {
   for (const auto &vec_dop : vec_vec_dop) {
     add(vec_dop, factor);
   }
 }
 
-void DiagOpExpression::add(const std::vector<DiagOperator> &vec_dop,
-                           scalar_t factor) {
+void DiagOpExpression::add(const OperatorProduct &vec_dop, scalar_t factor) {
   auto search = terms_.find(vec_dop);
 
   if (search != terms_.end()) {

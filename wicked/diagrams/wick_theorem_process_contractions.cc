@@ -25,28 +25,28 @@
   }
 
 void print_key(std::tuple<int, int, bool, int> key, int n);
-void print_contraction(const std::vector<DiagOperator> &ops,
+void print_contraction(const OperatorProduct &ops,
                        const std::vector<Tensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<SQOperator> &sqops,
                        const std::vector<int> sign_order);
 
-void print_contraction_graph(const std::vector<DiagOperator> &ops,
+void print_contraction_graph(const OperatorProduct &ops,
                              const CompositeContraction &contractions,
                              const std::vector<int> ops_perm,
                              const std::vector<int> contr_perm);
 
-std::string contraction_signature(const std::vector<DiagOperator> &ops,
+std::string contraction_signature(const OperatorProduct &ops,
                                   const CompositeContraction &contractions,
                                   const std::vector<int> &ops_perm,
                                   const std::vector<int> &contr_perm);
 
 using namespace std;
 
-Expression
-WickTheorem::process_contractions(scalar_t factor,
-                                  const std::vector<DiagOperator> &ops,
-                                  const int minrank, const int maxrank) {
+Expression WickTheorem::process_contractions(scalar_t factor,
+                                             const OperatorProduct &ops,
+                                             const int minrank,
+                                             const int maxrank) {
   PRINT(PrintLevel::Summary,
         std::cout << "\n- Step 3. Processing contractions" << std::endl;)
 
@@ -56,7 +56,7 @@ WickTheorem::process_contractions(scalar_t factor,
   // contraction_vec stores a list of elementary contractions appearing
   // in a term
   int nprocessed = 0;
-  int ops_rank = sum_num_ops(ops);
+  int ops_rank = ops.num_ops();
   for (const auto &contraction_vec : contractions_) {
     int contr_rank = 0;
     for (int c : contraction_vec) {
@@ -99,10 +99,9 @@ WickTheorem::process_contractions(scalar_t factor,
   return result;
 }
 
-std::tuple<std::vector<DiagOperator>, CompositeContraction, scalar_t>
+std::tuple<OperatorProduct, CompositeContraction, scalar_t>
 WickTheorem::canonicalize_contraction_graph(
-    const std::vector<DiagOperator> &ops,
-    const CompositeContraction &contractions) {
+    const OperatorProduct &ops, const CompositeContraction &contractions) {
   for (const auto &op : ops) {
     if (op.num_ops() % 2 != 0) {
       auto msg =
@@ -266,7 +265,7 @@ WickTheorem::canonicalize_contraction_graph(
         cout << "\n Best permutation of contractions: ";
         PRINT_ELEMENTS(best_contr_perm); cout << endl;);
 
-  std::vector<DiagOperator> best_ops;
+  OperatorProduct best_ops;
   for (int o : best_ops_perm) {
     best_ops.push_back(ops[o]);
   }
@@ -291,7 +290,7 @@ WickTheorem::canonicalize_contraction_graph(
   return std::make_tuple(best_ops, best_contractions, sign);
 }
 
-std::string contraction_signature(const std::vector<DiagOperator> &ops,
+std::string contraction_signature(const OperatorProduct &ops,
                                   const CompositeContraction &contractions,
                                   const std::vector<int> &ops_perm,
                                   const std::vector<int> &contr_perm) {
@@ -314,7 +313,7 @@ std::string contraction_signature(const std::vector<DiagOperator> &ops,
 }
 
 std::pair<SymbolicTerm, scalar_t>
-WickTheorem::evaluate_contraction(const std::vector<DiagOperator> &ops,
+WickTheorem::evaluate_contraction(const OperatorProduct &ops,
                                   const CompositeContraction &contractions,
                                   scalar_t factor) {
   // 1. Get the Tensor objects and SQOperator vector corresponding to the
@@ -520,7 +519,7 @@ WickTheorem::evaluate_contraction(const std::vector<DiagOperator> &ops,
 
 std::tuple<std::vector<Tensor>, std::vector<SQOperator>,
            std::map<std::tuple<int, int, bool, int>, int>>
-WickTheorem::contraction_tensors_sqops(const std::vector<DiagOperator> &ops) {
+WickTheorem::contraction_tensors_sqops(const OperatorProduct &ops) {
 
   std::vector<SQOperator> sqops;
   std::vector<Tensor> tensors;
@@ -615,7 +614,7 @@ std::vector<int> WickTheorem::vertex_vec_to_pos(
 }
 
 scalar_t
-WickTheorem::combinatorial_factor(const std::vector<DiagOperator> &ops,
+WickTheorem::combinatorial_factor(const OperatorProduct &ops,
                                   const CompositeContraction &contractions) {
 
   scalar_t factor = 1;

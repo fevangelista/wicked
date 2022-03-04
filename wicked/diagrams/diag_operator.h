@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "../product.hpp"
 #include "diag_vertex.h"
 #include "wicked-def.h"
 
@@ -54,18 +55,16 @@ private:
   DiagVertex vertex_;
 };
 
-class DiagOperatorProduct {
+class OperatorProduct : public Product<DiagOperator> {
 public:
-  /// Constructor
-  DiagOperatorProduct();
+  /// Constructors
+  OperatorProduct() : Product<DiagOperator>() {}
+  OperatorProduct(const std::vector<DiagOperator> &operators)
+      : Product<DiagOperator>(operators) {}
+  OperatorProduct(std::initializer_list<DiagOperator> operators)
+      : Product<DiagOperator>(operators) {}
 
-public:
-  /// Constructor
-  DiagOperatorProduct(const std::vector<DiagOperator> &operators);
-
-private:
-  ///
-  std::vector<DiagOperator> operators_;
+  int num_ops() const;
 };
 
 // Helper functions

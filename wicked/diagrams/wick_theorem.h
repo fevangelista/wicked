@@ -24,7 +24,7 @@ public:
   WickTheorem();
 
   /// Contract a product of operators
-  Expression contract(scalar_t factor, const std::vector<DiagOperator> &ops,
+  Expression contract(scalar_t factor, const OperatorProduct &ops,
                       const int minrank, const int maxrank);
 
   /// Contract a product of sums of operators
@@ -67,21 +67,21 @@ private:
 
   /// Generates all elementary contractions
   std::vector<ElementaryContraction>
-  generate_elementary_contractions(const std::vector<DiagOperator> &ops);
+  generate_elementary_contractions(const OperatorProduct &ops);
 
   /// Generates elementary contractions of occupied spaces
   void elementary_contractions_occupied(
-      const std::vector<DiagOperator> &ops, int s,
+      const OperatorProduct &ops, int s,
       std::vector<ElementaryContraction> &contr_vec);
 
   /// Generates elementary contractions of occupied spaces
   void elementary_contractions_unoccupied(
-      const std::vector<DiagOperator> &ops, int s,
+      const OperatorProduct &ops, int s,
       std::vector<ElementaryContraction> &contr_vec);
 
   /// Generates elementary contractions of general spaces
   void elementary_contractions_general(
-      const std::vector<DiagOperator> &ops, int s,
+      const OperatorProduct &ops, int s,
       std::vector<ElementaryContraction> &contr_vec);
 
   //
@@ -91,7 +91,7 @@ private:
 
   /// Generates all composite contractions for a given contraction
   /// pattern stored in ops
-  void generate_composite_contractions(const std::vector<DiagOperator> &ops,
+  void generate_composite_contractions(const OperatorProduct &ops,
                                        const int minrank, const int maxrank);
 
   /// Backtracking algorithm used to generate all contractions product of
@@ -133,20 +133,19 @@ private:
   //
 
   /// Process the contractions generated in step 2.
-  Expression process_contractions(scalar_t factor,
-                                  const std::vector<DiagOperator> &ops,
+  Expression process_contractions(scalar_t factor, const OperatorProduct &ops,
                                   const int minrank, const int maxrank);
 
   /// Apply the contraction to this set of operators and produce a term
   std::pair<SymbolicTerm, scalar_t>
-  evaluate_contraction(const std::vector<DiagOperator> &ops,
+  evaluate_contraction(const OperatorProduct &ops,
                        const CompositeContraction &contractions,
                        scalar_t factor);
 
   /// Return the tensors and operators correspoding to a product of operators
   std::tuple<std::vector<Tensor>, std::vector<SQOperator>,
              std::map<std::tuple<int, int, bool, int>, int>>
-  contraction_tensors_sqops(const std::vector<DiagOperator> &ops);
+  contraction_tensors_sqops(const OperatorProduct &ops);
 
   std::vector<int>
   vertex_vec_to_pos(const ElementaryContraction &vertex_vec,
@@ -155,12 +154,12 @@ private:
                     bool creation);
 
   /// Return the combinatorial factor corresponding to a contraction pattern
-  scalar_t combinatorial_factor(const std::vector<DiagOperator> &ops,
+  scalar_t combinatorial_factor(const OperatorProduct &ops,
                                 const CompositeContraction &contractions);
 
   // Create a canonical contraction graph
-  std::tuple<std::vector<DiagOperator>, CompositeContraction, scalar_t>
-  canonicalize_contraction_graph(const std::vector<DiagOperator> &ops,
+  std::tuple<OperatorProduct, CompositeContraction, scalar_t>
+  canonicalize_contraction_graph(const OperatorProduct &ops,
                                  const CompositeContraction &contractions);
 };
 

@@ -13,7 +13,7 @@
 
 using namespace std;
 
-void print_contraction_graph(const std::vector<DiagOperator> &ops,
+void print_contraction_graph(const OperatorProduct &ops,
                              const CompositeContraction &contractions,
                              const std::vector<int> ops_perm,
                              const std::vector<int> contr_perm) {
@@ -45,7 +45,7 @@ void print_key(std::tuple<int, int, bool, int> key, int n) {
        << "] -> " << n << endl;
 }
 
-void print_contraction(const std::vector<DiagOperator> &ops,
+void print_contraction(const OperatorProduct &ops,
                        const std::vector<Tensor> &tensors,
                        const std::vector<std::vector<bool>> &bit_map_vec,
                        const std::vector<SQOperator> &sqops,

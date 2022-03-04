@@ -23,8 +23,7 @@ void WickTheorem::do_canonicalize_graph(bool val) {
   do_canonicalize_graph_ = val;
 }
 
-Expression WickTheorem::contract(scalar_t factor,
-                                 const std::vector<DiagOperator> &ops,
+Expression WickTheorem::contract(scalar_t factor, const OperatorProduct &ops,
                                  const int minrank, const int maxrank) {
 
   ncontractions_ = 0;
