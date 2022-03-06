@@ -100,7 +100,7 @@ Expression WickTheorem::process_contractions(scalar_t factor,
 }
 
 std::tuple<OperatorProduct, CompositeContraction, scalar_t>
-WickTheorem::canonicalize_contraction_graph(
+WickTheorem::canonicalize_contraction_graph_old(
     const OperatorProduct &ops, const CompositeContraction &contractions) {
   for (const auto &op : ops) {
     if (op.num_ops() % 2 != 0) {
@@ -127,7 +127,9 @@ WickTheorem::canonicalize_contraction_graph(
       for (const auto &el_contr : contractions) {
         for (int s = 0; s < osi->num_spaces(); ++s) {
           if (osi->space_type(s) != SpaceType::General) {
-            if (el_contr[i].num_ops(s) * el_contr[j].num_ops(s) > 0) {
+            if (el_contr[i].cre(s) * el_contr[j].ann(s) +
+                    el_contr[i].ann(s) * el_contr[j].cre(s) >
+                0) {
               are_permutable = false;
             }
           }

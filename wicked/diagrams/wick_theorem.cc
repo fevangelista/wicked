@@ -25,7 +25,6 @@ void WickTheorem::do_canonicalize_graph(bool val) {
 
 Expression WickTheorem::contract(scalar_t factor, const OperatorProduct &ops,
                                  const int minrank, const int maxrank) {
-
   ncontractions_ = 0;
   contractions_.clear();
   elementary_contractions_.clear();

@@ -55,6 +55,7 @@ private:
   Vertex vertex_;
 };
 
+/// Check if two operators commute
 bool do_operators_commute(const Operator &a, const Operator &b);
 
 bool operator_noncommuting_less(const Operator &a, const Operator &b);

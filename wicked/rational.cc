@@ -1,3 +1,4 @@
+#include <numeric>
 #include <regex>
 
 #include "rational.h"
@@ -10,8 +11,10 @@ rational::rational(int numerator) {
 }
 
 rational::rational(int numerator, int denominator) {
+  // enforce a positive denominator
   numerator_ = denominator < 0 ? -numerator : numerator;
   denominator_ = denominator < 0 ? -denominator : denominator;
+  // bring to canonical form
   reduce();
 }
 
@@ -164,19 +167,10 @@ std::ostream &operator<<(std::ostream &os, const rational &rhs) {
 }
 
 void rational::reduce() {
-  int n = numerator_ < 0 ? -numerator_ : numerator_;
-  int d = denominator_;
-  int largest = n > d ? n : d;
-
-  int gcd = 0; // greatest common divisor
-
-  for (int loop = largest; loop >= 2; loop--)
-    if (numerator_ % loop == 0 && denominator_ % loop == 0) {
-      gcd = loop;
-      break;
-    }
-
-  if (gcd != 0) {
+  // find the gcd
+  long long int gcd = std::gcd(numerator_, denominator_);
+  // divide numerator and denominator by the gcd
+  if (gcd > 1) {
     numerator_ /= gcd;
     denominator_ /= gcd;
   }

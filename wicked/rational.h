@@ -38,9 +38,9 @@ public:
 
 private:
   /// the numerator
-  int numerator_;
+  long long int numerator_;
   /// the denominator
-  int denominator_;
+  long long int denominator_;
   /// reduce the rational number
   void reduce();
 };
