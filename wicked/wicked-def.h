@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "rational.h"
 #include <bitset>
 
 #define DEBUG_PRINT 0
@@ -18,6 +17,7 @@
 #endif
 
 /// Rational numbers
+#include "rational.h"
 using scalar_t = rational;
 
 /// Bit array

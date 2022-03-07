@@ -3,19 +3,43 @@
 
 #include <ostream>
 
+#define USE_BOOST_RATIONAL 1
+#if USE_BOOST_RATIONAL
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/rational.hpp>
+using rational_t = boost::multiprecision::int1024_t;
+#else
+using rational_t = long long int;
+#endif
+
+// class boost_rational
+//     : public boost::rational<boost::multiprecision::int1024_t> {
+
+// public:
+//   boost_rational(int i)
+//       : boost::rational<boost::multiprecision::int1024_t>(i) {}
+//   /// return a (nice) string representation, and optionally show the sign
+//   std::string str(bool sign = false) const;
+//   double to_double() const;
+//   std::string compile(const std::string &format) const;
+// };
+
 /// A class for rational numbers
 class rational {
+
 public:
   /// initialize with zero
   rational();
   /// initialize with rational (numerator/denominator)
-  rational(int numerator, int denominator);
+  rational(rational_t numerator, rational_t denominator);
+  /// initialize with integer (numerator)
+  rational(rational_t numerator);
   /// initialize with integer (numerator)
   rational(int numerator);
   /// return the numerator
-  int numerator() const;
+  rational_t numerator() const;
   /// return the denominator
-  int denominator() const;
+  rational_t denominator() const;
   /// return this converted to a double
   double to_double() const;
   /// return a (nice) string representation, and optionally show the sign
@@ -38,9 +62,9 @@ public:
 
 private:
   /// the numerator
-  long long int numerator_;
+  rational_t numerator_;
   /// the denominator
-  long long int denominator_;
+  rational_t denominator_;
   /// reduce the rational number
   void reduce();
 };

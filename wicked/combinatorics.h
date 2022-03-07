@@ -7,9 +7,9 @@
 typedef std::vector<std::vector<int>> vecvecint;
 typedef std::vector<int> vecint;
 
-int factorial(int n);
+long long int factorial(int n);
 
-int binomial(int n, int k);
+long long int binomial(int n, int k);
 
 // ==> Integer partitions <==
 

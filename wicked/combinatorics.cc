@@ -9,17 +9,17 @@
 
 #define DEBUG_PRODUCT_SPACE(code) //{ code }
 
-int factorial(int n) {
+long long int factorial(int n) {
   if (n == 0)
     return 1;
-  int result = 1;
-  for (int i = 2; i <= n; ++i) {
+  long long int result = 1;
+  for (long long int i = 2; i <= n; ++i) {
     result *= i;
   }
   return result;
 }
 
-int binomial(int n, int k) {
+long long int binomial(int n, int k) {
   if (k > n)
     return 0;
   if (k * 2 > n)
@@ -27,8 +27,8 @@ int binomial(int n, int k) {
   if (k == 0)
     return 1;
 
-  int result = n;
-  for (int i = 2; i <= k; ++i) {
+  long long int result = n;
+  for (long long int i = 2; i <= k; ++i) {
     result *= (n - i + 1);
     result /= i;
   }

@@ -1,6 +1,7 @@
 #include <numeric>
 #include <regex>
 
+#include "boost/lexical_cast.hpp"
 #include "rational.h"
 
 rational::rational() : numerator_(0), denominator_(1) {}
@@ -10,7 +11,12 @@ rational::rational(int numerator) {
   denominator_ = 1;
 }
 
-rational::rational(int numerator, int denominator) {
+rational::rational(rational_t numerator) {
+  numerator_ = numerator;
+  denominator_ = 1;
+}
+
+rational::rational(rational_t numerator, rational_t denominator) {
   // enforce a positive denominator
   numerator_ = denominator < 0 ? -numerator : numerator;
   denominator_ = denominator < 0 ? -denominator : denominator;
@@ -18,9 +24,9 @@ rational::rational(int numerator, int denominator) {
   reduce();
 }
 
-int rational::numerator() const { return numerator_; }
+rational_t rational::numerator() const { return numerator_; }
 
-int rational::denominator() const { return denominator_; }
+rational_t rational::denominator() const { return denominator_; }
 
 double rational::to_double() const {
   return static_cast<double>(numerator()) / static_cast<double>(denominator());
@@ -73,28 +79,38 @@ std::string rational::str(bool sign) const {
         s += "-";
       } else {
         if (numerator_ != 1) {
+#if USE_BOOST_RATIONAL
+          s += boost::lexical_cast<std::string>(numerator_);
+#else
           s += std::to_string(numerator_);
+#endif
         }
       }
     } else {
+#if USE_BOOST_RATIONAL
+      s += boost::lexical_cast<std::string>(numerator_) + "/" +
+           boost::lexical_cast<std::string>(denominator_);
+#else
       s += std::to_string(numerator_) + "/" + std::to_string(denominator_);
+#endif
     }
   }
   return s;
 }
 
 std::string rational::repr() const {
-  if (numerator_ == 0) {
-    return "0";
-  }
-  std::string s = (numerator_ > 0) ? "+" : "-";
-  if (denominator_ == 1) {
-    s += std::to_string(std::abs(numerator_));
-  } else {
-    s += std::to_string(std::abs(numerator_)) + "/" +
-         std::to_string(denominator_);
-  }
-  return s;
+  // if (numerator_ == 0) {
+  //   return "0";
+  // }
+  // std::string s = (numerator_ > 0) ? "+" : "-";
+  // if (denominator_ == 1) {
+  //   s += std::to_string(std::abs(numerator_));
+  // } else {
+  //   s += std::to_string(std::abs(numerator_)) + "/" +
+  //        std::to_string(denominator_);
+  // }
+  // return s;
+  return str(false);
 }
 
 std::string rational::latex() const {
@@ -108,7 +124,11 @@ std::string rational::latex() const {
       } else if (numerator_ == -1) {
         s += "-";
       } else {
+#if USE_BOOST_RATIONAL
+        s += boost::lexical_cast<std::string>(numerator_);
+#else
         s += std::to_string(numerator_);
+#endif
       }
     } else {
       if (numerator_ > 0) {
@@ -116,8 +136,13 @@ std::string rational::latex() const {
       } else {
         s += "-";
       }
-      s += "\\frac{" + std::to_string(std::abs(numerator_)) + "}{" +
+#if USE_BOOST_RATIONAL
+      s += "\\frac{" + boost::lexical_cast<std::string>(numerator_) + "}{" +
+           boost::lexical_cast<std::string>(denominator_) + "}";
+#else
+      s += "\\frac{" + std::to_string(boost::abs(numerator_)) + "}{" +
            std::to_string(denominator_) + "}";
+#endif
     }
   }
   return s;
@@ -167,8 +192,12 @@ std::ostream &operator<<(std::ostream &os, const rational &rhs) {
 }
 
 void rational::reduce() {
-  // find the gcd
-  long long int gcd = std::gcd(numerator_, denominator_);
+// find the gcd
+#if USE_BOOST_RATIONAL
+  rational_t gcd = boost::gcd(numerator_, denominator_);
+#else
+  rational_t gcd = std::gcd(numerator_, denominator_);
+#endif
   // divide numerator and denominator by the gcd
   if (gcd > 1) {
     numerator_ /= gcd;
@@ -189,7 +218,7 @@ rational make_rational_from_str(const std::string &s) {
   std::string sign = sm[1];
   std::string numerator_str = sm[2];
   std::string denominator_str = sm[3];
-  int numerator = 1, denominator = 1;
+  rational_t numerator = 1, denominator = 1;
   if (sign == "-") {
     numerator *= -1;
   }
@@ -201,3 +230,17 @@ rational make_rational_from_str(const std::string &s) {
   }
   return rational(numerator, denominator);
 }
+
+// std::string boost_rational::str(bool sign) const {
+//   std::stringstream ss;
+//   ss << *this;
+//   return ss.str();
+// }
+
+// double boost_rational::to_double() const {
+//   return boost::rational_cast<double>(*this);
+// }
+
+// std::string boost_rational::compile(const std::string &format) const {
+//   return std::to_string(to_double());
+// }

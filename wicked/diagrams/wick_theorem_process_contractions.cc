@@ -631,14 +631,21 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
     for (int v = 0; v < contraction.size(); v++) {
       const Vertex &vertex = contraction[v];
       for (int s = 0; s < osi->num_spaces(); s++) {
-        auto &[kcre, kann] = vertex.vertex(s);
-        auto &[ncre, nann] = free_vertices[v].vertex(s);
+        const auto &[kcre, kann] = vertex.vertex(s);
+        const auto &[ncre, nann] = free_vertices[v].vertex(s);
         factor *= binomial(ncre, kcre);
         factor *= binomial(nann, kann);
       }
       free_vertices[v] -= vertex;
     }
   }
+  // for (const Vertex &v : free_vertices) {
+  //   for (int s = 0; s < osi->num_spaces(); s++) {
+  //     const auto &[ncre, nann] = v.vertex(s);
+  //     factor /= factorial(ncre);
+  //     factor /= factorial(nann);
+  //   }
+  // }
   std::map<ElementaryContraction, int> contraction_count;
   for (const auto &contraction : contractions) {
     contraction_count[contraction] += 1;
