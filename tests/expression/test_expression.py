@@ -70,7 +70,19 @@ def test_expression3():
     assert str(expr) == "1"
 
 
+def test_expression4():
+    w.reset_space()
+    w.add_space("o", "fermion", "occupied", ["i", "j", "k", "l", "m"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c", "d", "e", "f"])
+    C = w.op("C", ["o+ o"])
+    D = w.op("D", ["v+ v"])
+    CD_bch = w.bch_series(C, D, 2)
+    CD_bch.canonicalize()
+    assert CD_bch.size() == 1
+
+
 if __name__ == "__main__":
     test_expression()
     test_expression2()
     test_expression3()
+    test_expression4()

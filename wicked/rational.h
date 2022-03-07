@@ -71,6 +71,8 @@ private:
 
 /// equal to
 bool operator==(const rational &lhs, const rational &rhs);
+/// not equal to
+bool operator!=(const rational &lhs, const rational &rhs);
 /// unary plus
 rational operator+(rational rhs);
 /// unary minus

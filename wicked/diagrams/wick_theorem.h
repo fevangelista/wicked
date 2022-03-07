@@ -9,7 +9,7 @@ class Tensor;
 class SymbolicTerm;
 class Operator;
 class OperatorProduct;
-class DiagOpExpression;
+class OperatorExpression;
 class Vertex;
 class ElementaryContraction;
 
@@ -29,7 +29,7 @@ public:
                       const int minrank, const int maxrank);
 
   /// Contract a product of sums of operators
-  Expression contract(scalar_t factor, const DiagOpExpression &expr,
+  Expression contract(scalar_t factor, const OperatorExpression &expr,
                       const int minrank, const int maxrank);
 
   /// Set the amount of printing

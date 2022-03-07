@@ -46,7 +46,8 @@ Expression WickTheorem::contract(scalar_t factor, const OperatorProduct &ops,
   return result;
 }
 
-Expression WickTheorem::contract(scalar_t factor, const DiagOpExpression &expr,
+Expression WickTheorem::contract(scalar_t factor,
+                                 const OperatorExpression &expr,
                                  const int minrank, const int maxrank) {
   Expression result;
   for (const auto &[ops, f] : expr.terms()) {

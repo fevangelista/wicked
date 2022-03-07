@@ -42,6 +42,9 @@ bool Operator::operator<(Operator const &other) const {
 
 std::string Operator::str() const {
   std::vector<std::string> s;
+  if (factor() != scalar_t(1)) {
+    s.push_back(factor().str(false));
+  }
   s.push_back(label_);
   s.push_back("{");
   for (int i = 0; i < osi->num_spaces(); ++i) {

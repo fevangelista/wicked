@@ -10,7 +10,7 @@ def test_diag():
     assert str(T1) == "+ t { v+ o }"
 
     T2 = w.op("t", ["v+ v+ o o"])
-    assert str(T2) == "+ t { v+ v+ o o }"
+    assert str(T2) == "+ 1/4 t { v+ v+ o o }"
 
     O2 = w.op("O", ["o+ v+ v o"])
     assert str(O2) == "+ O { o+ v+ v o }"

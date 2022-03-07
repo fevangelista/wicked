@@ -16,9 +16,9 @@ def test_rational():
     assert w.rational(3, 5) * w.rational(1, 2) == w.rational(3, 10)
     assert w.rational(3, 5) / w.rational(1, 2) == w.rational(6, 5)
 
-    assert repr(w.make_rational("1/2")) == "+1/2"
+    assert repr(w.make_rational("1/2")) == "1/2"
     assert repr(w.make_rational("-12")) == "-12"
-    assert repr(w.make_rational("12")) == "+12"
+    assert repr(w.make_rational("12")) == "12"
     assert repr(w.make_rational("-/2")) == "-1/2"
     assert repr(w.make_rational("-0/2")) == "0"
     assert w.make_rational("10/1").str(False) == "10"

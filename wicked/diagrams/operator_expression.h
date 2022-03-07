@@ -10,36 +10,37 @@
 using dop_expr_t = std::map<OperatorProduct, scalar_t>;
 
 /// A class to represent operators
-class DiagOpExpression {
+class OperatorExpression {
 public:
   /// Construct an empty sum
-  DiagOpExpression();
+  OperatorExpression();
 
   /// Construct sum with a vector of diagrams
-  DiagOpExpression(const std::vector<OperatorProduct> &vec_vec_dop,
-                   scalar_t factor = scalar_t(1));
+  OperatorExpression(const std::vector<OperatorProduct> &vec_vec_dop,
+                     scalar_t factor = scalar_t(1));
+
+  size_t size() const;
 
   /// Add a vector of diagrams to this sum
   void add(const OperatorProduct &vec_dop, scalar_t factor = 1);
 
-  void add2(const DiagOpExpression &expr, scalar_t factor = 1);
+  void add2(const OperatorExpression &expr, scalar_t factor = 1);
 
-  /// Return the sum object
-  const dop_expr_t &sum() const;
+  /// Return the terms
   const dop_expr_t &terms() const;
 
   void canonicalize();
 
   /// addition assignment
-  DiagOpExpression &operator+=(const DiagOpExpression &rhs);
+  OperatorExpression &operator+=(const OperatorExpression &rhs);
   /// subtraction assignment
-  DiagOpExpression &operator-=(const DiagOpExpression &rhs);
+  OperatorExpression &operator-=(const OperatorExpression &rhs);
   /// multiplication assignment (scalar)
-  DiagOpExpression &operator*=(const DiagOpExpression &rhs);
+  OperatorExpression &operator*=(const OperatorExpression &rhs);
   /// multiplication assignment (scalar)
-  DiagOpExpression &operator*=(scalar_t factor);
+  OperatorExpression &operator*=(scalar_t factor);
   /// division assignment (scalar)
-  DiagOpExpression &operator/=(scalar_t factor);
+  OperatorExpression &operator/=(scalar_t factor);
 
   /// Return a string representation of the operator
   std::string str() const;
@@ -50,10 +51,11 @@ private:
 };
 
 /// multiplication
-DiagOpExpression operator*(DiagOpExpression lhs, const DiagOpExpression &rhs);
+OperatorExpression operator*(OperatorExpression lhs,
+                             const OperatorExpression &rhs);
 
 /// Write a string representation of the operator to a stream
-std::ostream &operator<<(std::ostream &os, const DiagOpExpression &opsum);
+std::ostream &operator<<(std::ostream &os, const OperatorExpression &opsum);
 
 // Helper functions
 
@@ -63,7 +65,7 @@ std::ostream &operator<<(std::ostream &os, const DiagOpExpression &opsum);
 /// E.g.
 /// auto T1 = make_diag_operator("T1", {"o->v"});
 /// auto F = make_diag_operator("F", {"o->o","o->v","v->o","v->v"});
-DiagOpExpression
+OperatorExpression
 make_diag_operator_expression(const std::string &label,
                               const std::vector<std::string> &components);
 
@@ -73,20 +75,24 @@ make_diag_operator_expression(const std::string &label,
 /// E.g.
 /// auto T1 = make_operator("T1", {"v+ o"});
 /// auto F = make_operator("F", {"o+ o","v+ o","o+ v","v+ v"});
-DiagOpExpression
+OperatorExpression
 make_diag_operator_expression2(const std::string &label,
                                const std::vector<std::string> &components);
 
 /// Creates a new object with the commutator [A,B]
-DiagOpExpression commutator(const DiagOpExpression &A,
-                            const DiagOpExpression &B);
+OperatorExpression commutator(const OperatorExpression &A,
+                              const OperatorExpression &B);
+
+// /// Creates a new object with the commutator [A,B]
+// OperatorExpression
+// nested_commutator(const std::vector<OperatorExpression> &expr_vec);
 
 // /// Creates a new object with the exponential exp(A) truncated at a given
-// order DiagOpExpression exp(const DiagOpExpression &A, int order);
+// order OperatorExpression exp(const OperatorExpression &A, int order);
 
 /// Creates a new object with the Baker-Campbell-Hausdorff expansion of the
 /// quantity exp(-B) A exp(B) truncated at a given order n
-DiagOpExpression bch_series(const DiagOpExpression &A,
-                            const DiagOpExpression &B, int n);
+OperatorExpression bch_series(const OperatorExpression &A,
+                              const OperatorExpression &B, int n);
 
 #endif // _wicked_diag_operator_set_h_

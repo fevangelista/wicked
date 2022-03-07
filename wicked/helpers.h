@@ -50,6 +50,10 @@ public:
 
 template <class T, class F>
 void add_to_map(std::map<T, F> &m, const T &key, const F &value) {
+  // don't add a zero term
+  if (value == 0)
+    return;
+
   // find the key
   auto search = m.find(key);
 

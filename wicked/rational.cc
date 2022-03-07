@@ -174,8 +174,14 @@ rational operator/(rational lhs, const rational &rhs) {
 }
 
 bool operator==(const rational &lhs, const rational &rhs) {
+  if ((lhs.numerator() == 0) and (rhs.numerator() == 0))
+    return true;
   return ((lhs.numerator() == rhs.numerator()) and
           (lhs.denominator() == rhs.denominator()));
+}
+
+bool operator!=(const rational &lhs, const rational &rhs) {
+  return (not(lhs == rhs));
 }
 
 std::ostream &operator<<(std::ostream &os, const rational &rhs) {

@@ -68,11 +68,10 @@ void Expression::add(const Expression &expr, scalar_t scale) {
 
 Expression &Expression::canonicalize() {
   std::map<SymbolicTerm, scalar_t> canonical_terms;
-  for (auto &kv : terms_) {
-    SymbolicTerm term = kv.first;
+  for (const auto &[k, v] : terms_) {
+    SymbolicTerm term = k;
     scalar_t factor = term.canonicalize();
-    factor *= kv.second;
-
+    factor *= v;
     add_to_map(canonical_terms, term, factor);
   }
   terms_ = canonical_terms;

@@ -19,29 +19,32 @@ void export_Operator(py::module &m) {
   m.def("diag_operator", &make_diag_operator, "Create a Operator object");
 }
 
-void export_DiagOpExpression(py::module &m) {
-  py::class_<DiagOpExpression, std::shared_ptr<DiagOpExpression>>(
-      m, "DiagOpExpression")
+void export_OperatorExpression(py::module &m) {
+  py::class_<OperatorExpression, std::shared_ptr<OperatorExpression>>(
+      m, "OperatorExpression")
       .def(py::init<>())
-      .def(py::init<const DiagOpExpression &>())
+      .def(py::init<const OperatorExpression &>())
       .def(py::init<const std::vector<OperatorProduct> &, scalar_t>(),
            py::arg("vec_vec_dop"), py::arg("factor") = rational(1))
-      .def("add", &DiagOpExpression::add)
-      .def("add2", &DiagOpExpression::add2)
+      .def("size", &OperatorExpression::size)
+      .def("add", &OperatorExpression::add)
+      .def("add2", &OperatorExpression::add2)
       .def("__add__",
-           [](DiagOpExpression &rhs, const DiagOpExpression &lhs) {
+           [](OperatorExpression &rhs, const OperatorExpression &lhs) {
              rhs += lhs;
              return rhs;
            })
-      .def("__repr__", &DiagOpExpression::str)
-      .def("__str__", &DiagOpExpression::str)
-      .def("__matmul__", [](const DiagOpExpression &lhs,
-                            const DiagOpExpression &rhs) { return lhs * rhs; })
-      .def("canonicalize", &DiagOpExpression::canonicalize);
+      .def("__repr__", &OperatorExpression::str)
+      .def("__str__", &OperatorExpression::str)
+      .def("__matmul__",
+           [](const OperatorExpression &lhs, const OperatorExpression &rhs) {
+             return lhs * rhs;
+           })
+      .def("canonicalize", &OperatorExpression::canonicalize);
   m.def("op", &make_diag_operator_expression2,
-        "Create a DiagOpExpression object");
+        "Create a OperatorExpression object");
   m.def("commutator", &commutator,
-        "Create the commutator of two DiagOpExpression objects");
+        "Create the commutator of two OperatorExpression objects");
 
   m.def("bch_series", &bch_series,
         "Creates the Baker-Campbell-Hausdorff "
@@ -63,7 +66,7 @@ void export_WickTheorem(py::module &m) {
            py::overload_cast<scalar_t, const OperatorProduct &, int, int>(
                &WickTheorem::contract))
       .def("contract",
-           py::overload_cast<scalar_t, const DiagOpExpression &, int, int>(
+           py::overload_cast<scalar_t, const OperatorExpression &, int, int>(
                &WickTheorem::contract))
       .def("set_print", &WickTheorem::set_print)
       .def("set_max_cumulant", &WickTheorem::set_max_cumulant)
