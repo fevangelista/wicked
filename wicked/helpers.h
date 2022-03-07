@@ -12,8 +12,6 @@
 // Returns a comma separated list of the indices
 std::string join(const std::vector<std::string> &svec,
                  const std::string &sep = ",");
-// std::string to_string(const scalar_t r);
-// std::string to_latex(const scalar_t r);
 
 /// Split a string.  Default delimiters are spaces (\s) and/or commas
 std::vector<std::string> split(const std::string &s,
@@ -165,9 +163,5 @@ public:
 
   int get() { return m_; }
 };
-
-//{
-//  return enumerate2<T,A>(vec);
-//}
 
 #endif // _wicked_helpers_h_

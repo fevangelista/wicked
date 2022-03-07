@@ -22,42 +22,6 @@ std::string join(const std::vector<std::string> &strvec,
   return ss.str();
 }
 
-// std::string to_string(const std::vector<std::string> &strvec,
-//                       const std::string &sep) {
-//   if (strvec.size() == 0)
-//     return std::string();
-
-//   std::ostringstream ss;
-
-//   std::copy(strvec.begin(), strvec.end() - 1,
-//             std::ostream_iterator<std::string>(ss, sep.c_str()));
-//   ss << strvec.back();
-
-//   return ss.str();
-// }
-
-// std::string to_string(const scalar_t r) {
-//   if (r.numerator() == 0) {
-//     return "0";
-//   }
-//   if (r.denominator() == 1) {
-//     return std::to_string(r.numerator());
-//   }
-//   return std::to_string(r.numerator()) + "/" +
-//   std::to_string(r.denominator());
-// }
-
-// std::string to_latex(const scalar_t r) {
-//   if (r.numerator() == 0) {
-//     return "0";
-//   }
-//   if (r.denominator() == 1) {
-//     return std::to_string(r.numerator());
-//   }
-//   return "\frac{" + std::to_string(r.numerator()) + "}{" +
-//          std::to_string(r.denominator()) + "}";
-// }
-
 // trim from start
 inline std::string &ltrim(std::string &s) {
   s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char c) {
@@ -77,42 +41,6 @@ inline std::string &rtrim(std::string &s) {
 
 // trim from both ends
 inline std::string &trim(std::string &s) { return ltrim(rtrim(s)); }
-
-///**
-// * @brief readlines
-// * @param file
-// * @return
-// */
-// std::vector<std::string> readlines(const std::string& file)
-//{
-//    std::vector<std::string> result;
-//    std::string line;
-//    std::ifstream inputfile(file);
-//    if (inputfile.is_open()) {
-//        int k = 0;
-//        while (! inputfile.eof() ) {
-//            getline (inputfile,line);
-//            result.push_back(line);
-////            std::vector<string> split_line;
-////            split(split_line,line, is_any_of(" ") );
-////            foreach(string str,split_line){
-////                if(str[0] == 'a'){
-////                    if(str[1] == '+'){
-////                        term.add(sqCreation,moCore,k);
-////                    }else{
-////                        term.add(sqAnnihilation,moCore,k);
-////                    }
-////                    k++;
-////                }
-////            }
-//        }
-//        inputfile.close();
-//    }else{
-//        std::cout << "Unable to open file: " << file << std::endl;
-//        exit(1);
-//    }
-//    return result;
-//}
 
 std::vector<std::string> split(const std::string &s, regex re) {
   sregex_token_iterator it(s.begin(), s.end(), re, -1);

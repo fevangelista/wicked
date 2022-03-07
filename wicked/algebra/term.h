@@ -32,7 +32,7 @@ public:
   std::string latex() const;
 
 private:
-  scalar_t coefficient_ = {1};
+  scalar_t coefficient_ = {1, 1};
 };
 
 // Helper functions
