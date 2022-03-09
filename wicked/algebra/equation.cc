@@ -147,7 +147,7 @@ std::string Equation::compile(const std::string &format) const {
       args_vec.push_back(t_label);
     }
     str_vec.push_back(join(args_vec, ","));
-    str_vec.push_back(",optimize='optimal')");
+    str_vec.push_back(",optimize=\"optimal\")");
     return join(str_vec, "");
   }
   std::string msg = "Equation::compile() - the argument '" + format +

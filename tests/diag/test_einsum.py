@@ -41,26 +41,26 @@ def test_energy():
     assert len(mbeq["|"]) == 1
     comp = mbeq["|"][0].compile("einsum")
     print(comp)
-    assert comp == 'R += 1.000000000 * np.einsum("ia,ai->",T1["ov"],f["vo"])'
+    assert comp == 'R += 1.000000000 * np.einsum("ia,ai->",T1["ov"],f["vo"],optimize="optimal")'
 
     assert len(mbeq["o|v"]) == 2
     comp = mbeq["o|v"][1].compile("einsum")
     print(comp)
-    assert comp == 'Rov += 1.000000000 * np.einsum("ib,ba->ia",T1["ov"],f["vv"])'
+    assert comp == 'Rov += 1.000000000 * np.einsum("ib,ba->ia",T1["ov"],f["vv"],optimize="optimal")'
 
     comp = mbeq["o|v"][0].compile("einsum")
     print(comp)
-    assert comp == 'Rov += -1.000000000 * np.einsum("ja,ij->ia",T1["ov"],f["oo"])'
+    assert comp == 'Rov += -1.000000000 * np.einsum("ja,ij->ia",T1["ov"],f["oo"],optimize="optimal")'
 
     assert len(mbeq["o|o"]) == 1
     comp = mbeq["o|o"][0].compile("einsum")
     print(comp)
-    assert comp == 'Roo += 1.000000000 * np.einsum("ia,aj->ij",T1["ov"],f["vo"])'
+    assert comp == 'Roo += 1.000000000 * np.einsum("ia,aj->ij",T1["ov"],f["vo"],optimize="optimal")'
 
     assert len(mbeq["v|v"]) == 1
     comp = mbeq["v|v"][0].compile("einsum")
     print(comp)
-    assert comp == 'Rvv += -1.000000000 * np.einsum("ia,bi->ba",T1["ov"],f["vo"])'
+    assert comp == 'Rvv += -1.000000000 * np.einsum("ia,bi->ba",T1["ov"],f["vo"],optimize="optimal")'
 
     expr = wt.contract(w.rational(1), V @ T2, 0, 2)
     mbeq = expr.to_manybody_equation("R")
@@ -68,7 +68,7 @@ def test_energy():
     assert len(mbeq["|"]) == 1
     comp = mbeq["|"][0].compile("einsum")
     print(comp)
-    assert comp == 'R += 0.250000000 * np.einsum("ijab,abij->",T2["oovv"],v["vvoo"])'
+    assert comp == 'R += 0.250000000 * np.einsum("ijab,abij->",T2["oovv"],v["vvoo"],optimize="optimal")'
 
 
 if __name__ == "__main__":
