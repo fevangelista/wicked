@@ -18,6 +18,10 @@ void export_Tensor(py::module &m) {
                     const std::vector<Index> &, SymmetryType>())
       .def("__repr__", &Tensor::str)
       .def("__str__", &Tensor::str)
+      .def("label", &Tensor::label)
+      .def("lower", &Tensor::lower)
+      .def("upper", &Tensor::upper)
+      .def("symmetry", &Tensor::symmetry)
       .def("latex", &Tensor::latex)
       .def("compile", &Tensor::compile);
 
