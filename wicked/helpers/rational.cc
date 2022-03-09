@@ -1,7 +1,10 @@
 #include <numeric>
 #include <regex>
 
+#if USE_BOOST_RATIONAL
 #include "boost/lexical_cast.hpp"
+#endif
+
 #include "rational.h"
 
 rational::rational() : numerator_(0), denominator_(1) {}
