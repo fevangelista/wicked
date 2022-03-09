@@ -639,15 +639,7 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
       free_vertices[v] -= vertex;
     }
   }
-  // this code divides the numerator by the number of permutations of equivalent
-  // uncontracted operators
-  // for (const Vertex &v : free_vertices) {
-  //   for (int s = 0; s < osi->num_spaces(); s++) {
-  //     const auto &[ncre, nann] = v.vertex(s);
-  //     factor /= factorial(ncre);
-  //     factor /= factorial(nann);
-  //   }
-  // }
+
   std::map<ElementaryContraction, int> contraction_count;
   for (const auto &contraction : contractions) {
     contraction_count[contraction] += 1;

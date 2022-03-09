@@ -68,6 +68,13 @@ void export_WickTheorem(py::module &m) {
       .def("contract",
            py::overload_cast<scalar_t, const OperatorExpression &, int, int>(
                &WickTheorem::contract))
+      .def(
+          "contract",
+          [](WickTheorem &wt, const OperatorExpression &expr, const int minrank,
+             const int maxrank) {
+            return wt.contract(scalar_t(1), expr, minrank, maxrank);
+          },
+          "expr"_a, "minrank"_a, "maxrank"_a)
       .def("set_print", &WickTheorem::set_print)
       .def("set_max_cumulant", &WickTheorem::set_max_cumulant)
       .def("do_canonicalize_graph", &WickTheorem::do_canonicalize_graph);

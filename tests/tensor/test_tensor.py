@@ -31,7 +31,7 @@ def test_tensor():
     # Create a tensor with lower and upper indices
     t = w.tensor("T", ["v_0", "a_0"], ["o_0", "a_1"], w.sym.none)
     assert str(t) == "T^{o0,a1}_{v0,a0}"
-    assert t.latex() == "T^{i v}_{a u}"
+    assert t.latex() == "{T}^{i v}_{a u}"
 
 
 if __name__ == "__main__":

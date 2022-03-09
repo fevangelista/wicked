@@ -171,7 +171,9 @@ Expression::to_manybody_equation(const std::string &label) const {
     reverse(signature_str_lower.begin(), signature_str_lower.end());
     auto signature_str = signature_str_upper + "|" + signature_str_lower;
     lhs.add(lhs_tensor);
-    factor *= lhs_tensor.symmetry_factor();
+    //// REMOVED HERE
+    // factor *= lhs_tensor.symmetry_factor();
+    //// REMOVED HERE
 
     SymbolicTerm rhs;
     for (const auto &tensor : term.tensors()) {

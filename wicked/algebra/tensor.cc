@@ -111,7 +111,7 @@ std::string Tensor::latex() const {
   }
 
   std::regex num_re("1|2|3|4|5|6|7|8|9|0");
-  std::string label_wo_num = std::regex_replace(label_, num_re, "");
+  std::string label_wo_num = label_; // std::regex_replace(label_, num_re, "");
 
   std::vector<std::string> greek_letters{
       "alpha", "beta",    "gamma",   "delta", "epsilon", "zeta",
@@ -120,10 +120,10 @@ std::string Tensor::latex() const {
       "tau",   "upsilon", "phi",     "chi",   "psi",     "omega"};
   if (std::find(greek_letters.begin(), greek_letters.end(), label_wo_num) !=
       greek_letters.end()) {
-    return ("\\" + label_wo_num + "^{" + join(str_vec_upper, " ") + "}_{" +
+    return ("{\\" + label_wo_num + "}^{" + join(str_vec_upper, " ") + "}_{" +
             join(str_vec_lower, " ") + "}");
   }
-  return (label_wo_num + "^{" + join(str_vec_upper, " ") + "}_{" +
+  return ("{" + label_wo_num + "}^{" + join(str_vec_upper, " ") + "}_{" +
           join(str_vec_lower, " ") + "}");
 }
 
