@@ -64,7 +64,7 @@ FieldType string_to_field_type(const std::string &str) {
   }
   throw std::runtime_error(
       "\nstring_to_field_type() - called with an invalid string (" + str + ")" +
-      "\nValid options are: [occupied,unoccupied,general]");
+      "\nValid options are: [fermion]");
   return FieldType::Fermion;
 }
 
