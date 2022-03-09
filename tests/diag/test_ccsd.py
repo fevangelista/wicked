@@ -246,7 +246,7 @@ def test_r2_1():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), Vvvoo, 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("1 v^{o0,o1}_{v0,v1}")
+    val2 = w.expression("1/4 v^{o0,o1}_{v0,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -258,7 +258,7 @@ def test_r2_2():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), w.commutator(Fvv, T2), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("-2 f^{v2}_{v0} t^{o0,o1}_{v1,v2}")
+    val2 = w.expression("-1/2 f^{v2}_{v0} t^{o0,o1}_{v1,v2}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -270,7 +270,7 @@ def test_r2_3():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), w.commutator(Foo, T2), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("2 f^{o0}_{o2} t^{o1,o2}_{v0,v1}")
+    val2 = w.expression("1/2 f^{o0}_{o2} t^{o1,o2}_{v0,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -282,7 +282,7 @@ def test_r2_4():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), w.commutator(Voooo, T2), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("1/2 t^{o2,o3}_{v0,v1} v^{o0,o1}_{o2,o3}")
+    val2 = w.expression("1/8 t^{o2,o3}_{v0,v1} v^{o0,o1}_{o2,o3}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -294,7 +294,7 @@ def test_r2_5():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), w.commutator(Vvvvv, T2), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("1/2 t^{o0,o1}_{v2,v3} v^{v2,v3}_{v0,v1}")
+    val2 = w.expression("1/8 t^{o0,o1}_{v2,v3} v^{v2,v3}_{v0,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -306,7 +306,7 @@ def test_r2_6():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), w.commutator(Vovov, T2), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("-4 t^{o0,o2}_{v0,v2} v^{o1,v2}_{o2,v1}")
+    val2 = w.expression("- t^{o0,o2}_{v0,v2} v^{o1,v2}_{o2,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -318,7 +318,7 @@ def test_r2_7():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), w.commutator(Vvvov, T1), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("-2 t^{o0}_{v2} v^{o1,v2}_{v0,v1}")
+    val2 = w.expression("-1/2 t^{o0}_{v2} v^{o1,v2}_{v0,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -330,7 +330,7 @@ def test_r2_8():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1), w.commutator(Vovoo, T1), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("-2 t^{o2}_{v0} v^{o0,o1}_{o2,v1}")
+    val2 = w.expression("-1/2 t^{o2}_{v0} v^{o0,o1}_{o2,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -344,10 +344,10 @@ def test_r2_9_12():
     compare_expressions(
         sum.to_manybody_equation("r")["oo|vv"],
         [
-            "2 t^{o0,o2}_{v0,v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
-            "-1 t^{o0,o1}_{v0,v2} t^{o2,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
-            "1/4 t^{o2,o3}_{v0,v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}",
-            "-1 t^{o0,o2}_{v0,v1} t^{o1,o3}_{v2,v3} v^{v2,v3}_{o2,o3}",
+            "1/2 t^{o0,o2}_{v0,v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
+            "-1/4 t^{o0,o1}_{v0,v2} t^{o2,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
+            "1/16 t^{o2,o3}_{v0,v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}",
+            "-1/4 t^{o0,o2}_{v0,v1} t^{o1,o3}_{v2,v3} v^{v2,v3}_{o2,o3}",
         ],
     )
 
@@ -359,7 +359,7 @@ def test_r2_13():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1, 2), w.commutator(w.commutator(Voooo, T1), T1), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("1 t^{o2}_{v0} t^{o3}_{v1} v^{o0,o1}_{o2,o3}")
+    val2 = w.expression("1/4 t^{o2}_{v0} t^{o3}_{v1} v^{o0,o1}_{o2,o3}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -371,7 +371,7 @@ def test_r2_14():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1, 2), w.commutator(w.commutator(Vvvvv, T1), T1), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{v0,v1}")
+    val2 = w.expression("1/4 t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{v0,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -383,7 +383,7 @@ def test_r2_15():
     wt = w.WickTheorem()
     sum = wt.contract(w.rational(1, 2), w.commutator(w.commutator(Vovov, T1), T1), 4, 4)
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("4 t^{o2}_{v0} t^{o0}_{v2} v^{o1,v2}_{o2,v1}")
+    val2 = w.expression("t^{o2}_{v0} t^{o0}_{v2} v^{o1,v2}_{o2,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -398,8 +398,8 @@ def test_r2_16_17():
     compare_expressions(
         sum.to_manybody_equation("r")["oo|vv"],
         [
-            "2 f^{v2}_{o2} t^{o0}_{v2} t^{o1,o2}_{v0,v1}",
-            "2 f^{v2}_{o2} t^{o2}_{v0} t^{o0,o1}_{v1,v2}",
+            "1/2 f^{v2}_{o2} t^{o0}_{v2} t^{o1,o2}_{v0,v1}",
+            "1/2 f^{v2}_{o2} t^{o2}_{v0} t^{o0,o1}_{v1,v2}",
         ],
     )
 
@@ -414,9 +414,9 @@ def test_r2_18_21_22():
     compare_expressions(
         sum.to_manybody_equation("r")["oo|vv"],
         [
-            "2 t^{o2}_{v2} t^{o0,o3}_{v0,v1} v^{o1,v2}_{o2,o3}",
-            "-1 t^{o0}_{v2} t^{o2,o3}_{v0,v1} v^{o1,v2}_{o2,o3}",
-            "4 t^{o2}_{v0} t^{o0,o3}_{v1,v2} v^{o1,v2}_{o2,o3}",
+            "1/2 t^{o2}_{v2} t^{o0,o3}_{v0,v1} v^{o1,v2}_{o2,o3}",
+            "-1/4 t^{o0}_{v2} t^{o2,o3}_{v0,v1} v^{o1,v2}_{o2,o3}",
+            "t^{o2}_{v0} t^{o0,o3}_{v1,v2} v^{o1,v2}_{o2,o3}",
         ],
     )
 
@@ -431,9 +431,9 @@ def test_r2_19_20_23():
     compare_expressions(
         sum.to_manybody_equation("r")["oo|vv"],
         [
-            "2 t^{o2}_{v2} t^{o0,o1}_{v0,v3} v^{v2,v3}_{o2,v1}",
-            "4 t^{o0}_{v2} t^{o1,o2}_{v0,v3} v^{v2,v3}_{o2,v1}",
-            "-1 t^{o2}_{v0} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,v1}",
+            "1/2 t^{o2}_{v2} t^{o0,o1}_{v0,v3} v^{v2,v3}_{o2,v1}",
+            "t^{o0}_{v2} t^{o1,o2}_{v0,v3} v^{v2,v3}_{o2,v1}",
+            "-1/4 t^{o2}_{v0} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,v1}",
         ],
     )
 
@@ -450,7 +450,7 @@ def test_r2_24():
         4,
     )
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("-2 t^{o2}_{v0} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,v1}")
+    val2 = w.expression("-1/2 t^{o2}_{v0} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,v1}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -467,7 +467,7 @@ def test_r2_25():
         4,
     )
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
-    val2 = w.expression("-2 t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} v^{o1,v2}_{o2,o3}")
+    val2 = w.expression("-1/2 t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} v^{o1,v2}_{o2,o3}")
     print_comparison(val, val2)
     assert val == val2
 
@@ -487,11 +487,11 @@ def test_r2_26_30():
     compare_expressions(
         sum.to_manybody_equation("r")["oo|vv"],
         [
-            "-2 t^{o0}_{v2} t^{o2}_{v3} t^{o1,o3}_{v0,v1} v^{v2,v3}_{o2,o3}",
-            "1/2 t^{o0}_{v2} t^{o1}_{v3} t^{o2,o3}_{v0,v1} v^{v2,v3}_{o2,o3}",
-            "-2 t^{o2}_{v0} t^{o3}_{v2} t^{o0,o1}_{v1,v3} v^{v2,v3}_{o2,o3}",
-            "-4 t^{o2}_{v0} t^{o0}_{v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
-            "1/2 t^{o2}_{v0} t^{o3}_{v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}",
+            "-1/2 t^{o0}_{v2} t^{o2}_{v3} t^{o1,o3}_{v0,v1} v^{v2,v3}_{o2,o3}",
+            "1/8 t^{o0}_{v2} t^{o1}_{v3} t^{o2,o3}_{v0,v1} v^{v2,v3}_{o2,o3}",
+            "-1/2 t^{o2}_{v0} t^{o3}_{v2} t^{o0,o1}_{v1,v3} v^{v2,v3}_{o2,o3}",
+            "-1 t^{o2}_{v0} t^{o0}_{v2} t^{o1,o3}_{v1,v3} v^{v2,v3}_{o2,o3}",
+            "1/8 t^{o2}_{v0} t^{o3}_{v1} t^{o0,o1}_{v2,v3} v^{v2,v3}_{o2,o3}",
         ],
     )
 
@@ -509,7 +509,7 @@ def test_r2_31():
     )
     val = sum.to_manybody_equation("r")["oo|vv"][0].rhs_expression()
     val2 = w.expression(
-        "t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,o3}"
+        "1/4 t^{o2}_{v0} t^{o3}_{v1} t^{o0}_{v2} t^{o1}_{v3} v^{v2,v3}_{o2,o3}"
     )
     print_comparison(val, val2)
     assert val == val2

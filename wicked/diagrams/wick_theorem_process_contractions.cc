@@ -626,7 +626,8 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
     free_vertices.push_back(op.vertex());
   }
 
-  // for each contraction find the combinatorial factor
+  // for each contraction find the combinatorial factor associated to
+  // permutations of contracted indices
   for (const auto &contraction : contractions) {
     for (int v = 0; v < contraction.size(); v++) {
       const Vertex &vertex = contraction[v];
@@ -640,6 +641,8 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
     }
   }
 
+  // This last factor accounts for permutations of contractions with
+  // multiplicity higher than one
   std::map<ElementaryContraction, int> contraction_count;
   for (const auto &contraction : contractions) {
     contraction_count[contraction] += 1;
@@ -649,60 +652,3 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
   }
   return factor;
 }
-
-/////
-// void WickTheorem::compare_contraction_perm(
-//     const std::vector<Operator> &ops,
-//     const std::vector<std::vector<Vertex>> &contractions,
-//     const std::vector<int> &ops_perm, const std::vector<int> &contr_perm,
-//     std::vector<int> &best_ops_perm, std::vector<int> &best_contr_perm) {
-//   //  // 1. Compare operators
-//   //  int nops = ops.size();
-//   //  for (int i = 0; i < nops; i++) {
-//   //    if (ops[ops_perm[i]] < ops[best_ops_perm[i]]) {
-//   //      return;
-//   //    }
-//   //  }
-
-//   //  // 2. Compare contractions
-//   //  int ncontr = contractions.size();
-//   //  for (int j = 0; j < nops; j++) {
-//   //    for (int i = 0; i < ncontr; i++) {
-//   //      if (contractions[contr_perm[i]][ops_perm[j]] <
-//   //          contractions[best_contr_perm[i]][best_ops_perm[j]]) {
-//   //        return;
-//   //      }
-//   //    }
-//   //  }
-//   //  best_ops_perm = ops_perm;
-//   //  best_contr_perm = contr_perm;
-
-//   // 1. Compare operators
-//   int nops = ops.size();
-//   bool ops_better = false;
-//   for (int i = 0; i < nops; i++) {
-//     if (ops[best_ops_perm[i]] < ops[ops_perm[i]]) {
-//       ops_better = true;
-//       break;
-//     }
-//   }
-
-//   // 2. Compare contractions
-//   int ncontr = contractions.size();
-//   bool contr_better = false;
-//   for (int i = 0; i < ncontr; i++) {
-//     for (int j = 0; j < nops; j++) {
-//       if (contractions[best_contr_perm[i]][best_ops_perm[j]] <
-//           contractions[contr_perm[i]][ops_perm[j]]) {
-//         contr_better = true;
-//         break;
-//       }
-//     }
-//   }
-//   if (ops_better and contr_better) {
-//     cout << "\n Found better contraction" << endl;
-//     best_ops_perm = ops_perm;
-//     best_contr_perm = contr_perm;
-//     print_contraction(ops, contractions, ops_perm, contr_perm);
-//   }
-// }
