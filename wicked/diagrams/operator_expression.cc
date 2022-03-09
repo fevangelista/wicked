@@ -1,28 +1,16 @@
-#include "operator_expression.h"
-#include "helpers.h"
-#include "operator.h"
-#include "orbital_space.h"
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
 
-OperatorExpression::OperatorExpression() {}
+#include "operator.h"
+#include "operator_expression.h"
+
+OperatorExpression::OperatorExpression()
+    : Algebra<OperatorProduct, scalar_t>() {}
 
 OperatorExpression::OperatorExpression(
     const std::vector<OperatorProduct> &vec_vec_dop, scalar_t factor) {
   for (const auto &vec_dop : vec_vec_dop) {
     add(vec_dop, factor);
-  }
-}
-
-void OperatorExpression::add(const OperatorProduct &vec_dop, scalar_t factor) {
-  auto search = terms_.find(vec_dop);
-
-  if (search != terms_.end()) {
-    /// Found, then just add the factor to the existing term
-    search->second += factor;
-    if (search->second == 0) {
-      terms_.erase(search);
-    }
-  } else {
-    terms_[vec_dop] = factor;
   }
 }
 
@@ -32,9 +20,6 @@ void OperatorExpression::add2(const OperatorExpression &expr, scalar_t factor) {
   }
 }
 
-size_t OperatorExpression::size() const { return terms_.size(); }
-const dop_expr_t &OperatorExpression::terms() const { return terms_; }
-
 void OperatorExpression::canonicalize() {
   dop_expr_t canonical;
   for (auto [prod, scalar] : terms_) {
@@ -43,53 +28,6 @@ void OperatorExpression::canonicalize() {
     add_to_map(canonical, newprod, sign * scalar);
   }
   terms_ = canonical;
-}
-
-OperatorExpression &
-OperatorExpression::operator+=(const OperatorExpression &rhs) {
-  for (const auto &vec_dop_factor : rhs.terms()) {
-    add(vec_dop_factor.first, vec_dop_factor.second);
-  }
-  return *this;
-}
-
-OperatorExpression &
-OperatorExpression::operator-=(const OperatorExpression &rhs) {
-  for (const auto &vec_dop_factor : rhs.terms()) {
-    add(vec_dop_factor.first, -vec_dop_factor.second);
-  }
-  return *this;
-}
-
-OperatorExpression &
-OperatorExpression::operator*=(const OperatorExpression &rhs) {
-  OperatorExpression result;
-  for (const auto &r_vec_dop_factor : terms()) {
-    for (const auto &l_vec_dop_factor : rhs.terms()) {
-      std::vector<Operator> prod;
-      prod.insert(prod.end(), r_vec_dop_factor.first.begin(),
-                  r_vec_dop_factor.first.end());
-      prod.insert(prod.end(), l_vec_dop_factor.first.begin(),
-                  l_vec_dop_factor.first.end());
-      result.add(prod, r_vec_dop_factor.second * l_vec_dop_factor.second);
-    }
-  }
-  terms_ = result.terms_;
-  return *this;
-}
-
-OperatorExpression &OperatorExpression::operator*=(scalar_t factor) {
-  for (auto &vec_dop_factor : terms_) {
-    vec_dop_factor.second *= factor;
-  }
-  return *this;
-}
-
-OperatorExpression &OperatorExpression::operator/=(scalar_t factor) {
-  for (auto &vec_dop_factor : terms_) {
-    vec_dop_factor.second /= factor;
-  }
-  return *this;
 }
 
 std::string OperatorExpression::str() const {

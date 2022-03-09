@@ -14,7 +14,6 @@ def test_expression():
     term.add([w.cre("v_0"), w.ann("o_0")])
     term.set_normal_ordered(True)
     expr.add(term)
-
     assert str(expr) == "{ a+(v0) a-(o0) }"
 
     term = w.SymbolicTerm()

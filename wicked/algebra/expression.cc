@@ -1,16 +1,17 @@
 #include <algorithm>
 #include <iostream>
 
-#include "../orbital_space.h"
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
+#include "helpers/stl_utils.hpp"
+
 #include "equation.h"
 #include "expression.h"
-#include "helpers.h"
 #include "sqoperator.h"
-#include "stl_utils.hpp"
 #include "tensor.h"
 #include "term.h"
 
-Expression::Expression() {}
+Expression::Expression() : Algebra<SymbolicTerm, scalar_t>() {}
 
 void Expression::add(const Term &sterm) {
   SymbolicTerm symterm = sterm.symterm();
@@ -24,20 +25,6 @@ void Expression::add(const Term &sterm) {
     }
   } else {
     terms_[symterm] = sterm.coefficient();
-  }
-}
-
-void Expression::add(const SymbolicTerm &symterm, scalar_t coefficient) {
-  auto search = terms_.find(symterm);
-
-  if (search != terms_.end()) {
-    /// Found, then just add the factor to the existing term
-    search->second += coefficient;
-    if (search->second == 0) {
-      terms_.erase(search);
-    }
-  } else {
-    terms_[symterm] = coefficient;
   }
 }
 

@@ -1,8 +1,8 @@
 #include <cassert>
 
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
 #include "sqopprod.h"
-#include "../helpers.h"
-#include "../orbital_space.h"
 
 SQOpProd::SQOpProd() {
   for (auto &b : cre_) {

@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "../product.hpp"
 #include "../wicked-def.h"
+#include "helpers/product.hpp"
 
 class Vertex;
 

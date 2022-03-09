@@ -1,6 +1,6 @@
 #include "contraction.h"
 
-#include "../orbital_space.h"
+#include "helpers/orbital_space.h"
 #include "vertex.h"
 
 int ElementaryContraction::num_ops() const {

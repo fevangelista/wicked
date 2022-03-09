@@ -1,8 +1,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "../wicked/combinatorics.h"
-#include "../wicked/rational.h"
+#include "helpers/combinatorics.h"
+#include "helpers/rational.h"
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
 
@@ -18,7 +18,6 @@ void export_Tensor(py::module &m);
 void export_SymbolicTerm(py::module &m);
 void export_Expression(py::module &m);
 void export_Equation(py::module &m);
-
 void export_Operator(py::module &m);
 void export_OperatorExpression(py::module &m);
 void export_WickTheorem(py::module &m);

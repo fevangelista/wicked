@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-#include "../product.hpp"
 #include "vertex.h"
 #include "wicked-def.h"
 

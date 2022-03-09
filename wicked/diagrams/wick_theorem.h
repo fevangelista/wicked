@@ -12,6 +12,7 @@ class OperatorProduct;
 class OperatorExpression;
 class Vertex;
 class ElementaryContraction;
+class CompositeContraction;
 
 #include "../algebra/expression.h"
 

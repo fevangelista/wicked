@@ -4,13 +4,14 @@
 #include <map>
 #include <vector>
 
+#include "helpers/algebra.hpp"
 #include "operator_product.h"
 #include "wicked-def.h"
 
 using dop_expr_t = std::map<OperatorProduct, scalar_t>;
 
 /// A class to represent operators
-class OperatorExpression {
+class OperatorExpression : public Algebra<OperatorProduct, scalar_t> {
 public:
   /// Construct an empty sum
   OperatorExpression();
@@ -19,35 +20,14 @@ public:
   OperatorExpression(const std::vector<OperatorProduct> &vec_vec_dop,
                      scalar_t factor = scalar_t(1));
 
-  size_t size() const;
-
-  /// Add a vector of diagrams to this sum
-  void add(const OperatorProduct &vec_dop, scalar_t factor = 1);
-
   void add2(const OperatorExpression &expr, scalar_t factor = 1);
-
-  /// Return the terms
-  const dop_expr_t &terms() const;
 
   void canonicalize();
 
-  /// addition assignment
-  OperatorExpression &operator+=(const OperatorExpression &rhs);
-  /// subtraction assignment
-  OperatorExpression &operator-=(const OperatorExpression &rhs);
-  /// multiplication assignment (scalar)
-  OperatorExpression &operator*=(const OperatorExpression &rhs);
-  /// multiplication assignment (scalar)
-  OperatorExpression &operator*=(scalar_t factor);
-  /// division assignment (scalar)
-  OperatorExpression &operator/=(scalar_t factor);
+  using Algebra<OperatorProduct, scalar_t>::operator*=;
 
   /// Return a string representation of the operator
   std::string str() const;
-
-private:
-  /// A vector containing pairs ((op1, op2, ...), factor)
-  dop_expr_t terms_;
 };
 
 /// multiplication

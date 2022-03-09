@@ -4,13 +4,14 @@
 
 #include "fmt/format.h"
 
-#include "combinatorics.h"
+#include "helpers/combinatorics.h"
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
+#include "helpers/stl_utils.hpp"
+
 #include "contraction.h"
-#include "helpers.h"
 #include "operator.h"
 #include "operator_expression.h"
-#include "orbital_space.h"
-#include "stl_utils.hpp"
 
 #include "../algebra/expression.h"
 #include "../algebra/sqoperator.h"

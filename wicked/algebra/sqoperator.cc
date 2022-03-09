@@ -1,6 +1,6 @@
 #include "sqoperator.h"
-#include "combinatorics.h"
-#include "helpers.h"
+#include "helpers/combinatorics.h"
+#include "helpers/helpers.h"
 #include "index.h"
 #include "wicked-def.h"
 

@@ -2,8 +2,9 @@
 #include <iostream>
 #include <regex>
 
-#include "helpers.h"
-#include "orbital_space.h"
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
+
 #include "tensor.h"
 #include "wicked-def.h"
 

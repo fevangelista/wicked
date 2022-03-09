@@ -1,11 +1,12 @@
 #include "fmt/format.h"
 
-#include "combinatorics.h"
+#include "helpers/combinatorics.h"
+#include "helpers/helpers.h"
+#include "helpers/stl_utils.hpp"
+
 #include "contraction.h"
-#include "helpers.h"
 #include "operator.h"
 #include "operator_product.h"
-#include "stl_utils.hpp"
 
 #include "wick_theorem.h"
 

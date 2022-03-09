@@ -5,7 +5,7 @@
 
 #include "equation.h"
 #include "expression.h"
-#include "helpers.h"
+#include "helpers/helpers.h"
 #include "sqoperator.h"
 #include "tensor.h"
 #include "wicked-def.h"

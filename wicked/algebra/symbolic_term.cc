@@ -1,9 +1,10 @@
 #include <algorithm>
 
-#include "../combinatorics.h"
-#include "../helpers.h"
-#include "../orbital_space.h"
-#include "stl_utils.hpp"
+#include "helpers/combinatorics.h"
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
+#include "helpers/stl_utils.hpp"
+
 #include "term.h"
 
 using namespace std;

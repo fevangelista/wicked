@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "../wicked/orbital_space.h"
+#include "helpers/orbital_space.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

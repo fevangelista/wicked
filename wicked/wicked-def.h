@@ -17,7 +17,7 @@
 #endif
 
 /// Rational numbers
-#include "rational.h"
+#include "helpers/rational.h"
 using scalar_t = rational;
 
 /// Bit array

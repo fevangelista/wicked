@@ -1,7 +1,7 @@
 #include <cassert>
 
-#include "helpers.h"
-#include "orbital_space.h"
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
 #include "vertex.h"
 
 using namespace std;

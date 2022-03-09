@@ -3,8 +3,8 @@
 
 #include <string>
 
+#include "helpers/orbital_space.h"
 #include "index.h"
-#include "orbital_space.h"
 
 enum class SQOperatorType {
   Creation,

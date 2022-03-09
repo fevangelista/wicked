@@ -1,7 +1,8 @@
+#include "helpers/combinatorics.h"
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
+
 #include "operator.h"
-#include "combinatorics.h"
-#include "helpers.h"
-#include "orbital_space.h"
 
 using namespace std;
 

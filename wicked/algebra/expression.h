@@ -5,26 +5,29 @@
 #include <vector>
 
 #include "equation.h"
+#include "helpers/algebra.hpp"
 #include "index.h"
 #include "term.h"
 #include "wicked-def.h"
 
-/// A class to represent a sum of SQ terms.
-class Expression {
+/// A class to represent an algebraic expression
+class Expression : public Algebra<SymbolicTerm, scalar_t> {
 public:
   // ==> Constructor <==
   Expression();
 
   // ==> Class public interface <==
 
-  /// Return a map term -> factor
-  const std::map<SymbolicTerm, scalar_t> &terms() const { return terms_; }
+  // /// Return a map term -> factor
+  // const std::map<SymbolicTerm, scalar_t> &terms() const { return terms_; }
 
   /// Add a term that can optionally be scaled
   void add(const Term &term);
 
-  /// Add a term that can optionally be scaled
-  void add(const SymbolicTerm &term, scalar_t coefficient = 1);
+  using Algebra::add;
+
+  // /// Add a term that can optionally be scaled
+  // void add(const SymbolicTerm &term, scalar_t coefficient = 1);
 
   /// Add a term that can optionally be scaled
   void add(const std::pair<SymbolicTerm, scalar_t> &term_factor,
@@ -59,13 +62,6 @@ public:
   /// shows the number of upper/lower indices in each space
   std::map<std::string, std::vector<Equation>>
   to_manybody_equation(const std::string &label) const;
-
-private:
-  // ==> Class private data <==
-
-  std::map<SymbolicTerm, scalar_t> terms_;
-
-  // ==> Class private functions <==
 };
 
 /// addition

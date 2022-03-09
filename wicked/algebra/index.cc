@@ -1,9 +1,9 @@
 #include <algorithm>
 
-#include "combinatorics.h"
-#include "helpers.h"
+#include "helpers/combinatorics.h"
+#include "helpers/helpers.h"
+#include "helpers/orbital_space.h"
 #include "index.h"
-#include "orbital_space.h"
 
 Index::Index() : index_(std::make_pair(-1, -1)) {}
 
