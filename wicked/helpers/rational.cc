@@ -137,10 +137,11 @@ std::string rational::latex() const {
         s += "-";
       }
 #if USE_BOOST_RATIONAL
-      s += "\\frac{" + boost::lexical_cast<std::string>(numerator_) + "}{" +
+      s += "\\frac{" +
+           boost::lexical_cast<std::string>(boost::abs(numerator_)) + "}{" +
            boost::lexical_cast<std::string>(denominator_) + "}";
 #else
-      s += "\\frac{" + std::to_string(boost::abs(numerator_)) + "}{" +
+      s += "\\frac{" + std::to_string(std::abs(numerator_)) + "}{" +
            std::to_string(denominator_) + "}";
 #endif
     }
