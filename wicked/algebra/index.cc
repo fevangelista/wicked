@@ -51,23 +51,6 @@ scalar_t canonicalize_indices(std::vector<Index> &indices, bool reversed) {
   return permutation_sign(perm);
 }
 
-std::vector<std::vector<Index>> make_indices_from_space_labels(
-    const std::vector<std::vector<char>> &labels_space) {
-  std::vector<std::vector<Index>> indices;
-  std::vector<int> space_count(osi->num_spaces());
-  for (const auto &labels : labels_space) {
-    std::vector<Index> indices_space;
-    for (const auto &label : labels) {
-      int space = osi->label_to_space(label);
-      space_count[space] += 1;
-      int p = space_count[space];
-      indices_space.push_back(Index(space, p));
-    }
-    indices.push_back(indices_space);
-  }
-  return indices;
-}
-
 Index make_index_from_str(const std::string &s) {
   std::smatch sm;
   auto m = std::regex_match(s, sm, std::regex("([a-zA-Z])[_]?(\\d+)"));

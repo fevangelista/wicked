@@ -81,12 +81,6 @@ std::ostream &operator<<(std::ostream &os, const Index &idx);
 /// Canonicalize a set of indices
 scalar_t canonicalize_indices(std::vector<Index> &indices, bool reversed);
 
-/// Helper function that converts multiple vectors of space types
-/// (OrbitalSpaceType) to vectors of indices (Index) labeled staring with
-/// zero. Indices are assigned in an incremental way with no duplicates
-std::vector<std::vector<Index>> make_indices_from_space_labels(
-    const std::vector<std::vector<char>> &labels_space);
-
 /// A function that takes two lists of indices and creates a index map for the
 /// second list that voids duplicates
 index_map_t remap(const std::vector<Index> &idx_vec1,

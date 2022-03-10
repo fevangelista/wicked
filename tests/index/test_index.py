@@ -14,6 +14,7 @@ def test_index():
     assert i.pos() == 0
     assert str(i) == "o0"
     assert i.latex() == "i"
+    assert i.compile("ambit") == "o0"
 
     j = index("o_1")
     assert j.space() == 0
