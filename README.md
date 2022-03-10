@@ -1,6 +1,7 @@
 # Wick&d
 
-Wick&d is a python library that implements the algebra of second quantization for fermionic systems. Wick&d implements Wick's contraction theorem for general Fermi vacua.
+Wick&d is a python library that implements the algebra of second quantization for fermionic systems.
+Wick&d implements Wick's contraction theorem for general Fermi vacua.
 
 <img src="https://github.com/fevangelista/wicked/raw/master/lib/logo.png" width="300">
 
@@ -17,3 +18,8 @@ git clone --recurse-submodules https://github.com/fevangelista/wicked.git
 cd wicked
 python setup.py develop
 ```
+
+## Getting started
+
+To learn how to use Wick&d start from the [jupyter tutorials](https://github.com/fevangelista/wicked/tutorials).
+There are also a few examples of ways to use Wick&d in the [examples directory](https://github.com/fevangelista/wicked/examples).
