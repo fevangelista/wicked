@@ -2,7 +2,6 @@
 #include <pybind11/stl.h>
 
 #include "helpers/combinatorics.h"
-#include "helpers/rational.h"
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
 
@@ -21,33 +20,11 @@ void export_Equation(py::module &m);
 void export_Operator(py::module &m);
 void export_OperatorExpression(py::module &m);
 void export_WickTheorem(py::module &m);
+void export_rational(py::module &m);
 
 PYBIND11_MODULE(_wicked, m) {
   m.doc() = "Wicked python interface";
-
-  py::class_<rational, std::shared_ptr<rational>>(m, "rational")
-      .def(py::init<>())
-      .def(py::init<int>())
-      .def(py::init<int, int>())
-      .def("__float__", &rational::to_double)
-      .def("__eq__",
-           [](const rational &lhs, const rational &rhs) { return lhs == rhs; })
-      .def("__add__",
-           [](const rational &lhs, const rational &rhs) { return lhs + rhs; })
-      .def("__sub__",
-           [](const rational &lhs, const rational &rhs) { return lhs - rhs; })
-      .def("__mul__",
-           [](const rational &lhs, const rational &rhs) { return lhs * rhs; })
-      .def("__truediv__",
-           [](const rational &lhs, const rational &rhs) { return lhs / rhs; })
-      .def("__repr__", &rational::repr)
-      .def("str", &rational::str);
-  ;
-
-  m.def("make_rational", &make_rational_from_str);
-
-  m.def("int_part", &integer_partitions);
-
+  export_rational(m);
   export_combinatorics(m);
   export_OrbitalSpaceInfo(m);
   export_Index(m);

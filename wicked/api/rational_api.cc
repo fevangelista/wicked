@@ -1,0 +1,31 @@
+#include <pybind11/pybind11.h>
+
+#include "helpers/rational.h"
+
+namespace py = pybind11;
+using namespace pybind11::literals;
+
+void export_rational(py::module &m) {
+
+  py::class_<rational, std::shared_ptr<rational>>(m, "rational")
+      .def(py::init<>())
+      .def(py::init<int>())
+      .def(py::init<int, int>())
+      .def("latex", &rational::latex)
+      .def("compile", &rational::compile)
+      .def("__float__", &rational::to_double)
+      .def("__eq__",
+           [](const rational &lhs, const rational &rhs) { return lhs == rhs; })
+      .def("__add__",
+           [](const rational &lhs, const rational &rhs) { return lhs + rhs; })
+      .def("__sub__",
+           [](const rational &lhs, const rational &rhs) { return lhs - rhs; })
+      .def("__mul__",
+           [](const rational &lhs, const rational &rhs) { return lhs * rhs; })
+      .def("__truediv__",
+           [](const rational &lhs, const rational &rhs) { return lhs / rhs; })
+      .def("__repr__", &rational::repr)
+      .def("str", &rational::str);
+
+  m.def("make_rational", &make_rational_from_str);
+}

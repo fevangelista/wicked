@@ -102,18 +102,13 @@ std::string rational::str(bool sign) const {
 }
 
 std::string rational::repr() const {
-  // if (numerator_ == 0) {
-  //   return "0";
-  // }
-  // std::string s = (numerator_ > 0) ? "+" : "-";
-  // if (denominator_ == 1) {
-  //   s += std::to_string(std::abs(numerator_));
-  // } else {
-  //   s += std::to_string(std::abs(numerator_)) + "/" +
-  //        std::to_string(denominator_);
-  // }
-  // return s;
-  return str(false);
+#if USE_BOOST_RATIONAL
+  return "rational(" + boost::lexical_cast<std::string>(numerator_) + "," +
+         boost::lexical_cast<std::string>(denominator_) + ")";
+#else
+  return "rational(" + std::to_string(numerator_) + "," +
+         std::to_string(denominator_) + ")";
+#endif
 }
 
 std::string rational::latex() const {
@@ -189,15 +184,7 @@ bool operator!=(const rational &lhs, const rational &rhs) {
 }
 
 std::ostream &operator<<(std::ostream &os, const rational &rhs) {
-  if (rhs.numerator() == 0) {
-    os << '0';
-  } else {
-    if (rhs.denominator() == 1) {
-      os << rhs.numerator();
-    } else {
-      os << rhs.numerator() << '/' << rhs.denominator();
-    }
-  }
+  os << rhs.str(false);
   return os;
 }
 
@@ -219,7 +206,7 @@ void rational::reduce() {
 
 rational make_rational_from_str(const std::string &s) {
   std::smatch sm;
-  auto factor_re = std::regex("^\\s*([+-])?(\\d*)?\\/?(\\d*)?\\s*");
+  auto factor_re = std::regex("^\\s*([+-])?(\\d*)?(\\/)?(\\d*)?\\s*");
   auto m = std::regex_match(s, sm, factor_re);
   if (not m) {
     throw std::runtime_error("\nCould not convert the string " + s +
@@ -227,30 +214,24 @@ rational make_rational_from_str(const std::string &s) {
   }
   std::string sign = sm[1];
   std::string numerator_str = sm[2];
-  std::string denominator_str = sm[3];
-  rational_t numerator = 1, denominator = 1;
+  std::string division = sm[3];
+  std::string denominator_str = sm[4];
+  int numerator = 1, denominator = 1;
   if (sign == "-") {
     numerator *= -1;
+  }
+  // if we have a division sign
+  if (division.size() != 0) {
+    // make sure there is a numerator
+    if ((numerator_str.size() == 0) or (denominator_str.size() == 0))
+      throw std::runtime_error("\nCould not convert the string " + s +
+                               " to a rational object");
   }
   if (numerator_str.size() > 0) {
     numerator *= std::stoi(numerator_str);
   }
-  if (denominator_str.size() > 0) {
+  if ((division == "/") and (denominator_str.size() > 0)) {
     denominator *= std::stoi(denominator_str);
   }
   return rational(numerator, denominator);
 }
-
-// std::string boost_rational::str(bool sign) const {
-//   std::stringstream ss;
-//   ss << *this;
-//   return ss.str();
-// }
-
-// double boost_rational::to_double() const {
-//   return boost::rational_cast<double>(*this);
-// }
-
-// std::string boost_rational::compile(const std::string &format) const {
-//   return std::to_string(to_double());
-// }
