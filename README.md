@@ -21,5 +21,5 @@ python setup.py develop
 
 ## Getting started
 
-To learn how to use Wick&d start from the [jupyter tutorials](https://github.com/fevangelista/wicked/tutorials).
-There are also a few examples of ways to use Wick&d in the [examples directory](https://github.com/fevangelista/wicked/examples).
+To learn how to use Wick&d start from the [jupyter tutorials](https://github.com/fevangelista/wicked/tree/master/tutorials).
+There are also a few examples of ways to use Wick&d in the [examples directory](https://github.com/fevangelista/wicked/tree/master/examples).
