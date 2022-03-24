@@ -29,7 +29,7 @@ void export_OperatorExpression(py::module &m) {
            py::arg("vec_vec_dop"), py::arg("factor") = rational(1))
       .def("size", &OperatorExpression::size)
       .def("add", &OperatorExpression::add)
-      .def("dagger", &OperatorExpression::dagger)
+      .def("adjoint", &OperatorExpression::adjoint)
       .def("add2", &OperatorExpression::add2)
       .def("__add__",
            [](OperatorExpression rhs, const OperatorExpression &lhs) {

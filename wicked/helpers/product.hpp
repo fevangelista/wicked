@@ -23,10 +23,10 @@ public:
     return elements_ < other.elements_;
   }
 
-  Product dagger() const {
+  Product adjoint() const {
     Product d;
     for (const auto &e : elements()) {
-      d.push_back(e.dagger());
+      d.push_back(e.adjoint());
     }
     std::reverse(d.begin(), d.end());
     return d;
