@@ -18,6 +18,8 @@ public:
   Operator(const std::string &label, const std::vector<int> &cre,
            const std::vector<int> &ann);
 
+  Operator(const std::string &label, const Vertex &vertex);
+
   /// Return the label of the operator
   const std::string &label() const;
 
@@ -26,6 +28,8 @@ public:
 
   /// One over the number of permutations of equivalent operators
   scalar_t factor() const;
+
+  Operator adjoint() const;
 
   /// Return the number of creation operators in space
   int cre(int space) const;

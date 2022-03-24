@@ -80,20 +80,6 @@ bool Expression::operator==(const Expression &other) {
          std::equal(terms_.begin(), terms_.end(), other.terms_.begin());
 }
 
-Expression &Expression::operator+=(const Expression &sum) {
-  for (const auto &kv : sum.terms()) {
-    add(kv);
-  }
-  return *this;
-}
-
-Expression &Expression::operator-=(const Expression &sum) {
-  for (const auto &kv : sum.terms()) {
-    add(kv, -1);
-  }
-  return *this;
-}
-
 std::string Expression::str() const {
   std::vector<std::string> str_vec;
   int n = 0;
@@ -166,16 +152,6 @@ Expression::to_manybody_equation(const std::string &label) const {
     result[signature_str].push_back(Equation(lhs, rhs, factor));
   }
   return result;
-}
-
-Expression operator+(Expression lhs, const Expression &rhs) {
-  lhs += rhs;
-  return lhs;
-}
-
-Expression operator-(Expression lhs, const Expression &rhs) {
-  lhs -= rhs;
-  return lhs;
 }
 
 std::ostream &operator<<(std::ostream &os, const Expression &sum) {

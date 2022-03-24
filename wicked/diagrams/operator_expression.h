@@ -8,10 +8,10 @@
 #include "operator_product.h"
 #include "wicked-def.h"
 
-using dop_expr_t = std::map<OperatorProduct, scalar_t>;
-
 /// A class to represent operators
 class OperatorExpression : public Algebra<OperatorProduct, scalar_t> {
+  using opexpr_t = Algebra<OperatorProduct, scalar_t>::vecspace_t;
+
 public:
   /// Construct an empty sum
   OperatorExpression();
@@ -24,6 +24,16 @@ public:
 
   void canonicalize();
 
+  OperatorExpression adjoint() const {
+    OperatorExpression expr;
+    for (const auto &[e, c] : terms_) {
+      expr.add(e.adjoint(), c);
+    }
+    return expr;
+  }
+
+  // using Algebra<OperatorProduct, scalar_t>::operator+=;
+  // using Algebra<OperatorProduct, scalar_t>::operator-=;
   using Algebra<OperatorProduct, scalar_t>::operator*=;
 
   /// Return a string representation of the operator

@@ -7,9 +7,9 @@
 
 /// Represents a vector space of objects of type T over the field F
 template <class T, class F> class Algebra {
-  using vecspace_t = std::map<T, F>;
 
 public:
+  using vecspace_t = std::map<T, F>;
   Algebra() {}
   Algebra(const vecspace_t &v) : terms_(v) {}
 
@@ -31,7 +31,7 @@ public:
   /// subtraction assignment
   Algebra &operator-=(const Algebra &rhs) {
     for (const auto &[e, c] : rhs.terms()) {
-      add(terms_, e, -c);
+      add(e, -c);
     }
     return *this;
   }

@@ -58,6 +58,16 @@ Vertex &Vertex::operator-=(const Vertex &rhs) {
   return *this;
 }
 
+Vertex Vertex::adjoint() const {
+  std::vector<int> cre_v(osi->num_spaces(), 0);
+  std::vector<int> ann_v(osi->num_spaces(), 0);
+  for (int s = 0; s < osi->num_spaces(); ++s) {
+    cre_v[s] = ann(s);
+    ann_v[s] = cre(s);
+  }
+  return Vertex(cre_v, ann_v);
+}
+
 std::string Vertex::str() const {
   // std::vector<std::string> cv, av;
   // for (int s = 0; s < osi->num_spaces(); ++s) {

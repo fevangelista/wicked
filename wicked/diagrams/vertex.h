@@ -58,6 +58,9 @@ public:
   // Subtracts the operator count of another object
   Vertex &operator-=(const Vertex &rhs);
 
+  // Return the hermitian conjugate of this operator
+  Vertex adjoint() const;
+
   /// Return a string representation of the operator
   std::string str() const;
 

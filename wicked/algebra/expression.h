@@ -45,11 +45,11 @@ public:
   /// Compare this expression to another one
   bool operator==(const Expression &other);
 
-  /// Add an expression
-  Expression &operator+=(const Expression &terms);
+  // /// Add an expression
+  // Expression &operator+=(const Expression &terms);
 
-  /// Substract an expression
-  Expression &operator-=(const Expression &terms);
+  // /// Substract an expression
+  // Expression &operator-=(const Expression &terms);
 
   /// Return a string representation
   std::string str() const;
@@ -63,11 +63,6 @@ public:
   std::map<std::string, std::vector<Equation>>
   to_manybody_equation(const std::string &label) const;
 };
-
-/// addition
-Expression operator+(Expression lhs, const Expression &rhs);
-/// subtraction
-Expression operator-(Expression lhs, const Expression &rhs);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Expression &sum);

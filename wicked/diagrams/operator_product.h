@@ -10,6 +10,7 @@ class OperatorProduct : public Product<Operator> {
 public:
   /// Constructors
   OperatorProduct() : Product<Operator>() {}
+  OperatorProduct(Product<Operator> &&opprod) : Product<Operator>(opprod) {}
   OperatorProduct(const std::vector<Operator> &operators)
       : Product<Operator>(operators) {}
   OperatorProduct(std::initializer_list<Operator> operators)

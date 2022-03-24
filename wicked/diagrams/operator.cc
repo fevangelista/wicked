@@ -10,6 +10,9 @@ Operator::Operator(const std::string &label, const std::vector<int> &cre,
                    const std::vector<int> &ann)
     : label_(label), vertex_(cre, ann) {}
 
+Operator::Operator(const std::string &label, const Vertex &vertex)
+    : label_(label), vertex_(vertex) {}
+
 const std::string &Operator::label() const { return label_; }
 
 Vertex Operator::vertex() const { return vertex_; }
@@ -23,6 +26,10 @@ scalar_t Operator::factor() const {
     result /= static_cast<scalar_t>(factorial(ann(s)));
   }
   return result;
+}
+
+Operator Operator::adjoint() const {
+  return Operator(label(), vertex().adjoint());
 }
 
 int Operator::cre(int space) const { return vertex_.cre(space); }

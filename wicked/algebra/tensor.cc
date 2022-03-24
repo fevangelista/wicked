@@ -111,21 +111,29 @@ std::string Tensor::latex() const {
     str_vec_lower.push_back(index.latex());
   }
 
-  std::regex num_re("1|2|3|4|5|6|7|8|9|0");
-  std::string label_wo_num = label_; // std::regex_replace(label_, num_re, "");
-
-  std::vector<std::string> greek_letters{
-      "alpha", "beta",    "gamma",   "delta", "epsilon", "zeta",
-      "eta",   "theta",   "iota",    "kappa", "lambda",  "mu",
-      "nu",    "xi",      "omicron", "pi",    "rho",     "sigma",
-      "tau",   "upsilon", "phi",     "chi",   "psi",     "omega"};
-  if (std::find(greek_letters.begin(), greek_letters.end(), label_wo_num) !=
-      greek_letters.end()) {
-    return ("{\\" + label_wo_num + "}^{" + join(str_vec_upper, " ") + "}_{" +
-            join(str_vec_lower, " ") + "}");
+  // read the label. Here we try to separate the name (e.g., lambda) from the
+  // subscript (eg. 1). For greek letters we omit the subscript.
+  std::smatch sm;
+  auto m = std::regex_match(label_, sm, std::regex("([a-zA-Z]+)[_]?(\\d+)?"));
+  if (not m) {
+    throw std::runtime_error("\nCould not parse tensor label " + label_);
   }
-  return ("{" + label_wo_num + "}^{" + join(str_vec_upper, " ") + "}_{" +
-          join(str_vec_lower, " ") + "}");
+  std::string symbol = sm[1];
+  std::string raw_subscript = sm[2];
+  std::vector<std::string> greek{"alpha",  "beta", "gamma", "delta", "epsilon",
+                                 "zeta",   "eta",  "theta", "iota",  "kappa",
+                                 "lambda", "mu",   "nu",    "xi",    "omicron",
+                                 "pi",     "rho",  "sigma", "tau",   "upsilon",
+                                 "phi",    "chi",  "psi",   "omega"};
+  bool is_greek_symbol =
+      (std::find(greek.begin(), greek.end(), symbol) != greek.end());
+  std::string prefix = is_greek_symbol ? "{\\" : "{";
+  std::string subscript =
+      is_greek_symbol
+          ? ""
+          : (raw_subscript.size() == 0 ? "" : "_{" + raw_subscript + "}");
+  return prefix + symbol + subscript + "}^{" + join(str_vec_upper, " ") +
+         "}_{" + join(str_vec_lower, " ") + "}";
 }
 
 std::string Tensor::compile(const std::string &format) const {

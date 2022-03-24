@@ -20,8 +20,11 @@ void export_Expression(py::module &m) {
       .def("__repr__", &Expression::str)
       .def("__str__", &Expression::str)
       .def("__eq__", &Expression::operator==)
-      .def("__add__", [](const Expression &lhs,
-                         const Expression &rhs) { return lhs + rhs; })
+      .def("__add__",
+           [](Expression lhs, const Expression &rhs) {
+             lhs += rhs;
+             return lhs;
+           })
       .def("latex", &Expression::latex, "sep"_a = " \\\\ \n")
       .def("to_manybody_equation", &Expression::to_manybody_equation)
       .def("to_manybody_equations", &Expression::to_manybody_equation)

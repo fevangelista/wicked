@@ -1,5 +1,7 @@
 #include <pybind11/pybind11.h>
 
+#include "diagrams/operator.h"
+#include "diagrams/operator_expression.h"
 #include "helpers/rational.h"
 
 namespace py = pybind11;
@@ -22,6 +24,13 @@ void export_rational(py::module &m) {
            [](const rational &lhs, const rational &rhs) { return lhs - rhs; })
       .def("__mul__",
            [](const rational &lhs, const rational &rhs) { return lhs * rhs; })
+      .def(
+          "__mul__",
+          [](const rational &lhs, OperatorExpression rhs) {
+            rhs *= lhs;
+            return rhs;
+          },
+          py::is_operator())
       .def("__truediv__",
            [](const rational &lhs, const rational &rhs) { return lhs / rhs; })
       .def("__repr__", &rational::repr)

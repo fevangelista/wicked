@@ -21,7 +21,7 @@ void OperatorExpression::add2(const OperatorExpression &expr, scalar_t factor) {
 }
 
 void OperatorExpression::canonicalize() {
-  dop_expr_t canonical;
+  opexpr_t canonical;
   for (auto [prod, scalar] : terms_) {
     auto newprod = prod;
     const auto sign = newprod.canonicalize();

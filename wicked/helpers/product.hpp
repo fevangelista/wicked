@@ -9,7 +9,10 @@ template <class T> class Product {
 public:
   Product() {}
   Product(const prod_t &elements) : elements_(elements) {}
+  Product(const Product &prod) : elements_(prod.elements()) {}
   Product(std::initializer_list<T> elements) : elements_(elements) {}
+
+  const prod_t &elements() const { return elements_; }
 
   size_t size() const { return elements_.size(); }
 
@@ -17,6 +20,15 @@ public:
 
   bool operator<(const Product<T> &other) const {
     return elements_ < other.elements_;
+  }
+
+  Product dagger() const {
+    Product d;
+    for (const auto &e : elements()) {
+      d.push_back(e.dagger());
+    }
+    std::reverse(d.begin(), d.end());
+    return d;
   }
 
   T &operator[](size_t n) { return elements_[n]; }
@@ -27,7 +39,6 @@ public:
   typename std::vector<T>::const_iterator begin() const {
     return elements_.begin();
   }
-
   typename std::vector<T>::iterator end() { return elements_.end(); }
   typename std::vector<T>::const_iterator end() const {
     return elements_.end();

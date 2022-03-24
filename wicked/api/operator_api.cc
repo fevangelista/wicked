@@ -1,3 +1,4 @@
+#include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -28,10 +29,16 @@ void export_OperatorExpression(py::module &m) {
            py::arg("vec_vec_dop"), py::arg("factor") = rational(1))
       .def("size", &OperatorExpression::size)
       .def("add", &OperatorExpression::add)
+      .def("dagger", &OperatorExpression::dagger)
       .def("add2", &OperatorExpression::add2)
       .def("__add__",
-           [](OperatorExpression &rhs, const OperatorExpression &lhs) {
+           [](OperatorExpression rhs, const OperatorExpression &lhs) {
              rhs += lhs;
+             return rhs;
+           })
+      .def("__sub__",
+           [](OperatorExpression rhs, const OperatorExpression &lhs) {
+             rhs -= lhs;
              return rhs;
            })
       .def("__repr__", &OperatorExpression::str)
