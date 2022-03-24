@@ -1,6 +1,7 @@
 #ifndef _wicked_product_h_
 #define _wicked_product_h_
 
+#include <algorithm>
 #include <vector>
 
 template <class T> class Product {
