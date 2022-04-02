@@ -44,6 +44,14 @@ public:
 OperatorExpression operator*(OperatorExpression lhs,
                              const OperatorExpression &rhs);
 
+/// addition
+OperatorExpression operator+(OperatorExpression lhs,
+                             const OperatorExpression &rhs);
+
+/// subtraction
+OperatorExpression operator-(OperatorExpression lhs,
+                             const OperatorExpression &rhs);
+
 /// Write a string representation of the operator to a stream
 std::ostream &operator<<(std::ostream &os, const OperatorExpression &opsum);
 

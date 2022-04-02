@@ -49,6 +49,18 @@ OperatorExpression operator*(OperatorExpression lhs,
   return lhs;
 }
 
+OperatorExpression operator+(OperatorExpression lhs,
+                             const OperatorExpression &rhs) {
+  lhs += rhs;
+  return lhs;
+}
+
+OperatorExpression operator-(OperatorExpression lhs,
+                             const OperatorExpression &rhs) {
+  lhs -= rhs;
+  return lhs;
+}
+
 std::ostream &operator<<(std::ostream &os, const OperatorExpression &opsum) {
   os << opsum.str();
   return os;
@@ -109,28 +121,7 @@ make_diag_operator_expression2(const std::string &label,
 
 OperatorExpression commutator(const OperatorExpression &A,
                               const OperatorExpression &B) {
-  OperatorExpression result;
-  for (const auto &vec_factor_A : A.terms()) {
-    for (const auto &vec_factor_B : B.terms()) {
-      auto &vec_A = vec_factor_A.first;
-      auto &vec_B = vec_factor_B.first;
-
-      std::vector<Operator> vec_AB;
-      vec_AB.insert(vec_AB.end(), vec_A.begin(), vec_A.end());
-      vec_AB.insert(vec_AB.end(), vec_B.begin(), vec_B.end());
-
-      std::vector<Operator> vec_BA;
-      vec_BA.insert(vec_BA.end(), vec_B.begin(), vec_B.end());
-      vec_BA.insert(vec_BA.end(), vec_A.begin(), vec_A.end());
-
-      scalar_t factor_A = vec_factor_A.second;
-      scalar_t factor_B = vec_factor_B.second;
-
-      result.add(vec_AB, factor_A * factor_B);
-      result.add(vec_BA, -factor_A * factor_B);
-    }
-  }
-  return result;
+  return A * B - B * A;
 }
 
 // OperatorExpression exp(const OperatorExpression &A, int order) {

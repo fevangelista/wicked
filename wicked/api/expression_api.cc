@@ -19,6 +19,7 @@ void export_Expression(py::module &m) {
            "expr"_a, "scale"_a = scalar_t(1))
       .def("__repr__", &Expression::str)
       .def("__str__", &Expression::str)
+      .def("__len__", &Expression::size)
       .def("__eq__", &Expression::operator==)
       .def("__add__",
            [](Expression lhs, const Expression &rhs) {

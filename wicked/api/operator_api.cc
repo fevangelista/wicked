@@ -50,8 +50,24 @@ void export_OperatorExpression(py::module &m) {
       .def("canonicalize", &OperatorExpression::canonicalize);
   m.def("op", &make_diag_operator_expression2,
         "Create a OperatorExpression object");
-  m.def("commutator", &commutator,
-        "Create the commutator of two OperatorExpression objects");
+
+  m.def(
+      "commutator",
+      [](py::args args) {
+        int k = 0;
+        OperatorExpression result;
+        for (const auto &arg : args) {
+          OperatorExpression &object = py::cast<OperatorExpression &>(arg);
+          if (k == 0) {
+            result = object;
+          } else {
+            result = commutator(result, object);
+          }
+          k += 1;
+        }
+        return result;
+      },
+      "Create the commutator of a list of OperatorExpression objects");
 
   m.def("bch_series", &bch_series,
         "Creates the Baker-Campbell-Hausdorff "
