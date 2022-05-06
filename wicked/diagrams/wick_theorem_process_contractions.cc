@@ -8,6 +8,7 @@
 #include "helpers/helpers.h"
 #include "helpers/orbital_space.h"
 #include "helpers/stl_utils.hpp"
+#include "helpers/timer.hpp"
 
 #include "contraction.h"
 #include "operator.h"
@@ -75,13 +76,18 @@ Expression WickTheorem::process_contractions(scalar_t factor,
       for (int c : contraction_vec) {
         contraction.push_back(elementary_contractions_[c]);
       }
+
+      timer tc;
       const auto [best_ops, best_contractions, sign] =
           do_canonicalize_graph_
               ? canonicalize_contraction_graph(ops, contraction)
               : std::make_tuple(ops, contraction, scalar_t(1));
+      timers_["canonicalize_contraction_graph"] += tc.get();
 
+      timer te;
       std::pair<SymbolicTerm, scalar_t> term_factor =
           evaluate_contraction(best_ops, best_contractions, factor);
+      timers_["evaluate_contraction"] += te.get();
 
       SymbolicTerm &term = term_factor.first;
       scalar_t canonicalize_factor = term.canonicalize();
@@ -98,199 +104,6 @@ Expression WickTheorem::process_contractions(scalar_t factor,
                                          << std::endl;)
   }
   return result;
-}
-
-std::tuple<OperatorProduct, CompositeContraction, scalar_t>
-WickTheorem::canonicalize_contraction_graph_old(
-    const OperatorProduct &ops, const CompositeContraction &contractions) {
-  for (const auto &op : ops) {
-    if (op.num_ops() % 2 != 0) {
-      auto msg =
-          "\n\n  WickTheorem::canonicalize_contraction cannot yet handle "
-          "operators with an even number of sqops.\n";
-      throw std::runtime_error(msg);
-    }
-  }
-
-  // create a connectivity matrix conn_mat[i][j] such that
-  // if operators i and j are contracted, then conn_mat[i][j] = 1
-  const int nops = ops.size();
-
-  // create a matrix that for each operator lists all the operator that must
-  // appear to their right
-  std::vector<std::vector<int>> constraints(nops, std::vector<int>(nops, 0));
-  for (int i = 0; i < nops; i++) {
-    for (int j = 0; j < nops; j++) {
-      PRINT(PrintLevel::All,
-            cout << "\n Operator pair " << i << " " << j << endl;);
-      bool are_permutable = true;
-      // check the type of contractions between operators i and j
-      for (const auto &el_contr : contractions) {
-        for (int s = 0; s < osi->num_spaces(); ++s) {
-          if (osi->space_type(s) != SpaceType::General) {
-            if (el_contr[i].cre(s) * el_contr[j].ann(s) +
-                    el_contr[i].ann(s) * el_contr[j].cre(s) >
-                0) {
-              are_permutable = false;
-            }
-          }
-          if (osi->space_type(s) == SpaceType::General) {
-            if ((el_contr[i].num_ops(s) == 1) and (el_contr[j].num_ops(s))) {
-              if (el_contr.num_ops() == 2) {
-                are_permutable = false;
-              }
-            }
-          }
-        }
-      }
-      PRINT(
-          PrintLevel::All,
-          for (const auto &el_contr
-               : contractions) {
-            cout << el_contr[i] << endl;
-            cout << el_contr[j] << endl;
-          } cout
-              << "\n These operators are "
-              << (are_permutable ? "permutable" : "NOT permutable") << endl;);
-      constraints[i][j] = (are_permutable ? 0 : 1);
-    }
-  }
-
-  // const int maxops = 64;
-  // std::vector<std::bitset<maxops>> left_masks(nops);
-  // std::vector<std::bitset<maxops>> constraint_masks(nops);
-  // // create a mask for each operator
-  // for (int i = 0; i < nops; i++) {
-  //   for (int j = 0; j < i; j++) {
-  //     constraint_masks[i][j] = (constraints[i][j] == 1);
-  //   }
-  // }
-  PRINT(
-      PrintLevel::Detailed, cout << "\n  Contraction canonicalization" << endl;
-      // for (const auto &mask
-      //      : left_masks) { cout << mask << endl; };
-      cout << "\n  Operator contraint matrix:" << endl; for (const auto row
-                                                             : constraints) {
-        PRINT_ELEMENTS(row);
-        cout << endl;
-      });
-
-  // setup vectors that will store the best permutation of operators and
-  // contractions
-  std::vector<int> best_ops_perm(ops.size());
-  std::vector<int> best_contr_perm(contractions.size());
-  std::iota(best_ops_perm.begin(), best_ops_perm.end(), 0);
-  std::iota(best_contr_perm.begin(), best_contr_perm.end(), 0);
-
-  PRINT(PrintLevel::Detailed, cout << "Contraction to canonicalize:" << endl;
-        print_contraction_graph(ops, contractions, best_ops_perm,
-                                best_contr_perm););
-
-  std::vector<
-      std::pair<std::string, std::pair<std::vector<int>, std::vector<int>>>>
-      scores;
-  // Loop over all permutations of operators
-  std::vector<int> ops_perm(ops.size());
-  std::iota(ops_perm.begin(), ops_perm.end(), 0);
-  do {
-    PRINT(PrintLevel::Detailed, cout << "  Operator permutation: ";
-          PRINT_ELEMENTS(ops_perm););
-
-    bool is_allowed = true;
-    // check if this operator was permuted with any operators to its right
-    for (int i = 0; i < nops; i++) {
-      int i_perm = ops_perm[i];
-      // check each operator to its right
-      for (int j = i + 1; j < nops; j++) {
-        int j_perm = ops_perm[j];
-        // if operator j was to the left of i, check that they commute
-        if (j_perm < i_perm) {
-          // if they don't commute, this is not a valid permutation
-          if (constraints[i][j] == 1) {
-            is_allowed = false;
-          }
-        }
-      }
-    }
-
-    // bool allowed = true;
-    // for (int i = 0; i < nops; i++) {
-    //   std::bitset<maxops> i_mask;
-    //   int i_perm = ops_perm[i];
-    //   // create a mask of operators to the left of i
-    //   for (int j = 0; j < i; j++) {
-    //     i_mask[ops_perm[j]] = true;
-    //   }
-    //   if ((i_mask & left_masks[i_perm]) != left_masks[i_perm]) {
-    //     allowed = false;
-    //   }
-    // }
-
-    PRINT(PrintLevel::Detailed,
-          cout << (is_allowed ? " is allowed" : " is not allowed!") << endl;);
-
-    if (is_allowed) {
-      // find the "best" contraction permutation directly
-      std::vector<std::pair<std::vector<Vertex>, int>> sorted_contractions;
-
-      const int ncontr = contractions.size();
-      for (int i = 0; i < ncontr; i++) {
-        std::vector<Vertex> permuted_contr;
-        for (int j = 0; j < nops; j++) {
-          permuted_contr.push_back(contractions[i][ops_perm[j]]);
-        }
-        sorted_contractions.push_back(std::make_pair(permuted_contr, i));
-      }
-      std::sort(sorted_contractions.begin(), sorted_contractions.end());
-
-      std::vector<int> contr_perm;
-      for (int i = 0; i < ncontr; i++) {
-        contr_perm.push_back(sorted_contractions[i].second);
-      }
-      auto signature =
-          contraction_signature(ops, contractions, ops_perm, contr_perm);
-      scores.push_back(
-          std::make_pair(signature, std::make_pair(ops_perm, contr_perm)));
-    }
-  } while (std::next_permutation(ops_perm.begin(), ops_perm.end()));
-
-  std::sort(scores.begin(), scores.end());
-
-  PRINT(
-      PrintLevel::All, for (const auto &[score, op_contr]
-                            : scores) { cout << score << endl; });
-
-  best_ops_perm = scores.begin()->second.first;
-  best_contr_perm = scores.begin()->second.second;
-
-  PRINT(PrintLevel::Detailed, cout << "\n Best permutation of operators:    ";
-        PRINT_ELEMENTS(best_ops_perm);
-        cout << "\n Best permutation of contractions: ";
-        PRINT_ELEMENTS(best_contr_perm); cout << endl;);
-
-  OperatorProduct best_ops;
-  for (int o : best_ops_perm) {
-    best_ops.push_back(ops[o]);
-  }
-
-  // permute the order and operator upon a contraction acts
-  CompositeContraction best_contractions;
-  for (int c : best_contr_perm) {
-    std::vector<Vertex> permuted_contr;
-    for (int j = 0; j < nops; j++) {
-      permuted_contr.push_back(contractions[c][best_ops_perm[j]]);
-    }
-    best_contractions.push_back(permuted_contr);
-  }
-
-  scalar_t sign(1);
-  // TODO: check if there is a sign change
-
-  PRINT(PrintLevel::Detailed, cout << "Canonical contraction:" << endl;
-        print_contraction_graph(ops, contractions, best_ops_perm,
-                                best_contr_perm););
-
-  return std::make_tuple(best_ops, best_contractions, sign);
 }
 
 std::string contraction_signature(const OperatorProduct &ops,

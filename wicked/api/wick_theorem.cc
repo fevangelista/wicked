@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "../wicked/diagrams/contraction.h"
 #include "../wicked/diagrams/operator.h"
@@ -33,5 +34,6 @@ void export_WickTheorem(py::module &m) {
           "expr"_a, "minrank"_a, "maxrank"_a)
       .def("set_print", &WickTheorem::set_print)
       .def("set_max_cumulant", &WickTheorem::set_max_cumulant)
-      .def("do_canonicalize_graph", &WickTheorem::do_canonicalize_graph);
+      .def("do_canonicalize_graph", &WickTheorem::do_canonicalize_graph)
+      .def("timers", &WickTheorem::timers);
 }

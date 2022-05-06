@@ -49,8 +49,10 @@ public:
   /// vertex in a given space
   int num_ops(int space) const;
 
-  /// Comparison operator used for sorting
+  /// Comparison operators used for sorting
   bool operator<(Vertex const &other) const;
+  bool operator==(Vertex const &other) const;
+  bool operator!=(Vertex const &other) const;
 
   // Adds the operator count of another object
   Vertex &operator+=(const Vertex &rhs);

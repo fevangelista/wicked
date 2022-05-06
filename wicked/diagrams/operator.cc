@@ -48,6 +48,14 @@ bool Operator::operator<(Operator const &other) const {
   return vertex_ < other.vertex_;
 }
 
+bool Operator::operator==(Operator const &other) const {
+  return ((label_ == other.label_) and (vertex_ == other.vertex_));
+}
+
+bool Operator::operator!=(Operator const &other) const {
+  return ((label_ != other.label_) or (vertex_ != other.vertex_));
+}
+
 std::string Operator::str() const {
   std::vector<std::string> s;
   if (factor() != scalar_t(1)) {

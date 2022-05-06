@@ -42,6 +42,14 @@ bool Vertex::operator<(Vertex const &other) const {
   return vertex_ < other.vertex_;
 }
 
+bool Vertex::operator==(Vertex const &other) const {
+  return vertex_ == other.vertex_;
+}
+
+bool Vertex::operator!=(Vertex const &other) const {
+  return vertex_ != other.vertex_;
+}
+
 Vertex &Vertex::operator+=(const Vertex &rhs) {
   for (int s = 0; s < osi->num_spaces(); ++s) {
     vertex_[s].first += rhs.vertex_[s].first;

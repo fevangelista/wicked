@@ -42,6 +42,8 @@ public:
   /// Set the maximum cumulant level
   void set_max_cumulant(int val);
 
+  const std::map<std::string, double> &timers() const;
+
 private:
   /// A vector of elementary contractions
   std::vector<ElementaryContraction> elementary_contractions_;
@@ -49,6 +51,8 @@ private:
   /// The allowed contractions stored as a vector of indices of elementary
   /// contractions
   std::vector<std::vector<int>> contractions_;
+
+  std::map<std::string, double> timers_;
 
   /// The number of contractions found
   int ncontractions_ = 0;
@@ -164,8 +168,8 @@ private:
 
   // Create a canonical contraction graph
   std::tuple<OperatorProduct, CompositeContraction, scalar_t>
-  canonicalize_contraction_graph_old(const OperatorProduct &ops,
-                                     const CompositeContraction &contractions);
+  canonicalize_contraction_graph_experimental(
+      const OperatorProduct &ops, const CompositeContraction &contractions);
 };
 
 #endif // _wicked_diag_theorem_h_

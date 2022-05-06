@@ -44,6 +44,9 @@ public:
   /// Comparison operator used for sorting
   bool operator<(Operator const &other) const;
 
+  bool operator==(Operator const &other) const;
+  bool operator!=(Operator const &other) const;
+
   /// Return a string representation of the operator
   std::string str() const;
 
