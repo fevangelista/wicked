@@ -52,9 +52,6 @@ public:
   /// Return the tensors
   const std::vector<Tensor> &tensors() const { return tensors_; }
 
-  /// Return a vector containing all indices used in this term
-  std::vector<Index> indices() const;
-
   /// Apply a re-indexing map to this symbolic term
   void reindex(index_map_t &idx_map);
 
@@ -88,9 +85,6 @@ protected:
   std::vector<Tensor> tensors_;
 
   // ==> Class private functions <==
-
-  std::string operator_str() const;
-  std::string tensor_str() const;
 
   // Used in the canonicalization routine to find how the indices of a tensor
   // connect to all the other tensors

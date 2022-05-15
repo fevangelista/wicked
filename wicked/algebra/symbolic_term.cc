@@ -33,17 +33,17 @@ void SymbolicTerm::add(const Tensor &tensor) { tensors_.push_back(tensor); }
 
 int SymbolicTerm::nops() const { return operators_.size(); }
 
-std::vector<Index> SymbolicTerm::indices() const {
-  std::vector<Index> result;
-  for (const auto &t : tensors_) {
-    const auto t_idx = t.indices();
-    result.insert(result.end(), t_idx.begin(), t_idx.end());
-  }
-  for (const auto &op : operators_) {
-    result.push_back(op.index());
-  }
-  return result;
-}
+// std::vector<Index> SymbolicTerm::indices() const {
+//   std::vector<Index> result;
+//   for (const auto &t : tensors_) {
+//     const auto t_idx = t.indices();
+//     result.insert(result.end(), t_idx.begin(), t_idx.end());
+//   }
+//   for (const auto &op : operators_) {
+//     result.push_back(op.index());
+//   }
+//   return result;
+// }
 
 void SymbolicTerm::reindex(index_map_t &idx_map) {
   for (auto &t : tensors_) {
@@ -273,24 +273,6 @@ std::string SymbolicTerm::str() const {
       str_vec.push_back("}");
   }
 
-  return (join(str_vec, " "));
-}
-
-std::string SymbolicTerm::tensor_str() const {
-  std::vector<std::string> str_vec;
-  for (const Tensor &tensor : tensors_) {
-    str_vec.push_back(tensor.str());
-  }
-  return (join(str_vec, " "));
-}
-
-std::string SymbolicTerm::operator_str() const {
-  std::vector<std::string> str_vec;
-  str_vec.push_back("{");
-  for (const auto &op : operators_) {
-    str_vec.push_back(op.str());
-  }
-  str_vec.push_back("}");
   return (join(str_vec, " "));
 }
 
