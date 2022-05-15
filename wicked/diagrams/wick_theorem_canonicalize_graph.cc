@@ -96,50 +96,6 @@ bool do_contractions_commute(int i, int j, const OperatorProduct &ops,
   return do_commute;
 }
 
-bool op_less(const size_t &l, const size_t &r,
-             const std::vector<std::vector<int>> &ops_perms,
-             const OperatorProduct &ops) {
-  // here we are given the indices of the permutations of the operators and we
-  // have to determine if permutation l is less than r
-
-  const auto &l_ops_perm = ops_perms[l];
-  const auto &r_ops_perm = ops_perms[r];
-
-  // first compare the operators
-  // consider three cases:
-  // 1.  lops <  rops (return true)
-  // 2.  lops == rops (must check the contractions)
-  // 3.  lops >  rops (return false)
-  const int no = l_ops_perm.size();
-  for (int i = 0; i < no; i++) {
-    if (ops[l_ops_perm[i]] < ops[r_ops_perm[i]]) {
-      return true;
-    }
-    if (ops[r_ops_perm[i]] < ops[l_ops_perm[i]]) {
-      return false;
-    }
-  }
-  return false;
-}
-
-bool op_eq(const size_t &l, const size_t &r,
-           const std::vector<std::vector<int>> &ops_perms,
-           const OperatorProduct &ops) {
-  // here we are given the indices of the permutations of the operators and we
-  // have to determine if permutation l is equal to r
-
-  const auto &l_ops_perm = ops_perms[l];
-  const auto &r_ops_perm = ops_perms[r];
-
-  const int no = l_ops_perm.size();
-  for (int i = 0; i < no; i++) {
-    if (ops[l_ops_perm[i]] != ops[r_ops_perm[i]]) {
-      return false;
-    }
-  }
-  return true;
-}
-
 bool graph_less(const std::pair<int, int> &l, const std::pair<int, int> &r,
                 const std::vector<std::vector<int>> &ops_perms,
                 std::vector<std::vector<int>> &con_perms,
@@ -300,134 +256,180 @@ WickTheorem::canonicalize_contraction_graph(
   return std::make_tuple(best_ops, best_contractions, sign);
 }
 
-std::tuple<OperatorProduct, CompositeContraction, scalar_t>
-WickTheorem::canonicalize_contraction_graph_experimental(
-    const OperatorProduct &ops, const CompositeContraction &contractions) {
-  for (const auto &op : ops) {
-    if (op.num_ops() % 2 != 0) {
-      auto msg =
-          "\n\n  WickTheorem::canonicalize_contraction cannot yet handle "
-          "operators with an even number of sqops.\n";
-      throw std::runtime_error(msg);
-    }
-  }
+// bool op_less(const size_t &l, const size_t &r,
+//              const std::vector<std::vector<int>> &ops_perms,
+//              const OperatorProduct &ops) {
+//   // here we are given the indices of the permutations of the operators and
+//   we
+//   // have to determine if permutation l is less than r
 
-  scalar_t sign(1);
+//   const auto &l_ops_perm = ops_perms[l];
+//   const auto &r_ops_perm = ops_perms[r];
 
-  const int nops = ops.size();
+//   // first compare the operators
+//   // consider three cases:
+//   // 1.  lops <  rops (return true)
+//   // 2.  lops == rops (must check the contractions)
+//   // 3.  lops >  rops (return false)
+//   const int no = l_ops_perm.size();
+//   for (int i = 0; i < no; i++) {
+//     if (ops[l_ops_perm[i]] < ops[r_ops_perm[i]]) {
+//       return true;
+//     }
+//     if (ops[r_ops_perm[i]] < ops[l_ops_perm[i]]) {
+//       return false;
+//     }
+//   }
+//   return false;
+// }
 
-  // create a matrix that tells us if two operators commute
-  std::vector<std::vector<bool>> commutable(nops,
-                                            std::vector<bool>(nops, false));
-  for (int i = 0; i < nops; i++) {
-    for (int j = 0; j < nops; j++) {
-      // check if a commutation changes the contraction
-      if (do_contractions_commute(i, j, ops, contractions)) {
-        commutable[i][j] = true;
-      }
-    }
-  }
+// bool op_eq(const size_t &l, const size_t &r,
+//            const std::vector<std::vector<int>> &ops_perms,
+//            const OperatorProduct &ops) {
+//   // here we are given the indices of the permutations of the operators and
+//   we
+//   // have to determine if permutation l is equal to r
 
-  PRINT(
-      PrintLevel::Detailed, cout << "\n  Commutable operator matrix:" << endl;
-      for (const auto row
-           : commutable) {
-        PRINT_ELEMENTS(row);
-        cout << endl;
-      });
+//   const auto &l_ops_perm = ops_perms[l];
+//   const auto &r_ops_perm = ops_perms[r];
 
-  std::vector<std::vector<int>> ops_perms;
-  std::vector<std::vector<int>> con_perms;
-  {
-    // Loop over all permutations of operators
-    std::vector<int> ops_perm(ops.size());
-    std::iota(ops_perm.begin(), ops_perm.end(), 0);
-    do {
-      if (is_ops_permutation_valid(ops_perm, commutable)) {
-        ops_perms.push_back(ops_perm);
-        PRINT(PrintLevel::Detailed, cout << "  Operator permutation: ";
-              PRINT_ELEMENTS(ops_perm); cout << " +" << endl;);
-      } else {
-        PRINT(PrintLevel::Detailed, cout << "  Operator permutation: ";
-              PRINT_ELEMENTS(ops_perm); cout << endl;);
-      }
-    } while (std::next_permutation(ops_perm.begin(), ops_perm.end()));
+//   const int no = l_ops_perm.size();
+//   for (int i = 0; i < no; i++) {
+//     if (ops[l_ops_perm[i]] != ops[r_ops_perm[i]]) {
+//       return false;
+//     }
+//   }
+//   return true;
+// }
 
-    std::vector<int> con_perm(contractions.size());
-    std::iota(con_perm.begin(), con_perm.end(), 0);
-    do {
-      PRINT(PrintLevel::Detailed, cout << "    Contraction permutation: ";
-            PRINT_ELEMENTS(con_perm); cout << endl;);
-      con_perms.push_back(con_perm);
-    } while (std::next_permutation(con_perm.begin(), con_perm.end()));
-  }
+// std::tuple<OperatorProduct, CompositeContraction, scalar_t>
+// WickTheorem::canonicalize_contraction_graph_experimental(
+//     const OperatorProduct &ops, const CompositeContraction &contractions) {
+//   for (const auto &op : ops) {
+//     if (op.num_ops() % 2 != 0) {
+//       auto msg =
+//           "\n\n  WickTheorem::canonicalize_contraction cannot yet handle "
+//           "operators with an even number of sqops.\n";
+//       throw std::runtime_error(msg);
+//     }
+//   }
 
-  std::vector<size_t> idx(ops_perms.size());
-  std::iota(idx.begin(), idx.end(), 0);
-  // sort all the operator permutations
-  std::sort(idx.begin(), idx.end(), [&](const size_t &l, const size_t &r) {
-    return op_less(l, r, ops_perms, ops);
-  });
+//   scalar_t sign(1);
 
-  // check for degenerate best opeartor permutations
-  std::vector<std::vector<int>> best_ops_perms;
-  for (const size_t i : idx) {
-    if (op_eq(i, idx[0], ops_perms, ops)) {
-      best_ops_perms.push_back(ops_perms[i]);
-    } else {
-      break;
-    }
-  }
+//   const int nops = ops.size();
 
-  // store all the possible graphs
-  std::vector<std::pair<int, int>> graphs;
-  for (const auto &[o, ops_perm] : enumerate(best_ops_perms)) {
-    for (const auto &[c, con_perm] : enumerate(con_perms)) {
-      graphs.push_back(std::pair(o, c));
-    }
-  }
+//   // create a matrix that tells us if two operators commute
+//   std::vector<std::vector<bool>> commutable(nops,
+//                                             std::vector<bool>(nops, false));
+//   for (int i = 0; i < nops; i++) {
+//     for (int j = 0; j < nops; j++) {
+//       // check if a commutation changes the contraction
+//       if (do_contractions_commute(i, j, ops, contractions)) {
+//         commutable[i][j] = true;
+//       }
+//     }
+//   }
 
-  // sort all the graphs
-  std::sort(graphs.begin(), graphs.end(),
-            [&](const std::pair<int, int> &l, const std::pair<int, int> &r) {
-              return graph_less(l, r, best_ops_perms, con_perms, ops,
-                                contractions);
-            });
+//   PRINT(
+//       PrintLevel::Detailed, cout << "\n  Commutable operator matrix:" <<
+//       endl; for (const auto row
+//            : commutable) {
+//         PRINT_ELEMENTS(row);
+//         cout << endl;
+//       });
 
-  // setup vectors that will store the best permutation of
-  // operators and contractions
-  std::vector<int> best_ops_perm(ops.size());
-  std::vector<int> best_contr_perm(contractions.size());
-  std::iota(best_ops_perm.begin(), best_ops_perm.end(), 0);
-  std::iota(best_contr_perm.begin(), best_contr_perm.end(), 0);
+//   std::vector<std::vector<int>> ops_perms;
+//   std::vector<std::vector<int>> con_perms;
+//   {
+//     // Loop over all permutations of operators
+//     std::vector<int> ops_perm(ops.size());
+//     std::iota(ops_perm.begin(), ops_perm.end(), 0);
+//     do {
+//       if (is_ops_permutation_valid(ops_perm, commutable)) {
+//         ops_perms.push_back(ops_perm);
+//         PRINT(PrintLevel::Detailed, cout << "  Operator permutation: ";
+//               PRINT_ELEMENTS(ops_perm); cout << " +" << endl;);
+//       } else {
+//         PRINT(PrintLevel::Detailed, cout << "  Operator permutation: ";
+//               PRINT_ELEMENTS(ops_perm); cout << endl;);
+//       }
+//     } while (std::next_permutation(ops_perm.begin(), ops_perm.end()));
 
-  PRINT(PrintLevel::Detailed, cout << "Contraction to canonicalize:" << endl;
-        print_contraction_graph(ops, contractions, best_ops_perm,
-                                best_contr_perm););
+//     std::vector<int> con_perm(contractions.size());
+//     std::iota(con_perm.begin(), con_perm.end(), 0);
+//     do {
+//       PRINT(PrintLevel::Detailed, cout << "    Contraction permutation: ";
+//             PRINT_ELEMENTS(con_perm); cout << endl;);
+//       con_perms.push_back(con_perm);
+//     } while (std::next_permutation(con_perm.begin(), con_perm.end()));
+//   }
 
-  const auto [best_o_perm, best_c_perm] = graphs[0];
+//   std::vector<size_t> idx(ops_perms.size());
+//   std::iota(idx.begin(), idx.end(), 0);
+//   // sort all the operator permutations
+//   std::sort(idx.begin(), idx.end(), [&](const size_t &l, const size_t &r) {
+//     return op_less(l, r, ops_perms, ops);
+//   });
 
-  OperatorProduct best_ops;
-  for (int o : best_ops_perms[best_o_perm]) {
-    best_ops.push_back(ops[o]);
-  }
+//   // check for degenerate best opeartor permutations
+//   std::vector<std::vector<int>> best_ops_perms;
+//   for (const size_t i : idx) {
+//     if (op_eq(i, idx[0], ops_perms, ops)) {
+//       best_ops_perms.push_back(ops_perms[i]);
+//     } else {
+//       break;
+//     }
+//   }
 
-  // permute the order and operator upon a contraction acts
-  CompositeContraction best_contractions;
-  for (int c : con_perms[best_c_perm]) {
-    std::vector<GraphMatrix> permuted_contr;
-    for (int o : best_ops_perms[best_o_perm]) {
-      permuted_contr.push_back(contractions[c][o]);
-    }
-    // for (int j = 0; j < nops; j++) {
-    //   permuted_contr.push_back(contractions[c][best_ops_perm[j]]);
-    // }
-    best_contractions.push_back(permuted_contr);
-  }
+//   // store all the possible graphs
+//   std::vector<std::pair<int, int>> graphs;
+//   for (const auto &[o, ops_perm] : enumerate(best_ops_perms)) {
+//     for (const auto &[c, con_perm] : enumerate(con_perms)) {
+//       graphs.push_back(std::pair(o, c));
+//     }
+//   }
 
-  PRINT(PrintLevel::Detailed, cout << "Contraction to canonicalize:" << endl;
-        print_contraction_graph(ops, contractions, ops_perms[best_o_perm],
-                                con_perms[best_c_perm]););
+//   // sort all the graphs
+//   std::sort(graphs.begin(), graphs.end(),
+//             [&](const std::pair<int, int> &l, const std::pair<int, int> &r) {
+//               return graph_less(l, r, best_ops_perms, con_perms, ops,
+//                                 contractions);
+//             });
 
-  return std::make_tuple(best_ops, best_contractions, sign);
-}
+//   // setup vectors that will store the best permutation of
+//   // operators and contractions
+//   std::vector<int> best_ops_perm(ops.size());
+//   std::vector<int> best_contr_perm(contractions.size());
+//   std::iota(best_ops_perm.begin(), best_ops_perm.end(), 0);
+//   std::iota(best_contr_perm.begin(), best_contr_perm.end(), 0);
+
+//   PRINT(PrintLevel::Detailed, cout << "Contraction to canonicalize:" << endl;
+//         print_contraction_graph(ops, contractions, best_ops_perm,
+//                                 best_contr_perm););
+
+//   const auto [best_o_perm, best_c_perm] = graphs[0];
+
+//   OperatorProduct best_ops;
+//   for (int o : best_ops_perms[best_o_perm]) {
+//     best_ops.push_back(ops[o]);
+//   }
+
+//   // permute the order and operator upon a contraction acts
+//   CompositeContraction best_contractions;
+//   for (int c : con_perms[best_c_perm]) {
+//     std::vector<GraphMatrix> permuted_contr;
+//     for (int o : best_ops_perms[best_o_perm]) {
+//       permuted_contr.push_back(contractions[c][o]);
+//     }
+//     // for (int j = 0; j < nops; j++) {
+//     //   permuted_contr.push_back(contractions[c][best_ops_perm[j]]);
+//     // }
+//     best_contractions.push_back(permuted_contr);
+//   }
+
+//   PRINT(PrintLevel::Detailed, cout << "Contraction to canonicalize:" << endl;
+//         print_contraction_graph(ops, contractions, ops_perms[best_o_perm],
+//                                 con_perms[best_c_perm]););
+
+//   return std::make_tuple(best_ops, best_contractions, sign);
+// }
