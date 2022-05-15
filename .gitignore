@@ -28,6 +28,9 @@
 *.out
 *.app
 
+**/__pycache__
+.DS_Store
+.vscode/
 CMakeCache.txt
 CMakeFiles/
 Makefile
