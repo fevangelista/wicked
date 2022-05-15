@@ -1,21 +1,21 @@
+#include <numeric>
+
 #include "contraction.h"
 
+#include "graph_matrix.h"
 #include "helpers/orbital_space.h"
-#include "vertex.h"
 
 int ElementaryContraction::num_ops() const {
-  int n = 0;
-  for (const auto &vertex : elements_) {
-    n += vertex.num_ops();
-  }
-  return n;
+  return std::accumulate(elements_.begin(), elements_.end(), 0,
+                         [&](int a, const auto &b) { return a + b.num_ops(); });
 }
 
-std::vector<int> ElementaryContraction::spaces_in_vertices() const {
+std::vector<int>
+ElementaryContraction::spaces_in_elementary_contraction() const {
   std::vector<int> vec;
-  for (const auto &vertex : elements_) {
+  for (const auto &graph_matrix : elements_) {
     for (int s = 0; s < osi->num_spaces(); ++s) {
-      if (vertex.ann(s) + vertex.cre(s) > 0) {
+      if (graph_matrix.ann(s) + graph_matrix.cre(s) > 0) {
         vec.push_back(s);
       }
     }

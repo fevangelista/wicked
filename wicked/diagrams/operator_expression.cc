@@ -71,37 +71,6 @@ make_diag_operator_expression(const std::string &label,
                               const std::vector<std::string> &components) {
   OperatorExpression result;
   for (const std::string &s : components) {
-    auto s_vec = split(s, std::regex("[->]+"));
-
-    std::vector<char> ann_labels;
-    for (char c : s_vec[0]) {
-      ann_labels.push_back(c);
-    }
-    std::vector<char> cre_labels;
-    for (char c : s_vec[1]) {
-      cre_labels.push_back(c);
-    }
-    std::vector<int> cre(osi->num_spaces());
-    std::vector<int> ann(osi->num_spaces());
-    for (const auto &l : cre_labels) {
-      int space = osi->label_to_space(l);
-      cre[space] += 1;
-    }
-    for (const auto &l : ann_labels) {
-      int space = osi->label_to_space(l);
-      ann[space] += 1;
-    }
-
-    result.add({Operator(label, cre, ann)});
-  }
-  return result;
-}
-
-OperatorExpression
-make_diag_operator_expression2(const std::string &label,
-                               const std::vector<std::string> &components) {
-  OperatorExpression result;
-  for (const std::string &s : components) {
     auto s_vec = findall(s, "([a-zA-Z][+^]?)");
     std::vector<int> cre(osi->num_spaces());
     std::vector<int> ann(osi->num_spaces());

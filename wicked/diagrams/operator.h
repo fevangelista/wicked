@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "vertex.h"
+#include "graph_matrix.h"
 #include "wicked-def.h"
 
 /// A class to represent operators
@@ -18,13 +18,13 @@ public:
   Operator(const std::string &label, const std::vector<int> &cre,
            const std::vector<int> &ann);
 
-  Operator(const std::string &label, const Vertex &vertex);
+  Operator(const std::string &label, const GraphMatrix &graph_matrix);
 
   /// Return the label of the operator
   const std::string &label() const;
 
-  /// The vertex object
-  Vertex vertex() const;
+  /// The graph matrix object
+  GraphMatrix graph_matrix() const;
 
   /// One over the number of permutations of equivalent operators
   scalar_t factor() const;
@@ -38,7 +38,7 @@ public:
   int ann(int space) const;
 
   /// Return the number of creation + annilation operators represented by this
-  /// vertex
+  /// graph_matrix
   int num_ops() const;
 
   /// Comparison operator used for sorting
@@ -58,7 +58,7 @@ private:
   std::string label_;
 
   /// The number of creation/annihilation operators in each space
-  Vertex vertex_;
+  GraphMatrix graph_matrix_;
 };
 
 /// Check if two operators commute

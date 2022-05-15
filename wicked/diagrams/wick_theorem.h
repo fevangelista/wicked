@@ -10,7 +10,7 @@ class SymbolicTerm;
 class Operator;
 class OperatorProduct;
 class OperatorExpression;
-class Vertex;
+class GraphMatrix;
 class ElementaryContraction;
 class CompositeContraction;
 
@@ -105,13 +105,14 @@ private:
   void generate_contractions_backtrack(
       std::vector<int> a, int k,
       const std::vector<ElementaryContraction> &el_contr_vec,
-      std::vector<Vertex> &free_vertex_vec, const int minrank,
+      std::vector<GraphMatrix> &free_graph_matrix_vec, const int minrank,
       const int maxrank);
 
   /// Process a contraction (store it) found by the backtracking algorithm
-  void process_contraction(const std::vector<int> &a, int k,
-                           const std::vector<Vertex> &free_vertex_vec,
-                           const int minrank, const int maxrank);
+  void
+  process_contraction(const std::vector<int> &a, int k,
+                      const std::vector<GraphMatrix> &free_graph_matrix_vec,
+                      const int minrank, const int maxrank);
 
   /// Return a vector of indices of elementary contractions that can be added to
   /// the current backtracking solution. All candidates generated here lead to
@@ -119,19 +120,19 @@ private:
   std::vector<int>
   construct_candidates(std::vector<int> &a, int k,
                        const std::vector<ElementaryContraction> &el_contr_vec,
-                       const std::vector<Vertex> &free_vertex_vec);
+                       const std::vector<GraphMatrix> &free_graph_matrix_vec);
 
-  /// Applies a contraction to the list of free vertices. Used in backtracking
-  /// algorithm
+  /// Applies a contraction to the list of free graph matrices. Used in
+  /// backtracking algorithm
   void make_move(std::vector<int> &a, int k, int c,
                  const std::vector<ElementaryContraction> &el_contr_vec,
-                 std::vector<Vertex> &free_vertex_vec);
+                 std::vector<GraphMatrix> &free_graph_matrix_vec);
 
-  /// Undoes the application of a contraction to the list of free vertices. Used
-  /// in backtracking algorithm
+  /// Undoes the application of a contraction to the list of free graph
+  /// matrices. Used in backtracking algorithm
   void unmake_move(std::vector<int> &a, int k, int c,
                    const std::vector<ElementaryContraction> &el_contr_vec,
-                   std::vector<Vertex> &free_vertex_vec);
+                   std::vector<GraphMatrix> &free_graph_matrix_vec);
 
   //
   // Functions for step 3. of the Wick's theorem algorithm
@@ -153,9 +154,11 @@ private:
              std::map<std::tuple<int, int, bool, int>, int>>
   contraction_tensors_sqops(const OperatorProduct &ops);
 
-  std::vector<int> vertex_vec_to_pos(
-      const ElementaryContraction &vertex_vec, std::vector<Vertex> &ops_offset,
-      std::map<std::tuple<int, int, bool, int>, int> &op_map, bool creation);
+  std::vector<int>
+  elements_vec_to_pos(const ElementaryContraction &elements_vec,
+                      std::vector<GraphMatrix> &ops_offset,
+                      std::map<std::tuple<int, int, bool, int>, int> &op_map,
+                      bool creation);
 
   /// Return the combinatorial factor corresponding to a contraction pattern
   scalar_t combinatorial_factor(const OperatorProduct &ops,

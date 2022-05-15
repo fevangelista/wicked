@@ -115,7 +115,7 @@ std::string contraction_signature(const OperatorProduct &ops,
   int nops = ops.size();
   for (int i = 0; i < nops; i++) {
     s += ops[ops_perm[i]].label();
-    s += signature(ops[ops_perm[i]].vertex());
+    s += signature(ops[ops_perm[i]].graph_matrix());
   }
 
   // 2. Compare contractions
@@ -152,7 +152,7 @@ WickTheorem::evaluate_contraction(const OperatorProduct &ops,
   // tensors (density matrices, cumulants)
 
   // counts of how many second quantized operators are not contracted
-  std::vector<Vertex> ops_offset(ops.size());
+  std::vector<GraphMatrix> ops_offset(ops.size());
 
   // a counter to keep track of the positions assigned to operators
   int sorted_position = 0;
@@ -177,15 +177,15 @@ WickTheorem::evaluate_contraction(const OperatorProduct &ops,
 
     // Find the rank and space of this contraction
     int rank = contraction.num_ops();
-    int s = contraction.spaces_in_vertices()[0];
+    int s = contraction.spaces_in_elementary_contraction()[0];
     nsqops_contracted += rank;
 
     // find the position of the creation operators
     std::vector<int> pos_cre_sqops =
-        vertex_vec_to_pos(contraction, ops_offset, op_map, true);
+        elements_vec_to_pos(contraction, ops_offset, op_map, true);
     // find the position of the annihilation operators
     std::vector<int> pos_ann_sqops =
-        vertex_vec_to_pos(contraction, ops_offset, op_map, false);
+        elements_vec_to_pos(contraction, ops_offset, op_map, false);
 
     // mark the creation operators contracted and their order
     for (int c : pos_cre_sqops) {
@@ -385,20 +385,21 @@ WickTheorem::contraction_tensors_sqops(const OperatorProduct &ops) {
   return make_tuple(tensors, sqops, op_map);
 }
 
-std::vector<int> WickTheorem::vertex_vec_to_pos(
-    const ElementaryContraction &vertex_vec, std::vector<Vertex> &ops_offset,
+std::vector<int> WickTheorem::elements_vec_to_pos(
+    const ElementaryContraction &elements_vec,
+    std::vector<GraphMatrix> &ops_offset,
     std::map<std::tuple<int, int, bool, int>, int> &op_map, bool creation) {
 
   std::vector<int> result;
 
-  int s = vertex_vec.spaces_in_vertices()[0];
+  int s = elements_vec.spaces_in_elementary_contraction()[0];
 
-  PRINT(PrintLevel::All, cout << "\n  Vertex to position:" << endl;);
+  PRINT(PrintLevel::All, cout << "\n  GraphMatrix to position:" << endl;);
 
-  // Loop over all vertices
-  for (int v = 0; v < vertex_vec.size(); v++) {
-    const Vertex &vertex = vertex_vec[v];
-    int nops = creation ? vertex.cre(s) : vertex.ann(s);
+  // Loop over all graph matrices
+  for (int v = 0; v < elements_vec.size(); v++) {
+    const auto &graph_matrix = elements_vec[v];
+    int nops = creation ? graph_matrix.cre(s) : graph_matrix.ann(s);
     // assign the operator indices
     int ops_off = creation ? ops_offset[v].cre(s) : ops_offset[v].ann(s);
     for (int i = 0; i < nops; i++) {
@@ -435,23 +436,23 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
   scalar_t factor = 1;
 
   // stores the offset for each uncontracted operator
-  std::vector<Vertex> free_vertices;
+  std::vector<GraphMatrix> free_graph_matrix;
   for (const auto &op : ops) {
-    free_vertices.push_back(op.vertex());
+    free_graph_matrix.push_back(op.graph_matrix());
   }
 
   // for each contraction find the combinatorial factor associated to
   // permutations of contracted indices
   for (const auto &contraction : contractions) {
     for (int v = 0; v < contraction.size(); v++) {
-      const Vertex &vertex = contraction[v];
+      const auto &graph_matrix = contraction[v];
       for (int s = 0; s < osi->num_spaces(); s++) {
-        const auto &[kcre, kann] = vertex.vertex(s);
-        const auto &[ncre, nann] = free_vertices[v].vertex(s);
+        const auto &[kcre, kann] = graph_matrix.elements(s);
+        const auto &[ncre, nann] = free_graph_matrix[v].elements(s);
         factor *= binomial(ncre, kcre);
         factor *= binomial(nann, kann);
       }
-      free_vertices[v] -= vertex;
+      free_graph_matrix[v] -= graph_matrix;
     }
   }
 

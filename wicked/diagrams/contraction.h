@@ -7,22 +7,22 @@
 #include "../wicked-def.h"
 #include "helpers/product.hpp"
 
-class Vertex;
+class GraphMatrix;
 
 /// A class to represent an elementary contraction
-class ElementaryContraction : public Product<Vertex> {
+class ElementaryContraction : public Product<GraphMatrix> {
 public:
   /// Constructor
-  ElementaryContraction() : Product<Vertex>() {}
+  ElementaryContraction() : Product<GraphMatrix>() {}
 
   /// Constructor. Set number of creation and annihilation operators
-  ElementaryContraction(const std::vector<Vertex> &vertices)
-      : Product<Vertex>(vertices) {}
+  ElementaryContraction(const std::vector<GraphMatrix> &graph_matrix)
+      : Product<GraphMatrix>(graph_matrix) {}
 
   /// The number of second quantization operator contracted
   int num_ops() const;
 
-  std::vector<int> spaces_in_vertices() const;
+  std::vector<int> spaces_in_elementary_contraction() const;
 };
 
 /// A class to represent an elementary contraction

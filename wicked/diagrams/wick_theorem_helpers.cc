@@ -19,18 +19,18 @@ void print_contraction_graph(const OperatorProduct &ops,
                              const std::vector<int> ops_perm,
                              const std::vector<int> contr_perm) {
 
-  std::vector<Vertex> op_vertex_vec;
+  std::vector<GraphMatrix> op_graph_matrix_vec;
   for (int o : ops_perm) {
-    op_vertex_vec.push_back(ops[o].vertex());
+    op_graph_matrix_vec.push_back(ops[o].graph_matrix());
   }
 
   for (int o : ops_perm) {
     cout << setw(2) << ops[o].label() << "    ";
   }
   cout << endl;
-  cout << to_string(op_vertex_vec) << endl;
+  cout << to_string(op_graph_matrix_vec) << endl;
   for (int c : contr_perm) {
-    std::vector<Vertex> permuted_contr;
+    std::vector<GraphMatrix> permuted_contr;
     for (int o : ops_perm) {
       permuted_contr.push_back(contractions[c][o]);
     }
@@ -40,7 +40,7 @@ void print_contraction_graph(const OperatorProduct &ops,
 }
 
 void print_key(std::tuple<int, int, bool, int> key, int n) {
-  cout << "key[vertex = " << std::get<0>(key)
+  cout << "key[graph_matrix = " << std::get<0>(key)
        << ", space = " << std::get<1>(key)
        << ", creation = " << std::get<2>(key) << ", num = " << std::get<3>(key)
        << "] -> " << n << endl;

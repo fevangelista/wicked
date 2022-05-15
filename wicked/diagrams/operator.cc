@@ -8,14 +8,14 @@ using namespace std;
 
 Operator::Operator(const std::string &label, const std::vector<int> &cre,
                    const std::vector<int> &ann)
-    : label_(label), vertex_(cre, ann) {}
+    : label_(label), graph_matrix_(cre, ann) {}
 
-Operator::Operator(const std::string &label, const Vertex &vertex)
-    : label_(label), vertex_(vertex) {}
+Operator::Operator(const std::string &label, const GraphMatrix &graph_matrix)
+    : label_(label), graph_matrix_(graph_matrix) {}
 
 const std::string &Operator::label() const { return label_; }
 
-Vertex Operator::vertex() const { return vertex_; }
+GraphMatrix Operator::graph_matrix() const { return graph_matrix_; }
 
 scalar_t Operator::factor() const {
   scalar_t result = 1;
@@ -29,14 +29,14 @@ scalar_t Operator::factor() const {
 }
 
 Operator Operator::adjoint() const {
-  return Operator(label(), vertex().adjoint());
+  return Operator(label(), graph_matrix().adjoint());
 }
 
-int Operator::cre(int space) const { return vertex_.cre(space); }
+int Operator::cre(int space) const { return graph_matrix_.cre(space); }
 
-int Operator::ann(int space) const { return vertex_.ann(space); }
+int Operator::ann(int space) const { return graph_matrix_.ann(space); }
 
-int Operator::num_ops() const { return vertex_.num_ops(); }
+int Operator::num_ops() const { return graph_matrix_.num_ops(); }
 
 bool Operator::operator<(Operator const &other) const {
   // Compare the labels
@@ -44,16 +44,16 @@ bool Operator::operator<(Operator const &other) const {
     return true;
   if (label_ > other.label_)
     return false;
-  // Compare the vertices
-  return vertex_ < other.vertex_;
+  // Compare the graph matrices
+  return graph_matrix_ < other.graph_matrix_;
 }
 
 bool Operator::operator==(Operator const &other) const {
-  return ((label_ == other.label_) and (vertex_ == other.vertex_));
+  return ((label_ == other.label_) and (graph_matrix_ == other.graph_matrix_));
 }
 
 bool Operator::operator!=(Operator const &other) const {
-  return ((label_ != other.label_) or (vertex_ != other.vertex_));
+  return ((label_ != other.label_) or (graph_matrix_ != other.graph_matrix_));
 }
 
 std::string Operator::str() const {

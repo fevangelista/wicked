@@ -23,6 +23,10 @@ public:
     return elements_ < other.elements_;
   }
 
+  bool is_equal(const Product<T> &other) const {
+    return elements_ == other.elements_;
+  }
+
   Product adjoint() const {
     Product d;
     for (const auto &e : elements()) {
@@ -48,5 +52,10 @@ public:
 protected:
   prod_t elements_;
 };
+
+template <class T>
+bool operator==(const Product<T> &rhs, const Product<T> &lhs) {
+  return rhs.is_equal(lhs);
+}
 
 #endif // _wicked_product_h_

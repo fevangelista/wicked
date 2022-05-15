@@ -41,6 +41,10 @@ void export_OperatorExpression(py::module &m) {
              rhs -= lhs;
              return rhs;
            })
+      .def("__eq__",
+           [](const OperatorExpression &rhs, const OperatorExpression &lhs) {
+             return rhs.is_equal(lhs);
+           })
       .def("__repr__", &OperatorExpression::str)
       .def("__str__", &OperatorExpression::str)
       .def("__matmul__",
@@ -48,7 +52,7 @@ void export_OperatorExpression(py::module &m) {
              return lhs * rhs;
            })
       .def("canonicalize", &OperatorExpression::canonicalize);
-  m.def("op", &make_diag_operator_expression2,
+  m.def("op", &make_diag_operator_expression,
         "Create a OperatorExpression object");
 
   m.def(

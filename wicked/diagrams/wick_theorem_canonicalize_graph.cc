@@ -44,7 +44,7 @@ std::string contraction_signature(const OperatorProduct &ops,
 
 using namespace std;
 
-// vertex_canonicalization_less(OperatorProduct &ops,
+// elements_canonicalization_less(OperatorProduct &ops,
 //                              CompositeContraction &contractions) {}
 
 bool is_ops_permutation_valid(
@@ -283,7 +283,7 @@ WickTheorem::canonicalize_contraction_graph(
   // permute the order and operator upon a contraction acts
   CompositeContraction best_contractions;
   for (int c : con_perms[best_c_perm]) {
-    std::vector<Vertex> permuted_contr;
+    std::vector<GraphMatrix> permuted_contr;
     for (int o : ops_perms[best_o_perm]) {
       permuted_contr.push_back(contractions[c][o]);
     }
@@ -415,7 +415,7 @@ WickTheorem::canonicalize_contraction_graph_experimental(
   // permute the order and operator upon a contraction acts
   CompositeContraction best_contractions;
   for (int c : con_perms[best_c_perm]) {
-    std::vector<Vertex> permuted_contr;
+    std::vector<GraphMatrix> permuted_contr;
     for (int o : best_ops_perms[best_o_perm]) {
       permuted_contr.push_back(contractions[c][o]);
     }

@@ -21,6 +21,9 @@ public:
   /// add an element
   void add(const T &e, F c = scalar_t(1, 1)) { add_to_map(terms_, e, c); }
 
+  /// comparison
+  bool is_equal(const Algebra &rhs) const { return terms_ == rhs.terms_; }
+
   /// addition assignment
   Algebra &operator+=(const Algebra &rhs) {
     for (const auto &[e, c] : rhs.terms()) {
