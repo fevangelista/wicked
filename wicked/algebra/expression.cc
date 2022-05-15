@@ -137,8 +137,8 @@ Expression::to_manybody_equation(const std::string &label) const {
     std::string signature_str_lower;
     int pos = 0;
     for (const auto &[u, l] : signature) {
-      signature_str_upper += std::string(u, osi->label(pos));
-      signature_str_lower += std::string(l, osi->label(pos));
+      signature_str_upper += std::string(u, orbital_subspaces->label(pos));
+      signature_str_lower += std::string(l, orbital_subspaces->label(pos));
       pos += 1;
     }
     reverse(signature_str_lower.begin(), signature_str_lower.end());
@@ -167,10 +167,10 @@ Expression make_operator_expr(const std::string &label,
   for (const std::string &s : components) {
     auto s_vec = split(s);
 
-    std::vector<int> cre_count(osi->num_spaces(), 0);
-    std::vector<int> ann_count(osi->num_spaces(), 0);
+    std::vector<int> cre_count(orbital_subspaces->num_spaces(), 0);
+    std::vector<int> ann_count(orbital_subspaces->num_spaces(), 0);
     for (const auto &s : s_vec) {
-      int space = osi->label_to_space(s[0]);
+      int space = orbital_subspaces->label_to_space(s[0]);
       ann_count[space] += 1;
     }
 
@@ -179,7 +179,7 @@ Expression make_operator_expr(const std::string &label,
 
     // parse "v+ o"
     for (const auto &s : s_vec) {
-      int space = osi->label_to_space(s[0]);
+      int space = orbital_subspaces->label_to_space(s[0]);
       if (s.size() == 2) {
         auto idx = Index(space, cre_count[space]);
         cre.push_back(idx);

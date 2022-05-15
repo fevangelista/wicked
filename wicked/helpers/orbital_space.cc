@@ -3,9 +3,10 @@
 #include "helpers.h"
 #include "orbital_space.h"
 
-std::shared_ptr<OrbitalSpaceInfo> osi = std::make_shared<OrbitalSpaceInfo>();
+std::shared_ptr<OrbitalSpaceInfo> orbital_subspaces =
+    std::make_shared<OrbitalSpaceInfo>();
 
-std::shared_ptr<OrbitalSpaceInfo> get_osi() { return osi; }
+std::shared_ptr<OrbitalSpaceInfo> get_osi() { return orbital_subspaces; }
 
 std::map<FieldType, std::string> FieldType_to_str{
     {FieldType::Fermion, "fermion"}, {FieldType::Boson, "boson"}};

@@ -72,11 +72,11 @@ make_diag_operator_expression(const std::string &label,
   OperatorExpression result;
   for (const std::string &s : components) {
     auto s_vec = findall(s, "([a-zA-Z][+^]?)");
-    std::vector<int> cre(osi->num_spaces());
-    std::vector<int> ann(osi->num_spaces());
+    std::vector<int> cre(orbital_subspaces->num_spaces());
+    std::vector<int> ann(orbital_subspaces->num_spaces());
 
     for (auto const &el : s_vec) {
-      int space = osi->label_to_space(el[0]);
+      int space = orbital_subspaces->label_to_space(el[0]);
       if (el.size() > 1) {
         cre[space] += 1;
       } else {

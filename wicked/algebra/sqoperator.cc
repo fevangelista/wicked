@@ -11,7 +11,9 @@ SQOperator::~SQOperator() {}
 
 SQOperatorType SQOperator::type() const { return operator_.first; }
 
-FieldType SQOperator::field_type() const { return osi->field_type(space()); }
+FieldType SQOperator::field_type() const {
+  return orbital_subspaces->field_type(space());
+}
 
 Index SQOperator::index() const { return operator_.second; }
 
@@ -21,7 +23,9 @@ bool SQOperator::is_creation() const {
   return type() == SQOperatorType::Creation;
 }
 
-std::string SQOperator::op_symbol() const { return osi->op_symbol(space()); }
+std::string SQOperator::op_symbol() const {
+  return orbital_subspaces->op_symbol(space());
+}
 
 void SQOperator::reindex(index_map_t &idx_map) {
   if (idx_map.count(operator_.second) > 0) {

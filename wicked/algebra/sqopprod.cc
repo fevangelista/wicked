@@ -102,8 +102,8 @@ int SQOpProd::nops() const {
 std::string SQOpProd::str() const {
   std::vector<std::string> s;
   citerate([&](bool cre, const size_t &space, const size_t &i) {
-    s.push_back(std::string(cre ? "a+" : "a-") + "(" + osi->label(space) +
-                std::to_string(i) + ")");
+    s.push_back(std::string(cre ? "a+" : "a-") + "(" +
+                orbital_subspaces->label(space) + std::to_string(i) + ")");
   });
   return join(s, " ");
 }

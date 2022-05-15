@@ -32,21 +32,21 @@ WickTheorem::generate_elementary_contractions(const OperatorProduct &ops) {
       PrintLevel::Summary, cout << "\n  Operator   Space   Cre.   Ann.";
       cout << "\n  ------------------------------";
       for (int op = 0; op < nops; ++op) {
-        for (int s = 0; s < osi->num_spaces(); s++) {
-          cout << "\n      " << op << "        " << osi->label(s) << "      "
-               << ops[op].cre(s) << "      " << ops[op].ann(s);
+        for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
+          cout << "\n      " << op << "        " << orbital_subspaces->label(s)
+               << "      " << ops[op].cre(s) << "      " << ops[op].ann(s);
         }
       };
       cout << "\n";)
 
   // loop over orbital spaces
-  for (int s = 0; s < osi->num_spaces(); s++) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
     PRINT(PrintLevel::Summary, std::cout
                                    << "\n  Elementary contractions for space "
-                                   << osi->label(s) << ": ";)
+                                   << orbital_subspaces->label(s) << ": ";)
 
     // differentiate between various types of spaces
-    SpaceType space_type = osi->space_type(s);
+    SpaceType space_type = orbital_subspaces->space_type(s);
 
     // 1. Pairwise contractions 1 cre + 1 ann operator:
     // ┌───┐

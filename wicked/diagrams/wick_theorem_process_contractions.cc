@@ -200,7 +200,7 @@ WickTheorem::evaluate_contraction(const OperatorProduct &ops,
       sorted_position += 1;
     }
 
-    SpaceType dmstruc = osi->space_type(s);
+    SpaceType dmstruc = orbital_subspaces->space_type(s);
 
     // Pairwise contractions creation-annihilation:
     // ________
@@ -275,7 +275,7 @@ WickTheorem::evaluate_contraction(const OperatorProduct &ops,
   // creation operators come before annihilation operators
   for (SQOperatorType type :
        {SQOperatorType::Creation, SQOperatorType::Annihilation}) {
-    for (int s = 0; s < osi->num_spaces(); s++) {
+    for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
       for (int i = 0; i < sqops.size(); i++) {
         if ((sign_order[i] == -1) and (sqops[i].index().space() == s) and
             (sqops[i].type() == type)) {
@@ -341,7 +341,7 @@ WickTheorem::contraction_tensors_sqops(const OperatorProduct &ops) {
   std::vector<Tensor> tensors;
   std::map<std::tuple<int, int, bool, int>, int> op_map;
 
-  index_counter ic(osi->num_spaces());
+  index_counter ic(orbital_subspaces->num_spaces());
 
   // Loop over all operators
   int n = 0;
@@ -349,7 +349,7 @@ WickTheorem::contraction_tensors_sqops(const OperatorProduct &ops) {
     const auto &op = ops[o];
     // Loop over creation operators (lower indices)
     std::vector<Index> lower;
-    for (int s = 0; s < osi->num_spaces(); s++) {
+    for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
       for (int c = 0; c < op.cre(s); c++) {
         Index idx(s, ic.next_index(s)); // get next available index
         sqops.push_back(SQOperator(SQOperatorType::Creation, idx));
@@ -365,7 +365,7 @@ WickTheorem::contraction_tensors_sqops(const OperatorProduct &ops) {
     // the annihilation operators are layed out in a reversed order (hence the
     // need to reverse the upper indices of the tensor, see below)
     std::vector<Index> upper;
-    for (int s = osi->num_spaces() - 1; s >= 0; s--) {
+    for (int s = orbital_subspaces->num_spaces() - 1; s >= 0; s--) {
       for (int a = op.ann(s) - 1; a >= 0; a--) {
         Index idx(s, ic.next_index(s)); // get next available index
         sqops.push_back(SQOperator(SQOperatorType::Annihilation, idx));
@@ -446,7 +446,7 @@ WickTheorem::combinatorial_factor(const OperatorProduct &ops,
   for (const auto &contraction : contractions) {
     for (int v = 0; v < contraction.size(); v++) {
       const auto &graph_matrix = contraction[v];
-      for (int s = 0; s < osi->num_spaces(); s++) {
+      for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
         const auto &[kcre, kann] = graph_matrix.elements(s);
         const auto &[ncre, nann] = free_graph_matrix[v].elements(s);
         factor *= binomial(ncre, kcre);

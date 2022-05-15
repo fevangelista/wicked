@@ -81,7 +81,7 @@ bool do_contractions_commute(int i, int j, const OperatorProduct &ops,
   // loop over all elementary contractions
   for (const auto &el_contr : contractions) {
     // loop over all orbital spaces
-    for (int s = 0; s < osi->num_spaces(); ++s) {
+    for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
       // check if this is a single contraction
       if (el_contr.num_ops() == 2) {
         if (el_contr[i].cre(s) * el_contr[j].ann(s) > 0) {

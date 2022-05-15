@@ -18,10 +18,12 @@ bool Index::operator<(Index const &other) const {
 }
 
 std::string Index::str() const {
-  return osi->label(space()) + std::to_string(pos());
+  return orbital_subspaces->label(space()) + std::to_string(pos());
 }
 
-std::string Index::latex() const { return osi->index_label(space(), pos()); }
+std::string Index::latex() const {
+  return orbital_subspaces->index_label(space(), pos());
+}
 
 std::string Index::compile(const std::string &format) const { return str(); }
 
@@ -59,7 +61,7 @@ Index make_index_from_str(const std::string &s) {
                              " to an Index object");
   }
   std::string label = sm[1];
-  auto space = osi->label_to_space(label[0]);
+  auto space = orbital_subspaces->label_to_space(label[0]);
   size_t p = stoi(sm[2]);
   return Index(space, p);
 }
@@ -102,7 +104,7 @@ index_map_t remap(const std::vector<Index> &idx_vec1,
 }
 
 std::vector<int> num_indices_per_space(const std::vector<Index> &indices) {
-  std::vector<int> counter(osi->num_spaces());
+  std::vector<int> counter(orbital_subspaces->num_spaces());
   for (const auto &index : indices) {
     counter[index.space()] += 1;
   }
@@ -112,7 +114,7 @@ std::vector<int> num_indices_per_space(const std::vector<Index> &indices) {
 int symmetry_factor(const std::vector<Index> &indices) {
   int result = 1;
   std::vector<int> idx_per_space = num_indices_per_space(indices);
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     result *= factorial(idx_per_space[s]);
   }
   return result;

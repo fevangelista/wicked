@@ -14,7 +14,7 @@ std::vector<int>
 ElementaryContraction::spaces_in_elementary_contraction() const {
   std::vector<int> vec;
   for (const auto &graph_matrix : elements_) {
-    for (int s = 0; s < osi->num_spaces(); ++s) {
+    for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
       if (graph_matrix.ann(s) + graph_matrix.cre(s) > 0) {
         vec.push_back(s);
       }

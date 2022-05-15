@@ -106,10 +106,10 @@ std::string Equation::compile(const std::string &format) const {
 
     std::string lhs_tensor_label = lhs_tensor.label();
     for (const auto &l : lhs_tensor.upper()) {
-      lhs_tensor_label += osi->label(l.space());
+      lhs_tensor_label += orbital_subspaces->label(l.space());
     }
     for (const auto &l : lhs_tensor.lower()) {
-      lhs_tensor_label += osi->label(l.space());
+      lhs_tensor_label += orbital_subspaces->label(l.space());
     }
 
     str_vec.push_back(lhs_tensor_label +
@@ -138,10 +138,10 @@ std::string Equation::compile(const std::string &format) const {
     for (const auto &t : rhs().tensors()) {
       std::string t_label = t.label() + "[\"";
       for (const auto &l : t.upper()) {
-        t_label += osi->label(l.space());
+        t_label += orbital_subspaces->label(l.space());
       }
       for (const auto &l : t.lower()) {
-        t_label += osi->label(l.space());
+        t_label += orbital_subspaces->label(l.space());
       }
       t_label += "\"]";
       args_vec.push_back(t_label);

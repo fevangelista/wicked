@@ -17,10 +17,11 @@ void export_OrbitalSpaceInfo(py::module &m) {
       .def("label", &OrbitalSpaceInfo::label)
       .def("__str__", &OrbitalSpaceInfo::str);
 
-  m.def("osi", []() { return osi; });
+  m.def("osi", []() { return orbital_subspaces; });
 
   m.def(
-      "reset_space", []() { osi->reset(); }, "Reset the orbital space");
+      "reset_space", []() { orbital_subspaces->reset(); },
+      "Reset the orbital space");
 
   m.def(
       "add_space",
@@ -30,8 +31,8 @@ void export_OrbitalSpaceInfo(py::module &m) {
          const std::vector<char> &elementary_spaces) {
         FieldType field_type = string_to_field_type(field_type_str);
         SpaceType space_type = string_to_space_type(space_type_str);
-        osi->add_space(label, field_type, space_type, indices,
-                       elementary_spaces);
+        orbital_subspaces->add_space(label, field_type, space_type, indices,
+                                     elementary_spaces);
       },
       "label"_a, "field_type"_a, "space_type"_a, "indices"_a,
       "elementary_spaces"_a = std::vector<char>(),
@@ -39,5 +40,5 @@ void export_OrbitalSpaceInfo(py::module &m) {
       "[fermion,boson]. `space_type` can be any of "
       "[occupied,unoccupied,general]");
 
-  m.def("num_spaces", []() { return osi->num_spaces(); });
+  m.def("num_spaces", []() { return orbital_subspaces->num_spaces(); });
 }

@@ -112,7 +112,7 @@ std::vector<int> WickTheorem::construct_candidates(
     // free (uncontracted) operators
     bool is_valid_contraction = true;
     for (int A = 0; A < nops; A++) {
-      for (int s = 0; s < osi->num_spaces(); s++) {
+      for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
         if (free_graph_matrix_vec[A].cre(s) < el_contr[A].cre(s)) {
           is_valid_contraction = false;
         }

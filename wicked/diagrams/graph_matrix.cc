@@ -11,7 +11,7 @@ GraphMatrix::GraphMatrix() {}
 
 GraphMatrix::GraphMatrix(const std::vector<int> &cre,
                          const std::vector<int> &ann) {
-  for (int i = 0; i < osi->num_spaces(); i++) {
+  for (int i = 0; i < orbital_subspaces->num_spaces(); i++) {
     elements_[i] = std::make_pair(cre[i], ann[i]);
   }
 }
@@ -59,7 +59,7 @@ bool GraphMatrix::operator!=(GraphMatrix const &other) const {
 }
 
 GraphMatrix &GraphMatrix::operator+=(const GraphMatrix &rhs) {
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     elements_[s].first += rhs.elements_[s].first;
     elements_[s].second += rhs.elements_[s].second;
   }
@@ -67,7 +67,7 @@ GraphMatrix &GraphMatrix::operator+=(const GraphMatrix &rhs) {
 }
 
 GraphMatrix &GraphMatrix::operator-=(const GraphMatrix &rhs) {
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     elements_[s].first -= rhs.elements_[s].first;
     elements_[s].second -= rhs.elements_[s].second;
   }
@@ -75,9 +75,9 @@ GraphMatrix &GraphMatrix::operator-=(const GraphMatrix &rhs) {
 }
 
 GraphMatrix GraphMatrix::adjoint() const {
-  std::vector<int> cre_v(osi->num_spaces(), 0);
-  std::vector<int> ann_v(osi->num_spaces(), 0);
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  std::vector<int> cre_v(orbital_subspaces->num_spaces(), 0);
+  std::vector<int> ann_v(orbital_subspaces->num_spaces(), 0);
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     cre_v[s] = ann(s);
     ann_v[s] = cre(s);
   }
@@ -86,24 +86,24 @@ GraphMatrix GraphMatrix::adjoint() const {
 
 std::string GraphMatrix::str() const {
   // std::vector<std::string> cv, av;
-  // for (int s = 0; s < osi->num_spaces(); ++s) {
+  // for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
   //   cv.push_back(to_string(cre(s)));
   // }
-  // for (int s = 0; s < osi->num_spaces(); ++s) {
+  // for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
   //   av.push_back(to_string(ann(s)));
   // }
   // return "[" + join(cv, " ") + "|" + join(av, " ") + "]";
 
   std::vector<std::string> cv, av;
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     for (int i = 0; i < cre(s); ++i) {
-      std::string op_s(1, osi->label(s));
+      std::string op_s(1, orbital_subspaces->label(s));
       cv.push_back(op_s + "+");
     }
   }
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     for (int i = 0; i < ann(s); ++i) {
-      std::string op_s(1, osi->label(s));
+      std::string op_s(1, orbital_subspaces->label(s));
       cv.push_back(op_s);
     }
   }
@@ -123,7 +123,7 @@ int sum_num_ops(const std::vector<GraphMatrix> &graph_matrices) {
 std::string to_string(const std::vector<GraphMatrix> &elements_vec) {
   // print the creation operator above
   std::vector<std::string> lines;
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     std::string line;
     for (const auto &graph_matrix : elements_vec) {
       line += std::to_string(graph_matrix.cre(s)) + " " +
@@ -136,10 +136,10 @@ std::string to_string(const std::vector<GraphMatrix> &elements_vec) {
 
 std::string signature(const GraphMatrix &graph_matrix) {
   std::string str;
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     str += std::to_string(graph_matrix.cre(s));
   }
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     str += to_string(graph_matrix.ann(s));
   }
   return str;

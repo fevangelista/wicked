@@ -13,7 +13,8 @@ Tensor::Tensor(const std::string &label, const std::vector<Index> &lower,
     : label_(label), lower_(lower), upper_(upper), symmetry_(symmetry) {}
 
 std::vector<std::pair<int, int>> Tensor::signature() const {
-  std::vector<std::pair<int, int>> result(osi->num_spaces(), std::pair(0, 0));
+  std::vector<std::pair<int, int>> result(orbital_subspaces->num_spaces(),
+                                          std::pair(0, 0));
   for (const Index &idx : upper_) {
     result[idx.space()].first += 1;
   }

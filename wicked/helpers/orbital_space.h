@@ -93,7 +93,7 @@ private:
   std::map<std::string, int> indices_to_pos_;
 };
 
-extern std::shared_ptr<OrbitalSpaceInfo> osi;
+extern std::shared_ptr<OrbitalSpaceInfo> orbital_subspaces;
 
 std::shared_ptr<OrbitalSpaceInfo> get_osi();
 

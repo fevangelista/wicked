@@ -33,7 +33,7 @@ public:
   const std::vector<Index> &upper() const { return upper_; }
 
   /// Return a reference to the symmetry
-  const SymmetryType symmetry() const { return symmetry_; }
+  SymmetryType symmetry() const { return symmetry_; }
 
   /// Set the lower indices
   void set_lower(const std::vector<Index> &indices) { lower_ = indices; }

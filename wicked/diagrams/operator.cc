@@ -19,10 +19,10 @@ GraphMatrix Operator::graph_matrix() const { return graph_matrix_; }
 
 scalar_t Operator::factor() const {
   scalar_t result = 1;
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     result /= static_cast<scalar_t>(factorial(cre(s)));
   }
-  for (int s = 0; s < osi->num_spaces(); ++s) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); ++s) {
     result /= static_cast<scalar_t>(factorial(ann(s)));
   }
   return result;
@@ -63,16 +63,16 @@ std::string Operator::str() const {
   }
   s.push_back(label_);
   s.push_back("{");
-  for (int i = 0; i < osi->num_spaces(); ++i) {
+  for (int i = 0; i < orbital_subspaces->num_spaces(); ++i) {
     for (int j = 0; j < cre(i); j++) {
-      std::string op_s(1, osi->label(i));
+      std::string op_s(1, orbital_subspaces->label(i));
       s.push_back(op_s + "+");
     }
   }
 
-  for (int i = osi->num_spaces() - 1; i >= 0; --i) {
+  for (int i = orbital_subspaces->num_spaces() - 1; i >= 0; --i) {
     for (int j = 0; j < ann(i); j++)
-      s.push_back(std::string(1, osi->label(i)));
+      s.push_back(std::string(1, orbital_subspaces->label(i)));
   }
 
   s.push_back("}");
@@ -87,7 +87,7 @@ std::ostream &operator<<(std::ostream &os, const Operator &op) {
 
 bool do_operators_commute(const Operator &a, const Operator &b) {
   int noncommuting = 0;
-  for (int s = 0; s < osi->num_spaces(); s++) {
+  for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
     noncommuting += a.ann(s) * b.cre(s) + a.cre(s) * b.ann(s);
   }
   return noncommuting == 0;
@@ -105,14 +105,14 @@ Operator make_diag_operator(const std::string &label,
                             const std::vector<char> &cre_labels,
                             const std::vector<char> &ann_labels) {
   // count the number of creation and annihilation operators in each space
-  std::vector<int> cre(osi->num_spaces());
-  std::vector<int> ann(osi->num_spaces());
+  std::vector<int> cre(orbital_subspaces->num_spaces());
+  std::vector<int> ann(orbital_subspaces->num_spaces());
   for (const auto &l : cre_labels) {
-    int space = osi->label_to_space(l);
+    int space = orbital_subspaces->label_to_space(l);
     cre[space] += 1;
   }
   for (const auto &l : ann_labels) {
-    int space = osi->label_to_space(l);
+    int space = orbital_subspaces->label_to_space(l);
     ann[space] += 1;
   }
 

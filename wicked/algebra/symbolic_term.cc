@@ -127,9 +127,9 @@ scalar_t SymbolicTerm::canonicalize() {
 
   // 2. Relabel indices of tensors and operators
   // vector to keep track of how many indices in each space
-  std::vector<int> sqop_index_count(osi->num_spaces(), 0);
+  std::vector<int> sqop_index_count(orbital_subspaces->num_spaces(), 0);
   // vector to keep track of how many indices in each space
-  std::vector<int> tens_index_count(osi->num_spaces(), 0);
+  std::vector<int> tens_index_count(orbital_subspaces->num_spaces(), 0);
   index_map_t index_map;
   std::map<Index, bool> is_operator_index;
 
@@ -198,8 +198,8 @@ scalar_t SymbolicTerm::simplify() {
   WPRINT(cout << "\nSymbolic term simplification " << endl;);
   scalar_t factor = 1;
   // Canonicalize each space separately
-  for (int s = 0; s < osi->num_spaces(); s++) {
-    WPRINT(cout << "\nSpace " << osi->label(s) << endl;);
+  for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
+    WPRINT(cout << "\nSpace " << orbital_subspaces->label(s) << endl;);
 
     std::vector<std::vector<Index>> equivalent_classes;
     std::vector<std::pair<std::bitset<64>, std::bitset<64>>> ul_bit_masks;
