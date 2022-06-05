@@ -23,6 +23,29 @@ def generate_equation(mbeq, nocc, nvir):
     return funct
 
 
+def update_cc_amplitudes(T, R, invD, rank: int):
+    """
+    A function to updated the CCSD amplitudes
+
+    Parameters
+    ----------
+    T : dict[np.ndarray]
+        The cluster amplitudes
+    R : dict[np.ndarray]
+        The CC residual
+    invD : dict[np.ndarray]
+        The inverse MP denominators
+    rank : int
+        The rank of the CC equations (e.g., CCSD : rank = 2)
+    """
+    if rank >= 1:
+        T["ov"] += np.einsum("ia,ia->ia", R["ov"], invD["ov"])
+    if rank >= 2:
+        T["oovv"] += np.einsum("ijab,ijab->ijab", R["oovv"], invD["oovv"])
+    if rank >= 3:
+        T["ooovvv"] += np.einsum("ijkabc,ijkabc->ijkabc", R["ooovvv"], invD["ooovvv"])
+
+
 def antisymmetrize_residual_2_2(Roovv, nocc, nvir):
     # antisymmetrize the residual
     Roovv_anti = np.zeros((nocc, nocc, nvir, nvir))
@@ -31,11 +54,6 @@ def antisymmetrize_residual_2_2(Roovv, nocc, nvir):
     Roovv_anti -= np.einsum("ijab->ijba", Roovv)
     Roovv_anti += np.einsum("ijab->jiba", Roovv)
     return Roovv_anti
-
-
-def update_amplitudes_ccsd(T, R, invD):
-    T["ov"] += np.einsum("ia,ia->ia", R["ov"], invD["ov"])
-    T["oovv"] += np.einsum("ijab,ijab->ijab", R["oovv"], invD["oovv"])
 
 
 def antisymmetrize_residual_3_3(Rooovvv, nocc, nvir):
@@ -80,68 +98,34 @@ def antisymmetrize_residual_3_3(Rooovvv, nocc, nvir):
     return Rooovvv_anti
 
 
-def update_amplitudes_ccsdt(T, R, invD):
-    T["ov"] += np.einsum("ia,ia->ia", R["ov"], invD["ov"])
-    T["oovv"] += np.einsum("ijab,ijab->ijab", R["oovv"], invD["oovv"])
-    T["ooovvv"] += np.einsum("ijkabc,ijkabc->ijkabc", R["ooovvv"], invD["ooovvv"])
-
-
-def compute_inverse_denominators(H, nocc, nvir, rank):
+def compute_inverse_denominators(H: dict, nocc: list[int], nvir: list[int], rank: int):
+    """
+    A function to compute the inverse of Møller-Plesset denominators
+    """
     fo = np.diag(H["oo"])
     fv = np.diag(H["vv"])
 
     D = {}
 
-    if rank < 1:
-        return D
+    if rank >= 1:
+        D["ov"] = 1.0 / (fo.reshape(-1, 1) - fv)
 
-    d1 = np.zeros((nocc, nvir))
-    for i in range(nocc):
-        for a in range(nvir):
-            si = i % 2
-            sa = a % 2
-            if si == sa:
-                d1[i][a] = 1.0 / (fo[i] - fv[a])
-    D["ov"] = d1
+    if rank >= 2:
+        D["oovv"] = 1.0 / (
+            fo.reshape(-1, 1, 1, 1) + fo.reshape(-1, 1, 1) - fv.reshape(-1, 1) - fv
+        )
 
-    if rank < 2:
-        return D
-
-    d2 = np.zeros((nocc, nocc, nvir, nvir))
-    for i in range(nocc):
-        for j in range(nocc):
-            for a in range(nvir):
-                for b in range(nvir):
-                    si = i % 2
-                    sj = j % 2
-                    sa = a % 2
-                    sb = b % 2
-                    if si == sj == sa == sb:
-                        d2[i][j][a][b] = 1.0 / (fo[i] + fo[j] - fv[a] - fv[b])
-                    if si == sa and sj == sb and si != sj:
-                        d2[i][j][a][b] = 1.0 / (fo[i] + fo[j] - fv[a] - fv[b])
-                    if si == sb and sj == sa and si != sj:
-                        d2[i][j][a][b] = 1.0 / (fo[i] + fo[j] - fv[a] - fv[b])
-    D["oovv"] = d2
-
-    if rank < 3:
-        return D
-
-    d3 = np.zeros((nocc, nocc, nocc, nvir, nvir, nvir))
-    for i in range(nocc):
-        for j in range(nocc):
-            for k in range(nocc):
-                for a in range(nvir):
-                    for b in range(nvir):
-                        for c in range(nvir):
-                            si = i % 2
-                            sj = j % 2
-                            sk = k % 2
-                            sa = a % 2
-                            sb = b % 2
-                            sc = c % 2
-                            d3[i][j][k][a][b][c] = 1.0 / (
-                                fo[i] + fo[j] + fo[k] - fv[a] - fv[b] - fv[c]
-                            )
-    D["ooovvv"] = d3
+    if rank >= 3:
+        D["ooovvv"] = 1.0 / (
+            fo.reshape(-1, 1, 1, 1, 1, 1)
+            + fo.reshape(-1, 1, 1, 1, 1)
+            + fo.reshape(-1, 1, 1, 1)
+            - fv.reshape(-1, 1, 1)
+            - fv.reshape(-1, 1)
+            - fv
+        )
+    if rank > 3:
+        raise ValueError(
+            f"compute_inverse_denominators() supports rank up to 3, but was called with rank = {rank}"
+        )
     return D
