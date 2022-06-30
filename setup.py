@@ -84,7 +84,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="wicked",
-    version="0.1",
+    version="1.0.0",
     author="Francesco A. Evangelista",
     description="",
     long_description="",
