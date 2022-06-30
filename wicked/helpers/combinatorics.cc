@@ -1,8 +1,6 @@
 #include "combinatorics.h"
 
 long long int factorial(int n) {
-  if (n == 0)
-    return 1;
   long long int result = 1;
   for (long long int i = 2; i <= n; ++i) {
     result *= i;
