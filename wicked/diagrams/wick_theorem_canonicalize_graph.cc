@@ -149,7 +149,7 @@ WickTheorem::canonicalize_contraction_graph(
     if (op.num_ops() % 2 != 0) {
       auto msg =
           "\n\n  WickTheorem::canonicalize_contraction cannot yet handle "
-          "operators with an even number of sqops.\n";
+          "operators with an odd number of sqops.\n";
       throw std::runtime_error(msg);
     }
   }
