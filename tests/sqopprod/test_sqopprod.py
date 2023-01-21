@@ -20,7 +20,7 @@ def test_sqopprod():
 
     opprod = w.sqopprod(["v_0"], ["o_0"])
     assert str(opprod) == "a+(v0) a-(o0)"
-    assert opprod.latex() == "\hat{a}^\dagger_{a} \hat{a}_{i}"
+    assert opprod.latex() == r"\hat{a}^\dagger_{a} \hat{a}_{i}"
 
     opprod = w.sqopprod(["v_0", "v_1"], ["o_0", "o_1"])
     assert str(opprod) == "a+(v0) a+(v1) a-(o1) a-(o0)"
