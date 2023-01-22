@@ -172,7 +172,7 @@ Tensor make_tensor(const std::string &label,
 
 Tensor make_tensor_from_str(const std::string &s, SymmetryType symmetry) {
   std::smatch sm;
-  auto tensor_re =
+  auto const tensor_re =
       std::regex("([a-zA-Z0-9]+)\\^\\{([\\w,\\s]*)\\}_\\{([\\w,\\s]*)\\}");
   auto m = std::regex_match(s, sm, tensor_re);
   if (not m) {

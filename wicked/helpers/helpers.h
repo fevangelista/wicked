@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <numeric>
 #include <regex>
 #include <string>
 #include <vector>
@@ -23,6 +24,12 @@ std::vector<std::string> findall(const std::string &s,
 
 /// Split indices
 std::vector<std::string> split_indices(const std::string &s);
+
+template <class T> std::vector<T> iota_vector(size_t size, T value = T(0)) {
+  std::vector<T> v(size);
+  std::iota(v.begin(), v.end(), value);
+  return v;
+}
 
 /// A range iterator class used to loop over
 class int_matrix {

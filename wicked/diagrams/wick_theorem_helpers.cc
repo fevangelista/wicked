@@ -24,17 +24,17 @@ void print_contraction_graph(const OperatorProduct &ops,
     op_graph_matrix_vec.push_back(ops[o].graph_matrix());
   }
 
-  for (int o : ops_perm) {
-    cout << setw(2) << ops[o].label() << "    ";
-  }
-  cout << endl;
-  cout << to_string(op_graph_matrix_vec) << endl;
   for (int c : contr_perm) {
     std::vector<GraphMatrix> permuted_contr;
     for (int o : ops_perm) {
       permuted_contr.push_back(contractions[c][o]);
     }
     cout << "\n" << to_string(permuted_contr) << endl;
+  }
+  cout << endl;
+  cout << to_string(op_graph_matrix_vec) << endl;
+  for (int o : ops_perm) {
+    cout << setw(2) << ops[o].label() << "    ";
   }
   cout << endl;
 }

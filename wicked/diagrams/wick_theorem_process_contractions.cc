@@ -86,7 +86,7 @@ Expression WickTheorem::process_contractions(scalar_t factor,
 
       timer te;
       std::pair<SymbolicTerm, scalar_t> term_factor =
-          evaluate_contraction(best_ops, best_contractions, factor);
+          evaluate_contraction(best_ops, best_contractions, factor * sign);
       timers_["evaluate_contraction"] += te.get();
 
       SymbolicTerm &term = term_factor.first;

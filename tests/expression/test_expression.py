@@ -80,8 +80,19 @@ def test_expression4():
     assert CD_bch.size() == 1
 
 
+def test_expression5():
+    w.reset_space()
+    w.add_space("o", "fermion", "occupied", ["i", "j", "k", "l", "m"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c", "d", "e", "f"])
+    # empty string corresponds to no operator
+    expr = w.expression("f^{o0}_{}")
+    print(str(expr))
+    assert str(expr) == "f^{o0}_{}"
+
+
 if __name__ == "__main__":
     test_expression()
     test_expression2()
     test_expression3()
     test_expression4()
+    test_expression5()
