@@ -1,7 +1,7 @@
 #include <numeric>
 #include <regex>
 
-#if USE_BOOST_RATIONAL
+#if USE_BOOST_1024_INT
 #include "boost/lexical_cast.hpp"
 #endif
 
@@ -82,7 +82,7 @@ std::string rational::str(bool sign) const {
         s += "-";
       } else {
         if (numerator_ != 1) {
-#if USE_BOOST_RATIONAL
+#if USE_BOOST_1024_INT
           s += boost::lexical_cast<std::string>(numerator_);
 #else
           s += std::to_string(numerator_);
@@ -90,7 +90,7 @@ std::string rational::str(bool sign) const {
         }
       }
     } else {
-#if USE_BOOST_RATIONAL
+#if USE_BOOST_1024_INT
       s += boost::lexical_cast<std::string>(numerator_) + "/" +
            boost::lexical_cast<std::string>(denominator_);
 #else
@@ -102,7 +102,7 @@ std::string rational::str(bool sign) const {
 }
 
 std::string rational::repr() const {
-#if USE_BOOST_RATIONAL
+#if USE_BOOST_1024_INT
   return "rational(" + boost::lexical_cast<std::string>(numerator_) + "," +
          boost::lexical_cast<std::string>(denominator_) + ")";
 #else
@@ -122,7 +122,7 @@ std::string rational::latex() const {
       } else if (numerator_ == -1) {
         s += "-";
       } else {
-#if USE_BOOST_RATIONAL
+#if USE_BOOST_1024_INT
         s += boost::lexical_cast<std::string>(numerator_);
 #else
         s += std::to_string(numerator_);
@@ -134,10 +134,9 @@ std::string rational::latex() const {
       } else {
         s += "-";
       }
-#if USE_BOOST_RATIONAL
-      s += "\\frac{" +
-           boost::lexical_cast<std::string>(boost::abs(numerator_)) + "}{" +
-           boost::lexical_cast<std::string>(denominator_) + "}";
+#if USE_BOOST_1024_INT
+      s += "\\frac{" + boost::lexical_cast<std::string>(abs(numerator_)) +
+           "}{" + boost::lexical_cast<std::string>(denominator_) + "}";
 #else
       s += "\\frac{" + std::to_string(std::abs(numerator_)) + "}{" +
            std::to_string(denominator_) + "}";
@@ -190,7 +189,7 @@ std::ostream &operator<<(std::ostream &os, const rational &rhs) {
 
 void rational::reduce() {
 // find the gcd
-#if USE_BOOST_RATIONAL
+#if USE_BOOST_1024_INT
   rational_t gcd = boost::gcd(numerator_, denominator_);
 #else
   rational_t gcd = std::gcd(numerator_, denominator_);
@@ -235,3 +234,6 @@ rational make_rational_from_str(const std::string &s) {
   }
   return rational(numerator, denominator);
 }
+
+/// return true if boost rational is used
+bool use_boost_1024_int() { return USE_BOOST_1024_INT; }
