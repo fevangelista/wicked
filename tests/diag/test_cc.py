@@ -48,7 +48,16 @@ def cc_equations(n):
         
     return equations
 
-def test_cc_n(max_n):
+def test_cc():
+    """Test the CC equations"""
+    # The case of n = 8 can be tested only if the boost library is available
+    # otherwise we get the wrong number of terms for the CC equations
+    if w.use_boost_1024_int():
+        cc_n(8)
+    else:
+        cc_n(7)
+
+def cc_n(max_n):
     """Evaluate the number of terms in the n-th order CC equations"""
     # The number of terms in the CC equations for n = 0, 1, 2, ..., 8
     diagrams_count_ref = [[1],
@@ -84,7 +93,4 @@ def test_cc_n(max_n):
     assert diagrams_count == diagrams_count_ref[:max_n + 1]       
 
 if __name__ == "__main__":
-    if w.use_boost_1024_int():
-        test_cc_n(8)
-    else:
-        test_cc_n(7)
+    test_cc()
