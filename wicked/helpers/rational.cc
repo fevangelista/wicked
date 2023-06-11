@@ -236,4 +236,8 @@ rational make_rational_from_str(const std::string &s) {
 }
 
 /// return true if boost rational is used
-bool use_boost_1024_int() { return USE_BOOST_1024_INT; }
+#if USE_BOOST_1024_INT
+bool use_boost_1024_int() { return true; }
+#else
+bool use_boost_1024_int() { return false; }
+#endif
