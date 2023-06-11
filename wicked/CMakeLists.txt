@@ -15,4 +15,20 @@ if(CODE_COVERAGE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 endif(CODE_COVERAGE)
 
+# Look for the Boost libraries
+find_package(Boost)
+
+# Check if Boost was found
+if(Boost_FOUND)
+    message(STATUS "Boost found")
+
+    # Define the USE_BOOST_1024_INT flag
+    add_definitions(-DUSE_BOOST_1024_INT)
+
+    # Add Boost's include directories to the build
+    include_directories(${Boost_INCLUDE_DIRS})
+else()
+    message(STATUS "Boost not found")
+endif()
+
 pybind11_add_module(_wicked ${SRC_LIST} ${module_SOURCES})

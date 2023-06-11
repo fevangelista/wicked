@@ -37,4 +37,6 @@ void export_rational(py::module &m) {
       .def("str", &rational::str);
 
   m.def("make_rational", &make_rational_from_str);
+  m.def("use_boost_1024_int", &use_boost_1024_int,
+        "Return true if 1024-bit integers are used");
 }

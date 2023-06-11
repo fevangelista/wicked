@@ -3,8 +3,12 @@
 
 #include <ostream>
 
-#define USE_BOOST_RATIONAL 0
-#if USE_BOOST_RATIONAL
+/// USE_BOOST_1024_INT is set to true by CMake if boost is found
+/// otherwise, we use long long int.
+/// Note that long long int is not sufficient for all cases.
+/// For example, the CC equations with up to 8-body excitation operators cannot
+/// be handled with long long int.
+#if USE_BOOST_1024_INT
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/rational.hpp>
 using rational_t = boost::multiprecision::int1024_t;
@@ -73,9 +77,11 @@ rational operator-(rational lhs, const rational &rhs);
 rational operator*(rational lhs, const rational &rhs);
 /// division
 rational operator/(rational lhs, const rational &rhs);
-
+/// make a rational from a string
 rational make_rational_from_str(const std::string &s);
-
+/// output a rational to a stream
 std::ostream &operator<<(std::ostream &os, const rational &rhs);
+/// return true if boost rational is used
+bool use_boost_1024_int();
 
 #endif // _wicked_rational_h_
