@@ -21,7 +21,6 @@ void export_SymbolicTerm(py::module &m) {
       .def("set", py::overload_cast<const std::vector<SQOperator> &>(
                       &SymbolicTerm::set))
       .def("set_normal_ordered", &SymbolicTerm::set_normal_ordered);
-  ;
 
   py::class_<Term, std::shared_ptr<Term>>(m, "Term")
       .def(py::init<>())

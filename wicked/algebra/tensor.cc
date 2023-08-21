@@ -89,6 +89,14 @@ scalar_t Tensor::canonicalize() {
   return (symmetry_ == SymmetryType::Antisymmetric) ? sign : scalar_t(1);
 }
 
+Tensor Tensor::adjoint() const {
+  Tensor result(*this);
+  result.set_lower(this->lower());
+  result.set_upper(this->upper());
+  result.is_complex_conjugate_ = not this->is_complex_conjugate_;
+  return result;
+}
+
 std::string Tensor::str() const {
   std::vector<std::string> str_vec_upper;
   std::vector<std::string> str_vec_lower;

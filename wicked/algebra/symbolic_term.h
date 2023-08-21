@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "../helpers/product.hpp"
 #include "../wicked-def.h"
 #include "index.h"
 #include "sqoperator.h"
@@ -29,10 +30,12 @@ public:
   void set_normal_ordered(bool val);
   void set(const std::vector<Tensor> &tensors);
   void set(const std::vector<SQOperator> &op);
+  void set(const Product<SQOperator> &op);
 
   /// Add one or more SQOperators to the left
   void add(const SQOperator &op);
   void add(const std::vector<SQOperator> &ops);
+  void add(const Product<SQOperator> &ops);
 
   /// Add a tensor
   void add(const Tensor &tensor);
@@ -47,7 +50,7 @@ public:
   bool normal_ordered() const { return normal_ordered_; }
 
   /// Return the SQ operators
-  const std::vector<SQOperator> &ops() const { return operators_; }
+  const std::vector<SQOperator> &ops() const { return operators_.vec(); }
 
   /// Return the tensors
   const std::vector<Tensor> &tensors() const { return tensors_; }
@@ -57,6 +60,9 @@ public:
 
   /// Canonicalize this term and return the overall phase factor
   scalar_t canonicalize();
+
+  /// Return the adjoint of this symbolic term
+  SymbolicTerm adjoint() const;
 
   /// Canonicalize this term and return the overall phase factor
   // bool is_connected();
@@ -81,7 +87,7 @@ public:
 protected:
   // ==> Class private data <==
   bool normal_ordered_ = false;
-  std::vector<SQOperator> operators_;
+  Product<SQOperator> operators_;
   std::vector<Tensor> tensors_;
 
   // ==> Class private functions <==

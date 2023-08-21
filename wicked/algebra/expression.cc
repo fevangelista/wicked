@@ -65,6 +65,14 @@ Expression &Expression::canonicalize() {
   return *this;
 }
 
+Expression Expression::adjoint() const {
+  Expression expr;
+  for (const auto &[e, c] : terms_) {
+    expr.add(e.adjoint(), c);
+  }
+  return expr;
+}
+
 Expression &Expression::reindex(index_map_t &idx_map) {
   std::map<SymbolicTerm, scalar_t> reindexed_terms;
   for (auto &kv : terms_) {

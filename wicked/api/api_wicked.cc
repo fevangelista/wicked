@@ -12,7 +12,6 @@ void export_combinatorics(py::module &m);
 void export_OrbitalSpaceInfo(py::module &m);
 void export_Index(py::module &m);
 void export_SQOperator(py::module &m);
-void export_SQOpProd(py::module &m);
 void export_Tensor(py::module &m);
 void export_SymbolicTerm(py::module &m);
 void export_Expression(py::module &m);
@@ -29,7 +28,6 @@ PYBIND11_MODULE(_wicked, m) {
   export_OrbitalSpaceInfo(m);
   export_Index(m);
   export_SQOperator(m);
-  export_SQOpProd(m);
   export_Tensor(m);
   export_SymbolicTerm(m);
   export_Expression(m);

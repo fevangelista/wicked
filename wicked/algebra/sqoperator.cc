@@ -1,4 +1,5 @@
 #include "sqoperator.h"
+#include "../helpers/product.hpp"
 #include "helpers/combinatorics.h"
 #include "helpers/helpers.h"
 #include "index.h"
@@ -68,6 +69,12 @@ std::string SQOperator::latex() const {
   return s;
 }
 
+SQOperator SQOperator::adjoint() const {
+  SQOperatorType type =
+      (is_creation() ? SQOperatorType::Annihilation : SQOperatorType::Creation);
+  return SQOperator(type, index());
+}
+
 std::string SQOperator::compile(const std::string &format) const {
   throw std::runtime_error(
       "SQOperator::compile() - Operation does not make sense");
@@ -83,9 +90,9 @@ std::ostream &operator<<(std::ostream &os, const SQOperator &op) {
   return os;
 }
 
-scalar_t canonicalize_sqops(std::vector<SQOperator> &sqops, bool reversed) {
+scalar_t canonicalize_sqops(Product<SQOperator> &sqops, bool reversed) {
   std::vector<std::pair<SQOperator, int>> sqop_pos;
-  for (const auto &[n, sqop] : enumerate(sqops)) {
+  for (const auto &[n, sqop] : enumerate(sqops.vec())) {
     sqop_pos.push_back(std::make_pair(sqop, n));
   }
   // when reversed == false, we sort in increasing order

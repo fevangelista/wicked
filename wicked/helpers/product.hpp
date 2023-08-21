@@ -15,6 +15,8 @@ public:
 
   const prod_t &elements() const { return elements_; }
 
+  void clear() { elements_.clear(); }
+
   size_t size() const { return elements_.size(); }
 
   void push_back(const T &e) { elements_.push_back(e); }
@@ -48,6 +50,9 @@ public:
   typename std::vector<T>::const_iterator end() const {
     return elements_.end();
   }
+
+  const std::vector<T> &vec() const { return elements_; }
+  std::vector<T> &vec() { return elements_; }
 
 protected:
   prod_t elements_;

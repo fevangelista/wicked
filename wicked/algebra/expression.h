@@ -51,6 +51,8 @@ public:
   // /// Substract an expression
   // Expression &operator-=(const Expression &terms);
 
+  Expression adjoint() const;
+
   /// Return a string representation
   std::string str() const;
 

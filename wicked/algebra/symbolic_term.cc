@@ -19,11 +19,18 @@ SymbolicTerm::SymbolicTerm(bool normal_ordered,
 
 void SymbolicTerm::set_normal_ordered(bool val) { normal_ordered_ = val; }
 
-void SymbolicTerm::set(const std::vector<SQOperator> &op) { operators_ = op; }
+void SymbolicTerm::set(const std::vector<SQOperator> &ops) { operators_ = ops; }
+
+void SymbolicTerm::set(const Product<SQOperator> &op) { operators_ = op; }
 
 void SymbolicTerm::add(const SQOperator &op) { operators_.push_back(op); }
 
 void SymbolicTerm::add(const std::vector<SQOperator> &ops) {
+  auto product = Product<SQOperator>(ops);
+  add(product);
+}
+
+void SymbolicTerm::add(const Product<SQOperator> &ops) {
   for (const auto &op : ops) {
     add(op);
   }
@@ -32,6 +39,16 @@ void SymbolicTerm::add(const std::vector<SQOperator> &ops) {
 void SymbolicTerm::add(const Tensor &tensor) { tensors_.push_back(tensor); }
 
 int SymbolicTerm::nops() const { return operators_.size(); }
+
+SymbolicTerm SymbolicTerm::adjoint() const {
+  SymbolicTerm result;
+  result.set_normal_ordered(normal_ordered_);
+  for (const auto &tensor : tensors_) {
+    result.add(tensor.adjoint());
+  }
+  result.add(operators_.adjoint());
+  return result;
+}
 
 // std::vector<Index> SymbolicTerm::indices() const {
 //   std::vector<Index> result;
