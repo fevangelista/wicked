@@ -20,7 +20,4 @@
 #include "helpers/rational.h"
 using scalar_t = rational;
 
-/// Bit array
-using bitarray = std::bitset<64>;
-
 #endif // #ifndef _wicked_def_h_
