@@ -26,10 +26,22 @@ void export_Expression(py::module &m) {
              lhs += rhs;
              return lhs;
            })
+      .def("__sub__",
+           [](Expression rhs, const Expression &lhs) {
+             rhs -= lhs;
+             return rhs;
+           })
+      .def("__matmul__",
+           [](Expression rhs, const Expression &lhs) {
+             rhs *= lhs;
+             return rhs;
+           })
       .def("latex", &Expression::latex, "sep"_a = " \\\\ \n")
       .def("to_manybody_equation", &Expression::to_manybody_equation)
       .def("to_manybody_equations", &Expression::to_manybody_equation)
-      .def("canonicalize", &Expression::canonicalize);
+      .def("canonicalize", &Expression::canonicalize)
+      .def("adjoint", &Expression::adjoint,
+           "Return the adjoint of this expression");
 
   m.def("operator_expr", &make_operator_expr, "label"_a, "components"_a,
         "normal_ordered"_a, "symmetry"_a = SymmetryType::Antisymmetric,

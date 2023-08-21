@@ -18,16 +18,10 @@ public:
 
   // ==> Class public interface <==
 
-  // /// Return a map term -> factor
-  // const std::map<SymbolicTerm, scalar_t> &terms() const { return terms_; }
-
   /// Add a term that can optionally be scaled
   void add(const Term &term);
 
   using Algebra::add;
-
-  // /// Add a term that can optionally be scaled
-  // void add(const SymbolicTerm &term, scalar_t coefficient = 1);
 
   /// Add a term that can optionally be scaled
   void add(const std::pair<SymbolicTerm, scalar_t> &term_factor,
@@ -44,12 +38,6 @@ public:
 
   /// Compare this expression to another one
   bool operator==(const Expression &other);
-
-  // /// Add an expression
-  // Expression &operator+=(const Expression &terms);
-
-  // /// Substract an expression
-  // Expression &operator-=(const Expression &terms);
 
   Expression adjoint() const;
 

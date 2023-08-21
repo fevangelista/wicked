@@ -9,36 +9,52 @@
 template <class T, class F> class Algebra {
 
 public:
+  /// @brief A type used to store an element of the algebra. Uses a map from
+  /// elements of type T to field elements of type F
   using vecspace_t = std::map<T, F>;
+
+  /// @brief Default constructor
   Algebra() {}
+
+  /// @brief Construct from a map
+  /// @param v the element of the algebra
   Algebra(const vecspace_t &v) : terms_(v) {}
 
-  /// size of
+  /// @brief The number of elements in the term
   size_t size() const { return terms_.size(); }
+  /// @brief Return the terms as a map
   const vecspace_t &terms() const { return terms_; }
+  /// @brief Return the terms as a map
   vecspace_t &terms() { return terms_; }
 
-  /// add an element
+  /// @brief Add a term
+  /// @param e an element of the vector space
+  /// @param c an element of the field
   void add(const T &e, F c = scalar_t(1, 1)) { add_to_map(terms_, e, c); }
 
-  /// comparison
+  /// @brief Is this ter equal to another term?
   bool is_equal(const Algebra &rhs) const { return terms_ == rhs.terms_; }
 
-  /// addition assignment
+  /// @brief Addition assignment operator
+  /// @param rhs the term to add
   Algebra &operator+=(const Algebra &rhs) {
     for (const auto &[e, c] : rhs.terms()) {
       add(e, c);
     }
     return *this;
   }
-  /// subtraction assignment
+
+  /// @brief Subtraction assignment operator
+  /// @param rhs the term to subtract
   Algebra &operator-=(const Algebra &rhs) {
     for (const auto &[e, c] : rhs.terms()) {
       add(e, -c);
     }
     return *this;
   }
-  /// multiplication assignment (scalar)
+
+  /// @brief Multiplication assignment operator
+  /// @param rhs the term to multiply by
   Algebra &operator*=(const Algebra &rhs) {
     Algebra result;
     for (const auto &[e, c] : terms()) {
@@ -49,15 +65,21 @@ public:
     terms_ = result.terms_;
     return *this;
   }
-  /// multiplication assignment (scalar)
+
+  /// @brief Scalar multiplication assignment operator
+  /// @param rhs the scalar to multiply by
   Algebra &operator*=(scalar_t factor) {
     for (auto &[e, c] : terms()) {
       c *= factor;
     }
     return *this;
   }
-  /// division assignment (scalar)
+
+  /// @brief Scalar division assignment operator
   Algebra &operator/=(scalar_t factor) {
+    if (factor == scalar_t(0, 1)) {
+      throw std::runtime_error("division by zero");
+    }
     for (auto &[e, c] : terms()) {
       c /= factor;
     }

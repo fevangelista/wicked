@@ -26,7 +26,7 @@ public:
 
   // ==> Class public interface <==
 
-  /// Add one or more SQOperator
+  /// Set the tensors and operators
   void set_normal_ordered(bool val);
   void set(const std::vector<Tensor> &tensors);
   void set(const std::vector<SQOperator> &op);
@@ -64,6 +64,8 @@ public:
   /// Return the adjoint of this symbolic term
   SymbolicTerm adjoint() const;
 
+  bool is_normal_ordered() const;
+
   /// Canonicalize this term and return the overall phase factor
   // bool is_connected();
 
@@ -74,6 +76,10 @@ public:
 
   /// Comparison operator used for sorting
   bool operator==(const SymbolicTerm &term) const;
+
+  /// @brief Multiplication assignment operator
+  /// @param rhs the term to multiply by
+  SymbolicTerm &operator*=(const SymbolicTerm &rhs);
 
   /// Return a string representation
   std::string str() const;
@@ -99,6 +105,11 @@ protected:
 };
 
 // Helper functions
+
+/// @brief Return the product of two symbolic terms
+/// @param lhs the left-hand side term
+/// @param rhs the right-hand side term
+SymbolicTerm operator*(const SymbolicTerm lhs, const SymbolicTerm &rhs);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const SymbolicTerm &term);

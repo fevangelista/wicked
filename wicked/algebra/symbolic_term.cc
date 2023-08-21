@@ -19,6 +19,8 @@ SymbolicTerm::SymbolicTerm(bool normal_ordered,
 
 void SymbolicTerm::set_normal_ordered(bool val) { normal_ordered_ = val; }
 
+bool SymbolicTerm::is_normal_ordered() const { return normal_ordered_; }
+
 void SymbolicTerm::set(const std::vector<SQOperator> &ops) { operators_ = ops; }
 
 void SymbolicTerm::set(const Product<SQOperator> &op) { operators_ = op; }
@@ -48,6 +50,25 @@ SymbolicTerm SymbolicTerm::adjoint() const {
   }
   result.add(operators_.adjoint());
   return result;
+}
+
+SymbolicTerm &SymbolicTerm::operator*=(const SymbolicTerm &rhs) {
+  if (is_normal_ordered() or rhs.is_normal_ordered()) {
+    throw "Cannot multiply symbolic terms that are normal ordered. Use Wick's "
+          "theorem instead.";
+  }
+  for (const auto &tensor : rhs.tensors_) {
+    add(tensor);
+  }
+  for (const auto &op : rhs.operators_) {
+    add(op);
+  }
+  return *this;
+}
+
+SymbolicTerm operator*(SymbolicTerm lhs, const SymbolicTerm &rhs) {
+  lhs *= rhs;
+  return lhs;
 }
 
 // std::vector<Index> SymbolicTerm::indices() const {
