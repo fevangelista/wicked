@@ -21,6 +21,12 @@ void SymbolicTerm::set_normal_ordered(bool val) { normal_ordered_ = val; }
 
 bool SymbolicTerm::is_normal_ordered() const { return normal_ordered_; }
 
+bool SymbolicTerm::is_vacuum_normal_ordered() const {
+  return std::is_sorted(
+      operators_.begin(), operators_.end(),
+      [](const SQOperator &a, const SQOperator &b) { return a < b; });
+}
+
 void SymbolicTerm::set(const std::vector<SQOperator> &ops) { operators_ = ops; }
 
 void SymbolicTerm::set(const Product<SQOperator> &op) { operators_ = op; }

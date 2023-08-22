@@ -64,7 +64,16 @@ public:
   /// Return the adjoint of this symbolic term
   SymbolicTerm adjoint() const;
 
+  // /// @brief Return a normal ordered version of this term
+  // Expression normal_ordered() const;
+
+  /// @return is the SQ operator product normal ordered?
   bool is_normal_ordered() const;
+
+  /// @brief Check if the product of operators is normal ordered with respect to
+  /// the vacuum. The result of this function is independent of the value of the
+  /// normal_ordered_ flag.
+  bool is_vacuum_normal_ordered() const;
 
   /// Canonicalize this term and return the overall phase factor
   // bool is_connected();

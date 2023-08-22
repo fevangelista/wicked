@@ -143,6 +143,47 @@ enumerate_class<T, A> enumerate(std::vector<T, A> &vec) {
   return enumerate_class<T, A>(vec);
 }
 
+/// @brief A template function to find the first adjacent pair of elements in a
+/// vector that satisfy a predicate p and swap them.
+/// This function assumes that there is at least one pair of elements that
+/// satisfy the predicate.
+/// @param vec The vector to be modified
+/// @param p A binary predicate that takes two elements of the vector and
+/// compares them
+template <class T, class BinaryPredicate>
+void swap_first_unordered_pair(std::vector<T> &vec, BinaryPredicate p) {
+  auto it = std::adjacent_find(vec.begin(), vec.end(), p);
+  if (it != vec.end() && std::next(it) != vec.end()) {
+    std::swap(*it, *std::next(it));
+  }
+}
+
+/// @brief A template function to find the first adjacent pair of elements in a
+/// vector that satisfy a predicate p and remove them.
+/// @param vec The vector to be modified
+/// @param p A binary predicate that takes two elements of the vector and
+/// compares them
+/// @return An optional pair of elements that were removed from the vector in
+/// their original order
+template <class T, class BinaryPredicate>
+std::optional<std::pair<T, T>> remove_first_unordered_pair(std::vector<T> &vec,
+                                                           BinaryPredicate p) {
+  auto it = std::adjacent_find(vec.begin(), vec.end(), p);
+  if (it != vec.end() && std::next(it) != vec.end()) {
+    std::pair<T, T> erased_pair = {*it, *std::next(it)};
+    vec.erase(it, std::next(it, 2)); // Erase the pair of elements
+    return erased_pair;
+  }
+  return std::nullopt;
+}
+
+/// @brief A template function to check if a vector has no adjacent identical
+/// elements
+template <typename T>
+bool has_no_adjacent_identical_terms(const std::vector<T> &vec) {
+  return std::adjacent_find(vec.begin(), vec.end()) == vec.end();
+}
+
 class MyInt {
 private:
   int m_;

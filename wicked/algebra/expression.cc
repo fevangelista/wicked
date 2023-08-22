@@ -215,7 +215,8 @@ Expression make_operator_expr(const std::string &label,
   return result;
 }
 
-Expression string_to_expr(const std::string &s, SymmetryType symmetry) {
+Expression make_expression(const std::string &s, bool normal_ordered,
+                           SymmetryType symmetry) {
 
   TensorSyntax syntax = TensorSyntax::Wicked;
   Expression sum;
@@ -238,6 +239,7 @@ Expression string_to_expr(const std::string &s, SymmetryType symmetry) {
   auto tensors = findall(s, tensor_re);
 
   SymbolicTerm term;
+  term.set_normal_ordered(normal_ordered);
   for (const auto &t : tensors) {
     term.add(make_tensor_from_str(t, symmetry));
   }

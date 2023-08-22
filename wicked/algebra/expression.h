@@ -52,6 +52,15 @@ public:
   /// shows the number of upper/lower indices in each space
   std::map<std::string, std::vector<Equation>>
   to_manybody_equation(const std::string &label) const;
+
+  /// @brief Return a normal ordered version of this expression
+  /// @param only_same_index_contractions only contract operators with the same
+  /// indices (default: false), in other words assume that different indices
+  /// represent different spin orbitals
+  Expression
+  vacuum_normal_ordered(bool only_same_index_contractions = false) const;
+
+  bool is_vacuum_normal_ordered() const;
 };
 
 /// Print to an output stream
@@ -61,7 +70,8 @@ std::ostream &operator<<(std::ostream &os, const Expression &sum);
 enum class TensorSyntax { Wicked, TCE };
 
 ///// Create a sum from a string
-Expression string_to_expr(const std::string &s, SymmetryType symmetry);
+Expression make_expression(const std::string &s, bool normal_ordered,
+                           SymmetryType symmetry);
 
 Expression make_operator_expr(const std::string &label,
                               const std::vector<std::string> &components,

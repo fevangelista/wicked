@@ -38,7 +38,7 @@ public:
   /// Return the index of this operator
   Index index() const;
 
-  /// Return the index of this operator
+  /// Return the space on which this operator acts
   int space() const;
 
   /// Reindex this operator

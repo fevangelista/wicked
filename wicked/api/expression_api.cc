@@ -41,12 +41,17 @@ void export_Expression(py::module &m) {
       .def("to_manybody_equations", &Expression::to_manybody_equation)
       .def("canonicalize", &Expression::canonicalize)
       .def("adjoint", &Expression::adjoint,
-           "Return the adjoint of this expression");
+           "Return the adjoint of this expression")
+      .def("vacuum_normal_ordered", &Expression::vacuum_normal_ordered,
+           "only_same_index_contractions"_a = false,
+           "Return a vacuum normal ordered version of this expression")
+      .def("is_vacuum_normal_ordered", &Expression::is_vacuum_normal_ordered,
+           "Return true if this expression is vacuum normal ordered");
 
   m.def("operator_expr", &make_operator_expr, "label"_a, "components"_a,
         "normal_ordered"_a, "symmetry"_a = SymmetryType::Antisymmetric,
         "coefficient"_a = scalar_t(1));
 
-  m.def("expression", &string_to_expr, "s"_a,
+  m.def("expression", &make_expression, "s"_a, "normal_ordered"_a,
         "symmetry"_a = SymmetryType::Antisymmetric);
 }
