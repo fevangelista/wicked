@@ -71,7 +71,7 @@ make_diag_operator_expression(const std::string &label,
                               const std::vector<std::string> &components) {
   OperatorExpression result;
   for (const std::string &s : components) {
-    auto s_vec = findall(s, "([a-zA-Z][+^]?)");
+    auto s_vec = findall(s, std::regex(R"(([a-zA-Z][+^]?))"));
     std::vector<int> cre(orbital_subspaces->num_spaces());
     std::vector<int> ann(orbital_subspaces->num_spaces());
 

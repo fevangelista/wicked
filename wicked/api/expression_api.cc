@@ -36,6 +36,11 @@ void export_Expression(py::module &m) {
              rhs *= lhs;
              return rhs;
            })
+      .def("__mul__",
+           [](Expression rhs, scalar_t r) {
+             rhs *= r;
+             return rhs;
+           })
       .def("latex", &Expression::latex, "sep"_a = " \\\\ \n")
       .def("to_manybody_equation", &Expression::to_manybody_equation)
       .def("to_manybody_equations", &Expression::to_manybody_equation)
@@ -52,6 +57,6 @@ void export_Expression(py::module &m) {
         "normal_ordered"_a, "symmetry"_a = SymmetryType::Antisymmetric,
         "coefficient"_a = scalar_t(1));
 
-  m.def("expression", &make_expression, "s"_a, "normal_ordered"_a,
+  m.def("expression", &make_expression, "s"_a,
         "symmetry"_a = SymmetryType::Antisymmetric);
 }

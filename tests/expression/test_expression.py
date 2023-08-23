@@ -2,7 +2,7 @@ import wicked as w
 
 
 def test_expression():
-    """Test the Expression class"""
+    """Test the Expression class (initialization, printing)"""
     w.reset_space()
     w.add_space("o", "fermion", "occupied", ["i", "j"])
     w.add_space("a", "fermion", "general", ["u", "v"])
@@ -41,6 +41,7 @@ def test_expression():
 
 
 def test_expression2():
+    """Test the Expression class (initialization from operator expression)"""
     w.reset_space()
     w.add_space("o", "fermion", "occupied", ["i", "j"])
     w.add_space("a", "fermion", "general", ["u", "v"])
@@ -56,6 +57,7 @@ def test_expression2():
 
 
 def test_expression3():
+    """Test the Expression class (initialization from operator expression)"""
     w.reset_space()
     w.add_space("o", "fermion", "occupied", ["i", "j"])
     w.add_space("a", "fermion", "general", ["u", "v"])
@@ -67,6 +69,18 @@ def test_expression3():
     # identity
     expr = w.expression("1")
     assert str(expr) == "1"
+
+    # minus one
+    expr = w.expression("-1")
+    assert str(expr) == "-1"
+
+    # tensors and operators
+    expr = w.expression("-t^{a_1}_{o_0} a+(a_1) a-(o_0)")
+    assert str(expr) == "-t^{a1}_{o0} a+(a1) a-(o0)"
+
+    # tensors and operators
+    expr = w.expression("-t^{a_1}_{o_0} {a+(a_1) a-(o_0)}")
+    assert str(expr) == "-t^{a1}_{o0} { a+(a1) a-(o0) }"
 
 
 def test_expression4():
@@ -86,7 +100,6 @@ def test_expression5():
     w.add_space("v", "fermion", "unoccupied", ["a", "b", "c", "d", "e", "f"])
     # empty string corresponds to no operator
     expr = w.expression("f^{o0}_{}")
-    print(str(expr))
     assert str(expr) == "f^{o0}_{}"
 
 

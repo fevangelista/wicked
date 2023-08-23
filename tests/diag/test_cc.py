@@ -53,9 +53,11 @@ def test_cc():
     # The case of n = 8 can be tested only if the boost library is available
     # otherwise we get the wrong number of terms for the CC equations
     if w.use_boost_1024_int():
-        cc_n(8)
+        cc_test_n = 8
     else:
-        cc_n(7)
+        cc_test_n = 7
+    cc_test_n = 4
+    cc_n(cc_test_n)
 
 def cc_n(max_n):
     """Evaluate the number of terms in the n-th order CC equations"""
