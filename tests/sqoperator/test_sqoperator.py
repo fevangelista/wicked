@@ -37,6 +37,7 @@ def test_sqoperator2():
     assert w.cre("c_0") < w.cre("a_1")
     assert w.ann("c_1") < w.ann("c_0")
 
+
 def test_sqoperator3():
     """Test the SQOperator class"""
     w.reset_space()
@@ -44,7 +45,7 @@ def test_sqoperator3():
     w.add_space("a", "fermion", "general", ["u", "v"])
     w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
 
-    assert w.ann("c_0").normal_ordered_less(w.cre("c_0"))    
+    assert w.ann("c_0").normal_ordered_less(w.cre("c_0"))
     assert not w.cre("c_0").normal_ordered_less(w.cre("c_0"))
     assert w.cre("c_1").normal_ordered_less(w.cre("c_0"))
     assert not w.cre("c_0").normal_ordered_less(w.cre("c_1"))
@@ -67,6 +68,10 @@ def test_sqoperator3():
     assert not w.ann("a_0").normal_ordered_less(w.ann("a_0"))
     assert w.ann("a_1").normal_ordered_less(w.ann("a_0"))
     assert not w.ann("a_0").normal_ordered_less(w.ann("a_1"))
+
+    assert w.ann("c_0").normal_ordered_less(w.ann("v_0"))
+    assert not w.ann("v_0").normal_ordered_less(w.ann("c_0"))
+
 
 if __name__ == "__main__":
     test_sqoperator()

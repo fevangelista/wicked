@@ -16,12 +16,21 @@ FieldType SQOperator::field_type() const {
   return orbital_subspaces->field_type(space());
 }
 
-Index SQOperator::index() const { return operator_.second; }
+const Index &SQOperator::index() const { return operator_.second; }
 
 int SQOperator::space() const { return operator_.second.space(); }
 
+SpaceType SQOperator::space_type() const {
+  return orbital_subspaces->space_type(space());
+}
+
 bool SQOperator::is_creation() const {
   return type() == SQOperatorType::Creation;
+}
+
+bool SQOperator::is_quasiparticle_creation() const {
+  return space_type() == SpaceType::Occupied ? not is_creation()
+                                             : is_creation();
 }
 
 std::string SQOperator::op_symbol() const {
@@ -35,20 +44,35 @@ void SQOperator::reindex(index_map_t &idx_map) {
 }
 
 bool SQOperator::operator<(SQOperator const &other) const {
-  // first compare the type (annihilators come before creation operators)
-  if (operator_.first < other.operator_.first) {
-    return true;
+  // Here we compare the operators in the following order:
+  // 1. creation operators go to the left of annihilation operators
+  if (is_creation() != other.is_creation()) {
+    return is_creation();
   }
-  if (operator_.first > other.operator_.first) {
-    return false;
+  // 2. if both operators are creation or annihilation operators, then we
+  // compare the space and the index. The space is compared in the reverse order
+  // for annihilation operators.
+  if (is_creation()) {
+    return index() < other.index();
   }
-  // same type
-  // if creation, then just compare the index
-  if (operator_.first == SQOperatorType::Creation) {
-    return operator_.second < other.operator_.second;
+  return other.index() < index();
+}
+
+bool SQOperator::normal_ordered_less(SQOperator const &other) const {
+  const auto space_type = orbital_subspaces->space_type(space());
+  // Here we compare the operators in the following order:
+  // 1. quasi-particle creation operators go to the left of quasi-particle
+  // annihilation operators
+  if (is_quasiparticle_creation() != other.is_quasiparticle_creation()) {
+    return is_quasiparticle_creation();
   }
-  // if annihilation, flip comparison
-  return other.operator_.second < operator_.second;
+  // 2. if both operators are quasi-particle creation or annihilation operators,
+  // then we compare the space and the index. The space is compared in the
+  // reverse order for quasi-particle annihilation operators.
+  if (is_quasiparticle_creation()) {
+    return index() < other.index();
+  }
+  return other.index() < index();
 }
 
 bool SQOperator::operator==(SQOperator const &other) const {
@@ -73,6 +97,21 @@ SQOperator SQOperator::adjoint() const {
   SQOperatorType type =
       (is_creation() ? SQOperatorType::Annihilation : SQOperatorType::Creation);
   return SQOperator(type, index());
+}
+
+scalar_t SQOperator::commutator_factor(const SQOperator &other) const {
+  // if both operators are fermionic, return -1
+  if (field_type() == FieldType::Fermion and
+      other.field_type() == FieldType::Fermion) {
+    return -scalar_t(1);
+  }
+  // if both operators are bosonic, return +1
+  if (field_type() == FieldType::Boson and
+      other.field_type() == FieldType::Boson) {
+    return scalar_t(1);
+  }
+  // if one operator is fermionic and the other is bosonic, return 1
+  return scalar_t(1);
 }
 
 std::string SQOperator::compile(const std::string &format) const {

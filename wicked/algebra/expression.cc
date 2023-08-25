@@ -257,7 +257,7 @@ Expression make_expression(const std::string &s, SymmetryType symmetry) {
   std::regex factor_re, operator_re, normal_ordered_re, tensor_re;
   if (syntax == TensorSyntax::Wicked) {
     tensor_re = std::regex(R"(([a-zA-Z0-9]+\^\{[\w,\d]*\}_\{[\w,\d]*\}))");
-    operator_re = std::regex(R"(a([+-]{1,1})\(([\w\d]*)\))");
+    operator_re = std::regex(R"([ab]([+-]{1,1})\(([\w\d]*)\))");
     factor_re = std::regex(R"(^\s*([+-]?\d*\/?\d*)\s*)");
     normal_ordered_re = std::regex(R"((?:\{(?:\s*a[+-]\([\w\d]+\))+\s*\}))");
   }

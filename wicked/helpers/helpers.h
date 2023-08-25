@@ -150,11 +150,16 @@ enumerate_class<T, A> enumerate(std::vector<T, A> &vec) {
 /// @param p A binary predicate that takes two elements of the vector and
 /// compares them
 template <class T, class BinaryPredicate>
-void swap_first_unordered_pair(std::vector<T> &vec, BinaryPredicate p) {
+std::optional<std::pair<T, T>> swap_first_unordered_pair(std::vector<T> &vec,
+                                                         BinaryPredicate p) {
   auto it = std::adjacent_find(vec.begin(), vec.end(), p);
   if (it != vec.end() && std::next(it) != vec.end()) {
+    T firstValue = *it;
+    T secondValue = *std::next(it);
     std::swap(*it, *std::next(it));
+    return std::make_pair(firstValue, secondValue);
   }
+  return std::nullopt;
 }
 
 /// @brief A template function to find the first adjacent pair of elements in a
@@ -178,9 +183,19 @@ std::optional<std::pair<T, T>> remove_first_unordered_pair(std::vector<T> &vec,
 
 /// @brief A template function to check if a vector has no adjacent identical
 /// elements
+/// @param vec The vector to be checked
+/// @param p A binary predicate that takes two elements of the vector and checks
+/// for an additional condition (e.g., that both elements are fermions)
 template <typename T>
-bool has_no_adjacent_identical_terms(const std::vector<T> &vec) {
-  return std::adjacent_find(vec.begin(), vec.end()) == vec.end();
+bool has_no_adjacent_identical_terms(
+    const std::vector<T> &vec, std::function<bool(const T &, const T &)> p =
+                                   [](const T &, const T &) { return true; }) {
+  // return std::adjacent_find(vec.begin(), vec.end()) == vec.end();
+  auto it =
+      std::adjacent_find(vec.begin(), vec.end(), [&p](const T &a, const T &b) {
+        return a == b and p(a, b);
+      });
+  return it == vec.end();
 }
 
 class MyInt {
