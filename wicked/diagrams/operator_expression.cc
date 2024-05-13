@@ -83,7 +83,7 @@ make_diag_operator_expression(const std::string &label,
         ann[space] += 1;
       }
     }
-    result.add({Operator(label, cre, ann)});
+    result.add({Operator(label, cre, ann)}, true);
   }
   return result;
 }
