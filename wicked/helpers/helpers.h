@@ -56,7 +56,7 @@ public:
 };
 
 template <class T, class F>
-void add_to_map(std::map<T, F> &m, const T &key, const F &value, bool warn = false) {
+void add_to_map(std::map<T, F> &m, const T &key, const F &value, bool unique = false) {
   // don't add a zero term
   if (value == 0)
     return;
@@ -65,10 +65,7 @@ void add_to_map(std::map<T, F> &m, const T &key, const F &value, bool warn = fal
   auto search = m.find(key);
 
   if (search != m.end()) {
-    if (warn) {
-      std::cerr << "Attempting to add non-unique strings: " << key << "\n" << 
-      "Wick&d automatically accounts for all permutations of unique strings, "<<
-      "there's no need to add a non-unique string twice if that's not the intention" << std::endl;}
+    if (unique) {return;}
     // found key: just add the factor to the existing term
     search->second += value;
     // if after addition the result is zero, eliminate from map
