@@ -71,8 +71,9 @@ make_diag_operator_expression(const std::string &label,
                               const std::vector<std::string> &components,
                               bool unique) {
   OperatorExpression result;
-  if (!unique) {std::cout << "Warning: combinatorically equivalent operators are not "
-               "removed from the expression\n" << std::endl;}
+  if (!unique && components.size() > 1) {
+    std::cout << "Tip: if combinatorically equivalent operators are present, they will not be "
+    "removed from the expression! Set 'unique' to True to change this behavior.\n" << std::endl;}
   for (const std::string &s : components) {
     auto s_vec = findall(s, "([a-zA-Z][+^]?)");
     std::vector<int> cre(orbital_subspaces->num_spaces());
