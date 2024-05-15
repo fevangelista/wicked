@@ -77,3 +77,11 @@ def compute_inverse_denominators(H: dict, nocc: list[int], nvir: list[int], rank
             f"compute_inverse_denominators() supports rank up to 2, but was called with rank = {rank}"
         )
     return D
+
+def get_index_blocks(func):
+    blocks = set()
+    for line in func.split("\n"):
+        if "np.einsum" in line and "H[" in line: # is a contraction containing H
+            blocks.add(line.split("H[\"")[1].split("\"]")[0])
+
+    return blocks
