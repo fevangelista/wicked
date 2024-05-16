@@ -25,7 +25,7 @@ def generate_equation(mbeq, nocc, nvir):
 
 def update_cc_amplitudes(T, R, invD, rank: int):
     """
-    A function to updated the CCSD amplitudes
+    A function to update the CCSD amplitudes
 
     Parameters
     ----------
@@ -131,6 +131,14 @@ def compute_inverse_denominators(H: dict, nocc: list[int], nvir: list[int], rank
     return D
 
 def get_index_blocks(func):
+    """
+    A function to gather the necessary blocks of the Hamiltonian for the CC equations
+
+    Parameters
+    ----------
+    funt : str
+        The function(s) to parse.
+    """
     blocks = set()
     for line in func.split("\n"):
         if "np.einsum" in line and "H[" in line: # is a contraction containing H
