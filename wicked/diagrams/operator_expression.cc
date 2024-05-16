@@ -67,13 +67,11 @@ std::ostream &operator<<(std::ostream &os, const OperatorExpression &opsum) {
 }
 
 OperatorExpression
-make_diag_operator_expression(const std::string &label,
+make_diag_operator_expression_(const std::string &label,
                               const std::vector<std::string> &components,
                               bool unique) {
   OperatorExpression result;
-  if (!unique && components.size() > 1) {
-    std::cout << "Tip: if combinatorically equivalent operators are present, they will not be "
-    "removed from the expression! Set 'unique' to True to change this behavior.\n" << std::endl;}
+
   for (const std::string &s : components) {
     auto s_vec = findall(s, "([a-zA-Z][+^]?)");
     std::vector<int> cre(orbital_subspaces->num_spaces());
@@ -91,6 +89,25 @@ make_diag_operator_expression(const std::string &label,
   }
   return result;
 }
+
+OperatorExpression
+make_diag_operator_expression(const std::string &label,
+                              const std::vector<std::string> &components,
+                              bool unique) {
+  OperatorExpression result = make_diag_operator_expression_(label, components, unique);
+  return result;
+}
+
+OperatorExpression
+make_diag_operator_expression(const std::string &label,
+                              const std::vector<std::string> &components) {
+  if (components.size() > 1) {
+    std::cout << "Tip: if combinatorically equivalent operators are present, they will not be "
+    "removed from the expression! Set 'unique' to True to change this behavior, or to False to silence this tip.\n" << std::endl;}
+  OperatorExpression result = make_diag_operator_expression_(label, components);
+  return result;
+}
+
 
 OperatorExpression commutator(const OperatorExpression &A,
                               const OperatorExpression &B) {

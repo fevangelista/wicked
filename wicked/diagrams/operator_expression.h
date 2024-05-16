@@ -61,8 +61,16 @@ std::ostream &operator<<(std::ostream &os, const OperatorExpression &opsum);
 /// the components of this operator E.g. auto T1 = make_operator("T1", {"v+
 /// o"}); auto F = make_operator("F", {"o+ o","v+ o","o+ v","v+ v"});
 OperatorExpression
+make_diag_operator_expression_(const std::string &label,
+                              const std::vector<std::string> &components, bool unique=false);
+
+OperatorExpression
 make_diag_operator_expression(const std::string &label,
                               const std::vector<std::string> &components, bool unique);
+
+OperatorExpression
+make_diag_operator_expression(const std::string &label,
+                              const std::vector<std::string> &components);
 
 /// Creates a new object with the commutator [A,B]
 OperatorExpression commutator(const OperatorExpression &A,
