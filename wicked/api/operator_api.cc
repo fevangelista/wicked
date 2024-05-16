@@ -53,8 +53,10 @@ void export_OperatorExpression(py::module &m) {
              return lhs * rhs;
            })
       .def("canonicalize", &OperatorExpression::canonicalize);
-  m.def("op", &make_diag_operator_expression,
-        "label"_a, "components"_a, "unique"_a = false,
+  m.def("op", py::overload_cast<const std::string &, const std::vector<std::string> &, bool> (&make_diag_operator_expression),
+        "label"_a, "components"_a, "unique"_a,
+        "Create a OperatorExpression object");
+  m.def("op", py::overload_cast<const std::string &, const std::vector<std::string> &> (&make_diag_operator_expression),
         py::call_guard<py::scoped_ostream_redirect, 
         py::scoped_estream_redirect>(), 
         "Create a OperatorExpression object");
