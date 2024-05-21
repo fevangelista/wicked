@@ -83,7 +83,7 @@ public:
   std::string str() const;
 
   /// Return a dictionary representation
-  std::map<std::string, std::vector<std::string>> osi_dict() const;
+  std::map<std::string, std::vector<std::string>> to_dict() const;
 
 private:
   /// Vector of spaces

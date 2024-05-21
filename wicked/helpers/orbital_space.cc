@@ -111,7 +111,7 @@ std::string OrbitalSpaceInfo::str() const {
   return join(s, "\n\n");
 }
 
-std::map<std::string, std::vector<std::string>> OrbitalSpaceInfo::osi_dict() const {
+std::map<std::string, std::vector<std::string>> OrbitalSpaceInfo::to_dict() const {
   std::map<std::string, std::vector<std::string>> d;
   for (const auto &info : space_info_) {
     d[std::string(1, info.label())] = info.indices();
