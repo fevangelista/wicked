@@ -68,8 +68,10 @@ std::ostream &operator<<(std::ostream &os, const OperatorExpression &opsum) {
 
 OperatorExpression
 make_diag_operator_expression(const std::string &label,
-                              const std::vector<std::string> &components) {
+                              const std::vector<std::string> &components,
+                              bool unique=false) {
   OperatorExpression result;
+
   for (const std::string &s : components) {
     auto s_vec = findall(s, "([a-zA-Z][+^]?)");
     std::vector<int> cre(orbital_subspaces->num_spaces());
@@ -83,7 +85,11 @@ make_diag_operator_expression(const std::string &label,
         ann[space] += 1;
       }
     }
-    result.add({Operator(label, cre, ann)});
+    Operator op(label, cre, ann);
+    if (result.contains({op}) && unique) {
+        continue;
+    }
+    result.add({op}, scalar_t(1, 1));
   }
   return result;
 }
