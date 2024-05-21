@@ -29,6 +29,16 @@ def test_opexpr2():
     prod.canonicalize()
     assert str(prod) == "+ a { v+ v } c { o+ o } b { o+ o }"
 
+def test_opexpr3():
+    w.reset_space()
+    w.add_space("o", "fermion", "occupied", ["i", "j", "k", "l", "m", "n"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c", "d", "e", "f"])
+
+    op1 = w.op('a', ["v+ o+ o v", "o+ v+ v o"], unique=True)
+    op2 = w.op('a', ["v+ o+ v o"])
+    assert op1 == op2
+
 if __name__ == "__main__":
     test_opexpr1()
     test_opexpr2()
+    test_opexpr3()

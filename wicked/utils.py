@@ -53,7 +53,7 @@ def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
                         terms.append(
                             " ".join([s + "+" for s in le]) + " " + " ".join(re)
                         )
-    return wicked.op(label, terms)
+    return wicked.op(label, terms, unique=False)
 
 def compile_einsum(equation):
     """

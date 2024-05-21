@@ -21,6 +21,9 @@ public:
   /// add an element
   void add(const T &e, F c = scalar_t(1, 1)) { add_to_map(terms_, e, c); }
 
+  /// test if element is in the space
+  bool contains(const T &e) const { return terms_.find(e) != terms_.end(); }
+
   /// comparison
   bool is_equal(const Algebra &rhs) const { return terms_ == rhs.terms_; }
 
