@@ -69,7 +69,7 @@ std::ostream &operator<<(std::ostream &os, const OperatorExpression &opsum) {
 OperatorExpression
 make_diag_operator_expression(const std::string &label,
                               const std::vector<std::string> &components,
-                              bool unique=false) {
+                              bool unique) {
   OperatorExpression result;
 
   for (const std::string &s : components) {
@@ -86,8 +86,9 @@ make_diag_operator_expression(const std::string &label,
       }
     }
     Operator op(label, cre, ann);
-    if (result.contains({op}) && unique) {
-        continue;
+    // if we want unique terms, we check if the term is already in the result
+    if (unique and result.contains({op})) {
+      continue;
     }
     result.add({op}, scalar_t(1, 1));
   }
@@ -98,18 +99,6 @@ OperatorExpression commutator(const OperatorExpression &A,
                               const OperatorExpression &B) {
   return A * B - B * A;
 }
-
-// OperatorExpression exp(const OperatorExpression &A, int order) {
-//   OperatorExpression result;
-//   result.add({});
-//   //  OperatorExpression temp1;
-//   //  temp1.add({});
-//   //  for (int k = 1; k <= order; k++){
-//   //      temp1 *= A;
-//   //      result.add(temp);
-//   //  }
-//   return result;
-// }
 
 OperatorExpression bch_series(const OperatorExpression &A,
                               const OperatorExpression &B, int n) {
