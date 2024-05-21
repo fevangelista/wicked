@@ -15,6 +15,8 @@ void export_OrbitalSpaceInfo(py::module &m) {
       .def("add_space", &OrbitalSpaceInfo::add_space)
       .def("num_spaces", &OrbitalSpaceInfo::num_spaces)
       .def("label", &OrbitalSpaceInfo::label)
+      .def("indices", &OrbitalSpaceInfo::indices)
+      .def("to_dict", &OrbitalSpaceInfo::osi_dict)
       .def("__str__", &OrbitalSpaceInfo::str);
 
   m.def("osi", []() { return orbital_subspaces; });
