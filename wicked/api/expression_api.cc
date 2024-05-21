@@ -12,8 +12,8 @@ void export_Expression(py::module &m) {
       .def(py::init<>())
       .def("add", py::overload_cast<const Term &>(&Expression::add))
       .def("add",
-           py::overload_cast<const SymbolicTerm &, scalar_t, bool>(&Expression::add),
-           "term"_a, "coefficient"_a = scalar_t(1, 1), "unique"_a = false)
+           py::overload_cast<const SymbolicTerm &, scalar_t>(&Expression::add),
+           "term"_a, "coefficient"_a = scalar_t(1, 1))
       .def("add",
            py::overload_cast<const Expression &, scalar_t>(&Expression::add),
            "expr"_a, "scale"_a = scalar_t(1))
