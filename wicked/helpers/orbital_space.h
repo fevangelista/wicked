@@ -82,6 +82,9 @@ public:
   /// return a string representation
   std::string str() const;
 
+  /// Return a dictionary representation
+  std::map<std::string, std::vector<std::string>> to_dict() const;
+
 private:
   /// Vector of spaces
   std::vector<OrbitalSpace> space_info_;

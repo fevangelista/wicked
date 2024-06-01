@@ -68,8 +68,10 @@ std::ostream &operator<<(std::ostream &os, const OperatorExpression &opsum) {
 
 OperatorExpression
 make_diag_operator_expression(const std::string &label,
-                              const std::vector<std::string> &components) {
+                              const std::vector<std::string> &components,
+                              bool unique) {
   OperatorExpression result;
+
   for (const std::string &s : components) {
     auto s_vec = findall(s, std::regex(R"(([a-zA-Z][+^]?))"));
     std::vector<int> cre(orbital_subspaces->num_spaces());
@@ -83,7 +85,12 @@ make_diag_operator_expression(const std::string &label,
         ann[space] += 1;
       }
     }
-    result.add({Operator(label, cre, ann)});
+    Operator op(label, cre, ann);
+    // if we want unique terms, we check if the term is already in the result
+    if (unique and result.contains({op})) {
+      continue;
+    }
+    result.add({op}, scalar_t(1, 1));
   }
   return result;
 }
@@ -92,18 +99,6 @@ OperatorExpression commutator(const OperatorExpression &A,
                               const OperatorExpression &B) {
   return A * B - B * A;
 }
-
-// OperatorExpression exp(const OperatorExpression &A, int order) {
-//   OperatorExpression result;
-//   result.add({});
-//   //  OperatorExpression temp1;
-//   //  temp1.add({});
-//   //  for (int k = 1; k <= order; k++){
-//   //      temp1 *= A;
-//   //      result.add(temp);
-//   //  }
-//   return result;
-// }
 
 OperatorExpression bch_series(const OperatorExpression &A,
                               const OperatorExpression &B, int n) {

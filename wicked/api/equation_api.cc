@@ -14,6 +14,7 @@ void export_Equation(py::module &m) {
       .def("lhs", &Equation::lhs)
       .def("rhs", &Equation::rhs)
       .def("rhs_expression", &Equation::rhs_expression)
+      .def("rhs_factor", &Equation::rhs_factor)
       .def("__repr__", &Equation::str)
       .def("__str__", &Equation::str)
       .def("latex", &Equation::latex)

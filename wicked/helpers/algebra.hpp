@@ -32,7 +32,10 @@ public:
   /// @param c an element of the field
   void add(const T &e, F c = scalar_t(1, 1)) { add_to_map(terms_, e, c); }
 
-  /// @brief Is this ter equal to another term?
+  /// test if element is in the space
+  bool contains(const T &e) const { return terms_.find(e) != terms_.end(); }
+
+  /// @brief Is this term equal to another term?
   bool is_equal(const Algebra &rhs) const { return terms_ == rhs.terms_; }
 
   /// @brief Addition assignment operator

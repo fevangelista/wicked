@@ -1,3 +1,4 @@
+#include <pybind11/iostream.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -52,7 +53,10 @@ void export_OperatorExpression(py::module &m) {
              return lhs * rhs;
            })
       .def("canonicalize", &OperatorExpression::canonicalize);
-  m.def("op", &make_diag_operator_expression,
+  m.def("op", &make_diag_operator_expression, "label"_a, "components"_a,
+        "unique"_a = false,
+        py::call_guard<py::scoped_ostream_redirect,
+                       py::scoped_estream_redirect>(),
         "Create a OperatorExpression object");
 
   m.def(
