@@ -11,7 +11,7 @@
 #include "wicked-def.h"
 
 /// A class to represent an algebraic expression
-class Expression : public Algebra<SymbolicTerm, scalar_t> {
+class Expression : public Algebra<Expression, SymbolicTerm, scalar_t> {
 public:
   // ==> Constructor <==
   Expression();

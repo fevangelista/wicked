@@ -6,7 +6,7 @@
 #include "helpers/helpers.h"
 
 /// Represents a vector space of objects of type T over the field F
-template <class T, class F> class Algebra {
+template <typename Derived, class T, class F> class Algebra {
 
 public:
   /// @brief A type used to store an element of the algebra. Uses a map from
@@ -37,6 +37,15 @@ public:
 
   /// @brief Is this term equal to another term?
   bool is_equal(const Algebra &rhs) const { return terms_ == rhs.terms_; }
+
+  /// @brief Unary minus operator
+  Derived operator-() const {
+    Derived result;
+    for (const auto &[e, c] : terms()) {
+      result.add(e, -c);
+    }
+    return result;
+  }
 
   /// @brief Addition assignment operator
   /// @param rhs the term to add

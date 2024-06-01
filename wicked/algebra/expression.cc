@@ -11,7 +11,7 @@
 #include "tensor.h"
 #include "term.h"
 
-Expression::Expression() : Algebra<SymbolicTerm, scalar_t>() {}
+Expression::Expression() : Algebra<Expression, SymbolicTerm, scalar_t>() {}
 
 void Expression::add(const Term &term) {
   SymbolicTerm symterm = term.symterm();

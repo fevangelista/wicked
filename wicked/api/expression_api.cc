@@ -21,6 +21,7 @@ void export_Expression(py::module &m) {
       .def("__str__", &Expression::str)
       .def("__len__", &Expression::size)
       .def("__eq__", &Expression::operator==)
+      .def("__neg__", [](const Expression &rhs) { return -rhs; })
       .def("__add__",
            [](Expression lhs, const Expression &rhs) {
              lhs += rhs;
