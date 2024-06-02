@@ -144,8 +144,10 @@ std::string Expression::str() const {
 
 std::string Expression::latex(const std::string &sep) const {
   std::vector<std::string> str_vec;
-  for (auto &kv : terms_) {
-    str_vec.push_back(kv.second.latex() + ' ' + kv.first.latex());
+  bool first = true;
+  for (const auto &[term, factor] : terms_) {
+    str_vec.push_back(factor.latex(first) + ' ' + term.latex());
+    first = false;
   }
   return join(str_vec, sep);
 }

@@ -111,7 +111,7 @@ std::string rational::repr() const {
 #endif
 }
 
-std::string rational::latex() const {
+std::string rational::latex(bool first) const {
   std::string s;
   if (numerator_ == 0) {
     s = "0";
@@ -123,7 +123,8 @@ std::string rational::latex() const {
         s += "-";
       } else {
 #if USE_BOOST_1024_INT
-        s += boost::lexical_cast<std::string>(numerator_);
+        s += (first ? "" : (numerator_ > 0 ? "+" : "")) +
+             boost::lexical_cast<std::string>(numerator_);
 #else
         s += std::to_string(numerator_);
 #endif

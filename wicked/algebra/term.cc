@@ -41,7 +41,7 @@ std::string Term::str() const {
 }
 
 std::string Term::latex() const {
-  return coefficient_.latex() + " " + SymbolicTerm::latex();
+  return coefficient_.latex(true) + " " + SymbolicTerm::latex();
 }
 
 std::ostream &operator<<(std::ostream &os, const Term &term) {
