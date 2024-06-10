@@ -2,7 +2,7 @@ import wicked as w
 
 
 def test_term():
-    """Test the Tensor class"""
+    """Test the SymbolicTerm and Term classes"""
     w.reset_space()
     w.add_space("o", "fermion", "occupied", ["i", "j"])
     w.add_space("a", "fermion", "general", ["u", "v"])

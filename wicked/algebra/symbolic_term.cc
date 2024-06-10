@@ -60,16 +60,11 @@ SymbolicTerm SymbolicTerm::adjoint() const {
 }
 
 SymbolicTerm &SymbolicTerm::operator*=(const SymbolicTerm &rhs) {
-  if (is_labeled_normal_ordered() or rhs.is_labeled_normal_ordered()) {
-    throw "Cannot multiply symbolic terms that are normal ordered. Use Wick's "
-          "theorem instead.";
-  }
+  const auto [ops, normal_ordered] = operator_product(*this, rhs);
   for (const auto &tensor : rhs.tensors_) {
     add(tensor);
   }
-  for (const auto &op : rhs.operators_) {
-    add(op);
-  }
+  operators_ = ops;
   return *this;
 }
 
@@ -287,6 +282,70 @@ scalar_t SymbolicTerm::simplify() {
   }
 
   return factor;
+}
+
+std::pair<Product<SQOperator>, bool>
+operator_product_1(const SymbolicTerm &lhs, const SymbolicTerm &rhs) {
+  // Case 1: both terms are normal ordered
+  const bool normal_ordered = false;
+  Product<SQOperator> result;
+  throw std::runtime_error("Multiplication of symbolic terms that are normal "
+                           "ordered is not (yet) implemented.");
+  return std::make_pair(result, normal_ordered);
+}
+
+std::pair<Product<SQOperator>, bool>
+operator_product_2(const SymbolicTerm &lhs, const SymbolicTerm &rhs) {
+  // Case 2: the left-hand side is normal ordered the right-hand side is not
+  const bool normal_ordered = false;
+  Product<SQOperator> result;
+  throw std::runtime_error("Multiplication of symbolic terms that are normal "
+                           "ordered is not (yet) implemented.");
+  return std::make_pair(result, normal_ordered);
+}
+std::pair<Product<SQOperator>, bool>
+operator_product_3(const SymbolicTerm &lhs, const SymbolicTerm &rhs) {
+  // Case 3: the right-hand side is normal ordered the left-hand side is not
+  const bool normal_ordered = false;
+  Product<SQOperator> result;
+  throw std::runtime_error("Multiplication of symbolic terms that are normal "
+                           "ordered is not (yet) implemented.");
+  return std::make_pair(result, normal_ordered);
+}
+
+std::pair<Product<SQOperator>, bool>
+operator_product_4(const SymbolicTerm &lhs, const SymbolicTerm &rhs) {
+  // Case 4: neither term is normal ordered
+  const bool normal_ordered = false;
+  Product<SQOperator> result;
+  for (const auto &op : lhs.ops()) {
+    result.push_back(op);
+  }
+  for (const auto &op : rhs.ops()) {
+    result.push_back(op);
+  }
+  return std::make_pair(result, normal_ordered);
+}
+
+std::pair<Product<SQOperator>, bool> operator_product(const SymbolicTerm &lhs,
+                                                      const SymbolicTerm &rhs) {
+
+  // Case 1: both terms are normal ordered
+  if (lhs.is_labeled_normal_ordered() and rhs.is_labeled_normal_ordered()) {
+    return operator_product_1(lhs, rhs);
+  }
+  // Case 2: the left-hand side is normal ordered the right-hand side is not
+  else if (lhs.is_labeled_normal_ordered() and
+           not rhs.is_labeled_normal_ordered()) {
+    return operator_product_2(lhs, rhs);
+  }
+  // Case 3: the right-hand side is normal ordered the left-hand side is not
+  else if (not lhs.is_labeled_normal_ordered() and
+           rhs.is_labeled_normal_ordered()) {
+    return operator_product_3(lhs, rhs);
+  }
+  // Case 4: neither term is normal ordered
+  return operator_product_4(lhs, rhs);
 }
 
 bool SymbolicTerm::operator<(const SymbolicTerm &other) const {

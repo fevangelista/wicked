@@ -52,9 +52,9 @@ void export_Expression(py::module &m) {
       .def("canonicalize", &Expression::canonicalize)
       .def("adjoint", &Expression::adjoint,
            "Return the adjoint of this expression")
-      //  .def("vacuum_normal_ordered", &Expression::vacuum_normal_ordered,
-      //       "only_same_index_contractions"_a = false,
-      //       "Return a vacuum normal ordered version of this expression")
+      .def("vacuum_normal_ordered", &Expression::vacuum_normal_ordered,
+           "only_same_index_contractions"_a = false,
+           "Return a vacuum normal ordered version of this expression")
       .def("normal_ordered", &Expression::normal_ordered,
            "only_same_index_contractions"_a = false,
            "Return a vacuum normal ordered version of this expression")

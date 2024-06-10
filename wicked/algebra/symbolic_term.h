@@ -41,9 +41,6 @@ public:
   void add(const Tensor &tensor);
 
   /// Return the number of SQ operators
-  int noperators() const;
-
-  /// Return the number of SQ operators
   int nops() const;
 
   /// @return is the SQ operator product normal ordered?
@@ -99,6 +96,14 @@ public:
   /// Return a compilable representation
   std::string compile(const std::string &format) const;
 
+  /// Return a normal ordered version of this term
+  std::vector<std::pair<SymbolicTerm, scalar_t>>
+  normal_order(bool only_same_index_contractions = false) const;
+
+  /// Return a normal ordered version of this term
+  std::vector<std::pair<SymbolicTerm, scalar_t>>
+  vacuum_normal_order(bool only_same_index_contractions = false) const;
+
 protected:
   // ==> Class private data <==
   bool normal_ordered_ = false;
@@ -125,5 +130,8 @@ std::ostream &operator<<(std::ostream &os, const SymbolicTerm &term);
 
 std::ostream &operator<<(std::ostream &os,
                          const std::pair<SymbolicTerm, scalar_t> &term);
+
+std::pair<Product<SQOperator>, bool> operator_product(const SymbolicTerm &lhs,
+                                                      const SymbolicTerm &rhs);
 
 #endif // _wicked_symbolic_term_h_
