@@ -39,12 +39,12 @@ def test_expression():
 +{ a+(v0) a-(o0) }"""
     assert str(expr) == expr_str
     for idx, i in enumerate(expr):
-        if (idx == 0): 
-            assert str(i[0])=='{ a+(a0) }' 
-            assert i[1]==w.rational(3,2)
-        if (idx == 1):
-            assert str(i[0])=='{ a+(v0) a-(o0) }'
-            assert i[1]==w.rational(1,1)
+        if idx == 0:
+            assert str(i[0]) == "{ a+(a0) }"
+            assert i[1] == w.rational(3, 2)
+        if idx == 1:
+            assert str(i[0]) == "{ a+(v0) a-(o0) }"
+            assert i[1] == w.rational(1, 1)
 
 
 def test_expression2():
