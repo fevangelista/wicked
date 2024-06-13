@@ -73,7 +73,7 @@ private:
 
   /// Generates all elementary contractions
   std::vector<ElementaryContraction>
-  generate_elementary_contractions(const OperatorProduct &ops);
+  generate_elementary_contractions(const OperatorProduct &ops, bool inter_general=true);
 
   /// Generates elementary contractions of occupied spaces
   void elementary_contractions_occupied(
@@ -88,7 +88,14 @@ private:
   /// Generates elementary contractions of general spaces
   void elementary_contractions_general(
       const OperatorProduct &ops, int s,
-      std::vector<ElementaryContraction> &contr_vec);
+      std::vector<ElementaryContraction> &contr_vec,
+      std::map<int, std::vector<ElementaryContraction>> &contr_vec_general);
+
+  void elementary_contractions_inter_general(
+      const OperatorProduct &ops, int s1, int s2,
+      std::vector<ElementaryContraction> &contr_vec,
+      std::map<int, std::vector<ElementaryContraction>> &contr_vec_general);
+
 
   //
   // Functions for step 2. of the Wick's theorem algorithm

@@ -18,7 +18,7 @@
 using namespace std;
 
 std::vector<ElementaryContraction>
-WickTheorem::generate_elementary_contractions(const OperatorProduct &ops) {
+WickTheorem::generate_elementary_contractions(const OperatorProduct &ops, bool inter_general) {
   PRINT(PrintLevel::Summary,
         std::cout << "\n- Step 1. Generating elementary contractions"
                   << std::endl;)
@@ -27,6 +27,9 @@ WickTheorem::generate_elementary_contractions(const OperatorProduct &ops) {
 
   // a vector that will hold all the contractions
   std::vector<ElementaryContraction> contr_vec;
+  std::map<int, std::vector<ElementaryContraction>> contr_vec_general;
+
+  std::vector<int> general_subspaces;
 
   PRINT(
       PrintLevel::Summary, cout << "\n  Operator   Space   Cre.   Ann.";
@@ -66,9 +69,19 @@ WickTheorem::generate_elementary_contractions(const OperatorProduct &ops) {
     // ┌───┬───┬───┐
     // a^+ a   a   a^+
     if (space_type == SpaceType::General) {
-      elementary_contractions_general(ops, s, contr_vec);
+        elementary_contractions_general(ops, s, contr_vec, contr_vec_general);
+        general_subspaces.push_back(s);
+      }
     }
+
+  if (inter_general) {
+    // 4. Intra-general contractions
+    // ┌───┬───┬───┐
+    // a^+ a   a   a^+
+    
+    elementary_contractions_inter_general(ops, general_subspaces[0], general_subspaces[1], contr_vec, contr_vec_general);
   }
+
   return contr_vec;
 }
 
@@ -112,7 +125,8 @@ void WickTheorem::elementary_contractions_unoccupied(
 
 void WickTheorem::elementary_contractions_general(
     const OperatorProduct &ops, int s,
-    std::vector<ElementaryContraction> &contr_vec) {
+    std::vector<ElementaryContraction> &contr_vec,
+    std::map<int, std::vector<ElementaryContraction>> &contr_vec_general) {
   int nops = ops.size();
   // compute the largest possible cumulant for this space
   int sumcre = 0;
@@ -186,11 +200,32 @@ void WickTheorem::elementary_contractions_general(
           new_contr[A].set_ann(s, ann_legs[A]);
         }
         contr_vec.push_back(new_contr);
+        contr_vec_general[s].push_back(new_contr);
 
         PRINT(PrintLevel::Summary,
               cout << fmt::format("\n    {:5d}:", contr_vec.size());
               PRINT_ELEMENTS(new_contr, " "););
       }
+    }
+  }
+}
+
+void WickTheorem::elementary_contractions_inter_general(
+  const OperatorProduct &ops, int s1, int s2,
+  std::vector<ElementaryContraction> &contr_vec,
+  std::map<int, std::vector<ElementaryContraction>> &contr_vec_general) {
+  int nops = ops.size();
+  for (int i = 0; i < contr_vec_general[s1].size(); i++) {
+    for (auto j: contr_vec_general[s2]) {
+      std::vector<GraphMatrix> new_contr(nops);
+      std::copy(contr_vec_general[s1][i].begin(), contr_vec_general[s1][i].end(), new_contr.begin());
+      for (int k = 0; k < nops; k++) {
+        new_contr[k] += j[k];
+      }
+      contr_vec.push_back(new_contr);
+      PRINT(PrintLevel::Summary,
+            cout << fmt::format("\n    {:5d}:", contr_vec.size());
+            PRINT_ELEMENTS(new_contr, " "););
     }
   }
 }
