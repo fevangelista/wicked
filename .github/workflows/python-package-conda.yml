@@ -22,7 +22,7 @@ jobs:
         environment-file: environment.yml
         channels: conda-forge
         show-channel-urls: true
-        python-version: '3.11'
+        python-version: '3.9'
         auto-activate-base: false
         add-pip-as-python-dependency: true
 
