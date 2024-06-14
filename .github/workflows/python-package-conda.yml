@@ -1,0 +1,35 @@
+name: Python Package using Conda
+
+on: [push, pull_request]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}   
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: 'true'
+
+    - name: Setup Conda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        activate-environment: wicked
+        environment-file: environment.yml
+        channels: conda-forge
+        show-channel-urls: true
+        python-version: '3.11'
+        auto-activate-base: false
+        add-pip-as-python-dependency: true
+
+    - name: Install wicked
+      run: |
+        cd $HOME/work/wicked/wicked
+        python setup.py develop
+        pip list
+        cd $HOME/work/wicked/wicked/tests
+        python run_wicked_tests.py
