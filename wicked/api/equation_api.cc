@@ -18,5 +18,6 @@ void export_Equation(py::module &m) {
       .def("__repr__", &Equation::str)
       .def("__str__", &Equation::str)
       .def("latex", &Equation::latex)
+      .def("reindex", &Equation::reindex)
       .def("compile", &Equation::compile);
 }

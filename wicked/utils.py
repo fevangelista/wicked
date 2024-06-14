@@ -68,7 +68,10 @@ def compile_einsum(equation):
             if index_dict.get(i):
                 indstr += index_dict[i]
             else:
-                index = unused_indices[i[0]].pop(0)
+                try:
+                    index = unused_indices[i[0]].pop(0)
+                except:
+                    raise ValueError(f"Index {i} is not available for einsum contraction. Try enlarging the index pool.")
                 index_dict[i] = index
                 indstr += index
         

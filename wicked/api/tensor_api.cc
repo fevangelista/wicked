@@ -23,7 +23,8 @@ void export_Tensor(py::module &m) {
       .def("upper", &Tensor::upper)
       .def("symmetry", &Tensor::symmetry)
       .def("latex", &Tensor::latex)
-      .def("compile", &Tensor::compile);
+      .def("compile", &Tensor::compile)
+      .def("reindex", &Tensor::reindex);
 
   m.def("tensor", &make_tensor, "label"_a, "lower"_a, "upper"_a, "symmetry"_a);
   m.def("tensor", &make_tensor_from_str, "s"_a, "symmetry"_a);
