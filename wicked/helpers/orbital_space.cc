@@ -156,6 +156,16 @@ int OrbitalSpaceInfo::label_to_space(char label) const {
   return search->second;
 }
 
+std::vector<int> OrbitalSpaceInfo::indices_of_type(SpaceType type) const {
+  std::vector<int> indices;
+  for (size_t i = 0; i < space_info_.size(); i++) {
+    if (space_info_[i].space_type() == type) {
+      indices.push_back(i);
+    }
+  }
+  return indices;
+}
+
 void OrbitalSpaceInfo::reset() {
   space_info_.clear();
   label_to_pos_.clear();

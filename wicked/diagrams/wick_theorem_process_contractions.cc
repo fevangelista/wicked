@@ -392,38 +392,45 @@ std::vector<int> WickTheorem::elements_vec_to_pos(
 
   std::vector<int> result;
 
-  int s = elements_vec.spaces_in_elementary_contraction()[0];
-
+  std::vector<int> spaces = elements_vec.spaces_in_elementary_contraction();
+  // only retain unique elements
+  std::set<int> s(spaces.begin(), spaces.end());
   PRINT(PrintLevel::All, cout << "\n  GraphMatrix to position:" << endl;);
 
   // Loop over all graph matrices
   for (int v = 0; v < elements_vec.size(); v++) {
     const auto &graph_matrix = elements_vec[v];
-    int nops = creation ? graph_matrix.cre(s) : graph_matrix.ann(s);
     // assign the operator indices
-    int ops_off = creation ? ops_offset[v].cre(s) : ops_offset[v].ann(s);
-    for (int i = 0; i < nops; i++) {
-      // find the operator corresponding to this leg
-      auto key =
-          creation
-              ? std::make_tuple(v, s, true,
-                                ops_off + i) // start from the leftmost operator
-              : std::make_tuple(v, s, false, ops_off + i);
-      if (op_map.count(key) == 0) {
-        PRINT(PrintLevel::All, print_key(key, -1););
-        cout << " NOT FOUND!!!" << endl;
-        exit(1);
-      } else {
-        int sqop_pos = op_map[key];
-        result.push_back(sqop_pos);
-        PRINT(PrintLevel::All, print_key(key, sqop_pos););
-      }
+    std::map<int, int> nops;
+    for (auto l : s) { 
+      nops[l] = creation ? graph_matrix.cre(l) : graph_matrix.ann(l);
     }
-    // update the creator's offset
-    if (creation) {
-      ops_offset[v].set_cre(s, ops_off + nops);
-    } else {
-      ops_offset[v].set_ann(s, ops_off + nops);
+    for (auto l : s) {
+      int ops_off = creation ? ops_offset[v].cre(l) : ops_offset[v].ann(l);
+      for (int i = 0; i < nops[l]; i++) {
+        // find the operator corresponding to this leg
+        auto key =
+            creation
+                ? std::make_tuple(v, l, true,
+                                  ops_off + i) // start from the leftmost operator
+                : std::make_tuple(v, l, false, ops_off + i);
+        if (op_map.count(key) == 0) {
+          PRINT(PrintLevel::All, print_key(key, -1););
+          cout << " NOT FOUND!!!" << endl;
+          exit(1);
+        } else {
+          int sqop_pos = op_map[key];
+          result.push_back(sqop_pos);
+          PRINT(PrintLevel::All, print_key(key, sqop_pos););
+        }
+      }
+    
+      // update the creator's offset
+      if (creation) {
+        ops_offset[v].set_cre(l, ops_off + nops[l]);
+      } else {
+        ops_offset[v].set_ann(l, ops_off + nops[l]);
+      }
     }
   }
   return result;

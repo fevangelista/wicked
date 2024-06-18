@@ -73,7 +73,7 @@ private:
 
   /// Generates all elementary contractions
   std::vector<ElementaryContraction>
-  generate_elementary_contractions(const OperatorProduct &ops);
+  generate_elementary_contractions(const OperatorProduct &ops, bool inter_general=true);
 
   /// Generates elementary contractions of occupied spaces
   void elementary_contractions_occupied(
@@ -88,6 +88,11 @@ private:
   /// Generates elementary contractions of general spaces
   void elementary_contractions_general(
       const OperatorProduct &ops, int s,
+      std::vector<ElementaryContraction> &contr_vec);
+
+  /// Generates elementary contractions between general spaces
+  void elementary_contractions_inter_general(
+      const OperatorProduct &ops, std::vector<int> &s,
       std::vector<ElementaryContraction> &contr_vec);
 
   //

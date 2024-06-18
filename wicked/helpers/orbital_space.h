@@ -85,6 +85,9 @@ public:
   /// Return a dictionary representation
   std::map<std::string, std::vector<std::string>> to_dict() const;
 
+  /// Return all indices belonging to a space type
+  std::vector<int> indices_of_type(SpaceType type) const;
+
 private:
   /// Vector of spaces
   std::vector<OrbitalSpace> space_info_;
