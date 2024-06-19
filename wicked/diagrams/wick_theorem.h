@@ -95,6 +95,9 @@ private:
       const OperatorProduct &ops, std::vector<int> &s,
       std::vector<ElementaryContraction> &contr_vec);
 
+  /// Return the Ms of a given inter-general contraction
+  int ms_of_contraction(std::vector<GraphMatrix> &contr, std::vector<int> &s);
+
   //
   // Functions for step 2. of the Wick's theorem algorithm
   // implemented in wich_theorem_composite_contractions.cc

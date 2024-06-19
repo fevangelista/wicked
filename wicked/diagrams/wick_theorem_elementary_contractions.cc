@@ -72,10 +72,13 @@ WickTheorem::generate_elementary_contractions(const OperatorProduct &ops, bool i
 
   if (inter_general) {
     std::vector<int> s = orbital_subspaces->indices_of_type(SpaceType::General);
-    if (s.size() > 1) {
+    if (s.size() == 2) {
       elementary_contractions_inter_general(ops, s, contr_vec);}
     else {
-      elementary_contractions_general(ops, s[0], contr_vec);
+      cout << "Warning: Inter-general contractions require exactly two general spaces. Turning off inter-general contractions." << endl;
+      for (int i = 0; i < s.size(); i++) {
+        elementary_contractions_general(ops, i, contr_vec);
+      }
     }
   }
   return contr_vec;
@@ -312,10 +315,12 @@ void WickTheorem::elementary_contractions_inter_general(
               new_contr[A].set_ann(s[0], ann_legs_spaces[A][na[A]][0]);
               new_contr[A].set_ann(s[1], ann_legs_spaces[A][na[A]][1]);
             }
-            contr_vec.push_back(new_contr);
-            PRINT(PrintLevel::Summary,
-                  cout << fmt::format("\n    {:5d}:", contr_vec.size());
-                  PRINT_ELEMENTS(new_contr, " "););
+            if (ms_of_contraction(new_contr, s) == 0){
+              contr_vec.push_back(new_contr);
+              PRINT(PrintLevel::Summary,
+                    cout << fmt::format("\n    {:5d}:", contr_vec.size());
+                    PRINT_ELEMENTS(new_contr, " "););
+            }
             int A = 0;
             while (A < nops){
               if (nc[A] < cre_legs_spaces[A].size()-1){
@@ -349,4 +354,14 @@ void WickTheorem::elementary_contractions_inter_general(
       }
     }
   }
+}
+
+int WickTheorem::ms_of_contraction(std::vector<GraphMatrix> &contr, std::vector<int> &s) {
+  int ms = 0;
+  int nops = contr.size();
+  for (int A = 0; A < nops; A++) {
+    ms += contr[A].cre(s[0]) - contr[A].cre(s[1]);
+    ms -= contr[A].ann(s[0]) - contr[A].ann(s[1]);
+  }
+  return ms;
 }
