@@ -300,26 +300,50 @@ void WickTheorem::elementary_contractions_inter_general(
           }
         }
 
-        std::vector<GraphMatrix> new_contr(nops);
+        std::vector<int> nc(nops,0);
+        std::vector<int> na(nops,0);
 
-        for (int c1 = 0; c1 < cre_legs_spaces[0].size(); c1++){
-          for (int c2 = 0; c2 < cre_legs_spaces[1].size(); c2++){
-            for (int a1 = 0; a1 < ann_legs_spaces[0].size(); a1++){
-              for (int a2 = 0; a2 < ann_legs_spaces[1].size(); a2++){
-                new_contr[0].set_cre(s[0], cre_legs_spaces[0][c1][0]);
-                new_contr[0].set_cre(s[1], cre_legs_spaces[0][c1][1]);
-                new_contr[1].set_cre(s[0], cre_legs_spaces[1][c2][0]);
-                new_contr[1].set_cre(s[1], cre_legs_spaces[1][c2][1]);
-                new_contr[0].set_ann(s[0], ann_legs_spaces[0][a1][0]);
-                new_contr[0].set_ann(s[1], ann_legs_spaces[0][a1][1]);
-                new_contr[1].set_ann(s[0], ann_legs_spaces[1][a2][0]);
-                new_contr[1].set_ann(s[1], ann_legs_spaces[1][a2][1]);
-                contr_vec.push_back(new_contr);
-                PRINT(PrintLevel::Summary,
-                      cout << fmt::format("\n    {:5d}:", contr_vec.size());
-                      PRINT_ELEMENTS(new_contr, " "););
+        while (true){
+          while (true){
+            std::vector<GraphMatrix> new_contr(nops);
+            for (int A = 0; A < nops; A++){
+              new_contr[A].set_cre(s[0], cre_legs_spaces[A][nc[A]][0]);
+              new_contr[A].set_cre(s[1], cre_legs_spaces[A][nc[A]][1]);
+              new_contr[A].set_ann(s[0], ann_legs_spaces[A][na[A]][0]);
+              new_contr[A].set_ann(s[1], ann_legs_spaces[A][na[A]][1]);
+            }
+            contr_vec.push_back(new_contr);
+            PRINT(PrintLevel::Summary,
+                  cout << fmt::format("\n    {:5d}:", contr_vec.size());
+                  PRINT_ELEMENTS(new_contr, " "););
+            int A = 0;
+            while (A < nops){
+              if (nc[A] < cre_legs_spaces[A].size()-1){
+                nc[A]++;
+                break;
+              }
+              else{
+                nc[A] = 0;
+                A++;
               }
             }
+            if (A == nops){
+              break;
+            }
+          }
+          int A = 0;
+          while (A < nops){
+            if (na[A] < ann_legs_spaces[A].size()-1){
+              na[A]++;
+              break;
+            }
+            else{
+              na[A] = 0;
+              A++;
+            }
+          }
+          if (A == nops){
+            break;
           }
         }
       }
