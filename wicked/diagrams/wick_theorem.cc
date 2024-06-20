@@ -29,7 +29,7 @@ const std::map<std::string, double> &WickTheorem::timers() const {
 }
 
 Expression WickTheorem::contract(scalar_t factor, const OperatorProduct &ops,
-                                 const int minrank, const int maxrank) {
+                                 const int minrank, const int maxrank, bool inter_general) {
   ncontractions_ = 0;
   contractions_.clear();
   elementary_contractions_.clear();
@@ -42,7 +42,7 @@ Expression WickTheorem::contract(scalar_t factor, const OperatorProduct &ops,
 
   // Step 1. Generate elementary contractions
   timer t1;
-  elementary_contractions_ = generate_elementary_contractions(ops);
+  elementary_contractions_ = generate_elementary_contractions(ops, inter_general);
   timers_["step 1"] += t1.get();
 
   // Step 2. Generate allowed composite contractions
@@ -59,10 +59,10 @@ Expression WickTheorem::contract(scalar_t factor, const OperatorProduct &ops,
 
 Expression WickTheorem::contract(scalar_t factor,
                                  const OperatorExpression &expr,
-                                 const int minrank, const int maxrank) {
+                                 const int minrank, const int maxrank, bool inter_general) {
   Expression result;
   for (const auto &[ops, f] : expr.terms()) {
-    result += contract(factor * f, ops, minrank, maxrank);
+    result += contract(factor * f, ops, minrank, maxrank, inter_general);
   }
   return result;
 }

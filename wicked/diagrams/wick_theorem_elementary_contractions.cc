@@ -75,7 +75,6 @@ WickTheorem::generate_elementary_contractions(const OperatorProduct &ops, bool i
     if (s.size() == 2) {
       elementary_contractions_inter_general(ops, s, contr_vec);}
     else {
-      cout << "Warning: Inter-general contractions require exactly two general spaces. Turning off inter-general contractions." << endl;
       for (int i = 0; i < s.size(); i++) {
         elementary_contractions_general(ops, i, contr_vec);
       }
@@ -303,7 +302,7 @@ void WickTheorem::elementary_contractions_inter_general(
           }
         }
 
-        std::vector<int> nc(nops,0);
+        std::vector<int> nc(nops,0); // equivlant to a cartesian product iterator
         std::vector<int> na(nops,0);
 
         while (true){

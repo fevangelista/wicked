@@ -27,11 +27,11 @@ public:
 
   /// Contract a product of operators
   Expression contract(scalar_t factor, const OperatorProduct &ops,
-                      const int minrank, const int maxrank);
+                      const int minrank, const int maxrank, bool inter_general=false);
 
   /// Contract a product of sums of operators
   Expression contract(scalar_t factor, const OperatorExpression &expr,
-                      const int minrank, const int maxrank);
+                      const int minrank, const int maxrank, bool inter_general=false);
 
   /// Set the amount of printing
   void set_print(PrintLevel print);
@@ -73,7 +73,7 @@ private:
 
   /// Generates all elementary contractions
   std::vector<ElementaryContraction>
-  generate_elementary_contractions(const OperatorProduct &ops, bool inter_general=true);
+  generate_elementary_contractions(const OperatorProduct &ops, bool inter_general=false);
 
   /// Generates elementary contractions of occupied spaces
   void elementary_contractions_occupied(
