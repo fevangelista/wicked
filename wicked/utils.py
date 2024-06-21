@@ -61,7 +61,7 @@ def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
     return wicked.op(label, terms, unique=False)
 
 
-def compile_einsum(equation):
+def compile_einsum(equation, keys=None):
     """
     Compile an equation into a valid einsum expression.
     Turns a Wick&d equation (wicked._wicked.Equation) like H^{c0,a0}_{a1,a2} += 1/4 T2^{c0,a0}_{a3,a4} V^{a5,a6}_{a1,a2} eta1^{a4}_{a6} eta1^{a3}_{a5}
@@ -94,11 +94,15 @@ def compile_einsum(equation):
     tensor_label_string = ''
 
     for t in rhs.tensors():
-        tensor_label_string += t.label() + "[\"" + ''.join(
-            [str(_)[0] for _ in t.upper()]) + ''.join([str(_)[0] for _ in t.lower()]) + "\"],"
-        index_string += _get_unique_tensor_indices(
-            t, unused_indices, index_dict)
+        tensor_label = ''.join([str(_)[0] for _ in t.upper()]) + ''.join([str(_)[0] for _ in t.lower()])
+        tensor_label_string += t.label() + "[\"" + tensor_label + "\"],"
+        index_string += _get_unique_tensor_indices(t, unused_indices, index_dict)
         index_string += ','
+        if (type(keys) == dict):
+            if t.label() in keys:
+                keys[t.label()].add(f'{tensor_label}')
+            else:
+                keys[t.label()] = set([tensor_label])
 
     index_string = index_string[:-1] + '->'
     tensor_label_string += "optimize='optimal')"

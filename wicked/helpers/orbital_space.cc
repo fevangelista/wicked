@@ -81,6 +81,12 @@ void OrbitalSpaceInfo::add_space(char label, FieldType field_type,
                              "\" is already defined. Use another label.");
   }
 
+  if (space_type == SpaceType::General && indices_of_type(space_type).size() > 0){
+    std::cout << "Warning: you're adding more than one general spaces. \n" <<
+    "Multi-leg contractions between these general spaces is turned off by default. \n" <<
+    "Turn on 'inter_general=True' in contract to enable this behavior." << std::endl;
+  }
+
   size_t pos = space_info_.size();
   label_to_pos_[label] = pos;
   for (auto &index : indices) {
