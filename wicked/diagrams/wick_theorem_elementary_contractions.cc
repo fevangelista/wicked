@@ -302,7 +302,9 @@ void WickTheorem::elementary_contractions_inter_general(
           }
         }
 
-        std::vector<int> nc(nops,0); // equivlant to a cartesian product iterator
+        // the nc and na vectors are used to loop over all possible ways
+        // to distribute the legs over the two general spaces
+        std::vector<int> nc(nops,0);
         std::vector<int> na(nops,0);
 
         while (true){
@@ -314,12 +316,14 @@ void WickTheorem::elementary_contractions_inter_general(
               new_contr[A].set_ann(s[0], ann_legs_spaces[A][na[A]][0]);
               new_contr[A].set_ann(s[1], ann_legs_spaces[A][na[A]][1]);
             }
+            // only add the contraction if it is has Ms = 0
             if (ms_of_contraction(new_contr, s) == 0){
               contr_vec.push_back(new_contr);
               PRINT(PrintLevel::Summary,
                     cout << fmt::format("\n    {:5d}:", contr_vec.size());
                     PRINT_ELEMENTS(new_contr, " "););
             }
+            // increment the counter vectors
             int A = 0;
             while (A < nops){
               if (nc[A] < cre_legs_spaces[A].size()-1){
@@ -359,6 +363,7 @@ int WickTheorem::ms_of_contraction(std::vector<GraphMatrix> &contr, std::vector<
   int ms = 0;
   int nops = contr.size();
   for (int A = 0; A < nops; A++) {
+    // wlog, s[0] is assumed to have spin +1, s[1] is assumed to have spin -1
     ms += contr[A].cre(s[0]) - contr[A].cre(s[1]);
     ms -= contr[A].ann(s[0]) - contr[A].ann(s[1]);
   }
