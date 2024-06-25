@@ -82,8 +82,8 @@ void OrbitalSpaceInfo::add_space(char label, FieldType field_type,
   }
 
   if (space_type == SpaceType::General && indices_of_type(space_type).size() > 0){
-    std::cout << "Warning: you're adding more than one general spaces. \n" <<
-    "Multi-leg contractions between these general spaces is turned off by default. \n" <<
+    std::cout << "Warning: you're adding multiple general spaces. \n" <<
+    "Multi-leg contractions between these general spaces are turned off by default. \n" <<
     "Turn on 'inter_general=True' in contract to enable this behavior." << std::endl;
   }
 
