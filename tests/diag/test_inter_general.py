@@ -91,7 +91,7 @@ def test_inter_general_numerical():
     exec(si_code, globals())
     exec(so_code, globals())
 
-    n = 5
+    n = 6
     H_si = {}
     T_si = {}
     eta_si = {}
@@ -177,10 +177,10 @@ def test_inter_general_numerical():
     lambda3_so['aaaaaa'][beta, beta, alpha, beta, alpha, beta] = -lambda3_si['aAAaAA'].copy()
     lambda3_so['aaaaaa'][beta, beta, alpha, beta, beta, alpha] = lambda3_si['aAAaAA'].copy()
 
-    print(f'Spin-integrated: {si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si):.10f}')
-    print(f'Spin-orbital   : {so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so):.10f}')
-    print(f'Ratio          : {si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si)/so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so):.10f}')
-    assert np.isclose(si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si)/so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so),1.0)
+    print(f'Spin-integrated: {si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si):.13f}')
+    print(f'Spin-orbital   : {so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so):.13f}')
+    print(f'Difference     : {si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si)-so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so):.13f}')
+    assert np.isclose(si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si)-so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so),0.0,atol=1e-10)
 
 if __name__ == "__main__":
     test_inter_general()

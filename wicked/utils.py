@@ -1,7 +1,6 @@
 import wicked
 
-__all__ = ["string_to_expr", "gen_op",
-           "compile_einsum"]
+__all__ = ["string_to_expr", "gen_op", "compile_einsum", "dict_to_einsum"]
 
 
 def string_to_expr(s):
@@ -60,8 +59,23 @@ def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
                         )
     return wicked.op(label, terms, unique=False)
 
+def dict_to_einsum(eq_dict):
+    lhs = eq_dict['lhs'][0][0]
+    if eq_dict['lhs'][0][1] != '':
+        lhs += "[\'" + eq_dict['lhs'][0][1] + "\']"
+    rhs = "np.einsum(\'"
+    indices = ''
+    for t in eq_dict['rhs']:
+        indices += t[2] + ','
+    indices = indices[:-1]
+    blocks = ''
+    for t in eq_dict['rhs']:
+        blocks += t[0] + "[\'" + t[1] + "\'],"
+    blocks = blocks[:-1]
+    rhs += indices + "->" + eq_dict['lhs'][0][2] + "\'" + ',' + blocks + ",optimize='optimal')"
+    return lhs + ' += ' + f"{float(eq_dict['factor']):+.8f}" + ' * ' + rhs
 
-def compile_einsum(equation, keys=None):
+def compile_einsum(equation, keys=None, return_eq_dict=False):
     """
     Compile an equation into a valid einsum expression.
     Turns a Wick&d equation (wicked._wicked.Equation) like H^{c0,a0}_{a1,a2} += 1/4 T2^{c0,a0}_{a3,a4} V^{a5,a6}_{a1,a2} eta1^{a4}_{a6} eta1^{a3}_{a5}
@@ -80,6 +94,8 @@ def compile_einsum(equation, keys=None):
 
         return indstr
 
+    eq_dict = {'factor':0.0, 'lhs':[], 'rhs':[]}
+
     osi = wicked.osi()
     unused_indices = osi.to_dict()
     index_dict = {}
@@ -87,6 +103,7 @@ def compile_einsum(equation, keys=None):
     lhs = equation.lhs()
     rhs = equation.rhs()
     factor = equation.rhs_factor()
+    eq_dict['factor'] = factor
 
     # holds the expression part of the einsum contraction, e.g., iuvw,xyzr,wr,vz->iuxy
     index_string = ''
@@ -96,7 +113,9 @@ def compile_einsum(equation, keys=None):
     for t in rhs.tensors():
         tensor_label = ''.join([str(_)[0] for _ in t.upper()]) + ''.join([str(_)[0] for _ in t.lower()])
         tensor_label_string += t.label() + "[\"" + tensor_label + "\"],"
-        index_string += _get_unique_tensor_indices(t, unused_indices, index_dict)
+        tensor_indx = _get_unique_tensor_indices(t, unused_indices, index_dict)
+        index_string += tensor_indx
+        eq_dict['rhs'].append([t.label(), tensor_label, tensor_indx])
         index_string += ','
         if (type(keys) == dict):
             if t.label() in keys:
@@ -110,13 +129,16 @@ def compile_einsum(equation, keys=None):
     # If the lhs is not a scalar
     if (lhs.tensors()[0].upper() != [] or lhs.tensors()[0].lower() != []):
         left = rhs.tensors()[0].label()
-        left += ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].upper()]) + \
+        left_label = ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].upper()]) + \
             ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].lower()])
+        left += left_label
         res_indx = _get_unique_tensor_indices(
             rhs.tensors(), unused_indices, index_dict)
         index_string += res_indx
+        eq_dict['lhs'].append([lhs.tensors()[0].label(), left_label, res_indx])
     else:  # If it's scalar, just return the label.
         left = lhs.tensors()[0].label()
+        eq_dict['lhs'].append([lhs.tensors()[0].label(), '', ''])
 
     einsum_string = left \
         + ' ' \
@@ -125,4 +147,4 @@ def compile_einsum(equation, keys=None):
         + "', " \
         + tensor_label_string
 
-    return einsum_string
+    return einsum_string if not return_eq_dict else einsum_string, eq_dict
