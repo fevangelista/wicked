@@ -33,6 +33,9 @@ def test_tensor():
     assert str(t) == "T^{o0,a1}_{v0,a0}"
     assert t.latex() == "{T}^{i v}_{a u}"
 
+    t = w.tensor("T", ["v_0", "v_1"], ["a_0", "a_1"], w.sym.none)
+    assert t.symmetry_factor() == 4
+
 
 if __name__ == "__main__":
     test_tensor()
