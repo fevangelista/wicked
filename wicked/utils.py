@@ -147,4 +147,7 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
         + "', " \
         + tensor_label_string
 
-    return einsum_string if not return_eq_dict else einsum_string, eq_dict
+    if return_eq_dict:
+        return einsum_string, eq_dict
+    else:
+        return einsum_string

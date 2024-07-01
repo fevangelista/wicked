@@ -81,7 +81,7 @@ def test_inter_general_numerical():
     so_code = "def so_M(H,T,eta1,gamma1,lambda2,lambda3):\n   M = 0.0\n"
     si_keys = dict()
     for idx,i in enumerate(si_mbeq['|']):
-        si_code += '   ' + w.compile_einsum(i, si_keys) + '\n'
+        si_code += '   ' + w.compile_einsum(i, keys=si_keys) + '\n'
 
     for idx,i in enumerate(so_mbeq['|']):
         so_code += '   ' + w.compile_einsum(i) + '\n'
