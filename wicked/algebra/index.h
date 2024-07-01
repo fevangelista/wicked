@@ -44,6 +44,10 @@ public:
   /// @return true if other index is greater to this
   bool operator<(Index const &other) const;
 
+  /// Hash function
+  /// @return a hash value
+  size_t hash() const;
+
   /// @return a string representation
   /// (e.g., for index 1 of space 'o' returns 'o1')
   std::string str() const;

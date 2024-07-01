@@ -160,3 +160,8 @@ std::ostream &operator<<(std::ostream &os, const Equation &eterm) {
   os << eterm.str();
   return os;
 }
+
+void Equation::reindex(index_map_t &idx_map) {
+  lhs_.reindex(idx_map);
+  rhs_.reindex(idx_map);
+}

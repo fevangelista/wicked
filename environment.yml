@@ -1,0 +1,10 @@
+name: wicked
+
+dependencies:
+  - python=3.9
+  - pybind11
+  - cxx-compiler
+  - pip
+  - cmake
+  - pytest
+  - numpy

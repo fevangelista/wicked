@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 
 #include "helpers/combinatorics.h"
 #include "helpers/helpers.h"
@@ -15,6 +16,10 @@ bool Index::operator==(Index const &other) const {
 
 bool Index::operator<(Index const &other) const {
   return index_ < other.index_;
+}
+
+size_t Index::hash() const {
+  return std::hash<int>()(index_.first) ^ std::hash<int>()(index_.second);
 }
 
 std::string Index::str() const {

@@ -38,6 +38,9 @@ public:
   /// Return a compilable representation
   std::string compile(const std::string &format) const;
 
+  /// Reindex this equation
+  void reindex(index_map_t &idx_map);
+
 private:
   // ==> Class private data <==
 

@@ -34,6 +34,7 @@ void export_Expression(py::module &m) {
       .def("latex", &Expression::latex, "sep"_a = " \\\\ \n")
       .def("to_manybody_equation", &Expression::to_manybody_equation)
       .def("to_manybody_equations", &Expression::to_manybody_equation)
+      .def("reindex", &Expression::reindex)
       .def("canonicalize", &Expression::canonicalize);
 
   m.def("operator_expr", &make_operator_expr, "label"_a, "components"_a,
