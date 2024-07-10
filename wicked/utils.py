@@ -1,7 +1,6 @@
 import wicked
 
-__all__ = ["string_to_expr", "gen_op", "compile_einsum", "dict_to_einsum"]
-
+__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", "dict_to_einsum"]
 
 def string_to_expr(s):
     """
@@ -13,10 +12,8 @@ def string_to_expr(s):
         expr += wicked.expression(line)
     return expr
 
-
 def split(word):
     return [char for char in word]
-
 
 def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
     """
@@ -25,7 +22,7 @@ def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
     For example, instead of specifying all the components of an operator via
     wicked.op('T',['a+ c','v+ c','v+ a'])
     one can directly specify the
-    wicked.op('T',1,'av','ca')
+    wicked.gen_op('T',1,'av','ca')
     """
     import itertools
 
@@ -59,6 +56,37 @@ def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
                         )
     return wicked.op(label, terms, unique=False)
 
+def gen_op_ms0(label, rank, cre_spaces, ann_spaces, diagonal=True):
+    """
+    This function automates the creation of operators that span multiple spaces.
+
+    The operator is for Ms=0 spin-integrated theories, such that it only contains spin-preserving terms.
+
+    For example, instead of specifying all the components of an operator via
+    wicked.op('T',['a+ c','v+ c','v+ a','A+ C','V+ C','V+ A'])
+    one can directly specify the
+    wicked.gen_op_ms0('T',1,'av','ca')
+    """
+    import itertools
+    cre_spaces_alpha = [_ + '+' for _ in split(cre_spaces)]
+    cre_spaces_beta = [_.upper() + '+' for _ in split(cre_spaces)]
+    ann_spaces_alpha = [_ for _ in split(ann_spaces)]
+    ann_spaces_beta = [_.upper() for _ in split(ann_spaces)]
+
+    terms = []
+    for nalpha in range(rank+1):
+        nbeta = rank - nalpha
+        cre = (cre_spaces_alpha,)*nalpha + (cre_spaces_beta,)*nbeta
+        ann = (ann_spaces_alpha,)*nalpha + (ann_spaces_beta,)*nbeta
+        for i in itertools.product(*cre, *ann):
+            term = ' '.join(i)
+            if (not diagonal):
+                term_cleaned = term.replace('+','').replace(' ','').lower()
+                if (len(set(term_cleaned)) > 1): terms.append(term)
+            else: terms.append(term)
+
+    return wicked.op(label, terms, unique=True)
+
 def dict_to_einsum(eq_dict):
     lhs = eq_dict['lhs'][0][0]
     if eq_dict['lhs'][0][1] != '':
@@ -88,7 +116,10 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
             if index_dict.get(i):
                 indstr += index_dict[i]
             else:
-                index = unused_indices[i[0]].pop(0)
+                try:
+                    index = unused_indices[i[0]].pop(0)
+                except:
+                    raise ValueError(f"Index {i} is not available for einsum contraction. Try enlarging the index pool.")
                 index_dict[i] = index
                 indstr += index
 
@@ -128,12 +159,12 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
 
     # If the lhs is not a scalar
     if (lhs.tensors()[0].upper() != [] or lhs.tensors()[0].lower() != []):
-        left = rhs.tensors()[0].label()
+        left = lhs.tensors()[0].label()
         left_label = ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].upper()]) + \
             ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].lower()])
         left += left_label
         res_indx = _get_unique_tensor_indices(
-            rhs.tensors(), unused_indices, index_dict)
+            lhs.tensors()[0], unused_indices, index_dict)
         index_string += res_indx
         eq_dict['lhs'].append([lhs.tensors()[0].label(), left_label, res_indx])
     else:  # If it's scalar, just return the label.
