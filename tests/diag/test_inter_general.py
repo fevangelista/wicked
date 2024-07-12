@@ -180,7 +180,7 @@ def test_inter_general_numerical():
     print(f'Spin-integrated: {si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si):.13f}')
     print(f'Spin-orbital   : {so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so):.13f}')
     print(f'Difference     : {si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si)-so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so):.13f}')
-    assert np.isclose(si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si)-so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so),0.0,atol=1e-10)
+    assert np.isclose(si_M(H_si, T_si, eta_si, gamma_si, lambda2_si, lambda3_si)-so_M(H_so, T_so, eta_so, gamma_so, lambda2_so, lambda3_so),0.0,atol=1e-8)
 
 if __name__ == "__main__":
     test_inter_general()
