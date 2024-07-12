@@ -32,4 +32,4 @@ jobs:
         python setup.py develop
         pip list
         cd $HOME/work/wicked/wicked/tests
-        python run_wicked_tests.py
+        pytest
