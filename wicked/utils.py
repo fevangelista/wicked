@@ -162,7 +162,7 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
         left = lhs.tensors()[0].label()
         left_label = ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].upper()]) + \
             ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].lower()])
-        left += left_label
+        left += f"[\'{left_label}\']"
         res_indx = _get_unique_tensor_indices(
             lhs.tensors()[0], unused_indices, index_dict)
         index_string += res_indx
