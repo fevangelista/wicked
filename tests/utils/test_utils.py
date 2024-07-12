@@ -1,6 +1,14 @@
 import wicked as w
 
 def test_gen_op():
+    w.reset_space()
+    w.add_space('c', 'fermion', 'occupied', list('klmn'))
+    w.add_space('v', 'fermion', 'unoccupied', list('efgh'))
+    w.add_space('a', 'fermion', 'general', list('oabrstuvwxyz'))
+
+    w.add_space('C', 'fermion', 'occupied', list('KLMN'))
+    w.add_space('V', 'fermion', 'unoccupied', list('EFGH'))
+    w.add_space('A', 'fermion', 'general', list('OABRSTUVWXYZ'))
     F = w.gen_op('F', 1, 'cav', 'cav', diagonal=False)
     assert str(F) == \
     '+ F { a+ v }\n+ F { v+ a }\n+ F { a+ c }\n+ F { v+ c }\n+ F { c+ a }\n+ F { c+ v }'
@@ -10,6 +18,14 @@ def test_gen_op():
     '+ 1/4 V { a+ a+ a a }\n+ 1/2 V { a+ a+ a v }\n+ 1/4 V { a+ a+ v v }\n+ 1/2 V { v+ a+ a a }\n+ V { v+ a+ a v }\n+ 1/2 V { v+ a+ v v }\n+ 1/4 V { v+ v+ a a }\n+ 1/2 V { v+ v+ a v }\n+ 1/4 V { v+ v+ v v }\n+ 1/2 V { a+ a+ a c }\n+ 1/2 V { a+ a+ v c }\n+ V { v+ a+ a c }\n+ V { v+ a+ v c }\n+ 1/2 V { v+ v+ a c }\n+ 1/2 V { v+ v+ v c }\n+ 1/4 V { a+ a+ c c }\n+ 1/2 V { v+ a+ c c }\n+ 1/4 V { v+ v+ c c }\n+ 1/2 V { c+ a+ a a }\n+ V { c+ a+ a v }\n+ 1/2 V { c+ a+ v v }\n+ 1/2 V { c+ v+ a a }\n+ V { c+ v+ a v }\n+ 1/2 V { c+ v+ v v }\n+ V { c+ a+ a c }\n+ V { c+ a+ v c }\n+ V { c+ v+ a c }\n+ V { c+ v+ v c }\n+ 1/2 V { c+ a+ c c }\n+ 1/2 V { c+ v+ c c }\n+ 1/4 V { c+ c+ a a }\n+ 1/2 V { c+ c+ a v }\n+ 1/4 V { c+ c+ v v }\n+ 1/2 V { c+ c+ a c }\n+ 1/2 V { c+ c+ v c }\n+ 1/4 V { c+ c+ c c }'
 
 def test_gen_op_ms0():
+    w.reset_space()
+    w.add_space('c', 'fermion', 'occupied', list('klmn'))
+    w.add_space('v', 'fermion', 'unoccupied', list('efgh'))
+    w.add_space('a', 'fermion', 'general', list('oabrstuvwxyz'))
+
+    w.add_space('C', 'fermion', 'occupied', list('KLMN'))
+    w.add_space('V', 'fermion', 'unoccupied', list('EFGH'))
+    w.add_space('A', 'fermion', 'general', list('OABRSTUVWXYZ'))
     F = w.gen_op_ms0('F', 1, 'cav', 'cav', diagonal=False)
     assert str(F) == \
     '+ F { A+ V }\n+ F { V+ A }\n+ F { A+ C }\n+ F { V+ C }\n+ F { C+ A }\n+ F { C+ V }\n+ F { a+ v }\n+ F { v+ a }\n+ F { a+ c }\n+ F { v+ c }\n+ F { c+ a }\n+ F { c+ v }'
@@ -34,18 +50,9 @@ def test_compile_einsum():
     T2op = w.utils.gen_op('T2',2,'av','ca',diagonal=False)
     FT2 = wt.contract(w.commutator(F, T2op), 2, 2).to_manybody_equation("H")['c|v']
     eq = w.compile_einsum(FT2[-1])
-    assert eq == """Hcv += +1.00000000 * np.einsum('au,ivba,uv->ib', F["va"],T2["cavv"],gamma1["aa"],optimize='optimal')"""
-
+    assert eq == """H['cv'] += +1.00000000 * np.einsum('au,ivba,uv->ib', F["va"],T2["cavv"],gamma1["aa"],optimize='optimal')"""
 
 if __name__ == "__main__":
-    w.reset_space()
-    w.add_space('c', 'fermion', 'occupied', list('klmn'))
-    w.add_space('v', 'fermion', 'unoccupied', list('efgh'))
-    w.add_space('a', 'fermion', 'general', list('oabrstuvwxyz'))
-
-    w.add_space('C', 'fermion', 'occupied', list('KLMN'))
-    w.add_space('V', 'fermion', 'unoccupied', list('EFGH'))
-    w.add_space('A', 'fermion', 'general', list('OABRSTUVWXYZ'))
     test_gen_op()
     test_gen_op_ms0()
     test_dict_to_einsum()
