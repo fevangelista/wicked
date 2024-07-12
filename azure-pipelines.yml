@@ -28,10 +28,10 @@ steps:
     conda config --set always_yes yes
     if [ $(boost) = 'true' ]
     then
-      conda install -c conda-forge lcov pytest boost numpy
+      conda install -c conda-forge lcov pytest boost
       echo "##vso[task.setvariable variable=BOOST_ROOT]$(conda info --base)"
     else
-      conda install -c conda-forge lcov pytest numpy
+      conda install -c conda-forge lcov pytest
     fi
   displayName: 'Install conda dependencies'
 
@@ -43,7 +43,7 @@ steps:
   displayName: 'Compile wicked'
 
 - script: |
-    pip install pytest pytest-azurepipelines
+    pip install pytest pytest-azurepipelines numpy
     pytest tests
   displayName: 'Run pytest'
 
