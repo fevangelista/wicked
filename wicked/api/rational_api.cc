@@ -15,6 +15,14 @@ void export_rational(py::module &m) {
       .def(py::init<int, int>())
       .def("latex", &rational::latex)
       .def("compile", &rational::compile)
+      .def("numerator",
+           [](const rational &r) {
+             return static_cast<long long int>(r.numerator());
+           })
+      .def("denominator",
+           [](const rational &r) {
+             return static_cast<long long int>(r.denominator());
+           })
       .def("__float__", &rational::to_double)
       .def("__eq__",
            [](const rational &lhs, const rational &rhs) { return lhs == rhs; })

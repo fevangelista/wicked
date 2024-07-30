@@ -46,6 +46,8 @@ void export_Expression(py::module &m) {
           "__iter__",
           [](Expression &e) { return py::make_iterator(e.begin(), e.end()); },
           py::keep_alive<0, 1>())
+      .def("dot", &Expression::dot, "rhs"_a)
+      .def("norm", &Expression::norm)
       .def("latex", &Expression::latex, "sep"_a = " \\\\ \n")
       .def("to_manybody_equation", &Expression::to_manybody_equation)
       .def("to_manybody_equations", &Expression::to_manybody_equation)

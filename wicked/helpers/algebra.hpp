@@ -38,6 +38,28 @@ public:
   /// @brief Is this term equal to another term?
   bool is_equal(const Algebra &rhs) const { return terms_ == rhs.terms_; }
 
+  /// @brief Dot product of two terms
+  F dot(const Derived &rhs) const {
+    F result{0};
+    for (const auto &[e, c] : terms()) {
+      auto search = rhs.terms().find(e);
+      if (search != rhs.terms().end()) {
+        result += c * search->second;
+      }
+    }
+    return result;
+  }
+
+  /// @brief Norm of the term
+  double norm() const {
+    double result = 0;
+    for (const auto &[e, c] : terms()) {
+      auto c2 = c * c;
+      result += c2.to_double();
+    }
+    return std::sqrt(result);
+  }
+
   /// @brief Unary minus operator
   Derived operator-() const {
     Derived result;

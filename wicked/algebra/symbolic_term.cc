@@ -24,7 +24,15 @@ bool SymbolicTerm::is_labeled_normal_ordered() const { return normal_ordered_; }
 bool SymbolicTerm::is_vacuum_normal_ordered() const {
   return std::is_sorted(operators_.begin(), operators_.end(),
                         [](const SQOperator &a, const SQOperator &b) {
-                          return a.normal_ordered_less(b);
+                          // return a.normal_ordered_less(b);
+                          return a < b;
+                        });
+}
+
+bool SymbolicTerm::is_creation_then_annihilation() const {
+  return std::is_sorted(operators_.begin(), operators_.end(),
+                        [](const SQOperator &a, const SQOperator &b) {
+                          return b.is_creation() < a.is_creation();
                         });
 }
 
@@ -388,8 +396,25 @@ std::string SymbolicTerm::latex() const {
   if (nops()) {
     if (normal_ordered())
       str_vec.push_back("\\{");
-    for (const auto &op : operators_) {
-      str_vec.push_back(op.latex());
+    if (is_creation_then_annihilation()) {
+      std::vector<std::string> str_vec_cre;
+      std::vector<std::string> str_vec_ann;
+      for (const auto &op : operators_) {
+        if (op.is_creation()) {
+          str_vec_cre.push_back(op.index().latex());
+        } else {
+          str_vec_ann.push_back(op.index().latex());
+        }
+      }
+      // reverse the order of the annihilation operators
+      std::reverse(str_vec_ann.begin(), str_vec_ann.end());
+      std::string op_str = "\\hat{a}^{" + join(str_vec_cre, " ") + "}_{" +
+                           join(str_vec_ann, " ") + "}";
+      str_vec.push_back(op_str);
+    } else {
+      for (const auto &op : operators_) {
+        str_vec.push_back(op.latex());
+      }
     }
     if (normal_ordered())
       str_vec.push_back("\\}");

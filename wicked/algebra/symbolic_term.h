@@ -67,9 +67,13 @@ public:
   /// @return is the SQ operator product normal ordered?
   bool is_vacuum_normal_ordered() const;
 
-  /// @brief Check if the product of operators is normal ordered with respect to
-  /// the vacuum. The result of this function is independent of the value of the
-  /// normal_ordered_ flag.
+  /// @return is the SQ operator product sorted in such a way that creation
+  /// operators are to the left of annihilation operators?
+  bool is_creation_then_annihilation() const;
+
+  /// @brief Check if the product of operators is normal ordered with respect
+  /// to the vacuum. The result of this function is independent of the value
+  /// of the normal_ordered_ flag.
   bool is_labeled_normal_ordered() const;
 
   /// Canonicalize this term and return the overall phase factor
