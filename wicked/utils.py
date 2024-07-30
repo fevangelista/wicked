@@ -1,6 +1,6 @@
 import wicked
 
-__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", "dict_to_einsum"]
+__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", "dict_to_einsum", "get_contraction_scaling"]
 
 def string_to_expr(s):
     """
@@ -159,7 +159,8 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
 
     # If the lhs is not a scalar
     if (lhs.tensors()[0].upper() != [] or lhs.tensors()[0].lower() != []):
-        left = lhs.tensors()[0].label()
+        ltensor = lhs.tensors()[0].label()
+        left = ltensor
         left_label = ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].upper()]) + \
             ''.join([osi.label(_.space()) for _ in lhs.tensors()[0].lower()])
         left += f"[\'{left_label}\']"
@@ -167,6 +168,12 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
             lhs.tensors()[0], unused_indices, index_dict)
         index_string += res_indx
         eq_dict['lhs'].append([lhs.tensors()[0].label(), left_label, res_indx])
+
+        if (type(keys) == dict):
+            if ltensor in keys:
+                keys[ltensor].add(f'{left_label}')
+            else:
+                keys[ltensor] = set([left_label])
     else:  # If it's scalar, just return the label.
         left = lhs.tensors()[0].label()
         eq_dict['lhs'].append([lhs.tensors()[0].label(), '', ''])
@@ -182,3 +189,17 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
         return einsum_string, eq_dict
     else:
         return einsum_string
+    
+def get_contraction_scaling(equation):
+    _, eq_dict = wicked.compile_einsum(equation, return_eq_dict=True)
+    indices = [_[2] for _ in eq_dict['rhs']]
+    ind_set = set(''.join(indices))
+    osi = wicked.osi().to_dict()
+    index_dict = {}
+    for key in osi.keys():
+        for index in osi[key]:
+            index_dict[index] = key
+    scaling = {_:0 for _ in osi.keys()}
+    for i in ind_set:
+        scaling[index_dict[i]] += 1
+    return scaling
