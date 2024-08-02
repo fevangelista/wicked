@@ -1,6 +1,6 @@
 import wicked
 
-__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", "dict_to_einsum", "get_contraction_scaling"]
+__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", "dict_to_einsum", "get_contraction_scaling", "analyze_einsum"]
 
 def string_to_expr(s):
     """
@@ -199,6 +199,24 @@ def get_contraction_scaling(equation):
     for key in osi.keys():
         for index in osi[key]:
             index_dict[index] = key
+    scaling = {_:0 for _ in osi.keys()}
+    for i in ind_set:
+        scaling[index_dict[i]] += 1
+    return scaling
+
+def analyze_einsum(einsum_str):
+    # just get the lhs of the einsum contraction. e.g., mnab,abef
+    contraction = einsum_str.split("->")[0].split("(")[1][1:]
+    # put these indices into a set
+    indices = contraction.split(",")
+    ind_set = set(''.join(indices))
+    # get the orbital space corresponding to each index
+    osi = wicked.osi().to_dict()
+    index_dict = {}
+    for key in osi.keys():
+        for index in osi[key]:
+            index_dict[index] = key
+    # now count the scaling
     scaling = {_:0 for _ in osi.keys()}
     for i in ind_set:
         scaling[index_dict[i]] += 1
