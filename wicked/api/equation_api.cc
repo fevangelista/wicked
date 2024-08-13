@@ -19,5 +19,5 @@ void export_Equation(py::module &m) {
       .def("__str__", &Equation::str)
       .def("latex", &Equation::latex)
       .def("reindex", &Equation::reindex)
-      .def("compile", &Equation::compile);
+      .def("compile", &Equation::compile, "format"_a, "optimize"_a = "\"optimal\"");
 }
