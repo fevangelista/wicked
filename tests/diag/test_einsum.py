@@ -66,9 +66,9 @@ def test_energy():
     mbeq = expr.to_manybody_equation("R")
 
     assert len(mbeq["|"]) == 1
-    comp = mbeq["|"][0].compile("einsum")
+    comp = mbeq["|"][0].compile("einsum", optimize="True")
     print(comp)
-    assert comp == 'R += 0.250000000 * np.einsum("ijab,abij->",T2["oovv"],v["vvoo"],optimize="optimal")'
+    assert comp == 'R += 0.250000000 * np.einsum("ijab,abij->",T2["oovv"],v["vvoo"],optimize=True)'
 
 
 if __name__ == "__main__":
