@@ -1,6 +1,6 @@
 import wicked
 
-__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", "dict_to_einsum", "get_contraction_scaling", "analyze_einsum"]
+__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", "dict_to_einsum", "analyze_einsum"]
 
 def string_to_expr(s):
     """
@@ -87,7 +87,7 @@ def gen_op_ms0(label, rank, cre_spaces, ann_spaces, diagonal=True):
 
     return wicked.op(label, terms, unique=True)
 
-def dict_to_einsum(eq_dict):
+def dict_to_einsum(eq_dict, optimize="'optimal'"):
     lhs = eq_dict['lhs'][0][0]
     if eq_dict['lhs'][0][1] != '':
         lhs += "[\'" + eq_dict['lhs'][0][1] + "\']"
@@ -100,10 +100,10 @@ def dict_to_einsum(eq_dict):
     for t in eq_dict['rhs']:
         blocks += t[0] + "[\'" + t[1] + "\'],"
     blocks = blocks[:-1]
-    rhs += indices + "->" + eq_dict['lhs'][0][2] + "\'" + ',' + blocks + ",optimize='optimal')"
+    rhs += indices + "->" + eq_dict['lhs'][0][2] + "\'" + ',' + blocks + f",optimize={optimize})"
     return lhs + ' += ' + f"{float(eq_dict['factor']):+.8f}" + ' * ' + rhs
 
-def compile_einsum(equation, keys=None, return_eq_dict=False):
+def compile_einsum(equation, keys=None, return_eq_dict=False, optimize="'optimal'"):
     """
     Compile an equation into a valid einsum expression.
     Turns a Wick&d equation (wicked._wicked.Equation) like H^{c0,a0}_{a1,a2} += 1/4 T2^{c0,a0}_{a3,a4} V^{a5,a6}_{a1,a2} eta1^{a4}_{a6} eta1^{a3}_{a5}
@@ -155,7 +155,7 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
                 keys[t.label()] = set([tensor_label])
 
     index_string = index_string[:-1] + '->'
-    tensor_label_string += "optimize='optimal')"
+    tensor_label_string += f"optimize={optimize})"
 
     # If the lhs is not a scalar
     if (lhs.tensors()[0].upper() != [] or lhs.tensors()[0].lower() != []):
@@ -189,27 +189,15 @@ def compile_einsum(equation, keys=None, return_eq_dict=False):
         return einsum_string, eq_dict
     else:
         return einsum_string
-    
-def get_contraction_scaling(equation):
-    _, eq_dict = wicked.compile_einsum(equation, return_eq_dict=True)
-    indices = [_[2] for _ in eq_dict['rhs']]
-    ind_set = set(''.join(indices))
-    osi = wicked.osi().to_dict()
-    index_dict = {}
-    for key in osi.keys():
-        for index in osi[key]:
-            index_dict[index] = key
-    scaling = {_:0 for _ in osi.keys()}
-    for i in ind_set:
-        scaling[index_dict[i]] += 1
-    return scaling
 
-def analyze_einsum(einsum_str):
+def analyze_einsum(einsum_str, root_index=None):
     # just get the lhs of the einsum contraction. e.g., mnab,abef
     contraction = einsum_str.split("->")[0].split("(")[1][1:]
     # put these indices into a set
     indices = contraction.split(",")
     ind_set = set(''.join(indices))
+    if root_index is not None:
+        ind_set = ind_set - set(root_index)
     # get the orbital space corresponding to each index
     osi = wicked.osi().to_dict()
     index_dict = {}

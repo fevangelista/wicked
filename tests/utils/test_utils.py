@@ -52,7 +52,7 @@ def test_compile_einsum():
     eq = w.compile_einsum(FT2[-1])
     assert eq == """H['cv'] += +1.00000000 * np.einsum('au,ivba,uv->ib', F["va"],T2["cavv"],gamma1["aa"],optimize='optimal')"""
 
-def test_get_contraction_scaling():
+def test_analyze_einsum():
     w.reset_space()
     w.add_space("c", "fermion", "occupied", list('ijklmn'))
     w.add_space("a", "fermion", "general", list('uvwxyzrst'))
@@ -62,7 +62,8 @@ def test_get_contraction_scaling():
     F = w.utils.gen_op('F',1,'cav','cav',diagonal=True)
     T2op = w.utils.gen_op('T2',2,'av','ca',diagonal=False)
     FT2 = wt.contract(w.commutator(F, T2op), 2, 2).to_manybody_equation("H")['c|v']
-    scaling = w.get_contraction_scaling(FT2[-1])
+    einsum = w.compile_einsum(FT2[-1])
+    scaling = w.analyze_einsum(einsum)
     assert scaling['c'] == 1
     assert scaling['v'] == 2
     assert scaling['a'] == 2
@@ -72,4 +73,4 @@ if __name__ == "__main__":
     test_gen_op_ms0()
     test_dict_to_einsum()
     test_compile_einsum()
-    test_get_contraction_scaling()
+    test_analyze_einsum()
