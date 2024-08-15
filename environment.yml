@@ -8,3 +8,4 @@ dependencies:
   - cmake
   - pytest
   - numpy
+  - conda-forge::opt_einsum

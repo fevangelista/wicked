@@ -1,6 +1,7 @@
 import wicked
 
-__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", "dict_to_einsum", "analyze_einsum"]
+__all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", 
+           "dict_to_einsum", "analyze_einsum", "precompute_path"]
 
 def string_to_expr(s):
     """
@@ -209,3 +210,36 @@ def analyze_einsum(einsum_str, root_index=None):
     for i in ind_set:
         scaling[index_dict[i]] += 1
     return scaling
+
+def precompute_path(line, norbs=None, index_dict=None):
+    import opt_einsum as oe
+    import re
+
+    def _precompute(line, sizes_dict=None):
+        if sizes_dict is None:
+            sizes_dict = {k:10 for k in wicked.osi().to_dict()}
+        contr = line.split("->")[0].split("(")[1][1:]
+        rhs = line.split("->")[1].split("',")[0]
+        lhs = contr.split(',')
+        return oe.paths.optimal(lhs, [rhs], sizes_dict)
+
+    if norbs is None:
+        norbs = {k:10 for k in wicked.osi().to_dict().keys()}
+
+    osi = wicked.osi().to_dict()
+    if index_dict is None:
+        index_dict = {}
+    for key in osi.keys():
+        for index in osi[key]:
+            index_dict[index] = key
+
+    sizes_dict = {k: norbs[index_dict[k]] for k in index_dict.keys()}
+
+    if 'np.einsum' in line:
+        try:
+            path = ['einsum_path'] + _precompute(line, sizes_dict)
+            return re.sub(r"optimize='.*'\)", f"optimize={str(path)})", line)
+        except:
+            return line
+    else:
+        return line

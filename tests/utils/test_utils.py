@@ -68,9 +68,23 @@ def test_analyze_einsum():
     assert scaling['v'] == 2
     assert scaling['a'] == 2
 
+def test_precompute_path():
+    w.reset_space()
+    w.add_space('c', 'fermion', 'occupied', list('ijklmn'))
+    w.add_space('v', 'fermion', 'unoccupied', list('abcdef'))
+    w.add_space('a', 'fermion', 'general', list('opqrstuvwxyz'))
+
+    w.add_space('C', 'fermion', 'occupied', list('IJKLMN'))
+    w.add_space('V', 'fermion', 'unoccupied', list('ABCDEF'))
+    w.add_space('A', 'fermion', 'general', list('OPQRSTUVWXYZ'))
+    line = """C1['AA'] += -1.00000000 * np.einsum('oOaP,aQpR,pPoQ->OR', T2["aAvA"],V["vAaA"],lambda2["aAaA"],optimize='optimal')"""
+    line_precomputed = w.precompute_path(line)
+    assert line_precomputed == """C1['AA'] += -1.00000000 * np.einsum('oOaP,aQpR,pPoQ->OR', T2["aAvA"],V["vAaA"],lambda2["aAaA"],optimize=['einsum_path', (0, 2), (0, 1)])"""
+
 if __name__ == "__main__":
     test_gen_op()
     test_gen_op_ms0()
     test_dict_to_einsum()
     test_compile_einsum()
     test_analyze_einsum()
+    test_precompute_path()
