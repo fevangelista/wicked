@@ -211,17 +211,17 @@ def analyze_einsum(einsum_str, root_index=None):
         scaling[index_dict[i]] += 1
     return scaling
 
-def precompute_path(line, norbs=None, index_dict=None):
+def precompute_path(line, norbs=None, index_dict=None, memory_limit=5e8):
     import opt_einsum as oe
     import re
 
-    def _precompute(line, sizes_dict=None):
+    def _precompute(line, sizes_dict=None, memory_limit=5e8):
         if sizes_dict is None:
             sizes_dict = {k:10 for k in wicked.osi().to_dict()}
         contr = line.split("->")[0].split("(")[1][1:]
         rhs = line.split("->")[1].split("',")[0]
         lhs = contr.split(',')
-        return oe.paths.optimal(lhs, [rhs], sizes_dict)
+        return oe.paths.optimal(lhs, [rhs], sizes_dict, memory_limit)
 
     if norbs is None:
         norbs = {k:10 for k in wicked.osi().to_dict().keys()}
@@ -237,8 +237,8 @@ def precompute_path(line, norbs=None, index_dict=None):
 
     if 'np.einsum' in line:
         try:
-            path = ['einsum_path'] + _precompute(line, sizes_dict)
-            return re.sub(r"optimize='.*'\)", f"optimize={str(path)})", line)
+            path = ['einsum_path'] + _precompute(line, sizes_dict, memory_limit)
+            return re.sub(r"optimize=.*\)", f"optimize={str(path)})", line)
         except:
             return line
     else:

@@ -80,6 +80,10 @@ def test_precompute_path():
     line = """C1['AA'] += -1.00000000 * np.einsum('oOaP,aQpR,pPoQ->OR', T2["aAvA"],V["vAaA"],lambda2["aAaA"],optimize='optimal')"""
     line_precomputed = w.precompute_path(line)
     assert line_precomputed == """C1['AA'] += -1.00000000 * np.einsum('oOaP,aQpR,pPoQ->OR', T2["aAvA"],V["vAaA"],lambda2["aAaA"],optimize=['einsum_path', (0, 2), (0, 1)])"""
+    line = """C1['AA'] += -1.00000000 * np.einsum('oOaP,aQpR,pPoQ->OR', T2["aAvA"],V["vAaA"],lambda2["aAaA"],optimize=True)"""
+    line_precomputed = w.precompute_path(line)
+    assert line_precomputed == """C1['AA'] += -1.00000000 * np.einsum('oOaP,aQpR,pPoQ->OR', T2["aAvA"],V["vAaA"],lambda2["aAaA"],optimize=['einsum_path', (0, 2), (0, 1)])"""
+
 
 if __name__ == "__main__":
     test_gen_op()
