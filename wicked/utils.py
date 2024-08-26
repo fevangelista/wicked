@@ -1,7 +1,8 @@
 import wicked
 
 __all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", 
-           "dict_to_einsum", "analyze_einsum", "precompute_path"]
+           "dict_to_einsum", "analyze_einsum", "precompute_path", 
+           "equation_to_dict", "dict_to_equation"]
 
 def string_to_expr(s):
     """
@@ -211,35 +212,56 @@ def analyze_einsum(einsum_str, root_index=None):
         scaling[index_dict[i]] += 1
     return scaling
 
-def precompute_path(line, norbs=None, index_dict=None, memory_limit=5e8):
+def precompute_path(line, sizes_dict, memory_limit=None, optimize='optimal'):
     import opt_einsum as oe
     import re
 
-    def _precompute(line, sizes_dict=None, memory_limit=5e8):
-        if sizes_dict is None:
-            sizes_dict = {k:10 for k in wicked.osi().to_dict()}
+    pathgen = oe.paths.optimal
+    if optimize == 'optimal':
+        pathgen = oe.paths.optimal
+    elif optimize == 'greedy':
+        pathgen = oe.paths.greedy
+    elif optimize == 'branch_all':
+        pathgen = oe.paths.branch_all
+    elif optimize == 'branch_1':
+        pathgen = oe.paths.branch_1
+    elif optimize == 'branch_2':
+        pathgen = oe.paths.branch_2
+
+    def _precompute(line, sizes_dict, memory_limit, pathgen):
         contr = line.split("->")[0].split("(")[1][1:]
         rhs = line.split("->")[1].split("',")[0]
         lhs = contr.split(',')
-        return oe.paths.optimal(lhs, [rhs], sizes_dict, memory_limit)
-
-    if norbs is None:
-        norbs = {k:10 for k in wicked.osi().to_dict().keys()}
-
-    osi = wicked.osi().to_dict()
-    if index_dict is None:
-        index_dict = {}
-    for key in osi.keys():
-        for index in osi[key]:
-            index_dict[index] = key
-
-    sizes_dict = {k: norbs[index_dict[k]] for k in index_dict.keys()}
+        return pathgen(lhs, [rhs], sizes_dict, memory_limit)
 
     if 'np.einsum' in line:
         try:
-            path = ['einsum_path'] + _precompute(line, sizes_dict, memory_limit)
+            path = ['einsum_path'] + _precompute(line, sizes_dict, memory_limit, pathgen)
             return re.sub(r"optimize=.*\)", f"optimize={str(path)})", line)
         except:
             return line
     else:
         return line
+    
+def equation_to_dict(eq):
+    res = {}
+    res['factor'] = eq.rhs_factor()
+
+    lhs = eq.lhs().tensors()[0]
+    res['lhs'] = [lhs.label(), [str(_) for _ in lhs.lower()], [str(_) for _ in lhs.upper()]]
+
+    rhs = eq.rhs()
+    res['rhs'] = []
+    for i in rhs.tensors():
+        res['rhs'].append([i.label(), [str(_) for _ in i.lower()], [str(_) for _ in i.upper()]])
+    
+    return res
+
+def dict_to_equation(eqdict):
+    lhs = wicked.SymbolicTerm()
+    lhs.add(wicked.tensor(*eqdict['lhs'], wicked.sym.none))
+    rhs = wicked.SymbolicTerm()
+    for i in eqdict['rhs']:
+        rhs.add(wicked.tensor(*i, wicked.sym.none))
+
+    return wicked.Equation(lhs, rhs, eqdict['factor'])
