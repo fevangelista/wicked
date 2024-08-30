@@ -47,6 +47,15 @@ def test_expression1():
     expr = e.vacuum_normal_ordered()
     assert str(expr) == ""
 
+    # test the commutator of two operators
+    o = w.expression("a+(g_1)")
+    a = w.expression("a+(g_0)")
+    a -= a.adjoint()
+    c = o @ a - a @ o
+    print(c)
+    c = c.vacuum_normal_ordered()
+    print(c)
+
 
 def test_expression2():
     """Test the vacuum_normal_ordered method of the Expression class on pairs of operators"""
