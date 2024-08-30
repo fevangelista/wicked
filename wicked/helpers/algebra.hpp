@@ -1,6 +1,7 @@
 #ifndef _wicked_vector_space_h_
 #define _wicked_vector_space_h_
 
+#include <math>
 #include <vector>
 
 #include "helpers/helpers.h"
