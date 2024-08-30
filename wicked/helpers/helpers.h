@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <regex>
 #include <string>
 #include <vector>
