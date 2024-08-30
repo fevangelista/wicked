@@ -32,13 +32,15 @@ Expression::vacuum_normal_ordered(bool only_same_index_contractions) const {
   return new_expr;
 }
 
-Expression Expression::normal_ordered(bool only_same_index_contractions) const {
-  Expression new_expr;
-  for (const auto &[symterm, c] : terms()) {
-    const auto &new_terms = symterm.normal_order(only_same_index_contractions);
-    for (const auto &[new_symterm, new_c] : new_terms) {
-      new_expr.add(new_symterm, c * new_c);
-    }
-  }
-  return new_expr;
-}
+// Expression Expression::normal_ordered(bool only_same_index_contractions)
+// const {
+//   Expression new_expr;
+//   for (const auto &[symterm, c] : terms()) {
+//     const auto &new_terms =
+//     symterm.normal_order(only_same_index_contractions); for (const auto
+//     &[new_symterm, new_c] : new_terms) {
+//       new_expr.add(new_symterm, c * new_c);
+//     }
+//   }
+//   return new_expr;
+// }

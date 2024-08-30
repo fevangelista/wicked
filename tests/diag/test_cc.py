@@ -56,7 +56,6 @@ def test_cc():
         cc_test_n = 8
     else:
         cc_test_n = 7
-    cc_test_n = 4
     cc_n(cc_test_n)
 
 def cc_n(max_n):

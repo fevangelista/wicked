@@ -14,9 +14,10 @@ auto is_fermionic_operator_pair = [](SQOperator const &a, SQOperator const &b) {
          b.field_type() == FieldType::Fermion;
 };
 
-void recursive_normal_order(const SymbolicTerm &term, scalar_t c,
-                            vector<pair<SymbolicTerm, scalar_t>> &new_terms,
-                            bool only_same_index_contractions) {
+void recursive_vacuum_normal_order(
+    const SymbolicTerm &term, scalar_t c,
+    vector<pair<SymbolicTerm, scalar_t>> &new_terms,
+    bool only_same_index_contractions) {
   const auto &ops = term.ops();
   const int n = static_cast<int>(ops.size());
   // if there are no operators, we are done
@@ -54,8 +55,8 @@ void recursive_normal_order(const SymbolicTerm &term, scalar_t c,
     std::swap(swap_ops[pos], swap_ops[pos + 1]);
     auto swap_term = SymbolicTerm(false, swap_ops, term.tensors());
     // normal order the new term
-    recursive_normal_order(swap_term, c * sign, new_terms,
-                           only_same_index_contractions);
+    recursive_vacuum_normal_order(swap_term, c * sign, new_terms,
+                                  only_same_index_contractions);
 
     // 2. contract the operators at position pos and pos+1
 
@@ -80,8 +81,8 @@ void recursive_normal_order(const SymbolicTerm &term, scalar_t c,
           Tensor t("delta", {lower}, {upper}, SymmetryType::Nonsymmetric);
           removed_term.add(t);
         }
-        recursive_normal_order(removed_term, c, new_terms,
-                               only_same_index_contractions);
+        recursive_vacuum_normal_order(removed_term, c, new_terms,
+                                      only_same_index_contractions);
       }
     }
   }
@@ -90,17 +91,18 @@ void recursive_normal_order(const SymbolicTerm &term, scalar_t c,
 std::vector<std::pair<SymbolicTerm, scalar_t>>
 SymbolicTerm::vacuum_normal_order(bool only_same_index_contractions) const {
   std::vector<std::pair<SymbolicTerm, scalar_t>> new_terms;
-  recursive_normal_order(*this, 1, new_terms, only_same_index_contractions);
+  recursive_vacuum_normal_order(*this, 1, new_terms,
+                                only_same_index_contractions);
   return new_terms;
 }
 
-std::vector<std::pair<SymbolicTerm, scalar_t>>
-SymbolicTerm::normal_order(bool only_same_index_contractions) const {
-  // Step 1. Generating elementary contractions
-  // std::vector<ElementaryContraction> contr_vec;
-  // for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
-  // }
-  auto new_term = *this;
-  new_term.set_normal_ordered(true);
-  return {{new_term, 1}};
-}
+// std::vector<std::pair<SymbolicTerm, scalar_t>>
+// SymbolicTerm::normal_order(bool only_same_index_contractions) const {
+//   // Step 1. Generating elementary contractions
+//   // std::vector<ElementaryContraction> contr_vec;
+//   // for (int s = 0; s < orbital_subspaces->num_spaces(); s++) {
+//   // }
+//   auto new_term = *this;
+//   new_term.set_normal_ordered(true);
+//   return {{new_term, 1}};
+// }

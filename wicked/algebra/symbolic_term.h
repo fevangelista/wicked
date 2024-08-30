@@ -100,9 +100,9 @@ public:
   /// Return a compilable representation
   std::string compile(const std::string &format) const;
 
-  /// Return a normal ordered version of this term
-  std::vector<std::pair<SymbolicTerm, scalar_t>>
-  normal_order(bool only_same_index_contractions = false) const;
+  // /// Return a normal ordered version of this term
+  // std::vector<std::pair<SymbolicTerm, scalar_t>>
+  // normal_order(bool only_same_index_contractions = false) const;
 
   /// Return a normal ordered version of this term
   std::vector<std::pair<SymbolicTerm, scalar_t>>

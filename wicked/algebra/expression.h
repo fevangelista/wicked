@@ -61,11 +61,11 @@ public:
   Expression
   vacuum_normal_ordered(bool only_same_index_contractions = false) const;
 
-  /// @brief Return a normal ordered version of this expression
-  /// @param only_same_index_contractions only contract operators with the same
-  /// indices (default: false), in other words assume that different indices
-  /// represent different spin orbitals
-  Expression normal_ordered(bool only_same_index_contractions = false) const;
+  // /// @brief Return a normal ordered version of this expression
+  // /// @param only_same_index_contractions only contract operators with the same
+  // /// indices (default: false), in other words assume that different indices
+  // /// represent different spin orbitals
+  // Expression normal_ordered(bool only_same_index_contractions = false) const;
 
   bool is_vacuum_normal_ordered() const;
 };

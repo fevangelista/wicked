@@ -57,9 +57,9 @@ void export_Expression(py::module &m) {
       .def("vacuum_normal_ordered", &Expression::vacuum_normal_ordered,
            "only_same_index_contractions"_a = false,
            "Return a vacuum normal ordered version of this expression")
-      .def("normal_ordered", &Expression::normal_ordered,
-           "only_same_index_contractions"_a = false,
-           "Return a vacuum normal ordered version of this expression")
+      //  .def("normal_ordered", &Expression::normal_ordered,
+      //       "only_same_index_contractions"_a = false,
+      //       "Return a vacuum normal ordered version of this expression")
       .def("is_vacuum_normal_ordered", &Expression::is_vacuum_normal_ordered,
            "Return true if this expression is vacuum normal ordered");
 
