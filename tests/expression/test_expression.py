@@ -110,9 +110,29 @@ def test_expression5():
     assert str(expr) == "f^{o0}_{}"
 
 
+def test_expression_dot_and_norm():
+    w.reset_space()
+    w.add_space("o", "fermion", "occupied", ["i", "j", "k", "l", "m"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c", "d", "e", "f"])
+
+    expr = w.expression("2 a+(v_1) a-(o_0)")
+    assert expr.dot(expr) == w.rational(4)
+    assert expr.norm() == 2.0
+
+    expr2 = w.expression("-1 a+(v_2) a-(o_0)")
+    assert expr.dot(expr2) == w.rational(0)
+    assert expr2.dot(expr) == w.rational(0)
+    assert expr2.norm() == 1.0
+
+    expr3 = w.expression("a+(v_1) a-(o_0)") - expr2 + expr
+    assert expr3.dot(expr) == w.rational(6)
+    assert expr3.dot(expr2) == w.rational(-1)
+
+
 if __name__ == "__main__":
     test_expression()
     test_expression2()
     test_expression3()
     test_expression4()
     test_expression5()
+    test_expression_dot_and_norm()
