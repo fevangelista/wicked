@@ -13,13 +13,13 @@ def test_expression():
     term = w.Term()
     term.add([w.cre("v_0"), w.ann("o_0")])
     term.set_normal_ordered(True)
-    expr.add(term)
+    expr += term
     assert str(expr) == "{ a+(v0) a-(o0) }"
 
     term = w.SymbolicTerm()
     term.set_normal_ordered(True)
     term.add([w.cre("a_0")])
-    expr.add(term, w.rational(1, 2))
+    expr += (term, w.rational(1, 2))
     expr_str = """1/2 { a+(a0) }
 +{ a+(v0) a-(o0) }"""
     assert str(expr) == expr_str
@@ -29,12 +29,12 @@ def test_expression():
     term = w.SymbolicTerm()
     term.set_normal_ordered(True)
     term.add([w.cre("a_0")])
-    expr2.add(term)
+    expr2 += term
 
     expr_str = """{ a+(a0) }"""
     assert str(expr2) == expr_str
 
-    expr.add(expr2)
+    expr += expr2
     expr_str = """3/2 { a+(a0) }
 +{ a+(v0) a-(o0) }"""
     assert str(expr) == expr_str

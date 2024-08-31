@@ -13,45 +13,45 @@
 
 Expression::Expression() : Algebra<Expression, SymbolicTerm, scalar_t>() {}
 
-void Expression::add(const Term &term) {
-  SymbolicTerm symterm = term.symterm();
-  auto search = terms_.find(symterm);
+// void Expression::add(const Term &term) {
+//   SymbolicTerm symterm = term.symterm();
+//   auto search = terms_.find(symterm);
 
-  if (search != terms_.end()) {
-    /// Found, then just add the factor to the existing term
-    search->second += term.coefficient();
-    if (search->second == 0) {
-      terms_.erase(search);
-    }
-  } else {
-    terms_[symterm] = term.coefficient();
-  }
-}
+//   if (search != terms_.end()) {
+//     /// Found, then just add the factor to the existing term
+//     search->second += term.coefficient();
+//     if (search->second == 0) {
+//       terms_.erase(search);
+//     }
+//   } else {
+//     terms_[symterm] = term.coefficient();
+//   }
+// }
 
-void Expression::add(const std::pair<SymbolicTerm, scalar_t> &term_factor,
-                     scalar_t scale) {
+// void Expression::add(const std::pair<SymbolicTerm, scalar_t> &term_factor,
+//                      scalar_t scale) {
 
-  const SymbolicTerm &term = term_factor.first;
-  scalar_t factor = term_factor.second;
+//   const SymbolicTerm &term = term_factor.first;
+//   scalar_t factor = term_factor.second;
 
-  auto search = terms_.find(term);
+//   auto search = terms_.find(term);
 
-  if (search != terms_.end()) {
-    /// Found, then just add the factor to the existing term
-    search->second += scale * factor;
-    if (search->second == 0) {
-      terms_.erase(search);
-    }
-  } else {
-    terms_[term] = scale * factor;
-  }
-}
+//   if (search != terms_.end()) {
+//     /// Found, then just add the factor to the existing term
+//     search->second += scale * factor;
+//     if (search->second == 0) {
+//       terms_.erase(search);
+//     }
+//   } else {
+//     terms_[term] = scale * factor;
+//   }
+// }
 
-void Expression::add(const Expression &expr, scalar_t scale) {
-  for (const auto &kv : expr.terms()) {
-    add(kv, scale);
-  }
-}
+// void Expression::add(const Expression &expr, scalar_t scale) {
+//   for (const auto &kv : expr.terms()) {
+//     add(kv, scale);
+//   }
+// }
 
 Expression &Expression::canonicalize() {
   std::map<SymbolicTerm, scalar_t> canonical_terms;

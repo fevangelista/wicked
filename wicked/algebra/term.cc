@@ -54,3 +54,7 @@ std::vector<Term> wick_product(const Term &A, const Term &B) {
   scalar_t ab = A.coefficient() * B.coefficient();
   return result;
 }
+
+// /// @brief Create a term from a coefficient and a symbolic term
+// Term operator*(scalar_t c, const SymbolicTerm &term) { return Term(c, term);
+// }

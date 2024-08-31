@@ -70,6 +70,27 @@ public:
     return result;
   }
 
+  /// @brief Addition operator
+  /// @param rhs the term to add
+  Derived &operator+(const Algebra &rhs) {
+    Derived result;
+    for (const auto &[e, c] : terms()) {
+      result.add(e, c);
+    }
+    for (const auto &[e, c] : rhs.terms()) {
+      result.add(e, c);
+    }
+    return result;
+  }
+
+  /// @brief Addition assignment operator
+  /// @param rhs the term to add
+  Algebra &operator+=(const std::pair<T, F> &rhs) {
+    const auto &[e, c] = rhs;
+    add(e, c);
+    return *this;
+  }
+
   /// @brief Addition assignment operator
   /// @param rhs the term to add
   Algebra &operator+=(const Algebra &rhs) {

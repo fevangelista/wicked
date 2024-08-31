@@ -91,8 +91,10 @@ Expression WickTheorem::process_contractions(scalar_t factor,
 
       SymbolicTerm &term = term_factor.first;
       scalar_t canonicalize_factor = term.canonicalize();
-      result.add(
-          std::make_pair(term, term_factor.second * canonicalize_factor));
+      canonicalize_factor *= term_factor.second;
+      result += {term, canonicalize_factor};
+      // result.add(
+      // std::make_pair(term, term_factor.second * canonicalize_factor));
 
       PRINT(PrintLevel::Summary,
             Term t(term_factor.second * canonicalize_factor, term);

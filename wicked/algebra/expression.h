@@ -18,18 +18,6 @@ public:
 
   // ==> Class public interface <==
 
-  /// Add a term that can optionally be scaled
-  void add(const Term &term);
-
-  using Algebra::add;
-
-  /// Add a term that can optionally be scaled
-  void add(const std::pair<SymbolicTerm, scalar_t> &term_factor,
-           scalar_t scale = 1);
-
-  /// Add a term that can optionally be scaled
-  void add(const Expression &expr, scalar_t scale = 1);
-
   /// Canonicalize this sum
   Expression &canonicalize();
 
@@ -62,7 +50,8 @@ public:
   vacuum_normal_ordered(bool only_same_index_contractions = false) const;
 
   // /// @brief Return a normal ordered version of this expression
-  // /// @param only_same_index_contractions only contract operators with the same
+  // /// @param only_same_index_contractions only contract operators with the
+  // same
   // /// indices (default: false), in other words assume that different indices
   // /// represent different spin orbitals
   // Expression normal_ordered(bool only_same_index_contractions = false) const;

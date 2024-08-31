@@ -10,13 +10,6 @@ using namespace pybind11::literals;
 void export_Expression(py::module &m) {
   py::class_<Expression, std::shared_ptr<Expression>>(m, "Expression")
       .def(py::init<>())
-      .def("add", py::overload_cast<const Term &>(&Expression::add))
-      .def("add",
-           py::overload_cast<const SymbolicTerm &, scalar_t>(&Expression::add),
-           "term"_a, "coefficient"_a = scalar_t(1, 1))
-      .def("add",
-           py::overload_cast<const Expression &, scalar_t>(&Expression::add),
-           "expr"_a, "scale"_a = scalar_t(1))
       .def("__repr__", &Expression::str)
       .def("__str__", &Expression::str)
       .def("__len__", &Expression::size)
@@ -42,6 +35,28 @@ void export_Expression(py::module &m) {
              rhs *= r;
              return rhs;
            })
+      .def(
+          "__iadd__",
+          [](Expression &lhs, const Term &term) -> Expression & {
+            lhs += {term.symterm(), term.coefficient()};
+            return lhs;
+          },
+          py::is_operator()) // Bind in-place addition with Term
+      .def(
+          "__iadd__",
+          [](Expression &lhs,
+             const std::pair<SymbolicTerm, scalar_t> &term) -> Expression & {
+            lhs += term;
+            return lhs;
+          },
+          py::is_operator()) // Bind in-place addition with Term
+      .def(
+          "__iadd__",
+          [](Expression &lhs, const SymbolicTerm &sterm) -> Expression & {
+            lhs += {sterm, scalar_t(1)};
+            return lhs;
+          },
+          py::is_operator()) // Bind in-place addition with Term
       .def(
           "__iter__",
           [](Expression &e) { return py::make_iterator(e.begin(), e.end()); },
