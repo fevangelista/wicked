@@ -27,7 +27,8 @@ void export_SQOperator(py::module &m) {
            [](const SQOperator &l, const SQOperator &r) { return l < r; })
       .def("__eq__",
            [](const SQOperator &l, const SQOperator &r) { return l == r; })
-      .def("latex", &SQOperator::latex);
+      .def("latex", &SQOperator::latex)
+      .def("normal_ordered_less", &SQOperator::normal_ordered_less);
 
   m.def("sqoperator", &make_sqoperator, "index"_a, "type"_a);
   m.def(

@@ -40,6 +40,9 @@ private:
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Term &term);
 
+// /// @brief Create a term from a coefficient and a symbolic term
+// Term operator*(scalar_t c, const SymbolicTerm &term);
+
 ///// Create an operator
 Term make_term(const std::string &label, const std::vector<std::string> &cre,
                const std::vector<std::string> &ann,

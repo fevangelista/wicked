@@ -19,11 +19,35 @@ SymbolicTerm::SymbolicTerm(bool normal_ordered,
 
 void SymbolicTerm::set_normal_ordered(bool val) { normal_ordered_ = val; }
 
-void SymbolicTerm::set(const std::vector<SQOperator> &op) { operators_ = op; }
+bool SymbolicTerm::is_labeled_normal_ordered() const { return normal_ordered_; }
+
+bool SymbolicTerm::is_vacuum_normal_ordered() const {
+  return std::is_sorted(operators_.begin(), operators_.end(),
+                        [](const SQOperator &a, const SQOperator &b) {
+                          // return a.normal_ordered_less(b);
+                          return a < b;
+                        });
+}
+
+bool SymbolicTerm::is_creation_then_annihilation() const {
+  return std::is_sorted(operators_.begin(), operators_.end(),
+                        [](const SQOperator &a, const SQOperator &b) {
+                          return b.is_creation() < a.is_creation();
+                        });
+}
+
+void SymbolicTerm::set(const std::vector<SQOperator> &ops) { operators_ = ops; }
+
+void SymbolicTerm::set(const Product<SQOperator> &op) { operators_ = op; }
 
 void SymbolicTerm::add(const SQOperator &op) { operators_.push_back(op); }
 
 void SymbolicTerm::add(const std::vector<SQOperator> &ops) {
+  auto product = Product<SQOperator>(ops);
+  add(product);
+}
+
+void SymbolicTerm::add(const Product<SQOperator> &ops) {
   for (const auto &op : ops) {
     add(op);
   }
@@ -32,6 +56,30 @@ void SymbolicTerm::add(const std::vector<SQOperator> &ops) {
 void SymbolicTerm::add(const Tensor &tensor) { tensors_.push_back(tensor); }
 
 int SymbolicTerm::nops() const { return operators_.size(); }
+
+SymbolicTerm SymbolicTerm::adjoint() const {
+  SymbolicTerm result;
+  result.set_normal_ordered(normal_ordered_);
+  for (const auto &tensor : tensors_) {
+    result.add(tensor.adjoint());
+  }
+  result.add(operators_.adjoint());
+  return result;
+}
+
+SymbolicTerm &SymbolicTerm::operator*=(const SymbolicTerm &rhs) {
+  const auto [ops, normal_ordered] = operator_product(*this, rhs);
+  for (const auto &tensor : rhs.tensors_) {
+    add(tensor);
+  }
+  operators_ = ops;
+  return *this;
+}
+
+SymbolicTerm operator*(SymbolicTerm lhs, const SymbolicTerm &rhs) {
+  lhs *= rhs;
+  return lhs;
+}
 
 // std::vector<Index> SymbolicTerm::indices() const {
 //   std::vector<Index> result;
@@ -244,6 +292,70 @@ scalar_t SymbolicTerm::simplify() {
   return factor;
 }
 
+std::pair<Product<SQOperator>, bool>
+operator_product_1(const SymbolicTerm &lhs, const SymbolicTerm &rhs) {
+  // Case 1: both terms are normal ordered
+  const bool normal_ordered = false;
+  Product<SQOperator> result;
+  throw std::runtime_error("Multiplication of symbolic terms that are normal "
+                           "ordered is not (yet) implemented.");
+  return std::make_pair(result, normal_ordered);
+}
+
+std::pair<Product<SQOperator>, bool>
+operator_product_2(const SymbolicTerm &lhs, const SymbolicTerm &rhs) {
+  // Case 2: the left-hand side is normal ordered the right-hand side is not
+  const bool normal_ordered = false;
+  Product<SQOperator> result;
+  throw std::runtime_error("Multiplication of symbolic terms that are normal "
+                           "ordered is not (yet) implemented.");
+  return std::make_pair(result, normal_ordered);
+}
+std::pair<Product<SQOperator>, bool>
+operator_product_3(const SymbolicTerm &lhs, const SymbolicTerm &rhs) {
+  // Case 3: the right-hand side is normal ordered the left-hand side is not
+  const bool normal_ordered = false;
+  Product<SQOperator> result;
+  throw std::runtime_error("Multiplication of symbolic terms that are normal "
+                           "ordered is not (yet) implemented.");
+  return std::make_pair(result, normal_ordered);
+}
+
+std::pair<Product<SQOperator>, bool>
+operator_product_4(const SymbolicTerm &lhs, const SymbolicTerm &rhs) {
+  // Case 4: neither term is normal ordered
+  const bool normal_ordered = false;
+  Product<SQOperator> result;
+  for (const auto &op : lhs.ops()) {
+    result.push_back(op);
+  }
+  for (const auto &op : rhs.ops()) {
+    result.push_back(op);
+  }
+  return std::make_pair(result, normal_ordered);
+}
+
+std::pair<Product<SQOperator>, bool> operator_product(const SymbolicTerm &lhs,
+                                                      const SymbolicTerm &rhs) {
+
+  // Case 1: both terms are normal ordered
+  if (lhs.is_labeled_normal_ordered() and rhs.is_labeled_normal_ordered()) {
+    return operator_product_1(lhs, rhs);
+  }
+  // Case 2: the left-hand side is normal ordered the right-hand side is not
+  else if (lhs.is_labeled_normal_ordered() and
+           not rhs.is_labeled_normal_ordered()) {
+    return operator_product_2(lhs, rhs);
+  }
+  // Case 3: the right-hand side is normal ordered the left-hand side is not
+  else if (not lhs.is_labeled_normal_ordered() and
+           rhs.is_labeled_normal_ordered()) {
+    return operator_product_3(lhs, rhs);
+  }
+  // Case 4: neither term is normal ordered
+  return operator_product_4(lhs, rhs);
+}
+
 bool SymbolicTerm::operator<(const SymbolicTerm &other) const {
   if (tensors_ > other.tensors_) {
     return false;
@@ -284,8 +396,25 @@ std::string SymbolicTerm::latex() const {
   if (nops()) {
     if (normal_ordered())
       str_vec.push_back("\\{");
-    for (const auto &op : operators_) {
-      str_vec.push_back(op.latex());
+    if (is_creation_then_annihilation()) {
+      std::vector<std::string> str_vec_cre;
+      std::vector<std::string> str_vec_ann;
+      for (const auto &op : operators_) {
+        if (op.is_creation()) {
+          str_vec_cre.push_back(op.index().latex());
+        } else {
+          str_vec_ann.push_back(op.index().latex());
+        }
+      }
+      // reverse the order of the annihilation operators
+      std::reverse(str_vec_ann.begin(), str_vec_ann.end());
+      std::string op_str = "\\hat{a}^{" + join(str_vec_cre, " ") + "}_{" +
+                           join(str_vec_ann, " ") + "}";
+      str_vec.push_back(op_str);
+    } else {
+      for (const auto &op : operators_) {
+        str_vec.push_back(op.latex());
+      }
     }
     if (normal_ordered())
       str_vec.push_back("\\}");

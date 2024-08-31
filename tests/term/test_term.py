@@ -2,7 +2,7 @@ import wicked as w
 
 
 def test_term():
-    """Test the Tensor class"""
+    """Test the SymbolicTerm and Term classes"""
     w.reset_space()
     w.add_space("o", "fermion", "occupied", ["i", "j"])
     w.add_space("a", "fermion", "general", ["u", "v"])
@@ -26,7 +26,7 @@ def test_term():
     term.add([w.cre("v_0"), w.ann("o_0")])
     term.add(w.tensor("T", ["v_0"], ["o_0"], w.sym.anti))
     assert str(term) == "1/2 T^{o0}_{v0} { a+(v0) a-(o0) }"
-    assert term.latex() == "+\\frac{1}{2} {T}^{i}_{a} \\{ \\hat{a}^{a} \\hat{a}_{i} \\}"
+    assert term.latex() == "+\\frac{1}{2} {T}^{i}_{a} \\{ \\hat{a}^{a}_{i} \\}"
 
 
 if __name__ == "__main__":

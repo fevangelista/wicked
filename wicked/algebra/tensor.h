@@ -32,6 +32,9 @@ public:
   /// Return a reference to the upper indices
   const std::vector<Index> &upper() const { return upper_; }
 
+  /// Is this tensor complex conjugated?
+  bool is_complex_conjugate() const { return is_complex_conjugate_; }
+
   /// Return a reference to the symmetry
   SymmetryType symmetry() const { return symmetry_; }
 
@@ -49,6 +52,9 @@ public:
 
   /// Canonicalize this tensor and return the overall phase factor
   scalar_t canonicalize();
+
+  /// Return the adjoint of this tensor
+  Tensor adjoint() const;
 
   /// Return the rank of the tensor
   int rank() const { return lower_.size() + upper_.size(); }
@@ -77,10 +83,12 @@ public:
 private:
   // ==> Class private data <==
 
-  std::string label_;
-  std::vector<Index> lower_;
-  std::vector<Index> upper_;
-  SymmetryType symmetry_;
+  std::string label_;        // label of the tensor
+  std::vector<Index> lower_; // lower indices
+  std::vector<Index> upper_; // upper indices
+  SymmetryType symmetry_; // symmetry of the tensor (symmetric, antisymmetric,
+                          // or nonsymmetric)
+  bool is_complex_conjugate_ = false; // is this tensor complex conjugated?
 };
 
 /// A function to construct a tensor

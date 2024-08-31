@@ -39,7 +39,7 @@ public:
   /// return a string representation
   std::string repr() const;
   /// return a LaTeX representation
-  std::string latex() const;
+  std::string latex(bool first) const;
   /// return a compilable representation
   std::string compile(const std::string &format) const;
 
