@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <format>
 #include <iostream>
 
 #include "fmt/format.h"
@@ -113,7 +114,7 @@ std::string Equation::compile(const std::string &format) const {
     }
 
     str_vec.push_back(lhs_tensor_label +
-                      " += " + fmt::format("{:.9f}", rhs_factor().to_double()) +
+                      " += " + std::format("{:.9f}", rhs_factor().to_double()) +
                       " * np.einsum(");
 
     std::map<std::string, std::string> index_map;

@@ -1,5 +1,4 @@
-#ifndef _wicked_operator_product_h_
-#define _wicked_operator_product_h_
+#pragma once
 
 #include "helpers/product.hpp"
 #include "operator.h"
@@ -21,5 +20,3 @@ public:
 };
 
 OperatorProduct operator*(const OperatorProduct &l, const OperatorProduct &r);
-
-#endif // _wicked_operator_product_h_

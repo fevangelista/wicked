@@ -1,5 +1,4 @@
-#ifndef _wicked_symbolic_term_h_
-#define _wicked_symbolic_term_h_
+#pragma once
 
 #include <map>
 #include <numeric>
@@ -137,5 +136,3 @@ std::ostream &operator<<(std::ostream &os,
 
 std::pair<Product<SQOperator>, bool> operator_product(const SymbolicTerm &lhs,
                                                       const SymbolicTerm &rhs);
-
-#endif // _wicked_symbolic_term_h_

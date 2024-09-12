@@ -1,5 +1,4 @@
-#ifndef _wicked_timer_h_
-#define _wicked_timer_h_
+#pragma once
 
 #include <chrono>
 
@@ -30,5 +29,3 @@ private:
   /// stores the time when this object is created
   std::chrono::high_resolution_clock::time_point start_;
 };
-
-#endif // _wicked_timer_h_

@@ -1,5 +1,4 @@
-#ifndef _wicked_diag_theorem_h_
-#define _wicked_diag_theorem_h_
+#pragma once
 
 #include <optional>
 #include <string>
@@ -181,5 +180,3 @@ private:
   canonicalize_contraction_graph(const OperatorProduct &ops,
                                  const CompositeContraction &contractions);
 };
-
-#endif // _wicked_diag_theorem_h_

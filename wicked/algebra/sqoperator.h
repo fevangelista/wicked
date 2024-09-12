@@ -1,5 +1,4 @@
-#ifndef _wicked_sqoperator_h_
-#define _wicked_sqoperator_h_
+#pragma once
 
 #include <string>
 
@@ -90,5 +89,3 @@ std::ostream &operator<<(std::ostream &os, const SQOperator &op);
 
 /// Canonicalize a product of operators
 scalar_t canonicalize_sqops(Product<SQOperator> &sqops, bool reversed);
-
-#endif // _wicked_sqoperator_h_

@@ -1,5 +1,4 @@
-#ifndef _wicked_helpers_h_
-#define _wicked_helpers_h_
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -230,5 +229,3 @@ public:
 
   int get() { return m_; }
 };
-
-#endif // _wicked_helpers_h_

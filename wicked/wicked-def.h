@@ -1,5 +1,4 @@
-#ifndef _wicked_def_h_
-#define _wicked_def_h_
+#pragma once
 
 #include <vector>
 
@@ -19,5 +18,3 @@
 /// Rational numbers
 #include "helpers/rational.h"
 using scalar_t = rational;
-
-#endif // #ifndef _wicked_def_h_

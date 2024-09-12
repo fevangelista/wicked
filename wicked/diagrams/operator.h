@@ -1,5 +1,4 @@
-#ifndef _wicked_diag_operator_h_
-#define _wicked_diag_operator_h_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -75,5 +74,3 @@ Operator make_diag_operator(const std::string &label,
 
 /// Return the particle rank of a vector of operators
 int sum_num_ops(const std::vector<Operator> &ops);
-
-#endif // _wicked_diag_operator_h_

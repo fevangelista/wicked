@@ -1,5 +1,4 @@
-#ifndef _wicked_term_h_
-#define _wicked_term_h_
+#pragma once
 
 #include "symbolic_term.h"
 
@@ -49,5 +48,3 @@ Term make_term(const std::string &label, const std::vector<std::string> &cre,
                scalar_t coefficient = scalar_t(1));
 
 std::vector<Term> wick_product(const Term &A, const Term &B);
-
-#endif // _wicked_term_h_
