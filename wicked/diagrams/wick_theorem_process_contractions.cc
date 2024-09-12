@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <future>
 #include <iomanip>
 #include <iostream>
 
@@ -91,8 +92,10 @@ Expression WickTheorem::process_contractions(scalar_t factor,
 
       SymbolicTerm &term = term_factor.first;
       scalar_t canonicalize_factor = term.canonicalize();
-      result.add(
-          std::make_pair(term, term_factor.second * canonicalize_factor));
+      canonicalize_factor *= term_factor.second;
+      result += {term, canonicalize_factor};
+      // result.add(
+      // std::make_pair(term, term_factor.second * canonicalize_factor));
 
       PRINT(PrintLevel::Summary,
             Term t(term_factor.second * canonicalize_factor, term);
@@ -102,6 +105,89 @@ Expression WickTheorem::process_contractions(scalar_t factor,
   if (nprocessed == 0) {
     PRINT(PrintLevel::Summary, std::cout << "\n  No contractions generated\n"
                                          << std::endl;)
+  }
+  return result;
+}
+
+Expression WickTheorem::process_contractions_threads(scalar_t factor,
+                                                     const OperatorProduct &ops,
+                                                     const int minrank,
+                                                     const int maxrank) {
+  PRINT(PrintLevel::Summary,
+        std::cout << "\n- Step 3. Processing contractions" << std::endl;)
+
+  // Vector to store futures of each async call
+  std::vector<std::future<Expression>> futures;
+  int ops_rank = ops.num_ops();
+
+  // Launch async tasks for each contraction
+  for (const auto &contraction_vec : contractions_) {
+    futures.push_back(
+        std::async(std::launch::async, [this, &ops, &contraction_vec, factor,
+                                        minrank, maxrank, ops_rank] {
+          return process_single_contraction(ops, contraction_vec, minrank,
+                                            maxrank, factor, ops_rank);
+        }));
+  }
+
+  // Combine the results of all futures into a single Expression
+  Expression result;
+
+  // Use std::accumulate to sum all the results
+  for (auto &fut : futures) {
+    result += fut.get(); // Get the result from the future and add to the result
+  }
+
+  // Check if any contractions were processed
+  if (futures.empty()) {
+    PRINT(PrintLevel::Summary, std::cout << "\n  No contractions generated\n"
+                                         << std::endl;)
+  }
+
+  return result;
+}
+
+Expression WickTheorem::process_single_contraction(
+    const OperatorProduct &ops, const std::vector<int> &contraction_vec,
+    const int minrank, const int maxrank, const scalar_t factor,
+    const int ops_rank) {
+  Expression result;
+  int contr_rank = 0;
+  for (int c : contraction_vec) {
+    contr_rank += elementary_contractions_[c].num_ops();
+  }
+  int term_rank = ops_rank - contr_rank;
+
+  if ((term_rank >= minrank) and (term_rank <= maxrank)) {
+
+    CompositeContraction contraction;
+    for (int c : contraction_vec) {
+      contraction.push_back(elementary_contractions_[c]);
+    }
+
+    timer tc;
+    const auto [best_ops, best_contractions, sign] =
+        do_canonicalize_graph_
+            ? canonicalize_contraction_graph(ops, contraction)
+            : std::make_tuple(ops, contraction, scalar_t(1));
+    timers_["canonicalize_contraction_graph"] += tc.get();
+
+    timer te;
+    std::pair<SymbolicTerm, scalar_t> term_factor =
+        evaluate_contraction(best_ops, best_contractions, factor * sign);
+    timers_["evaluate_contraction"] += te.get();
+
+    SymbolicTerm &term = term_factor.first;
+    scalar_t canonicalize_factor = term.canonicalize();
+    canonicalize_factor *= term_factor.second;
+    result += {term, canonicalize_factor};
+    // result += (std::make_pair(term, canonicalize_factor));
+    // // result.add(
+    // std::make_pair(term, term_factor.second * canonicalize_factor));
+
+    PRINT(PrintLevel::Summary,
+          Term t(term_factor.second * canonicalize_factor, term);
+          cout << "\n    term: " << t << endl;)
   }
   return result;
 }

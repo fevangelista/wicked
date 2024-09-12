@@ -11,47 +11,47 @@
 #include "tensor.h"
 #include "term.h"
 
-Expression::Expression() : Algebra<SymbolicTerm, scalar_t>() {}
+Expression::Expression() : Algebra<Expression, SymbolicTerm, scalar_t>() {}
 
-void Expression::add(const Term &sterm) {
-  SymbolicTerm symterm = sterm.symterm();
-  auto search = terms_.find(symterm);
+// void Expression::add(const Term &term) {
+//   SymbolicTerm symterm = term.symterm();
+//   auto search = terms_.find(symterm);
 
-  if (search != terms_.end()) {
-    /// Found, then just add the factor to the existing term
-    search->second += sterm.coefficient();
-    if (search->second == 0) {
-      terms_.erase(search);
-    }
-  } else {
-    terms_[symterm] = sterm.coefficient();
-  }
-}
+//   if (search != terms_.end()) {
+//     /// Found, then just add the factor to the existing term
+//     search->second += term.coefficient();
+//     if (search->second == 0) {
+//       terms_.erase(search);
+//     }
+//   } else {
+//     terms_[symterm] = term.coefficient();
+//   }
+// }
 
-void Expression::add(const std::pair<SymbolicTerm, scalar_t> &term_factor,
-                     scalar_t scale) {
+// void Expression::add(const std::pair<SymbolicTerm, scalar_t> &term_factor,
+//                      scalar_t scale) {
 
-  const SymbolicTerm &term = term_factor.first;
-  scalar_t factor = term_factor.second;
+//   const SymbolicTerm &term = term_factor.first;
+//   scalar_t factor = term_factor.second;
 
-  auto search = terms_.find(term);
+//   auto search = terms_.find(term);
 
-  if (search != terms_.end()) {
-    /// Found, then just add the factor to the existing term
-    search->second += scale * factor;
-    if (search->second == 0) {
-      terms_.erase(search);
-    }
-  } else {
-    terms_[term] = scale * factor;
-  }
-}
+//   if (search != terms_.end()) {
+//     /// Found, then just add the factor to the existing term
+//     search->second += scale * factor;
+//     if (search->second == 0) {
+//       terms_.erase(search);
+//     }
+//   } else {
+//     terms_[term] = scale * factor;
+//   }
+// }
 
-void Expression::add(const Expression &expr, scalar_t scale) {
-  for (const auto &kv : expr.terms()) {
-    add(kv, scale);
-  }
-}
+// void Expression::add(const Expression &expr, scalar_t scale) {
+//   for (const auto &kv : expr.terms()) {
+//     add(kv, scale);
+//   }
+// }
 
 Expression &Expression::canonicalize() {
   std::map<SymbolicTerm, scalar_t> canonical_terms;
@@ -63,6 +63,14 @@ Expression &Expression::canonicalize() {
   }
   terms_ = canonical_terms;
   return *this;
+}
+
+Expression Expression::adjoint() const {
+  Expression expr;
+  for (const auto &[e, c] : terms_) {
+    expr.add(e.adjoint(), c);
+  }
+  return expr;
 }
 
 Expression &Expression::reindex(index_map_t &idx_map) {
@@ -83,22 +91,51 @@ bool Expression::operator==(const Expression &other) {
 std::string Expression::str() const {
   std::vector<std::string> str_vec;
   int n = 0;
-  for (auto &kv : terms_) {
-    std::string symterm_str = kv.first.str();
+  for (const auto &[symterm, c] : terms_) {
+    std::string symterm_str = symterm.str();
     std::string factor_str;
-    if (n == 0) { // don't show the first element sign unless it's negative
-      factor_str += kv.second.str(false);
+
+    if (symterm_str.size() > 0) {
+      // print an expression that contains a symbolict term
+      if (n == 0) { // don't show the first element sign unless it's negative
+        factor_str += c.str(false);
+      } else {
+        factor_str += c.str(true);
+      }
+      // rational(1,1).str() returns "", so we need to handle the case of
+      // a pure scalar term with no operator
+      if ((factor_str.size() > 1) and (factor_str != "-")) {
+        factor_str += " ";
+      }
     } else {
-      factor_str += kv.second.str(true);
+      // print a pure scalar term
+      if (n == 0) { // don't show the first element sign unless it's negative
+        factor_str += c.str(false);
+      } else {
+        factor_str += c.str(true);
+      }
+      // rational(1,1).str() returns "", so we need to handle theis case
+      if (factor_str.size() == 0) {
+        factor_str = (n == 0) ? "1" : "+1";
+      }
+      // rational(-1,1).str() returns "-", so we need to handle this case
+      if (factor_str == "-") {
+        factor_str = "-1";
+      }
     }
-    // rational(1,1).str() returns "", so we need to handle the case of
-    // a pure scalar term with no operator
-    if ((factor_str.size() > 1) and (factor_str != "-")) {
-      factor_str += " ";
-    }
-    if (factor_str.size() + symterm_str.size() == 0) {
-      factor_str = (n == 0) ? "1" : "+1";
-    }
+    // if (n == 0) { // don't show the first element sign unless it's negative
+    //   factor_str += c.str(false);
+    // } else {
+    //   factor_str += c.str(true);
+    // }
+    // // rational(1,1).str() returns "", so we need to handle the case of
+    // // a pure scalar term with no operator
+    // if ((factor_str.size() > 1) and (factor_str != "-")) {
+    //   factor_str += " ";
+    // }
+    // if (factor_str.size() + symterm_str.size() == 0) {
+    //   factor_str = (n == 0) ? "1" : "+1";
+    // }
     str_vec.push_back(factor_str + symterm_str);
     n++;
   }
@@ -107,8 +144,10 @@ std::string Expression::str() const {
 
 std::string Expression::latex(const std::string &sep) const {
   std::vector<std::string> str_vec;
-  for (auto &kv : terms_) {
-    str_vec.push_back(kv.second.latex() + ' ' + kv.first.latex());
+  bool first = true;
+  for (const auto &[term, factor] : terms_) {
+    str_vec.push_back(factor.latex(first) + ' ' + term.latex());
+    first = false;
   }
   return join(str_vec, sep);
 }
@@ -207,7 +246,7 @@ Expression make_operator_expr(const std::string &label,
   return result;
 }
 
-Expression string_to_expr(const std::string &s, SymmetryType symmetry) {
+Expression make_expression(const std::string &s, SymmetryType symmetry) {
 
   TensorSyntax syntax = TensorSyntax::Wicked;
   Expression sum;
@@ -217,19 +256,21 @@ Expression string_to_expr(const std::string &s, SymmetryType symmetry) {
   if (s.size() == 0)
     return sum;
 
-  //"f^{v0}_{o0} t^{o0}_{v0}"
-  std::string factor_re;
-  std::string tensor_re;
-  std::string operator_re;
+  std::regex factor_re, operator_re, normal_ordered_re, tensor_re;
   if (syntax == TensorSyntax::Wicked) {
-    tensor_re = "([a-zA-Z0-9]+\\^\\{[\\w,\\s]*\\}_\\{[\\w,\\s]*\\})";
-    operator_re = "a([+-]{1,1})\\(([\\w,\\d]*)\\)";
-    factor_re = "^\\s*([+-]?\\d*\\/?\\d*)\\s*";
+    tensor_re = std::regex(R"(([a-zA-Z0-9]+\^\{[\w,\d]*\}_\{[\w,\d]*\}))");
+    operator_re = std::regex(R"([ab]([+-]{1,1})\(([\w\d]*)\))");
+    factor_re = std::regex(R"(^\s*([+-]?\d*\/?\d*)\s*)");
+    normal_ordered_re = std::regex(R"((?:\{(?:\s*a[+-]\([\w\d]+\))+\s*\}))");
   }
 
   auto tensors = findall(s, tensor_re);
 
+  // use the normal_ordered_re to check if the string is already normal ordered
+  auto is_normal_ordered = std::regex_search(s, normal_ordered_re);
+
   SymbolicTerm term;
+  term.set_normal_ordered(is_normal_ordered);
   for (const auto &t : tensors) {
     term.add(make_tensor_from_str(t, symmetry));
   }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <regex>
 #include <string>
 #include <vector>
@@ -19,8 +20,7 @@ std::vector<std::string> split(const std::string &s,
                                std::regex re = std::regex("[\\s,]+"));
 
 /// Find all occurences of a pattern
-std::vector<std::string> findall(const std::string &s,
-                                 const std::string &regex);
+std::vector<std::string> findall(const std::string &s, const std::regex &regex);
 
 /// Split indices
 std::vector<std::string> split_indices(const std::string &s);
@@ -141,6 +141,62 @@ public:
 template <class T, class A = std::allocator<T>>
 enumerate_class<T, A> enumerate(std::vector<T, A> &vec) {
   return enumerate_class<T, A>(vec);
+}
+
+/// @brief A template function to find the first adjacent pair of elements in a
+/// vector that satisfy a predicate p and swap them.
+/// This function assumes that there is at least one pair of elements that
+/// satisfy the predicate.
+/// @param vec The vector to be modified
+/// @param p A binary predicate that takes two elements of the vector and
+/// compares them
+template <class T, class BinaryPredicate>
+std::optional<std::pair<T, T>> swap_first_unordered_pair(std::vector<T> &vec,
+                                                         BinaryPredicate p) {
+  auto it = std::adjacent_find(vec.begin(), vec.end(), p);
+  if (it != vec.end() && std::next(it) != vec.end()) {
+    T firstValue = *it;
+    T secondValue = *std::next(it);
+    std::swap(*it, *std::next(it));
+    return std::make_pair(firstValue, secondValue);
+  }
+  return std::nullopt;
+}
+
+/// @brief A template function to find the first adjacent pair of elements in a
+/// vector that satisfy a predicate p and remove them.
+/// @param vec The vector to be modified
+/// @param p A binary predicate that takes two elements of the vector and
+/// compares them
+/// @return An optional pair of elements that were removed from the vector in
+/// their original order
+template <class T, class BinaryPredicate>
+std::optional<std::pair<T, T>> remove_first_unordered_pair(std::vector<T> &vec,
+                                                           BinaryPredicate p) {
+  auto it = std::adjacent_find(vec.begin(), vec.end(), p);
+  if (it != vec.end() && std::next(it) != vec.end()) {
+    std::pair<T, T> erased_pair = {*it, *std::next(it)};
+    vec.erase(it, std::next(it, 2)); // Erase the pair of elements
+    return erased_pair;
+  }
+  return std::nullopt;
+}
+
+/// @brief A template function to check if a vector has no adjacent identical
+/// elements
+/// @param vec The vector to be checked
+/// @param p A binary predicate that takes two elements of the vector and checks
+/// for an additional condition (e.g., that both elements are fermions)
+template <typename T>
+bool has_no_adjacent_identical_terms(
+    const std::vector<T> &vec, std::function<bool(const T &, const T &)> p =
+                                   [](const T &, const T &) { return true; }) {
+  // return std::adjacent_find(vec.begin(), vec.end()) == vec.end();
+  auto it =
+      std::adjacent_find(vec.begin(), vec.end(), [&p](const T &a, const T &b) {
+        return a == b and p(a, b);
+      });
+  return it == vec.end();
 }
 
 class MyInt {

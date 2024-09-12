@@ -1,5 +1,4 @@
-#ifndef _wicked_diag_elements_h_
-#define _wicked_diag_elements_h_
+#pragma once
 
 #include <array>
 #include <string>
@@ -88,5 +87,3 @@ std::string to_string(const std::vector<GraphMatrix> &elements_vec);
 std::string signature(const GraphMatrix &graph_matrix);
 
 std::string signature(const std::vector<GraphMatrix> &elements_vec);
-
-#endif // _wicked_diag_elements_h_

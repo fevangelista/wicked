@@ -5,7 +5,7 @@
 #include "operator_expression.h"
 
 OperatorExpression::OperatorExpression()
-    : Algebra<OperatorProduct, scalar_t>() {}
+    : Algebra<OperatorExpression, OperatorProduct, scalar_t>() {}
 
 OperatorExpression::OperatorExpression(
     const std::vector<OperatorProduct> &vec_vec_dop, scalar_t factor) {
@@ -73,7 +73,7 @@ make_diag_operator_expression(const std::string &label,
   OperatorExpression result;
 
   for (const std::string &s : components) {
-    auto s_vec = findall(s, "([a-zA-Z][+^]?)");
+    auto s_vec = findall(s, std::regex(R"(([a-zA-Z][+^]?))"));
     std::vector<int> cre(orbital_subspaces->num_spaces());
     std::vector<int> ann(orbital_subspaces->num_spaces());
 

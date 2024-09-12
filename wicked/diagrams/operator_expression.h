@@ -9,8 +9,10 @@
 #include "wicked-def.h"
 
 /// A class to represent operators
-class OperatorExpression : public Algebra<OperatorProduct, scalar_t> {
-  using opexpr_t = Algebra<OperatorProduct, scalar_t>::vecspace_t;
+class OperatorExpression
+    : public Algebra<OperatorExpression, OperatorProduct, scalar_t> {
+  using opexpr_t =
+      Algebra<OperatorExpression, OperatorProduct, scalar_t>::vecspace_t;
 
 public:
   /// Construct an empty sum
@@ -32,8 +34,8 @@ public:
     return expr;
   }
 
-  using Algebra<OperatorProduct, scalar_t>::operator*=;
-  using Algebra<OperatorProduct, scalar_t>::is_equal;
+  using Algebra<OperatorExpression, OperatorProduct, scalar_t>::operator*=;
+  using Algebra<OperatorExpression, OperatorProduct, scalar_t>::is_equal;
 
   /// Return a string representation of the operator
   std::string str() const;

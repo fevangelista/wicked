@@ -15,6 +15,8 @@ public:
 
   const prod_t &elements() const { return elements_; }
 
+  void clear() { elements_.clear(); }
+
   size_t size() const { return elements_.size(); }
 
   void push_back(const T &e) { elements_.push_back(e); }
@@ -49,9 +51,26 @@ public:
     return elements_.end();
   }
 
+  const std::vector<T> &vec() const { return elements_; }
+  std::vector<T> &vec() { return elements_; }
+
+  /// @brief Multiplication assignment operator
+  /// @param rhs the term to multiply by
+  Product &operator*=(const Product &rhs) {
+    // Add the elements of the second product
+    elements_.insert(elements_.end(), rhs.elements_.begin(),
+                     rhs.elements_.end());
+    return *this;
+  }
+
 protected:
   prod_t elements_;
 };
+
+template <class T> Product<T> operator*(Product<T> rhs, const Product<T> &lhs) {
+  rhs *= lhs;
+  return rhs;
+}
 
 template <class T>
 bool operator==(const Product<T> &rhs, const Product<T> &lhs) {

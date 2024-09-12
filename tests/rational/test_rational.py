@@ -28,10 +28,9 @@ def test_rational():
     assert w.rational(4, 24) == w.rational(1, 6)
     # test to_double
     assert math.isclose(float(w.rational(1, 6)), 0.1666666667)
-
-    assert w.rational(1, 1).latex() == "+"
-    assert w.rational(-1, 1).latex() == "-"
-    assert w.rational(3, 1).latex() == "3"
+    assert w.rational(1, 1).latex(True) == "+"
+    assert w.rational(-1, 1).latex(True) == "-"
+    assert w.rational(3, 1).latex(True) == "3"
 
     # test failure to convert
     with pytest.raises(Exception):

@@ -38,6 +38,42 @@ def test_sqoperator2():
     assert w.ann("c_1") < w.ann("c_0")
 
 
+def test_sqoperator3():
+    """Test the SQOperator class"""
+    w.reset_space()
+    w.add_space("c", "fermion", "occupied", ["i", "j"])
+    w.add_space("a", "fermion", "general", ["u", "v"])
+    w.add_space("v", "fermion", "unoccupied", ["a", "b", "c"])
+
+    assert w.ann("c_0").normal_ordered_less(w.cre("c_0"))
+    assert not w.cre("c_0").normal_ordered_less(w.cre("c_0"))
+    assert w.cre("c_1").normal_ordered_less(w.cre("c_0"))
+    assert not w.cre("c_0").normal_ordered_less(w.cre("c_1"))
+    assert not w.ann("c_0").normal_ordered_less(w.ann("c_0"))
+    assert w.ann("c_0").normal_ordered_less(w.ann("c_1"))
+    assert not w.ann("c_1").normal_ordered_less(w.ann("c_0"))
+
+    assert w.cre("v_0").normal_ordered_less(w.ann("v_0"))
+    assert not w.cre("v_0").normal_ordered_less(w.cre("v_0"))
+    assert w.cre("v_0").normal_ordered_less(w.cre("v_1"))
+    assert not w.cre("v_1").normal_ordered_less(w.cre("v_0"))
+    assert not w.ann("v_0").normal_ordered_less(w.ann("v_0"))
+    assert w.ann("v_1").normal_ordered_less(w.ann("v_0"))
+    assert not w.ann("v_0").normal_ordered_less(w.ann("v_1"))
+
+    assert w.cre("a_0").normal_ordered_less(w.ann("a_0"))
+    assert not w.cre("a_0").normal_ordered_less(w.cre("a_0"))
+    assert w.cre("a_0").normal_ordered_less(w.cre("a_1"))
+    assert not w.cre("a_1").normal_ordered_less(w.cre("a_0"))
+    assert not w.ann("a_0").normal_ordered_less(w.ann("a_0"))
+    assert w.ann("a_1").normal_ordered_less(w.ann("a_0"))
+    assert not w.ann("a_0").normal_ordered_less(w.ann("a_1"))
+
+    assert w.ann("c_0").normal_ordered_less(w.ann("v_0"))
+    assert not w.ann("v_0").normal_ordered_less(w.ann("c_0"))
+
+
 if __name__ == "__main__":
     test_sqoperator()
     test_sqoperator2()
+    test_sqoperator3()
