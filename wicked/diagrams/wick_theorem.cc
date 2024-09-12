@@ -52,7 +52,8 @@ Expression WickTheorem::contract(scalar_t factor, const OperatorProduct &ops,
 
   // Step 3. Process contractions
   timer t3;
-  Expression result = process_contractions(factor, ops, minrank, maxrank);
+  Expression result =
+      process_contractions_threads(factor, ops, minrank, maxrank);
   timers_["step 3"] += t3.get();
   return result;
 }

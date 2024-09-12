@@ -1,6 +1,7 @@
 #ifndef _wicked_diag_theorem_h_
 #define _wicked_diag_theorem_h_
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -114,9 +115,9 @@ private:
                       const std::vector<GraphMatrix> &free_graph_matrix_vec,
                       const int minrank, const int maxrank);
 
-  /// Return a vector of indices of elementary contractions that can be added to
-  /// the current backtracking solution. All candidates generated here lead to
-  /// valid contractions
+  /// Return a vector of indices of elementary contractions that can be
+  /// added to the current backtracking solution. All candidates generated
+  /// here lead to valid contractions
   std::vector<int>
   construct_candidates(std::vector<int> &a, int k,
                        const std::vector<ElementaryContraction> &el_contr_vec,
@@ -142,6 +143,17 @@ private:
   /// Process the contractions generated in step 2.
   Expression process_contractions(scalar_t factor, const OperatorProduct &ops,
                                   const int minrank, const int maxrank);
+
+  /// Process the contractions generated in step 2. using threads
+  Expression process_contractions_threads(scalar_t factor,
+                                          const OperatorProduct &ops,
+                                          const int minrank, const int maxrank);
+
+  Expression process_single_contraction(const OperatorProduct &ops,
+                                        const std::vector<int> &contraction_vec,
+                                        const int minrank, const int maxrank,
+                                        const scalar_t factor,
+                                        const int ops_rank);
 
   /// Apply the contraction to this set of operators and produce a term
   std::pair<SymbolicTerm, scalar_t>

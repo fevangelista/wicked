@@ -2,9 +2,8 @@
 #define _wicked_operator_product_h_
 
 #include "helpers/product.hpp"
+#include "operator.h"
 #include "wicked-def.h"
-
-class Operator;
 
 class OperatorProduct : public Product<Operator> {
 public:

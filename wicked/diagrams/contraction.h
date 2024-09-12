@@ -1,13 +1,11 @@
-#ifndef _wicked_contraction_h_
-#define _wicked_contraction_h_
+#pragma once
 
 #include <string>
 #include <vector>
 
 #include "../wicked-def.h"
+#include "graph_matrix.h"
 #include "helpers/product.hpp"
-
-class GraphMatrix;
 
 /// A class to represent an elementary contraction
 class ElementaryContraction : public Product<GraphMatrix> {
@@ -31,5 +29,3 @@ public:
   /// Constructor
   CompositeContraction() : Product<ElementaryContraction>() {}
 };
-
-#endif // _wicked_contraction_h_
