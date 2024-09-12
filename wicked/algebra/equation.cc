@@ -2,8 +2,6 @@
 #include <format>
 #include <iostream>
 
-#include "fmt/format.h"
-
 #include "equation.h"
 #include "expression.h"
 #include "helpers/helpers.h"

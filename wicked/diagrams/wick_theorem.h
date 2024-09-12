@@ -42,6 +42,9 @@ public:
   /// Set the maximum cumulant level
   void set_max_cumulant(int val);
 
+  /// Set the single-threaded mode
+  void set_single_threaded(bool val);
+
   const std::map<std::string, double> &timers() const;
 
 private:
@@ -65,6 +68,8 @@ private:
 
   /// The default print level
   PrintLevel print_ = PrintLevel::None;
+
+  bool single_threaded_ = false;
 
   //
   // Functions for step 1. of the Wick's theorem algorithm
