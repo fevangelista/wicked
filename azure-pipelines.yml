@@ -11,10 +11,10 @@ pool:
   vmImage: ubuntu-latest
 strategy:
   matrix:
-    Python310:
+    Python311:
       python.version: '3.11'
       boost: 'false'
-    Python310Boost:
+    Python311-Boost:
       python.version: '3.11'
       boost: 'true'
 
