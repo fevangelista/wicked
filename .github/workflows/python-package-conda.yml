@@ -35,10 +35,13 @@ jobs:
         cd $HOME/work/wicked/wicked
         echo '[CMakeBuild]' > setup.cfg
         echo 'code_coverage=ON' >> setup.cfg
-        python setup.py develop
+        python setup.py develop --build-flags="-fprofile-arcs -ftest-coverage"
         pip list
         cd $HOME/work/wicked/wicked/tests
         pytest
+
+	ls -la
+
 
         lcov --directory . --capture --output-file coverage.info
         lcov --remove coverage.info '/usr/*' '*c++*' '*pybind11*' --output-file coverage2.info
