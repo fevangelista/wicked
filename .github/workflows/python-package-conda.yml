@@ -33,6 +33,8 @@ jobs:
     - name: Install wicked
       run: |
         cd $HOME/work/wicked/wicked
+        echo '[CMakeBuild]' > setup.cfg
+        echo 'code_coverage=ON' >> setup.cfg
         python setup.py develop
         pip list
         cd $HOME/work/wicked/wicked/tests
