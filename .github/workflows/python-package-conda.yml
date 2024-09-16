@@ -37,10 +37,11 @@ jobs:
         echo 'code_coverage=ON' >> setup.cfg
         cat setup.cfg
         python setup.py develop
-        pip list
+        pip list       
         lcov --directory . --zerocounters
-        cd $HOME/work/wicked/wicked/tests
+        cd tests
         pytest
+        cd ..
         ls -la
         lcov --directory . --capture --output-file coverage.info
         lcov --remove coverage.info '/usr/*' '*c++*' '*pybind11*' --output-file coverage.info
