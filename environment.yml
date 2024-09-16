@@ -1,7 +1,7 @@
 name: wicked
 
 dependencies:
-  - python=3.11
+  - python=3.10
   - pybind11
   - cxx-compiler
   - pip
