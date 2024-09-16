@@ -1,5 +1,4 @@
-#ifndef _wicked_combinatorics_h_
-#define _wicked_combinatorics_h_
+#pragma once
 
 #include <vector>
 
@@ -16,5 +15,3 @@ std::vector<std::vector<int>> integer_partitions(int n, int maxlen = 1024);
 
 // Computes the sign of a permutation of integers
 int permutation_sign(const std::vector<int> &vec);
-
-#endif // _wicked_combinatorics_h_

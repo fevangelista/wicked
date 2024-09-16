@@ -1,5 +1,4 @@
-#ifndef _wicked_equation_h_
-#define _wicked_equation_h_
+#pragma once
 
 #include "symbolic_term.h"
 #include <vector>
@@ -53,5 +52,3 @@ private:
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Equation &eterm);
-
-#endif // _wicked_equation_h_

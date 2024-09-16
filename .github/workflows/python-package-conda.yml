@@ -1,0 +1,53 @@
+name: Python Package using Conda
+
+on: 
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 15 * * *'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}   
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: 'true'
+
+    - name: Setup Conda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        activate-environment: wicked
+        environment-file: environment.yml
+        channels: conda-forge
+        show-channel-urls: true
+        python-version: '3.10'
+        auto-activate-base: false
+        add-pip-as-python-dependency: true
+
+    - name: Install wicked
+      run: |
+        cd $HOME/work/wicked/wicked
+        echo '[CMakeBuild]' > setup.cfg
+        echo 'code_coverage=ON' >> setup.cfg
+        cat setup.cfg
+        python setup.py develop
+        pip list       
+        lcov --directory . --zerocounters
+        cd tests
+        pytest
+        cd ..
+        ls -la
+        lcov --directory . --capture --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*c++*' '*pybind11*' --output-file coverage.info
+        lcov --list coverage.info #debug info
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

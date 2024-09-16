@@ -1,10 +1,8 @@
-#ifndef _wicked_operator_product_h_
-#define _wicked_operator_product_h_
+#pragma once
 
 #include "helpers/product.hpp"
+#include "operator.h"
 #include "wicked-def.h"
-
-class Operator;
 
 class OperatorProduct : public Product<Operator> {
 public:
@@ -22,5 +20,3 @@ public:
 };
 
 OperatorProduct operator*(const OperatorProduct &l, const OperatorProduct &r);
-
-#endif // _wicked_operator_product_h_

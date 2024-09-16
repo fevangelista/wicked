@@ -1,0 +1,12 @@
+name: wicked
+
+dependencies:
+  - python
+  - pybind11
+  - cxx-compiler
+  - pip
+  - cmake
+  - pytest
+  - numpy
+  - conda-forge::opt_einsum
+  - conda-forge::lcov

@@ -1,5 +1,4 @@
-#ifndef _wicked_tensor_h_
-#define _wicked_tensor_h_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -103,5 +102,3 @@ Tensor make_tensor_from_str(const std::string &index, SymmetryType symmetry);
 
 /// Print to an output stream
 std::ostream &operator<<(std::ostream &os, const Tensor &tensor);
-
-#endif // _wicked_tensor_h_

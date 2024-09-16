@@ -2,7 +2,6 @@
 
 #include "contraction.h"
 
-#include "graph_matrix.h"
 #include "helpers/orbital_space.h"
 
 int ElementaryContraction::num_ops() const {

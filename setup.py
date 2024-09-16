@@ -77,7 +77,7 @@ class CMakeBuild(build_ext):
             os.makedirs(self.build_temp)
 
         subprocess.check_call(["cmake"] + cmake_args)
-        subprocess.check_call(["cmake", "--build", ".", "-j2"] + build_args)
+        subprocess.check_call(["cmake", "--build", ".", "-j4"] + build_args)
 
         print()  # Add empty line for nicer output
 

@@ -1,5 +1,4 @@
-#ifndef _wicked_diag_operator_set_h_
-#define _wicked_diag_operator_set_h_
+#pragma once
 
 #include <map>
 #include <vector>
@@ -78,5 +77,3 @@ OperatorExpression commutator(const OperatorExpression &A,
 /// quantity exp(-B) A exp(B) truncated at a given order n
 OperatorExpression bch_series(const OperatorExpression &A,
                               const OperatorExpression &B, int n);
-
-#endif // _wicked_diag_operator_set_h_

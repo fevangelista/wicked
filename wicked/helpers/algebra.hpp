@@ -1,5 +1,4 @@
-#ifndef _wicked_vector_space_h_
-#define _wicked_vector_space_h_
+#pragma once
 
 #include <cmath>
 #include <vector>
@@ -150,5 +149,3 @@ public:
 protected:
   vecspace_t terms_;
 };
-
-#endif // _wicked_vector_space_h_

@@ -1,5 +1,4 @@
-#ifndef _wicked_helpers_h_
-#define _wicked_helpers_h_
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -198,37 +197,3 @@ bool has_no_adjacent_identical_terms(
       });
   return it == vec.end();
 }
-
-class MyInt {
-private:
-  int m_;
-
-public:
-  MyInt(int m) : m_(m) { std::cout << "created " << m_ << std::endl; }
-
-  // Copy constructor
-  MyInt(const MyInt &my) : m_(my.m_) {
-    std::cout << "copied " << m_ << std::endl;
-  }
-
-  // Move constructor
-  MyInt(MyInt &&other) : m_(other.m_) {
-    std::cout << "moved " << m_ << std::endl;
-  }
-
-  // Copy assignment operator
-  MyInt &operator=(const MyInt &other) {
-    std::cout << "copy assigned " << m_ << std::endl;
-    return *this;
-  }
-
-  // Move assignment operator
-  MyInt &operator=(MyInt &&other) {
-    std::cout << "move assigned " << m_ << std::endl;
-    return *this;
-  }
-
-  int get() { return m_; }
-};
-
-#endif // _wicked_helpers_h_

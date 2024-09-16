@@ -1,5 +1,4 @@
 #include "operator_product.h"
-#include "operator.h"
 
 using namespace std;
 
