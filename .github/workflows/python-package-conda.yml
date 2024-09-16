@@ -35,12 +35,14 @@ jobs:
         cd $HOME/work/wicked/wicked
         echo '[CMakeBuild]' > setup.cfg
         echo 'code_coverage=ON' >> setup.cfg
+        cat setup.cfg
         python setup.py develop
         pip list
+        lcov --directory . --zerocounters
         cd $HOME/work/wicked/wicked/tests
         pytest
         ls -la
         lcov --directory . --capture --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' '*c++*' '*pybind11*' --output-file coverage2.info
-        lcov --list coverage2.info #debug info
+        lcov --remove coverage.info '/usr/*' '*c++*' '*pybind11*' --output-file coverage.info
+        lcov --list coverage.info #debug info
         bash <(curl -s https://codecov.io/bash)
