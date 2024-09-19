@@ -211,37 +211,6 @@ def analyze_einsum(einsum_str, root_index=None):
     for i in ind_set:
         scaling[index_dict[i]] += 1
     return scaling
-
-def precompute_path(line, sizes_dict, memory_limit=None, optimize='optimal'):
-    import opt_einsum as oe
-    import re
-
-    pathgen = oe.paths.optimal
-    if optimize == 'optimal':
-        pathgen = oe.paths.optimal
-    elif optimize == 'greedy':
-        pathgen = oe.paths.greedy
-    elif optimize == 'branch_all':
-        pathgen = oe.paths.branch_all
-    elif optimize == 'branch_1':
-        pathgen = oe.paths.branch_1
-    elif optimize == 'branch_2':
-        pathgen = oe.paths.branch_2
-
-    def _precompute(line, sizes_dict, memory_limit, pathgen):
-        contr = line.split("->")[0].split("(")[1][1:]
-        rhs = line.split("->")[1].split("',")[0]
-        lhs = contr.split(',')
-        return pathgen(lhs, [rhs], sizes_dict, memory_limit)
-
-    if 'np.einsum' in line:
-        try:
-            path = ['einsum_path'] + _precompute(line, sizes_dict, memory_limit, pathgen)
-            return re.sub(r"optimize=.*\)", f"optimize={str(path)})", line)
-        except:
-            return line
-    else:
-        return line
     
 def equation_to_dict(eq):
     res = {}
