@@ -1,7 +1,7 @@
 import wicked
 
 __all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", 
-           "dict_to_einsum", "analyze_einsum", "precompute_path", 
+           "dict_to_einsum", "analyze_einsum", 
            "equation_to_dict", "dict_to_equation"]
 
 def string_to_expr(s):
