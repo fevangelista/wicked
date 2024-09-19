@@ -1,5 +1,4 @@
-#ifndef _wicked_expression_h_
-#define _wicked_expression_h_
+#pragma once
 
 #include <map>
 #include <vector>
@@ -72,5 +71,3 @@ Expression make_operator_expr(const std::string &label,
                               const std::vector<std::string> &components,
                               bool normal_ordered, SymmetryType symmetry,
                               scalar_t coefficient = scalar_t(1));
-
-#endif // _wicked_expression_h_

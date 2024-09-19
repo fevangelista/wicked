@@ -1,5 +1,4 @@
-#ifndef _wicked_orbital_space_h_
-#define _wicked_orbital_space_h_
+#pragma once
 
 #include <map>
 #include <memory>
@@ -108,5 +107,3 @@ SpaceType string_to_space_type(const std::string &str);
 
 /// Used to convert a string (e.g., "fermion") to a FieldType
 FieldType string_to_field_type(const std::string &str);
-
-#endif // _wicked_orbital_space_h_

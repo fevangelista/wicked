@@ -1,4 +1,4 @@
-#include "fmt/format.h"
+#include <format>
 
 #include "helpers/combinatorics.h"
 #include "helpers/helpers.h"
@@ -95,7 +95,7 @@ void WickTheorem::elementary_contractions_occupied(
         new_contr[r].set_ann(s, 1);
         contr_vec.push_back(new_contr);
         PRINT(PrintLevel::Summary,
-              cout << fmt::format("\n    {:5d}:", contr_vec.size());
+              cout << std::format("\n    {:5d}:", contr_vec.size());
               PRINT_ELEMENTS(new_contr, " "););
       }
     }
@@ -114,7 +114,7 @@ void WickTheorem::elementary_contractions_unoccupied(
         new_contr[r].set_cre(s, 1);
         contr_vec.push_back(new_contr);
         PRINT(PrintLevel::Summary,
-              cout << fmt::format("\n    {:5d}:", contr_vec.size());
+              cout << std::format("\n    {:5d}:", contr_vec.size());
               PRINT_ELEMENTS(new_contr, " "););
       }
     }
@@ -199,7 +199,7 @@ void WickTheorem::elementary_contractions_general(
         contr_vec.push_back(new_contr);
 
         PRINT(PrintLevel::Summary,
-              cout << fmt::format("\n    {:5d}:", contr_vec.size());
+              cout << std::format("\n    {:5d}:", contr_vec.size());
               PRINT_ELEMENTS(new_contr, " "););
       }
     }

@@ -26,14 +26,28 @@ jobs:
         environment-file: environment.yml
         channels: conda-forge
         show-channel-urls: true
-        python-version: '3.9'
+        python-version: '3.10'
         auto-activate-base: false
         add-pip-as-python-dependency: true
 
     - name: Install wicked
       run: |
         cd $HOME/work/wicked/wicked
+        echo '[CMakeBuild]' > setup.cfg
+        echo 'code_coverage=ON' >> setup.cfg
+        cat setup.cfg
         python setup.py develop
-        pip list
-        cd $HOME/work/wicked/wicked/tests
+        pip list       
+        lcov --directory . --zerocounters
+        cd tests
         pytest
+        cd ..
+        ls -la
+        lcov --directory . --capture --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*c++*' '*pybind11*' --output-file coverage.info
+        lcov --list coverage.info #debug info
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

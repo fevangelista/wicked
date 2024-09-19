@@ -8,25 +8,24 @@
  * This software is provided "as is" without express or implied
  * warranty, and with no claim as to its suitability for any purpose.
  */
-#ifndef GENERALPURPOSE_HPP
-#define GENERALPURPOSE_HPP
+#pragma once
 
-#include <array>
-#include <vector>
-#include <deque>
-#include <list>
-#include <forward_list>
-#include <set>
-#include <map>
-#include <unordered_set>
-#include <unordered_map>
 #include <algorithm>
-#include <iterator>
-#include <functional>
-#include <numeric>
-#include <iostream>
-#include <string>
+#include <array>
+#include <deque>
+#include <forward_list>
 #include <fstream>
+#include <functional>
+#include <iostream>
+#include <iterator>
+#include <list>
+#include <map>
+#include <numeric>
+#include <set>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 // INSERT_ELEMENTS (collection, first, last)
 // - fill values from first to last into the collection
@@ -73,5 +72,3 @@ inline void PRINT_MAPPED_ELEMENTS(const T &coll,
   }
   std::cout << std::endl;
 }
-
-#endif /*GENERALPURPOSE_HPP*/

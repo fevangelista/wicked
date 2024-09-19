@@ -1,5 +1,4 @@
-#ifndef _wicked_product_h_
-#define _wicked_product_h_
+#pragma once
 
 #include <algorithm>
 #include <vector>
@@ -76,5 +75,3 @@ template <class T>
 bool operator==(const Product<T> &rhs, const Product<T> &lhs) {
   return rhs.is_equal(lhs);
 }
-
-#endif // _wicked_product_h_

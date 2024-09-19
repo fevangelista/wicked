@@ -1,5 +1,4 @@
-#ifndef _wicked_index_h_
-#define _wicked_index_h_
+#pragma once
 
 #include <map>
 #include <string>
@@ -97,5 +96,3 @@ std::vector<int> num_indices_per_space(const std::vector<Index> &indices);
 /// This is the product n1! x n2! x n3! x ... where ni is the number of
 /// indices that belong to orbital space i
 int symmetry_factor(const std::vector<Index> &indices);
-
-#endif // _wicked_index_h_

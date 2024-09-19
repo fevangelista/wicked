@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "fmt/format.h"
+#include <format>
 
 #include "helpers/combinatorics.h"
 #include "helpers/helpers.h"

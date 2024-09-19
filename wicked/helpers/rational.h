@@ -1,5 +1,4 @@
-#ifndef _wicked_rational_h_
-#define _wicked_rational_h_
+#pragma once
 
 #include <ostream>
 
@@ -83,5 +82,3 @@ rational make_rational_from_str(const std::string &s);
 std::ostream &operator<<(std::ostream &os, const rational &rhs);
 /// return true if boost rational is used
 bool use_boost_1024_int();
-
-#endif // _wicked_rational_h_
