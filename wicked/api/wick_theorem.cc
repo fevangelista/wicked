@@ -23,13 +23,11 @@ void export_WickTheorem(py::module &m) {
            py::overload_cast<scalar_t, const OperatorProduct &, int, int, bool>(
                &WickTheorem::contract),
             "factor"_a, "ops"_a, "minrank"_a, "maxrank"_a, "inter_general"_a = false,
-           "factor"_a, "ops"_a, "minrank"_a, "maxrank"_a,
            "Contract a product of operators")
       .def("contract",
            py::overload_cast<scalar_t, const OperatorExpression &, int, int, bool>(
                &WickTheorem::contract),
             "factor"_a, "expr"_a, "minrank"_a, "maxrank"_a, "inter_general"_a = false,
-           "factor"_a, "ops"_a, "minrank"_a, "maxrank"_a,
            "Contract a product of operators")
       .def(
           "contract",

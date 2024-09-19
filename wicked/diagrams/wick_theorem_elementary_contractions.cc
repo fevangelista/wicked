@@ -320,8 +320,8 @@ void WickTheorem::elementary_contractions_inter_general(
             if (ms_of_contraction(new_contr, s) == 0){
               contr_vec.push_back(new_contr);
               PRINT(PrintLevel::Summary,
-                    cout << fmt::format("\n    {:5d}:", contr_vec.size());
-                    PRINT_ELEMENTS(new_contr, " "););
+              cout << std::format("\n    {:5d}:", contr_vec.size());
+              PRINT_ELEMENTS(new_contr, " "););
             }
             // increment the counter vectors
             int A = 0;
