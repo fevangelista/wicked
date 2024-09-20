@@ -40,6 +40,9 @@ public:
   /// Reindex this equation
   void reindex(index_map_t &idx_map);
 
+  /// canonicalize this equation
+  void canonicalize();
+
 private:
   // ==> Class private data <==
 

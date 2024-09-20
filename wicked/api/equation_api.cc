@@ -17,7 +17,9 @@ void export_Equation(py::module &m) {
       .def("rhs_factor", &Equation::rhs_factor)
       .def("__repr__", &Equation::str)
       .def("__str__", &Equation::str)
+      .def("__eq__", &Equation::operator==)
       .def("latex", &Equation::latex)
       .def("reindex", &Equation::reindex)
+      .def("canonicalize", &Equation::canonicalize)
       .def("compile", &Equation::compile, "format"_a, "optimize"_a = "\"optimal\"");
 }

@@ -18,6 +18,7 @@ void export_Tensor(py::module &m) {
                     const std::vector<Index> &, SymmetryType>())
       .def("__repr__", &Tensor::str)
       .def("__str__", &Tensor::str)
+      .def("__eq__", &Tensor::operator==)
       .def("label", &Tensor::label)
       .def("lower", &Tensor::lower)
       .def("upper", &Tensor::upper)

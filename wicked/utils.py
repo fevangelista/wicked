@@ -228,9 +228,9 @@ def equation_to_dict(eq):
 
 def dict_to_equation(eqdict):
     lhs = wicked.SymbolicTerm()
-    lhs.add(wicked.tensor(*eqdict['lhs'], wicked.sym.none))
+    lhs.add(wicked.tensor(*eqdict['lhs'], wicked.sym.anti))
     rhs = wicked.SymbolicTerm()
     for i in eqdict['rhs']:
-        rhs.add(wicked.tensor(*i, wicked.sym.none))
+        rhs.add(wicked.tensor(*i, wicked.sym.anti))
 
     return wicked.Equation(lhs, rhs, eqdict['factor'])

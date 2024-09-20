@@ -54,8 +54,8 @@ public:
   /// Apply a re-indexing map to this symbolic term
   void reindex(index_map_t &idx_map);
 
-  /// Canonicalize this term and return the overall phase factor
-  scalar_t canonicalize();
+  /// Canonicalize this term and return the overall phase factor and the index map
+  std::tuple<scalar_t, index_map_t> canonicalize();
 
   /// Return the adjoint of this symbolic term
   SymbolicTerm adjoint() const;

@@ -164,3 +164,9 @@ void Equation::reindex(index_map_t &idx_map) {
   lhs_.reindex(idx_map);
   rhs_.reindex(idx_map);
 }
+
+void Equation::canonicalize() {
+  auto [rhs_factor, idx_map] = rhs_.canonicalize();
+  factor_ *= rhs_factor;
+  lhs_.reindex(idx_map);
+}

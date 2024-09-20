@@ -90,7 +90,7 @@ Expression WickTheorem::process_contractions(scalar_t factor,
       timers_["evaluate_contraction"] += te.get();
 
       SymbolicTerm &term = term_factor.first;
-      scalar_t canonicalize_factor = term.canonicalize();
+      auto [canonicalize_factor, _] = term.canonicalize();
       canonicalize_factor *= term_factor.second;
       result += {term, canonicalize_factor};
       // result.add(
@@ -177,7 +177,7 @@ Expression WickTheorem::process_single_contraction(
     timers_["evaluate_contraction"] += te.get();
 
     SymbolicTerm &term = term_factor.first;
-    scalar_t canonicalize_factor = term.canonicalize();
+    auto [canonicalize_factor, _] = term.canonicalize();
     canonicalize_factor *= term_factor.second;
     result += {term, canonicalize_factor};
     // result += (std::make_pair(term, canonicalize_factor));
