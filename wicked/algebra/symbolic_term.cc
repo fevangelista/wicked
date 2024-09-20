@@ -103,7 +103,7 @@ void SymbolicTerm::reindex(index_map_t &idx_map) {
 }
 
 #define NEW_CANONICALIZATION 1
-scalar_t SymbolicTerm::canonicalize() {
+std::tuple<scalar_t, index_map_t> SymbolicTerm::canonicalize() {
   scalar_t factor(1);
 
 //
@@ -239,7 +239,7 @@ scalar_t SymbolicTerm::canonicalize() {
 
   WPRINT(std::cout << "\n  " << str();)
 
-  return factor;
+  return std::make_tuple(factor, index_map);
 }
 
 scalar_t SymbolicTerm::simplify() {
@@ -367,7 +367,7 @@ bool SymbolicTerm::operator<(const SymbolicTerm &other) const {
 }
 
 bool SymbolicTerm::operator==(const SymbolicTerm &other) const {
-  return (tensors_ == other.tensors_) and (operators_ == other.operators_);
+  return tensors_ == other.tensors_;
 }
 
 std::string SymbolicTerm::str() const {

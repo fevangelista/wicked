@@ -66,6 +66,7 @@ void export_Expression(py::module &m) {
       .def("latex", &Expression::latex, "sep"_a = " \\\\ \n")
       .def("to_manybody_equation", &Expression::to_manybody_equation)
       .def("to_manybody_equations", &Expression::to_manybody_equation)
+      .def("reindex", &Expression::reindex)
       .def("canonicalize", &Expression::canonicalize)
       .def("adjoint", &Expression::adjoint,
            "Return the adjoint of this expression")

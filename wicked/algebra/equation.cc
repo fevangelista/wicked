@@ -91,7 +91,7 @@ get_unique_tensor_indices(const Tensor &t,
   return indices;
 }
 
-std::string Equation::compile(const std::string &format) const {
+std::string Equation::compile(const std::string &format, const std::string &optimize) const {
   if (format == "ambit") {
     std::vector<std::string> str_vec;
     str_vec.push_back(lhs_.compile(format) + " += " + factor_.compile(format));
@@ -146,7 +146,7 @@ std::string Equation::compile(const std::string &format) const {
       args_vec.push_back(t_label);
     }
     str_vec.push_back(join(args_vec, ","));
-    str_vec.push_back(",optimize=\"optimal\")");
+    str_vec.push_back(",optimize="+optimize+")");
     return join(str_vec, "");
   }
   std::string msg = "Equation::compile() - the argument '" + format +
@@ -158,4 +158,15 @@ std::string Equation::compile(const std::string &format) const {
 std::ostream &operator<<(std::ostream &os, const Equation &eterm) {
   os << eterm.str();
   return os;
+}
+
+void Equation::reindex(index_map_t &idx_map) {
+  lhs_.reindex(idx_map);
+  rhs_.reindex(idx_map);
+}
+
+void Equation::canonicalize() {
+  auto [rhs_factor, idx_map] = rhs_.canonicalize();
+  factor_ *= rhs_factor;
+  lhs_.reindex(idx_map);
 }

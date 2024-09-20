@@ -81,6 +81,12 @@ void OrbitalSpaceInfo::add_space(char label, FieldType field_type,
                              "\" is already defined. Use another label.");
   }
 
+  if (space_type == SpaceType::General && indices_of_type(space_type).size() > 0){
+    std::cout << "Warning: you're adding multiple general spaces. \n" <<
+    "Multi-leg contractions between these general spaces are turned off by default. \n" <<
+    "Turn on 'inter_general=True' in contract to enable this behavior." << std::endl;
+  }
+
   size_t pos = space_info_.size();
   label_to_pos_[label] = pos;
   for (auto &index : indices) {
@@ -154,6 +160,16 @@ int OrbitalSpaceInfo::label_to_space(char label) const {
                              "function to define orbital spaces.");
   }
   return search->second;
+}
+
+std::vector<int> OrbitalSpaceInfo::indices_of_type(SpaceType type) const {
+  std::vector<int> indices;
+  for (size_t i = 0; i < space_info_.size(); i++) {
+    if (space_info_[i].space_type() == type) {
+      indices.push_back(i);
+    }
+  }
+  return indices;
 }
 
 void OrbitalSpaceInfo::reset() {
