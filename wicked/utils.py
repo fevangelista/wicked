@@ -1,7 +1,7 @@
 import wicked
 
 __all__ = ["string_to_expr", "gen_op", "gen_op_ms0", "compile_einsum", 
-           "dict_to_einsum", "analyze_einsum", 
+           "dict_to_einsum", "analyze_einsum",
            "equation_to_dict", "dict_to_equation"]
 
 def string_to_expr(s):
@@ -17,7 +17,7 @@ def string_to_expr(s):
 def split(word):
     return [char for char in word]
 
-def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
+def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True, only_terms=False):
     """
     This function automates the creation of operators that span multiple spaces.
 
@@ -28,14 +28,22 @@ def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
     """
     import itertools
 
+    if isinstance(rank, tuple) or isinstance(rank, list):
+        assert len(rank) == 2 # (cre_rank, ann_rank)
+        cre_rank, ann_rank = rank
+        if (cre_rank != ann_rank) and (not diagonal):
+            raise ValueError("diagonal=False is not well defined for rank[0] != rank[1]")
+    elif isinstance(rank, int):
+        cre_rank = ann_rank = rank
+
     cre_spaces = split(cre_spaces)
     ann_spaces = split(ann_spaces)
 
     osi = wicked.osi()
     m = {osi.label(n): n for n in range(osi.num_spaces())}
 
-    c = [cre_spaces for n in range(rank)]
-    a = [ann_spaces for n in range(rank)]
+    c = [cre_spaces for _ in range(cre_rank)]
+    a = [ann_spaces for _ in range(ann_rank)]
     terms = []
     for le in itertools.product(*c):
         is_le_sorted = all(m[le[i]] <= m[le[i + 1]]
@@ -56,9 +64,9 @@ def gen_op(label, rank, cre_spaces, ann_spaces, diagonal=True):
                             " ".join([s + "+" for s in le]) +
                             " " + " ".join(re)
                         )
-    return wicked.op(label, terms, unique=False)
+    return terms if only_terms else wicked.op(label, terms, unique=False)
 
-def gen_op_ms0(label, rank, cre_spaces, ann_spaces, diagonal=True):
+def gen_op_ms0(label, rank, cre_spaces, ann_spaces, diagonal=True, only_terms=False):
     """
     This function automates the creation of operators that span multiple spaces.
 
@@ -70,8 +78,11 @@ def gen_op_ms0(label, rank, cre_spaces, ann_spaces, diagonal=True):
     wicked.gen_op_ms0('T',1,'av','ca')
     """
     import itertools
-    cre_spaces_alpha = [_ + '+' for _ in split(cre_spaces)]
-    cre_spaces_beta = [_.upper() + '+' for _ in split(cre_spaces)]
+    osi = wicked.osi()
+    m = {osi.label(n): n for n in range(osi.num_spaces())}
+    
+    cre_spaces_alpha = [_ for _ in split(cre_spaces)]
+    cre_spaces_beta = [_.upper() for _ in split(cre_spaces)]
     ann_spaces_alpha = [_ for _ in split(ann_spaces)]
     ann_spaces_beta = [_.upper() for _ in split(ann_spaces)]
 
@@ -79,15 +90,34 @@ def gen_op_ms0(label, rank, cre_spaces, ann_spaces, diagonal=True):
     for nalpha in range(rank+1):
         nbeta = rank - nalpha
         cre = (cre_spaces_alpha,)*nalpha + (cre_spaces_beta,)*nbeta
-        ann = (ann_spaces_alpha,)*nalpha + (ann_spaces_beta,)*nbeta
-        for i in itertools.product(*cre, *ann):
-            term = ' '.join(i)
-            if (not diagonal):
-                term_cleaned = term.replace('+','').replace(' ','').lower()
-                if (len(set(term_cleaned)) > 1): terms.append(term)
-            else: terms.append(term)
+        ann = (ann_spaces_beta,)*nbeta + (ann_spaces_alpha,)*nalpha
+        for le in itertools.product(*cre):
+            is_le_sorted = all(m[le[i]] <= m[le[i + 1]]
+                            for i in range(len(le) - 1))
+            if is_le_sorted:
+                for re in itertools.product(*ann):
+                    is_re_sorted = all(m[re[i]] >= m[re[i + 1]]
+                                    for i in range(len(re) - 1))
+                    if is_re_sorted:
+                        if not diagonal:
+                            if le != re:
+                                terms.append(
+                                    " ".join([s + "+" for s in le]) +
+                                    " " + " ".join(re)
+                                )
+                        else:
+                            terms.append(
+                                " ".join([s + "+" for s in le]) +
+                                " " + " ".join(re)
+                            )
+        # for i in itertools.product(*cre, *ann):
+        #     term = ' '.join(i)
+        #     if (not diagonal):
+        #         term_cleaned = term.replace('+','').replace(' ','').lower()
+        #         if (len(set(term_cleaned)) > 1): terms.append(term)
+        #     else: terms.append(term)
 
-    return wicked.op(label, terms, unique=True)
+    return terms if only_terms else wicked.op(label, terms, unique=True)
 
 def dict_to_einsum(eq_dict, optimize="'optimal'"):
     lhs = eq_dict['lhs'][0][0]

@@ -17,6 +17,7 @@ void export_SymbolicTerm(py::module &m);
 void export_Expression(py::module &m);
 void export_Equation(py::module &m);
 void export_Operator(py::module &m);
+void export_OperatorProduct(py::module &m);
 void export_OperatorExpression(py::module &m);
 void export_WickTheorem(py::module &m);
 void export_rational(py::module &m);
@@ -33,6 +34,7 @@ PYBIND11_MODULE(_wicked, m) {
   export_Expression(m);
   export_Equation(m);
   export_Operator(m);
+  export_OperatorProduct(m);
   export_OperatorExpression(m);
   export_WickTheorem(m);
 }

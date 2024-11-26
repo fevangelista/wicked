@@ -38,6 +38,9 @@ public:
 
   /// Return a string representation of the operator
   std::string str() const;
+
+  /// Return the underlying terms
+  const opexpr_t &terms() const { return terms_; }
 };
 
 /// multiplication

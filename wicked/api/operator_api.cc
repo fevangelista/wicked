@@ -21,6 +21,18 @@ void export_Operator(py::module &m) {
   m.def("diag_operator", &make_diag_operator, "Create a Operator object");
 }
 
+void export_OperatorProduct(py::module &m) {
+  py::class_<OperatorProduct, std::shared_ptr<OperatorProduct>>(m,
+                                                                "OperatorProduct")
+      .def(py::init<>())
+      .def(py::init<const OperatorProduct &>())
+      .def(py::init<const std::vector<Operator> &>())
+      .def("__repr__", &OperatorProduct::str)
+      .def("__str__", &OperatorProduct::str)
+      .def("num_ops", &OperatorProduct::num_ops)
+      .def("canonicalize", &OperatorProduct::canonicalize);
+}
+
 void export_OperatorExpression(py::module &m) {
   py::class_<OperatorExpression, std::shared_ptr<OperatorExpression>>(
       m, "OperatorExpression")
@@ -52,6 +64,13 @@ void export_OperatorExpression(py::module &m) {
            [](const OperatorExpression &lhs, const OperatorExpression &rhs) {
              return lhs * rhs;
            })
+      .def("__iter__",
+           [](const OperatorExpression &opexpr) {
+             return py::make_iterator(opexpr.terms().begin(),
+                                      opexpr.terms().end());
+           },
+           py::keep_alive<0, 1>())
+      .def("terms", &OperatorExpression::terms)
       .def("canonicalize", &OperatorExpression::canonicalize);
   m.def("op", &make_diag_operator_expression, "label"_a, "components"_a,
         "unique"_a = false,
