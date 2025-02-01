@@ -1,16 +1,18 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/map.h>
+#include <nanobind/stl/shared_ptr.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
 #include "helpers/orbital_space.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
 /// Export the Indexclass
-void export_OrbitalSpaceInfo(py::module &m) {
-  py::class_<OrbitalSpaceInfo, std::shared_ptr<OrbitalSpaceInfo>>(
-      m, "OrbitalSpaceInfo")
-      .def(py::init<>())
+void export_OrbitalSpaceInfo(nb::module_ &m) {
+  nb::class_<OrbitalSpaceInfo>(m, "OrbitalSpaceInfo")
+      .def(nb::init<>())
       .def("reset_space", &OrbitalSpaceInfo::reset)
       .def("add_space", &OrbitalSpaceInfo::add_space)
       .def("num_spaces", &OrbitalSpaceInfo::num_spaces)

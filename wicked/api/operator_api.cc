@@ -1,7 +1,6 @@
-#include <pybind11/iostream.h>
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
 #include "../wicked/diagrams/contraction.h"
 #include "../wicked/diagrams/operator.h"
@@ -9,25 +8,24 @@
 #include "../wicked/diagrams/operator_product.h"
 #include "../wicked/diagrams/wick_theorem.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
-void export_Operator(py::module &m) {
-  py::class_<Operator, std::shared_ptr<Operator>>(m, "Operator")
-      .def(py::init<const std::string &, const std::vector<int> &,
+void export_Operator(nb::module_ &m) {
+  nb::class_<Operator>(m, "Operator")
+      .def(nb::init<const std::string &, const std::vector<int> &,
                     const std::vector<int> &>())
       .def("__repr__", &Operator::str)
       .def("__str__", &Operator::str);
   m.def("diag_operator", &make_diag_operator, "Create a Operator object");
 }
 
-void export_OperatorExpression(py::module &m) {
-  py::class_<OperatorExpression, std::shared_ptr<OperatorExpression>>(
-      m, "OperatorExpression")
-      .def(py::init<>())
-      .def(py::init<const OperatorExpression &>())
-      .def(py::init<const std::vector<OperatorProduct> &, scalar_t>(),
-           py::arg("vec_vec_dop"), py::arg("factor") = rational(1))
+void export_OperatorExpression(nb::module_ &m) {
+  nb::class_<OperatorExpression>(m, "OperatorExpression")
+      .def(nb::init<>())
+      .def(nb::init<const OperatorExpression &>())
+      .def(nb::init<const std::vector<OperatorProduct> &, scalar_t>(),
+           nb::arg("vec_vec_dop"), nb::arg("factor") = rational(1))
       .def("size", &OperatorExpression::size)
       .def("add", &OperatorExpression::add)
       .def("adjoint", &OperatorExpression::adjoint)
@@ -53,19 +51,24 @@ void export_OperatorExpression(py::module &m) {
              return lhs * rhs;
            })
       .def("canonicalize", &OperatorExpression::canonicalize);
-  m.def("op", &make_diag_operator_expression, "label"_a, "components"_a,
-        "unique"_a = false,
-        py::call_guard<py::scoped_ostream_redirect,
-                       py::scoped_estream_redirect>(),
-        "Create a OperatorExpression object");
+  // m.def("op", &make_diag_operator_expression, "label"_a, "components"_a,
+  //       "unique"_a = false,
+  //       nb::call_guard<nb::scoped_ostream_redirect,
+  //                      nb::scoped_estream_redirect>(),
+  //       "Create a OperatorExpression object");
+
+  m.def("op", &make_diag_operator_expression, nb::arg("label"),
+        nb::arg("components"), nb::arg("unique") = false,
+        // nb::call_guard<nb::ostream_redirect>(),
+        "Create an OperatorExpression object");
 
   m.def(
       "commutator",
-      [](py::args args) {
+      [](nb::args args) {
         int k = 0;
         OperatorExpression result;
         for (const auto &arg : args) {
-          OperatorExpression &object = py::cast<OperatorExpression &>(arg);
+          OperatorExpression &object = nb::cast<OperatorExpression &>(arg);
           if (k == 0) {
             result = object;
           } else {

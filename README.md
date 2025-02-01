@@ -11,11 +11,12 @@ Wick&d implements Wick's contraction theorem for general Fermi vacua.
 
 ## Installation (develpment version)
 
-To install Wick&d, clone this repository (including its submodule pybind11) and compile it using the `setup.py` file:
+To install Wick&d, clone this repository (including its submodule pybind11) and compile it using the `pip install` command:
+
 ```bash
 git clone --recurse-submodules https://github.com/fevangelista/wicked.git
 cd wicked
-python setup.py develop
+pip install --no-build-isolation -ve .
 ```
 
 ## Getting started

@@ -8,11 +8,12 @@ def test_orbital_space():
     w.add_space("a", "fermion", "general", ["u", "v", "w", "x", "y", "z"])
     w.add_space("v", "fermion", "unoccupied", ["e", "f"])
     assert w.num_spaces() == 3
+    osi = w.osi()
     osi_dict = w.osi().to_dict()
     assert set(osi_dict.keys()) == set(["c", "a", "v"])
-    assert set(osi_dict['c']) == set(["m", "n"])
-    assert set(osi_dict['a']) == set(["u", "v", "w", "x", "y", "z"])
-    assert set(osi_dict['v']) == set(["e", "f"])
+    assert set(osi_dict["c"]) == set(["m", "n"])
+    assert set(osi_dict["a"]) == set(["u", "v", "w", "x", "y", "z"])
+    assert set(osi_dict["v"]) == set(["e", "f"])
 
 
 def test_orbital_space_exceptions():

@@ -1,12 +1,12 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/vector.h>
 
 #include "helpers/combinatorics.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
 /// Export the combinatorics
-void export_combinatorics(py::module &m) {
+void export_combinatorics(nb::module_ &m) {
   m.def("integer_partitions", &integer_partitions);
 }

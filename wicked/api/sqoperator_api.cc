@@ -1,23 +1,23 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
 
 #include "../wicked/algebra/sqoperator.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
 /// Export the Indexclass
-void export_SQOperator(py::module &m) {
-  py::enum_<FieldType>(m, "stat")
+void export_SQOperator(nb::module_ &m) {
+  nb::enum_<FieldType>(m, "stat")
       .value("fermion", FieldType::Fermion)
       .value("boson", FieldType::Boson);
 
-  py::enum_<SQOperatorType>(m, "type")
+  nb::enum_<SQOperatorType>(m, "type")
       .value("cre", SQOperatorType::Creation)
       .value("ann", SQOperatorType::Annihilation);
 
-  py::class_<SQOperator, std::shared_ptr<SQOperator>>(m, "SQOperator")
-      .def(py::init<SQOperatorType, Index>())
+  nb::class_<SQOperator>(m, "SQOperator")
+      .def(nb::init<SQOperatorType, Index>())
       .def("type", &SQOperator::type)
       .def("index", &SQOperator::index)
       .def("field_type", &SQOperator::field_type)

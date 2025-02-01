@@ -1,18 +1,19 @@
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
 
 #include "diagrams/operator.h"
 #include "diagrams/operator_expression.h"
 #include "helpers/rational.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
-void export_rational(py::module &m) {
+void export_rational(nb::module_ &m) {
 
-  py::class_<rational, std::shared_ptr<rational>>(m, "rational")
-      .def(py::init<>())
-      .def(py::init<int>())
-      .def(py::init<int, int>())
+  nb::class_<rational>(m, "rational")
+      .def(nb::init<>())
+      .def(nb::init<int>())
+      .def(nb::init<int, int>())
       .def("latex", &rational::latex)
       .def("compile", &rational::compile)
       .def("numerator",
@@ -38,7 +39,7 @@ void export_rational(py::module &m) {
             rhs *= lhs;
             return rhs;
           },
-          py::is_operator())
+          nb::is_operator())
       .def("__truediv__",
            [](const rational &lhs, const rational &rhs) { return lhs / rhs; })
       .def("__repr__", &rational::repr)

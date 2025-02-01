@@ -1,16 +1,16 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
 
-#include "../wicked/algebra/equation.h"
-#include "../wicked/algebra/expression.h" // for rhs_expression
+#include "algebra/equation.h"
+#include "algebra/expression.h" // for rhs_expression
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
 /// Export the Equation class
-void export_Equation(py::module &m) {
-  py::class_<Equation, std::shared_ptr<Equation>>(m, "Equation")
-      .def(py::init<const SymbolicTerm &, const SymbolicTerm &, scalar_t>())
+void export_Equation(nb::module_ &m) {
+  nb::class_<Equation>(m, "Equation")
+      .def(nb::init<const SymbolicTerm &, const SymbolicTerm &, scalar_t>())
       .def("lhs", &Equation::lhs)
       .def("rhs", &Equation::rhs)
       .def("rhs_expression", &Equation::rhs_expression)

@@ -1,15 +1,17 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/pair.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
 #include "../wicked/algebra/index.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
 /// Export the Indexclass
-void export_Index(py::module &m) {
-  py::class_<Index, std::shared_ptr<Index>>(m, "Index")
-      .def(py::init<int, int>())
+void export_Index(nb::module_ &m) {
+  nb::class_<Index>(m, "Index")
+      .def(nb::init<int, int>())
       .def("space", &Index::space)
       .def("pos", &Index::pos)
       .def("__repr__", &Index::str)

@@ -1,20 +1,21 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
 #include "../wicked/algebra/tensor.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
 /// Export the Indexclass
-void export_Tensor(py::module &m) {
-  py::enum_<SymmetryType>(m, "sym")
+void export_Tensor(nb::module_ &m) {
+  nb::enum_<SymmetryType>(m, "sym")
       .value("symm", SymmetryType::Symmetric)
       .value("anti", SymmetryType::Antisymmetric)
       .value("none", SymmetryType::Nonsymmetric);
 
-  py::class_<Tensor, std::shared_ptr<Tensor>>(m, "Tensor")
-      .def(py::init<const std::string &, const std::vector<Index> &,
+  nb::class_<Tensor>(m, "Tensor")
+      .def(nb::init<const std::string &, const std::vector<Index> &,
                     const std::vector<Index> &, SymmetryType>())
       .def("__repr__", &Tensor::str)
       .def("__str__", &Tensor::str)

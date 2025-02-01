@@ -1,15 +1,19 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/make_iterator.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/map.h>
+#include <nanobind/stl/pair.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
 #include "../wicked/algebra/expression.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 
 /// Export the Indexclass
-void export_Expression(py::module &m) {
-  py::class_<Expression, std::shared_ptr<Expression>>(m, "Expression")
-      .def(py::init<>())
+void export_Expression(nb::module_ &m) {
+  nb::class_<Expression>(m, "Expression")
+      .def(nb::init<>())
       .def("__repr__", &Expression::str)
       .def("__str__", &Expression::str)
       .def("__len__", &Expression::size)
@@ -41,7 +45,7 @@ void export_Expression(py::module &m) {
             lhs += {term.symterm(), term.coefficient()};
             return lhs;
           },
-          py::is_operator()) // Bind in-place addition with Term
+          nb::is_operator()) // Bind in-place addition with Term
       .def(
           "__iadd__",
           [](Expression &lhs,
@@ -49,18 +53,22 @@ void export_Expression(py::module &m) {
             lhs += term;
             return lhs;
           },
-          py::is_operator()) // Bind in-place addition with Term
+          nb::is_operator()) // Bind in-place addition with Term
       .def(
           "__iadd__",
           [](Expression &lhs, const SymbolicTerm &sterm) -> Expression & {
             lhs += {sterm, scalar_t(1)};
             return lhs;
           },
-          py::is_operator()) // Bind in-place addition with Term
+          nb::is_operator()) // Bind in-place addition with Term
       .def(
           "__iter__",
-          [](Expression &e) { return py::make_iterator(e.begin(), e.end()); },
-          py::keep_alive<0, 1>())
+          [](Expression &e) {
+            return nb::make_iterator(
+                nb::type<std::map<SymbolicTerm, scalar_t>>(), "iterator",
+                e.begin(), e.end());
+          },
+          nb::keep_alive<0, 1>())
       .def("dot", &Expression::dot, "rhs"_a)
       .def("norm", &Expression::norm)
       .def("latex", &Expression::latex, "sep"_a = " \\\\ \n")
