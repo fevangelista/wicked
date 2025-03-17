@@ -139,7 +139,10 @@ def dict_to_einsum(eq_dict, optimize="'optimal'", no_np=False):
     indices = indices[:-1]
     blocks = ""
     for t in eq_dict["rhs"]:
-        blocks += t[0] + "['" + t[1] + "'],"
+        if t[1] != "":
+            blocks += t[0] + "['" + t[1] + "'],"
+        else:
+            blocks += t[0] + ","
     blocks = blocks[:-1]
     rhs += (
         indices
