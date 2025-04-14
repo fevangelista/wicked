@@ -102,6 +102,7 @@ def gen_op_ms0(label, rank, cre_spaces, ann_spaces, diagonal=True, only_terms=Fa
         cre = (cre_spaces_alpha,) * nalpha + (cre_spaces_beta,) * nbeta
         ann = (ann_spaces_beta,) * nbeta + (ann_spaces_alpha,) * nalpha
         for le in itertools.product(*cre):
+            print(le)
             is_le_sorted = all(m[le[i]] <= m[le[i + 1]] for i in range(len(le) - 1))
             if is_le_sorted:
                 for re in itertools.product(*ann):
@@ -110,7 +111,7 @@ def gen_op_ms0(label, rank, cre_spaces, ann_spaces, diagonal=True, only_terms=Fa
                     )
                     if is_re_sorted:
                         if not diagonal:
-                            if le != re:
+                            if tuple(_.lower() for _ in le) != tuple(_.lower() for _ in re):
                                 terms.append(
                                     " ".join([s + "+" for s in le]) + " " + " ".join(re)
                                 )
