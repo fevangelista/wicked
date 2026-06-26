@@ -88,10 +88,9 @@ setup(
     author="Francesco A. Evangelista",
     description="",
     long_description="",
-    # tell setuptools to look for any packages under 'wicked'
-    packages=find_packages("wicked"),
-    # tell setuptools that all packages will be under the 'wicked' directory
-    # and nowhere else
+    # ship the top-level 'wicked' Python package (__init__.py, utils.py)
+    # alongside the compiled _wicked extension built into it
+    packages=["wicked"],
     package_dir={"": "."},
     # add an extension module named 'wicked' to the package 'wicked'
     ext_modules=[CMakeExtension("wicked")],
