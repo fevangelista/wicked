@@ -27,11 +27,11 @@ public:
 
   /// Contract a product of operators
   Expression contract(scalar_t factor, const OperatorProduct &ops,
-                      const int minrank, const int maxrank);
+                      const int minrank, const int maxrank, bool inter_general=false);
 
   /// Contract a product of sums of operators
   Expression contract(scalar_t factor, const OperatorExpression &expr,
-                      const int minrank, const int maxrank);
+                      const int minrank, const int maxrank, bool inter_general=false);
 
   /// Set the amount of printing
   void set_print(PrintLevel print);
@@ -78,7 +78,7 @@ private:
 
   /// Generates all elementary contractions
   std::vector<ElementaryContraction>
-  generate_elementary_contractions(const OperatorProduct &ops);
+  generate_elementary_contractions(const OperatorProduct &ops, bool inter_general=false);
 
   /// Generates elementary contractions of occupied spaces
   void elementary_contractions_occupied(
@@ -94,6 +94,14 @@ private:
   void elementary_contractions_general(
       const OperatorProduct &ops, int s,
       std::vector<ElementaryContraction> &contr_vec);
+
+  /// Generates elementary contractions between general spaces
+  void elementary_contractions_inter_general(
+      const OperatorProduct &ops, std::vector<int> &s,
+      std::vector<ElementaryContraction> &contr_vec);
+
+  /// Return the Ms of a given inter-general contraction
+  int ms_of_contraction(std::vector<GraphMatrix> &contr, std::vector<int> &s);
 
   //
   // Functions for step 2. of the Wick's theorem algorithm

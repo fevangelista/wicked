@@ -13,6 +13,7 @@ void export_SymbolicTerm(py::module &m) {
       .def(py::init<>())
       .def("__repr__", &SymbolicTerm::str)
       .def("__str__", &SymbolicTerm::str)
+      .def("__eq__", &SymbolicTerm::operator==)
       .def("latex", &SymbolicTerm::latex)
       .def("add", py::overload_cast<const std::vector<SQOperator> &>(
                       &SymbolicTerm::add))
@@ -22,6 +23,7 @@ void export_SymbolicTerm(py::module &m) {
                       &SymbolicTerm::set))
       .def("set_normal_ordered", &SymbolicTerm::set_normal_ordered)
       .def("ops", &SymbolicTerm::ops)
+      .def("canonicalize", &SymbolicTerm::canonicalize)
       .def("tensors", &SymbolicTerm::tensors);
 
   py::class_<Term, std::shared_ptr<Term>>(m, "Term")
@@ -29,6 +31,7 @@ void export_SymbolicTerm(py::module &m) {
       .def(py::init<const SymbolicTerm>())
       .def("__repr__", &Term::str)
       .def("__str__", &Term::str)
+      .def("__eq__", &Term::operator==)
       .def("latex", &Term::latex)
       .def("add",
            py::overload_cast<const std::vector<SQOperator> &>(&Term::add))

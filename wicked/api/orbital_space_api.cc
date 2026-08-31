@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/iostream.h>
 
 #include "helpers/orbital_space.h"
 
@@ -31,6 +32,7 @@ void export_OrbitalSpaceInfo(py::module &m) {
          const std::string &space_type_str,
          const std::vector<std::string> &indices,
          const std::vector<char> &elementary_spaces) {
+        py::scoped_ostream_redirect stream(std::cout, py::module_::import("sys").attr("stdout"));
         FieldType field_type = string_to_field_type(field_type_str);
         SpaceType space_type = string_to_space_type(space_type_str);
         orbital_subspaces->add_space(label, field_type, space_type, indices,

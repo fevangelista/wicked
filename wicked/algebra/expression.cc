@@ -57,7 +57,7 @@ Expression &Expression::canonicalize() {
   std::map<SymbolicTerm, scalar_t> canonical_terms;
   for (const auto &[k, v] : terms_) {
     SymbolicTerm term = k;
-    scalar_t factor = term.canonicalize();
+    auto [factor, _] = term.canonicalize();
     factor *= v;
     add_to_map(canonical_terms, term, factor);
   }

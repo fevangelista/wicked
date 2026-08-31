@@ -1,6 +1,7 @@
 #pragma once
 
 #include "helpers/product.hpp"
+#include "helpers/helpers.h"
 #include "operator.h"
 #include "wicked-def.h"
 
@@ -17,6 +18,8 @@ public:
   scalar_t canonicalize();
 
   int num_ops() const;
+
+  std::string str() const;
 };
 
 OperatorProduct operator*(const OperatorProduct &l, const OperatorProduct &r);

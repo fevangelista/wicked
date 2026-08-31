@@ -10,6 +10,14 @@ int OperatorProduct::num_ops() const {
   return r;
 }
 
+std::string OperatorProduct::str() const {
+  vector<string> s;
+  for (const auto &op : elements_) {
+    s.push_back(op.str());
+  }
+  return join(s, " ");
+}
+
 scalar_t OperatorProduct::canonicalize() {
   int nperm = 0;
   int n = elements_.size();

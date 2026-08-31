@@ -16,6 +16,7 @@ void export_Index(py::module &m) {
       .def("__str__", &Index::str)
       .def("__lt__", [](const Index &l, const Index &r) { return l < r; })
       .def("__eq__", [](const Index &l, const Index &r) { return l == r; })
+      .def("__hash__", &Index::hash)
       .def("latex", &Index::latex)
       .def("compile", &Index::compile);
 

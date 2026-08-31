@@ -35,7 +35,13 @@ public:
   std::string latex() const;
 
   /// Return a compilable representation
-  std::string compile(const std::string &format) const;
+  std::string compile(const std::string &format, const std::string &optimize="\"optimal\"") const;
+
+  /// Reindex this equation
+  void reindex(index_map_t &idx_map);
+
+  /// canonicalize this equation
+  void canonicalize();
 
 private:
   // ==> Class private data <==
